@@ -1,11 +1,10 @@
 import React, { useRef, useState, useEffect } from 'react';
-import Draggable from 'react-draggable';
 import { X } from 'lucide-react';
 import { playSynthSound } from '../utils/audioSynth';
 
 export default function PresentationContainer({ 
   isDoodling, 
-  stickersOnCanvas, 
+  instructorStickers = [], 
   mediaUrl, 
   mediaType,
   onClearMedia
@@ -84,16 +83,15 @@ export default function PresentationContainer({
         onMouseOut={stopDrawing}
       />
 
-      {/* Stickers Layer */}
-      {stickersOnCanvas.map((sticker) => (
-        <Draggable key={sticker.id} disabled={isDoodling} bounds="parent">
-          <div 
-            className="canvas-sticker"
-            onDoubleClick={() => handleStickerClick(sticker.name)}
-          >
-            <img src={`/assets/svg_stickers/${sticker.name}`} alt={sticker.name} style={{ width: '100%', height: '100%', pointerEvents: 'none' }} />
-          </div>
-        </Draggable>
+      {/* Instructor Stickers Layer (Static border positions) */}
+      {instructorStickers.map((sticker) => (
+        <img 
+          key={sticker.id}
+          src={`/assets/svg_stickers/${sticker.name}`} 
+          alt={sticker.name} 
+          className={`ic-sticker pos-${sticker.position}`}
+          onDoubleClick={() => handleStickerClick(sticker.name)}
+        />
       ))}
     </div>
   );

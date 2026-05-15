@@ -1,60 +1,129 @@
 import React, { useState } from 'react';
 import PresentationContainer from './components/PresentationContainer';
-import Toolbar from './components/Toolbar';
 import Chat from './components/Chat';
-import People from './components/People';
+import GuestContainer from './components/GuestContainer';
+import GuestTools from './components/GuestTools';
+import InstructorToolbox from './components/InstructorToolbox';
+import Toolbar from './components/Toolbar';
 
 function App() {
-  const [isHandRaised, setIsHandRaised] = useState(false);
+  const [participants] = useState(
+    Array.from({ length: 16 }, (_, i) => ({
+      id: i + 1,
+      name: i === 0 ? "You" : `Student ${i}`,
+      color: `hsl(${(i * 137.5) % 360}, 70%, 60%)`,
+      initial: i === 0 ? "Y" : "S"
+    }))
+  );
+
+  const [activeGuestId, setActiveGuestId] = useState(null);
+  const [guestButtons, setGuestButtons] = useState({});
+  const [guestStickers, setGuestStickers] = useState({});
+  const [instructorStickers, setInstructorStickers] = useState([]);
   const [isDoodling, setIsDoodling] = useState(false);
-  const [stickersOnCanvas, setStickersOnCanvas] = useState([]);
   const [mediaUrl, setMediaUrl] = useState(null);
-  const [mediaType, setMediaType] = useState(null); // 'image' or 'video'
+  const [mediaType, setMediaType] = useState(null);
 
-  const handleAddSticker = (stickerName) => {
-    setStickersOnCanvas(prev => [
-      ...prev, 
-      { id: Date.now() + Math.random(), name: stickerName }
-    ]);
+  const toggleGuestButton = (guestId, btnName) => {
+    setGuestButtons(prev => ({
+      ...prev,
+      [guestId]: {
+        ...(prev[guestId] || { raiseHand: false, mute: false, chat: false }),
+        [btnName]: !(prev[guestId]?.[btnName])
+      }
+    }));
   };
 
-  const handleMediaUpload = (url, type) => {
-    setMediaUrl(url);
-    setMediaType(type);
+  const handleAddSticker = (targetId, stickerName, isInstructor) => {
+    if (isInstructor) {
+      setInstructorStickers(prev => {
+        let newStickers = [...prev];
+        const nextPos = newStickers.length % 4 + 1; // 1,2,3,4
+        if (newStickers.length >= 4) {
+          newStickers.shift(); // remove oldest
+        }
+        newStickers.push({ id: Date.now() + Math.random(), name: stickerName, position: nextPos });
+        return newStickers;
+      });
+    } else {
+      setGuestStickers(prev => {
+        let current = prev[targetId] || [];
+        
+        if (stickerName.includes("Sun with sunglasses")) {
+           // Replace any existing sun
+           current = current.filter(s => s.position !== 'sun');
+           current.push({ id: Date.now() + Math.random(), name: stickerName, position: 'sun' });
+        } else {
+           const usedPositions = current.map(s => s.position).filter(p => p !== 'sun');
+           let pos = 1;
+           for (let i = 1; i <= 4; i++) {
+             if (!usedPositions.includes(i)) { pos = i; break; }
+           }
+           
+           if (usedPositions.length === 4) {
+             const oldestIdx = current.findIndex(s => s.position !== 'sun');
+             if (oldestIdx !== -1) current.splice(oldestIdx, 1);
+           }
+           current.push({ id: Date.now() + Math.random(), name: stickerName, position: pos });
+        }
+        
+        if (current.length > 5) { // max 4 normal + 1 sun? No, user said max 4 total
+          current.shift();
+        }
+        
+        return { ...prev, [targetId]: current };
+      });
+    }
   };
 
-  const handleClearMedia = () => {
-    setMediaUrl(null);
-    setMediaType(null);
-  };
+  const activeGuest = participants.find(p => p.id === activeGuestId);
 
   return (
     <div className="app-container">
-      {isHandRaised && (
-        <div className="raise-hand-indicator">
-          <span style={{ fontSize: '1.2rem' }}>✋</span> Hand Raised
-        </div>
-      )}
-
-      <div className="pc-wrapper">
-        <PresentationContainer 
-          isDoodling={isDoodling}
-          stickersOnCanvas={stickersOnCanvas}
-          mediaUrl={mediaUrl}
-          mediaType={mediaType}
-          onClearMedia={handleClearMedia}
-        />
-        <Toolbar 
-          isDoodling={isDoodling}
-          setIsDoodling={setIsDoodling}
-          onAddSticker={handleAddSticker}
-          onMediaUpload={handleMediaUpload}
-        />
+      {/* Left Sidebar */}
+      <div className="left-sidebar">
+         <InstructorToolbox onAddSticker={handleAddSticker} />
       </div>
 
+      {/* Center Grid */}
+      <div className="center-grid-area">
+         {/* Unified PC + GT container placed first so grid-auto-flow: dense wraps around it */}
+         <div className="pc-gt-unified">
+            <PresentationContainer 
+              isDoodling={isDoodling}
+              mediaUrl={mediaUrl}
+              mediaType={mediaType}
+              onClearMedia={() => {setMediaUrl(null); setMediaType(null);}}
+              instructorStickers={instructorStickers}
+            />
+            <GuestTools 
+              activeGuest={activeGuest}
+              guestButtons={guestButtons}
+              toggleGuestButton={toggleGuestButton}
+              onAddSticker={handleAddSticker}
+            />
+            <Toolbar 
+              isDoodling={isDoodling}
+              setIsDoodling={setIsDoodling}
+              onMediaUpload={(url, type) => { setMediaUrl(url); setMediaType(type); }}
+            />
+         </div>
+         
+         {participants.map(p => (
+           <GuestContainer 
+             key={p.id}
+             participant={p}
+             isActive={activeGuestId === p.id}
+             onClick={() => setActiveGuestId(p.id)}
+             stickers={guestStickers[p.id] || []}
+             buttons={guestButtons[p.id] || {}}
+           />
+         ))}
+      </div>
+
+      {/* Right Sidebar */}
       <div className="right-sidebar">
-        <People />
-        <Chat isHandRaised={isHandRaised} setIsHandRaised={setIsHandRaised} />
+         <Chat />
       </div>
     </div>
   );
