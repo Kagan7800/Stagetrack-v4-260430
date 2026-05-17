@@ -6,55 +6,16 @@
   --glass-bg: rgba(255, 255, 255, 0.1);
   --glass-border: rgba(255, 255, 255, 0.2);
   --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-  
+
   --primary-color: #6366f1;
   --primary-hover: #4f46e5;
   --accent-color: #ec4899;
-  
+
   --text-main: #f8fafc;
   --text-muted: #cbd5e1;
 }
 
-/* Instructor Control Bar */
-.instructor-control-bar {
-  width: 100%;
-  height: 50px;
-  background: var(--glass-bg);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--glass-border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 24px;
-  padding: 0 24px;
-  z-index: 100;
-  flex-shrink: 0;
-}
-
-.ic-toggle-btn {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid var(--glass-border);
-  color: white;
-  padding: 8px 16px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-family: 'Risque', serif;
-}
-
-.ic-toggle-btn:hover {
-  background: var(--primary-color);
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
-}
-
-.ic-toggle-btn.active {
-  background: var(--accent-color);
-  border-color: var(--accent-color);
-}
+/* Top control bar was removed */
 
 * {
   box-sizing: border-box;
@@ -97,35 +58,56 @@ body {
   overflow: hidden;
 }
 
-/* Left Sidebar: Instructor Toolbox */
+/* Left Sidebar: Unified Toolbox */
 .left-sidebar {
-  width: 120px;
+  width: 150px;
+  /* 25% wider */
   display: flex;
   flex-direction: column;
 }
 
 /* Right Sidebar: Chat (Narrower) */
 .right-sidebar {
-  width: 250px; /* Reduced by ~50% from 350px/400px */
+  width: 250px;
+  /* Reduced by ~50% from 350px/400px */
   display: flex;
   flex-direction: column;
 }
 
 /* Center Grid */
 .center-grid-area {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  grid-template-rows: repeat(4, 1fr);
-  gap: 12px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 2% 10px 2%;
+  /* 40px top, 2% sides, 10px bottom */
+  gap: 20px;
   flex: 1;
-  grid-auto-flow: dense;
 }
 
-/* Unified PC + GT Container */
+/* Side Peos Mini-Grid */
+.side-peos {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: repeat(4, 1fr);
+  column-gap: 8.5%; /* Reduced by 15% from the previous 10% */
+  row-gap: 20px;
+  height: 100%;
+}
+
+/* Unified PC Container */
 .pc-gt-unified {
-  grid-column: 2 / 6; /* Spans cols 2,3,4,5 */
-  grid-row: 2 / 4;    /* Spans rows 2,3 - height of 2 gc */
-  border: 2px solid #22c55e; /* Green border around both */
+  height: calc(54.5% - 10px);
+  /* Reduced height to make room for margin */
+  margin: 1.5%;
+  /* Same amount of padding added around the PC */
+  aspect-ratio: 16 / 9;
+  flex-shrink: 0; /* CRITICAL: Locks the PC size exactly so it never shrinks */
+  align-self: center;
+  border: 2px solid #22c55e;
+  /* Green border around both */
   border-radius: 16px;
   display: flex;
   flex-direction: column;
@@ -133,8 +115,6 @@ body {
   box-shadow: var(--glass-shadow);
   position: relative;
   overflow: hidden;
-  aspect-ratio: 16 / 9;
-  justify-self: center;
 }
 
 .pc-canvas-area {
@@ -144,37 +124,89 @@ body {
   align-items: center;
   justify-content: center;
   /* Opacity 0 border inside the unified container */
-  border-bottom: 1px solid rgba(255,255,255,0); 
+  border-bottom: 1px solid rgba(255, 255, 255, 0);
 }
 
-/* Guest Tools (GT) */
-.guest-tools-area {
-  height: 80px;
+/* Unified Toolbox (Left Sidebar Content) */
+.unified-toolbox {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 8px;
-  /* Opacity 0 border inside the unified container */
-  border-top: 1px solid rgba(255,255,255,0);
+  overflow: hidden;
 }
 
-.gt-buttons-row {
+.toolbox-header {
+  padding: 12px;
+  border-bottom: 1px solid var(--glass-border);
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.toolbox-header h2 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+.toolbox-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
   gap: 16px;
-  margin-bottom: 8px;
 }
 
-.gt-sticker-row {
+.toolbox-section {
   display: flex;
-  width: 100%;
+  flex-direction: column;
   gap: 8px;
-  overflow-x: auto;
+}
+
+.ic-section {
+  border-top: 1px solid var(--glass-border);
+  padding-top: 16px;
+}
+
+.section-title {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+.gt-buttons-col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.gt-sticker-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.ic-tools-row {
+  display: flex;
   justify-content: center;
+  gap: 12px;
+  margin-bottom: 8px;
 }
 
 /* Guest Buttons (gb) */
 .gb-btn {
-  background: rgba(255, 255, 255, 0); /* Opacity 0 until clicked */
+  background: rgba(255, 255, 255, 0);
+  /* Opacity 0 until clicked */
   border: 1px solid var(--glass-border);
   color: white;
   padding: 4px 12px;
@@ -201,14 +233,19 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: visible; /* To allow stickers on borders */
+  overflow: visible;
+  /* To allow stickers on borders */
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
+
+  /* Stretch vertically and horizontally to fill boundaries */
+  width: 100%;
+  height: 100%;
 }
 
 .video-cell:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .video-cell.active-gc {
@@ -226,11 +263,33 @@ body {
 }
 
 /* GC Sticker Positions */
-.gc-sticker.pos-1 { top: -16px; left: -16px; }
-.gc-sticker.pos-2 { top: -16px; right: -16px; }
-.gc-sticker.pos-3 { bottom: -16px; left: -16px; }
-.gc-sticker.pos-4 { bottom: -16px; right: -16px; }
-.gc-sticker.pos-sun { bottom: 0; right: 0; transform: translate(0, 50%); } /* "bottom left hugging right border with 0px"? Wait, the user said bottom left hugging right border. Let's make it bottom row, right edge */
+.gc-sticker.pos-1 {
+  top: -16px;
+  left: -16px;
+}
+
+.gc-sticker.pos-2 {
+  top: -16px;
+  right: -16px;
+}
+
+.gc-sticker.pos-3 {
+  bottom: -16px;
+  left: -16px;
+}
+
+.gc-sticker.pos-4 {
+  bottom: -16px;
+  right: -16px;
+}
+
+.gc-sticker.pos-sun {
+  bottom: 0;
+  right: 0;
+  transform: translate(0, 50%);
+}
+
+/* "bottom left hugging right border with 0px"? Wait, the user said bottom left hugging right border. Let's make it bottom row, right edge */
 
 /* IC (Instructor Container) Sticker Positions */
 .ic-sticker {
@@ -239,10 +298,35 @@ body {
   height: 48px;
   z-index: 15;
 }
-.ic-sticker.pos-1 { top: -24px; left: 25%; transform: translateX(-50%); } /* top left center */
-.ic-sticker.pos-2 { top: -24px; right: 25%; transform: translateX(50%); } /* top right center */
-.ic-sticker.pos-3 { top: 50%; left: -24px; transform: translateY(-50%); } /* left center */
-.ic-sticker.pos-4 { top: 50%; right: -24px; transform: translateY(-50%); } /* right center */
+
+.ic-sticker.pos-1 {
+  top: -24px;
+  left: 25%;
+  transform: translateX(-50%);
+}
+
+/* top left center */
+.ic-sticker.pos-2 {
+  top: -24px;
+  right: 25%;
+  transform: translateX(50%);
+}
+
+/* top right center */
+.ic-sticker.pos-3 {
+  top: 50%;
+  left: -24px;
+  transform: translateY(-50%);
+}
+
+/* left center */
+.ic-sticker.pos-4 {
+  top: 50%;
+  right: -24px;
+  transform: translateY(-50%);
+}
+
+/* right center */
 
 /* Sticker Tray / Palette */
 .sticker-item {
@@ -298,7 +382,8 @@ body {
 .chat-input-wrapper {
   display: flex;
   gap: 8px;
-  width: 100%; /* Dynamically fits 100% of bottom row */
+  width: 100%;
+  /* Dynamically fits 100% of bottom row */
 }
 
 .chat-input {
@@ -340,16 +425,19 @@ body {
   position: absolute;
   z-index: 10;
 }
-.media-container img, .media-container video {
+
+.media-container img,
+.media-container video {
   width: 100%;
   height: 100%;
   object-fit: contain;
 }
+
 .close-media-btn {
   position: absolute;
   top: 16px;
   right: 16px;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0, 0, 0, 0.5);
   color: white;
   border: none;
   width: 32px;
@@ -371,12 +459,23 @@ body {
   z-index: 20;
   pointer-events: none;
 }
+
 .doodle-canvas.active {
   pointer-events: auto;
   cursor: crosshair;
 }
 
 /* Scrollbar customization */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 10px; }
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--glass-border);
+  border-radius: 10px;
+}

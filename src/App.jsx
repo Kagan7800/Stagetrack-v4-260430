@@ -2,10 +2,7 @@ import React, { useState } from 'react';
 import PresentationContainer from './components/PresentationContainer';
 import Chat from './components/Chat';
 import GuestContainer from './components/GuestContainer';
-import GuestTools from './components/GuestTools';
-import InstructorToolbox from './components/InstructorToolbox';
-import InstructorControlBar from './components/InstructorControlBar';
-import Toolbar from './components/Toolbar';
+import UnifiedToolbox from './components/UnifiedToolbox';
 
 function App() {
   const [participants] = useState(
@@ -25,8 +22,6 @@ function App() {
   const [mediaUrl, setMediaUrl] = useState(null);
   const [mediaType, setMediaType] = useState(null);
 
-  // Instructor Controls
-  const [isToolboxOpen, setIsToolboxOpen] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
 
   // Chat Moderation State
@@ -121,30 +116,52 @@ function App() {
   };
 
   const activeGuest = participants.find(p => p.id === activeGuestId);
+  const isInstructor = activeGuestId === 1;
+
+  // Toggle chat if 'chat' button is pressed by a guest or instructor
+  const handleToggleGuestButton = (guestId, btnName) => {
+    toggleGuestButton(guestId, btnName);
+    if (btnName === 'chat') {
+      setIsChatOpen(true);
+    }
+  };
 
   return (
     <div className="app-container">
-      {/* Top Instructor Control Bar */}
-      <InstructorControlBar 
-        isToolboxOpen={isToolboxOpen}
-        setIsToolboxOpen={setIsToolboxOpen}
-        isChatOpen={isChatOpen}
-        setIsChatOpen={setIsChatOpen}
-        onSimulateGuestMessage={handleSimulateGuestMessage}
-      />
-
       {/* Main Content Layout */}
       <div className="main-content">
-        {/* Left Sidebar */}
-        {isToolboxOpen && (
+        {/* Left Sidebar: Unified Toolbox (visible when a guest/instructor is selected) */}
+        {activeGuestId !== null && (
           <div className="left-sidebar">
-             <InstructorToolbox onAddSticker={handleAddSticker} onClose={() => setIsToolboxOpen(false)} />
+            <UnifiedToolbox 
+              activeGuest={activeGuest}
+              guestButtons={guestButtons}
+              toggleGuestButton={handleToggleGuestButton}
+              onAddSticker={handleAddSticker}
+              isInstructor={isInstructor}
+              isDoodling={isDoodling}
+              setIsDoodling={setIsDoodling}
+              onMediaUpload={(url, type) => { setMediaUrl(url); setMediaType(type); }}
+              onClose={() => setActiveGuestId(null)}
+            />
           </div>
         )}
 
         {/* Center Grid */}
         <div className="center-grid-area">
-           {/* Unified PC + GT container placed first so grid-auto-flow: dense wraps around it */}
+           <div className="side-peos">
+             {participants.slice(0, 8).map(p => (
+               <GuestContainer 
+                 key={p.id}
+                 participant={p}
+                 isActive={activeGuestId === p.id}
+                 onClick={() => setActiveGuestId(p.id)}
+                 stickers={guestStickers[p.id] || []}
+                 buttons={guestButtons[p.id] || {}}
+               />
+             ))}
+           </div>
+
            <div className="pc-gt-unified">
               <PresentationContainer 
                 isDoodling={isDoodling}
@@ -153,29 +170,20 @@ function App() {
                 onClearMedia={() => {setMediaUrl(null); setMediaType(null);}}
                 instructorStickers={instructorStickers}
               />
-              <GuestTools 
-                activeGuest={activeGuest}
-                guestButtons={guestButtons}
-                toggleGuestButton={toggleGuestButton}
-                onAddSticker={handleAddSticker}
-              />
-              <Toolbar 
-                isDoodling={isDoodling}
-                setIsDoodling={setIsDoodling}
-                onMediaUpload={(url, type) => { setMediaUrl(url); setMediaType(type); }}
-              />
            </div>
            
-           {participants.map(p => (
-             <GuestContainer 
-               key={p.id}
-               participant={p}
-               isActive={activeGuestId === p.id}
-               onClick={() => setActiveGuestId(p.id)}
-               stickers={guestStickers[p.id] || []}
-               buttons={guestButtons[p.id] || {}}
-             />
-           ))}
+           <div className="side-peos">
+             {participants.slice(8, 16).map(p => (
+               <GuestContainer 
+                 key={p.id}
+                 participant={p}
+                 isActive={activeGuestId === p.id}
+                 onClick={() => setActiveGuestId(p.id)}
+                 stickers={guestStickers[p.id] || []}
+                 buttons={guestButtons[p.id] || {}}
+               />
+             ))}
+           </div>
         </div>
 
         {/* Right Sidebar */}

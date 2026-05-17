@@ -34,7 +34,8 @@ export default function GuestContainer({
       <div style={{ 
         position: 'absolute', 
         bottom: '4px', 
-        left: '4px', 
+        left: '50%',
+        transform: 'translateX(-50%)',
         background: 'rgba(0,0,0,0.6)', 
         padding: '2px 6px', 
         borderRadius: '4px',
