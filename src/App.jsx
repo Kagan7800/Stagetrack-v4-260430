@@ -4,6 +4,7 @@ import Chat from './components/Chat';
 import GuestContainer from './components/GuestContainer';
 import GuestTools from './components/GuestTools';
 import InstructorToolbox from './components/InstructorToolbox';
+import InstructorControlBar from './components/InstructorControlBar';
 import Toolbar from './components/Toolbar';
 
 function App() {
@@ -23,6 +24,50 @@ function App() {
   const [isDoodling, setIsDoodling] = useState(false);
   const [mediaUrl, setMediaUrl] = useState(null);
   const [mediaType, setMediaType] = useState(null);
+
+  // Instructor Controls
+  const [isToolboxOpen, setIsToolboxOpen] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
+
+  // Chat Moderation State
+  const [messages, setMessages] = useState([
+    { id: 1, text: "Welcome to the Music Fun classroom!", sender: "system", status: "public" }
+  ]);
+
+  const handleSimulateGuestMessage = () => {
+    setMessages(prev => [
+      ...prev,
+      { id: Date.now(), text: "Hello! I have a question.", sender: "guest", status: "pending", senderName: "Student 3" }
+    ]);
+  };
+
+  const handleModerateMessage = (msgId, action) => {
+    setMessages(prev => prev.map(msg => {
+      if (msg.id === msgId) {
+        if (action === 'show') return { ...msg, status: 'public' };
+        if (action === 'ignore') return { ...msg, status: 'ignored' };
+        if (action === 'reply_private') return { ...msg, status: 'private' };
+      }
+      return msg;
+    }));
+
+    if (action === 'show') {
+      setIsChatOpen(true); // Open chat globally when a message is approved
+    } else if (action === 'reply_private') {
+      setIsChatOpen(true); // Open chat for IC to type reply
+      // Simulate reply being added
+      setTimeout(() => {
+        setMessages(prev => [
+          ...prev,
+          { id: Date.now(), text: "I will answer that privately.", sender: "self", status: "private" }
+        ]);
+      }, 500);
+    }
+  };
+
+  const handleSendChatMessage = (text) => {
+    setMessages(prev => [...prev, { id: Date.now(), text, sender: "self", status: "public" }]);
+  };
 
   const toggleGuestButton = (guestId, btnName) => {
     setGuestButtons(prev => ({
@@ -50,7 +95,6 @@ function App() {
         let current = prev[targetId] || [];
         
         if (stickerName.includes("Sun with sunglasses")) {
-           // Replace any existing sun
            current = current.filter(s => s.position !== 'sun');
            current.push({ id: Date.now() + Math.random(), name: stickerName, position: 'sun' });
         } else {
@@ -67,7 +111,7 @@ function App() {
            current.push({ id: Date.now() + Math.random(), name: stickerName, position: pos });
         }
         
-        if (current.length > 5) { // max 4 normal + 1 sun? No, user said max 4 total
+        if (current.length > 5) {
           current.shift();
         }
         
@@ -80,50 +124,71 @@ function App() {
 
   return (
     <div className="app-container">
-      {/* Left Sidebar */}
-      <div className="left-sidebar">
-         <InstructorToolbox onAddSticker={handleAddSticker} />
-      </div>
+      {/* Top Instructor Control Bar */}
+      <InstructorControlBar 
+        isToolboxOpen={isToolboxOpen}
+        setIsToolboxOpen={setIsToolboxOpen}
+        isChatOpen={isChatOpen}
+        setIsChatOpen={setIsChatOpen}
+        onSimulateGuestMessage={handleSimulateGuestMessage}
+      />
 
-      {/* Center Grid */}
-      <div className="center-grid-area">
-         {/* Unified PC + GT container placed first so grid-auto-flow: dense wraps around it */}
-         <div className="pc-gt-unified">
-            <PresentationContainer 
-              isDoodling={isDoodling}
-              mediaUrl={mediaUrl}
-              mediaType={mediaType}
-              onClearMedia={() => {setMediaUrl(null); setMediaType(null);}}
-              instructorStickers={instructorStickers}
-            />
-            <GuestTools 
-              activeGuest={activeGuest}
-              guestButtons={guestButtons}
-              toggleGuestButton={toggleGuestButton}
-              onAddSticker={handleAddSticker}
-            />
-            <Toolbar 
-              isDoodling={isDoodling}
-              setIsDoodling={setIsDoodling}
-              onMediaUpload={(url, type) => { setMediaUrl(url); setMediaType(type); }}
-            />
-         </div>
-         
-         {participants.map(p => (
-           <GuestContainer 
-             key={p.id}
-             participant={p}
-             isActive={activeGuestId === p.id}
-             onClick={() => setActiveGuestId(p.id)}
-             stickers={guestStickers[p.id] || []}
-             buttons={guestButtons[p.id] || {}}
-           />
-         ))}
-      </div>
+      {/* Main Content Layout */}
+      <div className="main-content">
+        {/* Left Sidebar */}
+        {isToolboxOpen && (
+          <div className="left-sidebar">
+             <InstructorToolbox onAddSticker={handleAddSticker} onClose={() => setIsToolboxOpen(false)} />
+          </div>
+        )}
 
-      {/* Right Sidebar */}
-      <div className="right-sidebar">
-         <Chat />
+        {/* Center Grid */}
+        <div className="center-grid-area">
+           {/* Unified PC + GT container placed first so grid-auto-flow: dense wraps around it */}
+           <div className="pc-gt-unified">
+              <PresentationContainer 
+                isDoodling={isDoodling}
+                mediaUrl={mediaUrl}
+                mediaType={mediaType}
+                onClearMedia={() => {setMediaUrl(null); setMediaType(null);}}
+                instructorStickers={instructorStickers}
+              />
+              <GuestTools 
+                activeGuest={activeGuest}
+                guestButtons={guestButtons}
+                toggleGuestButton={toggleGuestButton}
+                onAddSticker={handleAddSticker}
+              />
+              <Toolbar 
+                isDoodling={isDoodling}
+                setIsDoodling={setIsDoodling}
+                onMediaUpload={(url, type) => { setMediaUrl(url); setMediaType(type); }}
+              />
+           </div>
+           
+           {participants.map(p => (
+             <GuestContainer 
+               key={p.id}
+               participant={p}
+               isActive={activeGuestId === p.id}
+               onClick={() => setActiveGuestId(p.id)}
+               stickers={guestStickers[p.id] || []}
+               buttons={guestButtons[p.id] || {}}
+             />
+           ))}
+        </div>
+
+        {/* Right Sidebar */}
+        {isChatOpen && (
+          <div className="right-sidebar">
+             <Chat 
+               messages={messages} 
+               onSendMessage={handleSendChatMessage} 
+               onModerate={handleModerateMessage}
+               onClose={() => setIsChatOpen(false)} 
+             />
+          </div>
+        )}
       </div>
     </div>
   );

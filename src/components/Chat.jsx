@@ -1,37 +1,56 @@
 import React, { useState } from 'react';
-import { Send, Hand } from 'lucide-react';
-import { playConfirmSound } from '../utils/audioSynth';
+import { Send, X } from 'lucide-react';
 
-export default function Chat() {
-  const [messages, setMessages] = useState([
-    { id: 1, text: "Welcome to the Music Fun classroom!", sender: "system" }
-  ]);
+export default function Chat({ messages = [], onSendMessage, onModerate, onClose }) {
   const [input, setInput] = useState("");
 
   const handleSend = (e) => {
     e.preventDefault();
     if (!input.trim()) return;
-    
-    setMessages([...messages, { id: Date.now(), text: input, sender: "self" }]);
+    onSendMessage(input);
     setInput("");
-    
-    // Simulate a reply
-    setTimeout(() => {
-      setMessages(prev => [...prev, { id: Date.now(), text: "That's great!", sender: "other" }]);
-    }, 1500);
   };
 
   return (
     <div className="glass-panel sidebar">
-      <div style={{ padding: '16px', borderBottom: '1px solid var(--glass-border)' }}>
+      <div style={{ padding: '16px', borderBottom: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h2 style={{ fontSize: '1.2rem', fontWeight: '600' }}>Classroom Chat</h2>
+        <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer' }}>
+          <X size={20} />
+        </button>
       </div>
       
       <div className="chat-container">
         <div className="chat-messages">
-          {messages.map(msg => (
-            <div key={msg.id} className={`chat-message ${msg.sender === 'system' ? 'other' : msg.sender}`}>
-              {msg.text}
+          {messages.filter(m => m.status !== 'ignored').map(msg => (
+            <div key={msg.id} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              <div className={`chat-message ${msg.sender === 'system' ? 'other' : msg.sender === 'self' ? 'self' : 'other'}`} style={{ alignSelf: msg.sender === 'self' ? 'flex-end' : 'flex-start' }}>
+                {msg.senderName && (
+                  <span style={{ fontSize: '0.7rem', opacity: 0.8, display: 'block', marginBottom: '4px', fontWeight: 'bold' }}>
+                    {msg.senderName}
+                  </span>
+                )}
+                {msg.text}
+                {msg.status === 'private' && (
+                  <span style={{ fontSize: '0.7rem', display: 'block', color: '#fcd34d', marginTop: '4px' }}>
+                    (Private Reply)
+                  </span>
+                )}
+              </div>
+              
+              {msg.status === 'pending' && (
+                <div style={{ display: 'flex', gap: '6px', alignSelf: 'flex-start', marginTop: '2px', background: 'rgba(0,0,0,0.3)', padding: '6px', borderRadius: '8px' }}>
+                  <button onClick={() => onModerate(msg.id, 'show')} style={{ fontSize: '0.7rem', padding: '4px 8px', background: '#22c55e', border: 'none', borderRadius: '4px', cursor: 'pointer', color: 'white', fontWeight: 'bold' }}>
+                    Show
+                  </button>
+                  <button onClick={() => onModerate(msg.id, 'ignore')} style={{ fontSize: '0.7rem', padding: '4px 8px', background: '#ef4444', border: 'none', borderRadius: '4px', cursor: 'pointer', color: 'white', fontWeight: 'bold' }}>
+                    Ignore
+                  </button>
+                  <button onClick={() => onModerate(msg.id, 'reply_private')} style={{ fontSize: '0.7rem', padding: '4px 8px', background: '#f59e0b', border: 'none', borderRadius: '4px', cursor: 'pointer', color: 'white', fontWeight: 'bold' }}>
+                    Private Reply
+                  </button>
+                </div>
+              )}
             </div>
           ))}
         </div>
