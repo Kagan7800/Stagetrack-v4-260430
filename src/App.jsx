@@ -74,6 +74,19 @@ function App() {
     }));
   };
 
+  const getStickerCategory = (name) => {
+    const lower = name.toLowerCase();
+    if (lower.includes('sun')) return { cat: 'sun', pos: 'sun' };
+    if (lower.includes('birthday')) return { cat: 'birthday', pos: 'birthday' };
+    if (lower.includes('crown')) return { cat: 'crown', pos: 'crown' };
+    if (lower.includes('star')) return { cat: 'star', pos: 'star' };
+    if (lower.includes('magic') || lower.includes('sparkle')) return { cat: 'magic', pos: 'magic' };
+    if (lower.includes('guitar') || lower.includes('piano') || lower.includes('drum') || 
+        lower.includes('trumpet') || lower.includes('xylophone') || 
+        lower.includes('boat') || lower.includes('truck')) return { cat: 'theme', pos: 'theme-br' };
+    return { cat: 'theme', pos: 'theme-bc' };
+  };
+
   const handleAddSticker = (targetId, stickerName, isInstructor) => {
     if (isInstructor) {
       setInstructorStickers(prev => {
@@ -87,28 +100,24 @@ function App() {
       });
     } else {
       setGuestStickers(prev => {
-        let current = prev[targetId] || [];
+        let current = [...(prev[targetId] || [])];
+        const { cat, pos } = getStickerCategory(stickerName);
         
-        if (stickerName.includes("Sun with sunglasses")) {
-           current = current.filter(s => s.position !== 'sun');
-           current.push({ id: Date.now() + Math.random(), name: stickerName, position: 'sun' });
-        } else {
-           const usedPositions = current.map(s => s.position).filter(p => p !== 'sun');
-           let pos = 1;
-           for (let i = 1; i <= 4; i++) {
-             if (!usedPositions.includes(i)) { pos = i; break; }
-           }
-           
-           if (usedPositions.length === 4) {
-             const oldestIdx = current.findIndex(s => s.position !== 'sun');
-             if (oldestIdx !== -1) current.splice(oldestIdx, 1);
-           }
-           current.push({ id: Date.now() + Math.random(), name: stickerName, position: pos });
+        // Remove existing sticker of SAME CATEGORY to enforce 1-of-a-type rule
+        current = current.filter(s => {
+           const existingCat = getStickerCategory(s.name).cat;
+           if (existingCat === cat) return false;
+           // Birthday overrides Crown
+           if (cat === 'birthday' && existingCat === 'crown') return false;
+           return true;
+        });
+
+        // Crown is ignored if Birthday is active
+        if (cat === 'crown' && current.some(s => getStickerCategory(s.name).cat === 'birthday')) {
+           return prev;
         }
-        
-        if (current.length > 5) {
-          current.shift();
-        }
+
+        current.push({ id: Date.now() + Math.random(), name: stickerName, position: pos, category: cat });
         
         return { ...prev, [targetId]: current };
       });
@@ -128,6 +137,11 @@ function App() {
 
   return (
     <div className="app-container">
+      {/* Top Banner */}
+      <div className="top-banner">
+        <img src="/banner.png" alt="Music Fun Banner" />
+      </div>
+
       {/* Main Content Layout */}
       <div className="main-content">
         {/* Left Sidebar: Unified Toolbox (visible when a guest/instructor is selected) */}

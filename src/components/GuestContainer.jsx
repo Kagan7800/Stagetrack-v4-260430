@@ -48,17 +48,11 @@ export default function GuestContainer({
         {participant.name}
       </div>
 
-      {/* Mic Status */}
-      <div style={{ 
-        position: 'absolute', 
-        top: '4px', 
-        right: '4px',
-        background: 'rgba(0,0,0,0.5)',
-        borderRadius: '50%',
-        padding: '2px',
-        display: 'flex',
-        gap: '4px'
-      }}>
+      {/* Hand Raise Glow Layer (z-index: 15) */}
+      {buttons.raiseHand && <div className="hand-raise-glow"></div>}
+
+      {/* Mic / Hand Status (z-index: 20) */}
+      <div className="gc-status-icons">
         {buttons.raiseHand && <Hand size={10} color="#eab308" />}
         {buttons.mute ? <MicOff size={10} color="#ef4444" /> : <Mic size={10} color="#22c55e" />}
       </div>
