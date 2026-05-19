@@ -197,7 +197,7 @@ body {
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  margin: 0;
+  margin: 20px 0 0 0;
   text-align: center;
 }
 
@@ -209,7 +209,7 @@ body {
 
 .gt-sticker-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 4px;
 }
 

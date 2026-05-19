@@ -29,12 +29,7 @@ function App() {
     { id: 1, text: "Welcome to the Music Fun classroom!", sender: "system", status: "public" }
   ]);
 
-  const handleSimulateGuestMessage = () => {
-    setMessages(prev => [
-      ...prev,
-      { id: crypto.randomUUID(), text: "Hello! I have a question.", sender: "guest", status: "pending", senderName: "Student 3" }
-    ]);
-  };
+
 
   const handleModerateMessage = (msgId, action) => {
     setMessages(prev => prev.map(msg => {
