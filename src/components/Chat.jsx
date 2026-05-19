@@ -12,10 +12,10 @@ export default function Chat({ messages = [], onSendMessage, onModerate, onClose
   };
 
   return (
-    <div className="glass-panel sidebar">
-      <div style={{ padding: '16px', borderBottom: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h2 style={{ fontSize: '1.2rem', fontWeight: '600' }}>Classroom Chat</h2>
-        <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer' }}>
+    <div className="glass-panel sidebar chat-sidebar">
+      <div className="chat-header">
+        <h2>Classroom Chat</h2>
+        <button onClick={onClose} className="close-btn">
           <X size={20} />
         </button>
       </div>
@@ -23,30 +23,30 @@ export default function Chat({ messages = [], onSendMessage, onModerate, onClose
       <div className="chat-container">
         <div className="chat-messages">
           {messages.filter(m => m.status !== 'ignored').map(msg => (
-            <div key={msg.id} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-              <div className={`chat-message ${msg.sender === 'system' ? 'other' : msg.sender === 'self' ? 'self' : 'other'}`} style={{ alignSelf: msg.sender === 'self' ? 'flex-end' : 'flex-start' }}>
+            <div key={msg.id} className="chat-message-wrapper">
+              <div className={`chat-message ${msg.sender === 'system' ? 'system' : msg.sender === 'self' ? 'self' : 'other'}`}>
                 {msg.senderName && (
-                  <span style={{ fontSize: '0.7rem', opacity: 0.8, display: 'block', marginBottom: '4px', fontWeight: 'bold' }}>
+                  <span className="chat-sender-name">
                     {msg.senderName}
                   </span>
                 )}
                 {msg.text}
                 {msg.status === 'private' && (
-                  <span style={{ fontSize: '0.7rem', display: 'block', color: '#fcd34d', marginTop: '4px' }}>
+                  <span className="chat-private-note">
                     (Private Reply)
                   </span>
                 )}
               </div>
               
               {msg.status === 'pending' && (
-                <div style={{ display: 'flex', gap: '6px', alignSelf: 'flex-start', marginTop: '2px', background: 'rgba(0,0,0,0.3)', padding: '6px', borderRadius: '8px' }}>
-                  <button onClick={() => onModerate(msg.id, 'show')} style={{ fontSize: '0.7rem', padding: '4px 8px', background: '#22c55e', border: 'none', borderRadius: '4px', cursor: 'pointer', color: 'white', fontWeight: 'bold' }}>
+                <div className="chat-mod-actions">
+                  <button onClick={() => onModerate(msg.id, 'show')} className="mod-btn show">
                     Show
                   </button>
-                  <button onClick={() => onModerate(msg.id, 'ignore')} style={{ fontSize: '0.7rem', padding: '4px 8px', background: '#ef4444', border: 'none', borderRadius: '4px', cursor: 'pointer', color: 'white', fontWeight: 'bold' }}>
+                  <button onClick={() => onModerate(msg.id, 'ignore')} className="mod-btn ignore">
                     Ignore
                   </button>
-                  <button onClick={() => onModerate(msg.id, 'reply_private')} style={{ fontSize: '0.7rem', padding: '4px 8px', background: '#f59e0b', border: 'none', borderRadius: '4px', cursor: 'pointer', color: 'white', fontWeight: 'bold' }}>
+                  <button onClick={() => onModerate(msg.id, 'reply_private')} className="mod-btn reply">
                     Private Reply
                   </button>
                 </div>

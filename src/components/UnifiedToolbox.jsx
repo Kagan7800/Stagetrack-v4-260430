@@ -76,8 +76,8 @@ export default function UnifiedToolbox({
 
           <h3 className="section-title">Stickers</h3>
           <div className="gt-sticker-grid">
-            {guestStickers.map((sticker, idx) => (
-              <div key={`gs-${idx}`} className="sticker-item" onClick={() => onAddSticker(activeGuest.id, sticker, false)}>
+            {guestStickers.map((sticker) => (
+              <div key={sticker} className="sticker-item" onClick={() => onAddSticker(activeGuest.id, sticker, false)}>
                 <img src={`/assets/svg_stickers/${sticker}`} alt={sticker} />
               </div>
             ))}
@@ -117,9 +117,9 @@ export default function UnifiedToolbox({
 
             <h3 className="section-title">Global Stickers</h3>
             <div className="gt-sticker-grid">
-              {instructorStickers.map((sticker, idx) => (
+              {instructorStickers.map((sticker) => (
                 <div 
-                  key={`is-${idx}`} 
+                  key={sticker} 
                   className="sticker-item" 
                   onClick={() => onAddSticker('instructor', sticker, true)}
                 >

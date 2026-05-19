@@ -32,7 +32,7 @@ function App() {
   const handleSimulateGuestMessage = () => {
     setMessages(prev => [
       ...prev,
-      { id: Date.now(), text: "Hello! I have a question.", sender: "guest", status: "pending", senderName: "Student 3" }
+      { id: crypto.randomUUID(), text: "Hello! I have a question.", sender: "guest", status: "pending", senderName: "Student 3" }
     ]);
   };
 
@@ -54,14 +54,14 @@ function App() {
       setTimeout(() => {
         setMessages(prev => [
           ...prev,
-          { id: Date.now(), text: "I will answer that privately.", sender: "self", status: "private" }
+          { id: crypto.randomUUID(), text: "I will answer that privately.", sender: "self", status: "private" }
         ]);
       }, 500);
     }
   };
 
   const handleSendChatMessage = (text) => {
-    setMessages(prev => [...prev, { id: Date.now(), text, sender: "self", status: "public" }]);
+    setMessages(prev => [...prev, { id: crypto.randomUUID(), text, sender: "self", status: "public" }]);
   };
 
   const toggleGuestButton = (guestId, btnName) => {
@@ -95,7 +95,7 @@ function App() {
         if (newStickers.length >= 4) {
           newStickers.shift(); // remove oldest
         }
-        newStickers.push({ id: Date.now() + Math.random(), name: stickerName, position: nextPos });
+        newStickers.push({ id: crypto.randomUUID(), name: stickerName, position: nextPos });
         return newStickers;
       });
     } else {
@@ -117,7 +117,7 @@ function App() {
            return prev;
         }
 
-        current.push({ id: Date.now() + Math.random(), name: stickerName, position: pos, category: cat });
+        current.push({ id: crypto.randomUUID(), name: stickerName, position: pos, category: cat });
         
         return { ...prev, [targetId]: current };
       });
@@ -155,7 +155,11 @@ function App() {
               isInstructor={isInstructor}
               isDoodling={isDoodling}
               setIsDoodling={setIsDoodling}
-              onMediaUpload={(url, type) => { setMediaUrl(url); setMediaType(type); }}
+              onMediaUpload={(url, type) => { 
+                if (mediaUrl) URL.revokeObjectURL(mediaUrl);
+                setMediaUrl(url); 
+                setMediaType(type); 
+              }}
               onClose={() => setActiveGuestId(null)}
             />
           </div>
@@ -181,7 +185,11 @@ function App() {
                 isDoodling={isDoodling}
                 mediaUrl={mediaUrl}
                 mediaType={mediaType}
-                onClearMedia={() => {setMediaUrl(null); setMediaType(null);}}
+                onClearMedia={() => {
+                  if (mediaUrl) URL.revokeObjectURL(mediaUrl);
+                  setMediaUrl(null); 
+                  setMediaType(null);
+                }}
                 instructorStickers={instructorStickers}
               />
            </div>

@@ -14,37 +14,12 @@ export default function GuestContainer({
       onClick={() => onClick(participant)}
     >
       {/* Avatar Circle */}
-      <div style={{ 
-        width: '40px', 
-        height: '40px', 
-        borderRadius: '50%', 
-        background: participant.color,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontSize: '1.2rem',
-        fontWeight: 'bold',
-        color: '#fff',
-        boxShadow: '0 4px 10px rgba(0,0,0,0.3)'
-      }}>
+      <div className="gc-avatar" style={{ background: participant.color }}>
         {participant.initial}
       </div>
 
       {/* Name Badge */}
-      <div style={{ 
-        position: 'absolute', 
-        bottom: '4px', 
-        left: '50%',
-        transform: 'translateX(-50%)',
-        background: 'rgba(0,0,0,0.6)', 
-        padding: '2px 6px', 
-        borderRadius: '4px',
-        fontSize: '0.65rem',
-        maxWidth: '80%',
-        whiteSpace: 'nowrap',
-        overflow: 'hidden',
-        textOverflow: 'ellipsis'
-      }}>
+      <div className="gc-name-badge">
         {participant.name}
       </div>
 

@@ -14,16 +14,43 @@ export default function PresentationContainer({
   const [context, setContext] = useState(null);
 
   useEffect(() => {
-    if (canvasRef.current) {
-      const canvas = canvasRef.current;
+    if (!canvasRef.current) return;
+    
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    setContext(ctx);
+
+    const resizeCanvas = () => {
+      // Save current drawing
+      const tempCanvas = document.createElement('canvas');
+      const tempCtx = tempCanvas.getContext('2d');
+      tempCanvas.width = canvas.width;
+      tempCanvas.height = canvas.height;
+      if (canvas.width > 0 && canvas.height > 0) {
+        tempCtx.drawImage(canvas, 0, 0);
+      }
+
+      // Resize
       canvas.width = canvas.offsetWidth;
       canvas.height = canvas.offsetHeight;
-      const ctx = canvas.getContext('2d');
+
+      // Restore drawing and settings
       ctx.lineWidth = 4;
       ctx.lineCap = 'round';
       ctx.strokeStyle = '#ec4899';
-      setContext(ctx);
-    }
+      if (tempCanvas.width > 0 && tempCanvas.height > 0) {
+        ctx.drawImage(tempCanvas, 0, 0);
+      }
+    };
+
+    const observer = new ResizeObserver(() => {
+      resizeCanvas();
+    });
+
+    observer.observe(canvas.parentElement);
+    resizeCanvas(); // initial
+
+    return () => observer.disconnect();
   }, []);
 
   const startDrawing = (e) => {
