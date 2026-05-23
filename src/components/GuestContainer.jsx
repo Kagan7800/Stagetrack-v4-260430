@@ -54,12 +54,22 @@ export default function GuestContainer({
            style.marginRight = nudge.x ? `${-nudge.x}px` : undefined;
         }
 
+        const isIcSticker = typeof s.position === 'string' && s.position !== 'confetti';
+
+        if (isIcSticker) {
+          const xTrans = s.position.includes('tr-c') || s.position.includes('rc-a') || s.position.includes('br-n') || s.position.includes('rc-b') ? '50%' : '-50%';
+          const yTrans = s.position.includes('br-n') || s.position.includes('bl-n') ? '50%' : '-50%';
+          const rot = s.rotation || 0;
+          const sc = s.scale || 1;
+          style.transform = `translate(${xTrans}, ${yTrans}) rotate(${rot}deg) scale(${sc})`;
+        }
+
         return (
           <img 
             key={s.id} 
             src={`/assets/svg_stickers/${s.name}`} 
             alt={s.name} 
-            className={`gc-sticker pos-${s.position} ${s.name === 'Sun with sunglasses 2.svg' ? 'sun-special' : ''}`} 
+            className={`gc-sticker pos-${s.position} ${isIcSticker ? 'ic-placed' : ''} ${(s.name === 'Sun with sunglasses 2.svg' && typeof s.position === 'number') ? 'sun-special' : ''}`} 
             style={style}
           />
         );

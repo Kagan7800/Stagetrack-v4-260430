@@ -6,8 +6,6 @@ import heartPng from '../assets/RealHeart.png';
 import crownPng from '../assets/RealCrown.png';
 import birthdayPng from '../assets/Happy_Birthday.png';
 import starPng from '../assets/Star.png';
-import starGreenPng from '../assets/Star_Green.png';
-import starPinkPng from '../assets/Star_Pink.png';
 
 export default function InstructorToolbox() {
   const {
@@ -30,8 +28,11 @@ export default function InstructorToolbox() {
     { id: 'Happy_Birthday.png', src: birthdayPng }, 
     { id: 'Star.png', src: starPng },
     { id: 'Star2.png', src: starPng, isSmall: true },
-    { id: 'Star_Green.png', src: starGreenPng, isSmall: true },
-    { id: 'Star_Pink.png', src: starPinkPng, isSmall: true }
+    { id: 'Star_LightBlue.svg', src: '/assets/svg_stickers/Star_LightBlue.svg' },
+    { id: 'Star_Green.svg', src: '/assets/svg_stickers/Star_Green.svg' },
+    { id: 'Star_Pink.svg', src: '/assets/svg_stickers/Star_Pink.svg' },
+    { id: 'Star_Silver.svg', src: '/assets/svg_stickers/Star_Silver.svg' },
+    { id: 'Star_Gold.svg', src: '/assets/svg_stickers/Star_Gold.svg' }
   ];
 
   const handleFileUpload = (e) => {

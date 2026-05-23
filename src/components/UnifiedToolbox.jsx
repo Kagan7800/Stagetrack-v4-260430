@@ -77,13 +77,12 @@ export default function UnifiedToolbox({
 
           <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
             <h3 className="section-title">Stickers</h3>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', marginTop: '10px' }}>
+            <div className="gt-sticker-grid">
               {guestStickers.map((sticker) => (
                 <div 
                   key={sticker} 
                   className="sticker-item" 
                   onClick={() => onAddSticker(activeGuest.id, sticker, false)}
-                  style={{ width: '50px', height: '50px' }}
                 >
                   <img 
                     src={`/assets/svg_stickers/${sticker}`} 

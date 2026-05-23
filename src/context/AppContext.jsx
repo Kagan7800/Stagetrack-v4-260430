@@ -136,43 +136,83 @@ export function AppProvider({ children }) {
         return { ...prev, [targetId]: current };
       }
 
-      const isSun = stickerName === 'Sun with sunglasses 2.svg';
+      const icSlots = ['tl-c', 'tr-c', 'lc', 'rc-a', 'br-n', 'bl-n', 'lc-a', 'rc-b', 'lc-b'];
 
-      if (isSun) {
-        // Sun always goes to position 4
-        const targetPos = 4;
-        const existingStickerAtTarget = current.find(s => s.position === targetPos);
-        if (existingStickerAtTarget) {
-          // Move the existing sticker at position 4 to one of the other 3 positions (1, 2, 3)
-          const occupiedPositions = current.map(s => s.position);
-          const emptyPos = [1, 2, 3].find(p => !occupiedPositions.includes(p));
-          if (emptyPos !== undefined) {
-            existingStickerAtTarget.position = emptyPos;
-          } else {
-            // All 4 positions are full (1, 2, 3, 4), so the replaced sticker disappears
-            current = current.filter(s => s.id !== existingStickerAtTarget.id);
-          }
+      if (isInstructor) {
+        if (stickerName === 'UNDO_IC') {
+          // Remove the last added instructor sticker (which occupies one of the 9 slots)
+          const lastIcIndex = current.findLastIndex(s => icSlots.includes(s.position));
+          if (lastIcIndex !== -1) current.splice(lastIcIndex, 1);
+          return { ...prev, [targetId]: current };
         }
-        current.push({ id: crypto.randomUUID(), name: stickerName, position: targetPos });
-      } else {
-        // Normal sticker
-        const hasSun = current.some(s => s.name === 'Sun with sunglasses 2.svg');
-        const allowedPositions = hasSun ? [1, 2, 3] : [1, 2, 3, 4];
+
+        // Calculate consecutive count of active instructor stickers to vary angle and size of each next added sticker
+        const activeIcStickersCount = current.filter(s => icSlots.includes(s.position)).length;
+        const rotations = [-15, 15, -7, 10, -12, 5, -5, 12, 0];
+        const scales = [0.85, 1.15, 0.9, 1.1, 0.95, 1.05, 1.0];
         
-        const normalStickers = current.filter(s => typeof s.position === 'number' && s.name !== 'Sun with sunglasses 2.svg');
+        // Add slight random variations to angle and size to prevent identical overlapping and collisions
+        const randomAngle = (Math.random() - 0.5) * 8; // -4 to +4 degrees variation
+        const randomScale = (Math.random() - 0.5) * 0.1; // -0.05 to +0.05 scale variation
+        
+        const rotation = Number((rotations[activeIcStickersCount % rotations.length] + randomAngle).toFixed(1));
+        const scale = Number((scales[activeIcStickersCount % scales.length] + randomScale).toFixed(2));
 
-        if (normalStickers.length >= allowedPositions.length) {
-          // Remove the oldest normal sticker among allowed positions
-          const oldestNormalIndex = current.findIndex(s => allowedPositions.includes(s.position) && s.name !== 'Sun with sunglasses 2.svg');
-          if (oldestNormalIndex !== -1) {
-            current.splice(oldestNormalIndex, 1);
+        // Find the first unoccupied slot among the 9 slots
+        const occupiedSlots = current.map(s => s.position);
+        const nextSlot = icSlots.find(slot => !occupiedSlots.includes(slot));
+
+        if (nextSlot) {
+          current.push({ id: crypto.randomUUID(), name: stickerName, position: nextSlot, rotation, scale });
+        } else {
+          // All 9 slots are full: remove the oldest instructor sticker (FIFO) and reuse its position
+          const oldestIcIndex = current.findIndex(s => icSlots.includes(s.position));
+          if (oldestIcIndex !== -1) {
+            const removed = current[oldestIcIndex];
+            current.splice(oldestIcIndex, 1);
+            current.push({ id: crypto.randomUUID(), name: stickerName, position: removed.position, rotation, scale });
           }
         }
+      } else {
+        // Guest sticker logic
+        const isSun = stickerName === 'Sun with sunglasses 2.svg';
 
-        // Now find the first empty position among allowed positions
-        const occupiedPositions = current.map(s => s.position);
-        const nextPos = allowedPositions.find(p => !occupiedPositions.includes(p));
-        current.push({ id: crypto.randomUUID(), name: stickerName, position: nextPos });
+        if (isSun) {
+          // Sun always goes to position 4
+          const targetPos = 4;
+          const existingStickerAtTarget = current.find(s => s.position === targetPos);
+          if (existingStickerAtTarget) {
+            // Move the existing sticker at position 4 to one of the other 3 positions (1, 2, 3)
+            const occupiedPositions = current.map(s => s.position);
+            const emptyPos = [1, 2, 3].find(p => !occupiedPositions.includes(p));
+            if (emptyPos !== undefined) {
+              existingStickerAtTarget.position = emptyPos;
+            } else {
+              // All 4 positions are full (1, 2, 3, 4), so the replaced sticker disappears
+              current = current.filter(s => s.id !== existingStickerAtTarget.id);
+            }
+          }
+          current.push({ id: crypto.randomUUID(), name: stickerName, position: targetPos });
+        } else {
+          // Normal sticker
+          const hasSun = current.some(s => s.name === 'Sun with sunglasses 2.svg');
+          const allowedPositions = hasSun ? [1, 2, 3] : [1, 2, 3, 4];
+          
+          const normalStickers = current.filter(s => typeof s.position === 'number' && s.name !== 'Sun with sunglasses 2.svg');
+
+          if (normalStickers.length >= allowedPositions.length) {
+            // Remove the oldest normal sticker among allowed positions
+            const oldestNormalIndex = current.findIndex(s => allowedPositions.includes(s.position) && s.name !== 'Sun with sunglasses 2.svg');
+            if (oldestNormalIndex !== -1) {
+              current.splice(oldestNormalIndex, 1);
+            }
+          }
+
+          // Now find the first empty position among allowed positions
+          const occupiedPositions = current.map(s => s.position);
+          const nextPos = allowedPositions.find(p => !occupiedPositions.includes(p));
+          current.push({ id: crypto.randomUUID(), name: stickerName, position: nextPos });
+        }
       }
 
       return { ...prev, [targetId]: current };
