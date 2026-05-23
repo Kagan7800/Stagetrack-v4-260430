@@ -59,7 +59,7 @@ export default function GuestContainer({
             key={s.id} 
             src={`/assets/svg_stickers/${s.name}`} 
             alt={s.name} 
-            className={`gc-sticker pos-${s.position}`} 
+            className={`gc-sticker pos-${s.position} ${s.name === 'Sun with sunglasses 2.svg' ? 'sun-special' : ''}`} 
             style={style}
           />
         );

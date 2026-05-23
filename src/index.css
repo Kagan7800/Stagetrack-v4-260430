@@ -527,6 +527,12 @@ body {
   z-index: 30;
 }
 
+.gc-sticker.sun-special {
+  right: 0px !important;
+  left: auto !important;
+  transform: translateY(50%) !important;
+}
+
 /* Hand Raise Glow Layer */
 .hand-raise-glow {
   position: absolute;
@@ -559,28 +565,58 @@ body {
   z-index: 15;
 }
 
-.ic-sticker.pos-1 {
+.ic-sticker.pos-tl-c {
   top: 0;
   left: 25%;
   transform: translate(-50%, -50%);
 }
 
-.ic-sticker.pos-2 {
+.ic-sticker.pos-tr-c {
   top: 0;
   right: 25%;
   transform: translate(50%, -50%);
 }
 
-.ic-sticker.pos-3 {
+.ic-sticker.pos-lc {
   top: 50%;
   left: 0;
   transform: translate(-50%, -50%);
 }
 
-.ic-sticker.pos-4 {
-  top: 50%;
+.ic-sticker.pos-rc-a {
+  top: 25%;
   right: 0;
   transform: translate(50%, -50%);
+}
+
+.ic-sticker.pos-br-n {
+  bottom: 0;
+  right: 25%;
+  transform: translate(50%, 50%);
+}
+
+.ic-sticker.pos-bl-n {
+  bottom: 0;
+  left: 25%;
+  transform: translate(-50%, 50%);
+}
+
+.ic-sticker.pos-lc-a {
+  top: 25%;
+  left: 0;
+  transform: translate(-50%, -50%);
+}
+
+.ic-sticker.pos-rc-b {
+  top: 75%;
+  right: 0;
+  transform: translate(50%, -50%);
+}
+
+.ic-sticker.pos-lc-b {
+  top: 75%;
+  left: 0;
+  transform: translate(-50%, -50%);
 }
 
 /* right center */
