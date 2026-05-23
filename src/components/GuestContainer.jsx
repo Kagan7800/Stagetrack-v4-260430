@@ -1,4 +1,4 @@
-import { Hand } from 'lucide-react';
+import { Hand, MicOff } from 'lucide-react';
 
 export default function GuestContainer({ 
   participant, 
@@ -6,11 +6,14 @@ export default function GuestContainer({
   onClick, 
   stickers = [],
   buttons = { raiseHand: false, mute: false },
-  nudges = {}
+  nudges = {},
+  globalMute
 }) {
+  const isMuted = buttons.mute || globalMute;
+
   return (
     <div 
-      className={`video-cell ${isActive ? 'active-gc' : ''}`} 
+      className={`video-cell ${isActive ? 'active-gc' : ''} ${isMuted ? 'muted-grayscale' : ''}`} 
       onClick={() => onClick(participant)}
     >
 
@@ -23,12 +26,14 @@ export default function GuestContainer({
       {/* Hand Raise Glow Layer (z-index: 15) */}
       {buttons.raiseHand && <div className="hand-raise-glow"></div>}
 
-      {/* Hand Status (z-index: 20) */}
-      {buttons.raiseHand && (
+      {/* Status Icons (z-index: 20) */}
+      {(buttons.raiseHand || isMuted) && (
         <div className="gc-status-icons">
-          <Hand size={10} color="#eab308" />
+          {buttons.raiseHand && <Hand size={10} color="#eab308" />}
+          {isMuted && <MicOff size={10} color="#ef4444" />}
         </div>
       )}
+
 
       {/* Stickers */}
       {stickers.map((s) => {

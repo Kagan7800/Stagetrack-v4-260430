@@ -345,6 +345,12 @@ body {
   box-shadow: 0 0 15px rgba(99, 102, 241, 0.5);
 }
 
+.video-cell.muted-grayscale {
+  filter: grayscale(100%);
+  opacity: 0.6;
+}
+
+
 /* Absolute Positioning for Stickers on GC borders */
 .gc-sticker {
   position: absolute;
@@ -478,8 +484,8 @@ body {
   top: 4px;
   right: 4px;
   background: rgba(0,0,0,0.5);
-  border-radius: 50%;
-  padding: 2px;
+  border-radius: 9999px;
+  padding: 2px 4px;
   display: flex;
   gap: 4px;
   z-index: 20; /* Above glow, below magic/sun */
