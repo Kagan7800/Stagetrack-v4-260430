@@ -87,21 +87,21 @@ function App() {
                      instructorStickers={instructorStickers}
                      onClearMedia={clearMedia}
                    />
-                   
-                   {/* Unified Toolbox Overlay */}
-                   {activeGuestId !== null && activeGuest && (
-                     <div className="unified-guest-toolbox-overlay">
-                       <UnifiedToolbox 
-                         activeGuest={activeGuest}
-                         guestButtons={guestButtons}
-                         toggleGuestButton={handleToggleGuestButton}
-                         onAddSticker={handleAddSticker}
-                         onClose={() => setActiveGuestId(null)}
-                       />
-                     </div>
-                   )}
                </div>
              </div>
+
+             {/* Unified Toolbox Overlay (STO) */}
+             {activeGuestId !== null && activeGuest && (
+               <div className="toolbox-panel">
+                 <UnifiedToolbox 
+                   activeGuest={activeGuest}
+                   guestButtons={guestButtons}
+                   toggleGuestButton={handleToggleGuestButton}
+                   onAddSticker={handleAddSticker}
+                   onClose={() => setActiveGuestId(null)}
+                 />
+               </div>
+             )}
            </div>
            
            <div className="side-peos">
