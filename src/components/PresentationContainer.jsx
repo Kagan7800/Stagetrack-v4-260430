@@ -1,10 +1,8 @@
 import { useRef, useState, useEffect } from 'react';
 import { X } from 'lucide-react';
-import { playSynthSound } from '../utils/audioSynth';
 
 export default function PresentationContainer({ 
   isDoodling, 
-  instructorStickers = [], 
   mediaUrl, 
   mediaType,
   onClearMedia
@@ -74,16 +72,6 @@ export default function PresentationContainer({
     setIsDrawing(false);
   };
 
-  const handleStickerClick = (stickerName) => {
-    const name = stickerName.toLowerCase();
-    if (name.includes('piano')) playSynthSound('piano');
-    else if (name.includes('trumpet')) playSynthSound('trumpet');
-    else if (name.includes('drum')) playSynthSound('drums');
-    else if (name.includes('guitar')) playSynthSound('guitar');
-    else if (name.includes('xylophone')) playSynthSound('xylophone');
-    else playSynthSound('default');
-  };
-
   return (
     <div className="pc-canvas-area">
       {/* Media Layer */}
@@ -135,17 +123,6 @@ export default function PresentationContainer({
         onMouseUp={stopDrawing}
         onMouseOut={stopDrawing}
       />
-
-      {/* Instructor Stickers Layer (Static border positions) */}
-      {instructorStickers.map((sticker) => (
-        <img 
-          key={sticker.id}
-          src={`/assets/svg_stickers/${sticker.name}`} 
-          alt={sticker.name} 
-          className={`ic-sticker pos-${sticker.position}`}
-          onDoubleClick={() => handleStickerClick(sticker.name)}
-        />
-      ))}
     </div>
   );
 }

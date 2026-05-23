@@ -11,7 +11,6 @@ function App() {
     activeGuestId, setActiveGuestId,
     guestButtons, handleToggleGuestButton,
     guestStickers, handleAddSticker, stickerNudges,
-    instructorStickers,
     isDoodling, setIsDoodling,
     mediaUrl, mediaType, setMediaUpload, clearMedia,
     isChatOpen, setIsChatOpen,
@@ -43,7 +42,6 @@ function App() {
         {isInstructorSidebarVisible && (
           <div className={`instructor-left-sidebar ${isSidebarOpen ? 'open' : 'closed'}`}>
             <InstructorToolbox 
-               instructorStickers={instructorStickers}
                onAddSticker={handleAddSticker}
                isDoodling={isDoodling}
                setIsDoodling={setIsDoodling}
@@ -84,7 +82,6 @@ function App() {
                      isDoodling={isDoodling}
                      mediaUrl={mediaUrl}
                      mediaType={mediaType}
-                     instructorStickers={instructorStickers}
                      onClearMedia={clearMedia}
                    />
                </div>

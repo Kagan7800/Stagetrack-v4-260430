@@ -24,7 +24,6 @@ export function AppProvider({ children }) {
   const [activeGuestId, setActiveGuestId] = useState(null);
   const [guestButtons, setGuestButtons] = useState({});
   const [guestStickers, setGuestStickers] = useState({});
-  const [instructorStickers, setInstructorStickers] = useState([]);
   const [equippedSticker, setEquippedSticker] = useState(null);
   
   const [isDoodling, setIsDoodlingInternal] = useState(false);
@@ -112,39 +111,8 @@ export function AppProvider({ children }) {
   const handleAddSticker = useCallback((targetId, stickerName, isInstructor) => {
     // If it's the instructor adding a sticker to the instructor container
     if (isInstructor && targetId === 'instructor') {
-      if (stickerName === 'UNDO_IC') {
-        setInstructorStickers(prev => {
-          const next = [...prev];
-          next.pop();
-          return next;
-        });
-        return;
-      }
-
-      setInstructorStickers(prev => {
-        // Toggle off if it already exists
-        const existingIndex = prev.findIndex(s => s.name === stickerName);
-        if (existingIndex !== -1) {
-          return prev.filter((_, idx) => idx !== existingIndex);
-        }
-
-        // Predefined 9 slots in order
-        const icSlots = ['tl-c', 'tr-c', 'lc', 'rc-a', 'br-n', 'bl-n', 'lc-a', 'rc-b', 'lc-b'];
-
-        // Find the first unoccupied slot
-        const occupiedSlots = prev.map(s => s.position);
-        const nextSlot = icSlots.find(slot => !occupiedSlots.includes(slot));
-
-        if (nextSlot) {
-          return [...prev, { id: crypto.randomUUID(), name: stickerName, position: nextSlot }];
-        } else {
-          // All 9 slots are full: remove the oldest sticker (FIFO) and reuse its position
-          const next = [...prev];
-          const removed = next.shift();
-          return [...next, { id: crypto.randomUUID(), name: stickerName, position: removed.position }];
-        }
-      });
-      return;
+      if (activeGuestId === null) return;
+      targetId = activeGuestId;
     }
 
     // Otherwise, guest/PEO stickers
@@ -209,7 +177,7 @@ export function AppProvider({ children }) {
 
       return { ...prev, [targetId]: current };
     });
-  }, []);
+  }, [activeGuestId]);
 
   const stickerNudges = useMemo(() => {
     const nudges = {};
@@ -286,7 +254,6 @@ export function AppProvider({ children }) {
     guestButtons, handleToggleGuestButton,
     guestStickers, handleAddSticker,
     stickerNudges,
-    instructorStickers,
     isDoodling, setIsDoodling,
     mediaUrl, mediaType, setMediaUpload, clearMedia,
     isChatOpen, setIsChatOpen,

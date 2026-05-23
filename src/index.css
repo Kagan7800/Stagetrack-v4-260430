@@ -557,63 +557,56 @@ body {
   z-index: 20; /* Above glow, below magic/sun */
 }
 
-/* IC (Instructor Container) Sticker Positions */
-.ic-sticker {
-  position: absolute;
-  width: 48px;
-  height: 48px;
-  z-index: 15;
-}
-
-.ic-sticker.pos-tl-c {
+/* GC Sticker Positions for Instructor-Added Slots */
+.gc-sticker.pos-tl-c {
   top: 0;
   left: 25%;
   transform: translate(-50%, -50%);
 }
 
-.ic-sticker.pos-tr-c {
+.gc-sticker.pos-tr-c {
   top: 0;
   right: 25%;
   transform: translate(50%, -50%);
 }
 
-.ic-sticker.pos-lc {
+.gc-sticker.pos-lc {
   top: 50%;
   left: 0;
   transform: translate(-50%, -50%);
 }
 
-.ic-sticker.pos-rc-a {
+.gc-sticker.pos-rc-a {
   top: 25%;
   right: 0;
   transform: translate(50%, -50%);
 }
 
-.ic-sticker.pos-br-n {
+.gc-sticker.pos-br-n {
   bottom: 0;
   right: 25%;
   transform: translate(50%, 50%);
 }
 
-.ic-sticker.pos-bl-n {
+.gc-sticker.pos-bl-n {
   bottom: 0;
   left: 25%;
   transform: translate(-50%, 50%);
 }
 
-.ic-sticker.pos-lc-a {
+.gc-sticker.pos-lc-a {
   top: 25%;
   left: 0;
   transform: translate(-50%, -50%);
 }
 
-.ic-sticker.pos-rc-b {
+.gc-sticker.pos-rc-b {
   top: 75%;
   right: 0;
   transform: translate(50%, -50%);
 }
 
-.ic-sticker.pos-lc-b {
+.gc-sticker.pos-lc-b {
   top: 75%;
   left: 0;
   transform: translate(-50%, -50%);
