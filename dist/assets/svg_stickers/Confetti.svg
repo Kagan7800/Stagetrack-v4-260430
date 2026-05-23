@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 400">
+  <!-- Animated confetti -->
+  <g id="animatedConfetti">
+    <!-- Falling red -->
+    <circle cx="100" cy="0" r="4" fill="#ff0000">
+      <animateMotion dur="3s" repeatCount="indefinite" path="M0,0 Q50,150 0,300" />
+      <animate attributeName="opacity" values="1;0.3;1" dur="3s" repeatCount="indefinite" />
+    </circle>
+
+    <!-- Falling yellow -->
+    <circle cx="200" cy="0" r="4" fill="#ffeb3b">
+      <animateMotion dur="3.5s" repeatCount="indefinite" path="M0,0 Q-30,180 0,300" />
+      <animate attributeName="opacity" values="1;0.3;1" dur="3.5s" repeatCount="indefinite" />
+    </circle>
+
+    <!-- Falling blue -->
+    <circle cx="300" cy="0" r="4" fill="#1e90ff">
+      <animateMotion dur="4s" repeatCount="indefinite" path="M0,0 Q40,200 0,300" />
+      <animate attributeName="opacity" values="1;0.3;1" dur="4s" repeatCount="indefinite" />
+    </circle>
+
+    <!-- Falling pink -->
+    <circle cx="400" cy="0" r="4" fill="#ff69b4">
+      <animateMotion dur="3.2s" repeatCount="indefinite" path="M0,0 Q-40,160 0,300" />
+      <animate attributeName="opacity" values="1;0.3;1" dur="3.2s" repeatCount="indefinite" />
+    </circle>
+  </g>
+</svg>

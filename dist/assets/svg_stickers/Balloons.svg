@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 450 450">
+  <defs>
+    <linearGradient id="yellowGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffeb3b"/>
+      <stop offset="100%" stop-color="#fbc02d"/>
+    </linearGradient>
+    <linearGradient id="blueGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1e88e5"/>
+      <stop offset="100%" stop-color="#0d47a1"/>
+    </linearGradient>
+    <linearGradient id="redGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#d32f2f"/>
+      <stop offset="100%" stop-color="#b71c1c"/>
+    </linearGradient>
+  </defs>
+
+  <ellipse cx="150" cy="150" rx="80" ry="100" fill="url(#yellowGrad)" stroke="#e0a800" stroke-width="3"/>
+  <ellipse cx="250" cy="130" rx="80" ry="100" fill="url(#blueGrad)" stroke="#0d47a1" stroke-width="3"/>
+  <ellipse cx="350" cy="160" rx="80" ry="100" fill="url(#redGrad)" stroke="#b71c1c" stroke-width="3"/>
+
+  <path d="M150 250 L140 270 L160 270 Z" fill="#ff69b4"/>
+  <path d="M250 230 L240 250 L260 250 Z" fill="#8e24aa"/>
+  <path d="M350 260 L340 280 L360 280 Z" fill="#fdd835"/>
+</svg>

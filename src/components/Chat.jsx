@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Send, X } from 'lucide-react';
 
 export default function Chat({ messages = [], onSendMessage, onModerate, onClose }) {
@@ -14,7 +14,7 @@ export default function Chat({ messages = [], onSendMessage, onModerate, onClose
   return (
     <div className="glass-panel sidebar chat-sidebar">
       <div className="chat-header">
-        <h2>Classroom Chat</h2>
+        <h2>Chat</h2>
         <button onClick={onClose} className="close-btn">
           <X size={20} />
         </button>

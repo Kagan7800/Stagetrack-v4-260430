@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import { useRef } from 'react';
 import { Hand, MicOff, MessageSquare, Palette, Image as ImageIcon, X } from 'lucide-react';
 
 export default function UnifiedToolbox({ 
@@ -15,11 +15,11 @@ export default function UnifiedToolbox({
   const fileInputRef = useRef(null);
 
   const guestStickers = [
-    "Balloons 2 2.svg", "Boat 2.svg", "Crown 4.svg", "Dancer 2.svg", 
+    "Balloons 2 2.svg", "Boat 2.svg", "Dancer 2.svg", 
     "Dog 2.svg", "Drums 2.svg", "Fish 2.svg", "Flowers 6.svg", 
-    "Guitar 2.svg", "Happy Birthday 2.svg", "Kitten 2.svg", 
+    "Guitar 2.svg", "Kitten 2.svg", 
     "Piano 2 3.svg", "Sun with sunglasses 2.svg", "Truck 2 2.svg", 
-    "Trumpet 2.svg", "Xylophone 2.svg"
+    "Trumpet 2.svg", "Xylophone 2.svg", "Confetti.svg"
   ];
 
   const instructorStickers = [
@@ -42,7 +42,7 @@ export default function UnifiedToolbox({
   };
 
   return (
-    <div className="glass-panel sidebar unified-toolbox">
+    <div className="unified-toolbox glass-panel" style={{ height: '100%', width: '100%' }}>
       <div className="toolbox-header">
         <h2>{activeGuest.name}'s Tools</h2>
         <button onClick={onClose} className="close-btn">
@@ -74,13 +74,25 @@ export default function UnifiedToolbox({
             </button>
           </div>
 
-          <h3 className="section-title">Stickers</h3>
-          <div className="gt-sticker-grid">
-            {guestStickers.map((sticker) => (
-              <div key={sticker} className="sticker-item" onClick={() => onAddSticker(activeGuest.id, sticker, false)}>
-                <img src={`/assets/svg_stickers/${sticker}`} alt={sticker} />
-              </div>
-            ))}
+
+          <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
+            <h3 className="section-title">Stickers</h3>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', marginTop: '10px' }}>
+              {guestStickers.map((sticker) => (
+                <div 
+                  key={sticker} 
+                  className="sticker-item" 
+                  onClick={() => onAddSticker(activeGuest.id, sticker, false)}
+                  style={{ width: '50px', height: '50px' }}
+                >
+                  <img 
+                    src={`/assets/svg_stickers/${sticker}`} 
+                    alt={sticker} 
+                    style={sticker.includes('Guitar') ? { transform: 'scale(1.25)' } : {}}
+                  />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 

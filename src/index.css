@@ -21,6 +21,7 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  font-family: 'Risque', serif;
 }
 
 body {
@@ -47,20 +48,25 @@ body {
   flex-direction: column;
   height: 100vh;
   width: 100vw;
-  padding: 16px;
-  gap: 16px;
+  padding: 0;
+  gap: 0;
 }
 
 .main-content {
   display: flex;
   flex: 1;
-  gap: 16px;
+  gap: 10px;
+  padding: 10px;
   overflow: hidden;
+  background-image: url('/b2.png');
+  background-size: cover;
+  background-position: center;
 }
 
 /* Top Banner */
 .top-banner {
   width: 100%;
+  height: 13vh;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -68,19 +74,12 @@ body {
 }
 
 .top-banner img {
-  width: 100%;
-  height: auto;
-  max-height: 20vh;
+  height: 100%;
+  width: auto;
   object-fit: contain;
 }
 
-/* Left Sidebar: Unified Toolbox */
-.left-sidebar {
-  width: 150px;
-  /* 25% wider */
-  display: flex;
-  flex-direction: column;
-}
+/* Left Sidebar removed to prevent layout shift */
 
 /* Right Sidebar: Chat (Narrower) */
 .right-sidebar {
@@ -96,10 +95,11 @@ body {
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  padding: 10px 2% 10px 2%;
-  /* 10px top, 2% sides, 10px bottom */
-  gap: 20px;
+  padding: 0;
+  gap: 10px;
   flex: 1;
+  width: 100%;
+  height: 100%;
 }
 
 /* Side Peos Mini-Grid */
@@ -107,29 +107,84 @@ body {
   flex: 1;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: repeat(4, 1fr);
-  column-gap: 8.5%; /* Reduced by 15% from the previous 10% */
+  grid-template-rows: repeat(auto-fit, minmax(0, 1fr));
+  column-gap: 8.5%;
   row-gap: 20px;
   height: 100%;
+  transition: flex 0.3s ease;
+}
+
+.side-peos[data-columns="1"] {
+  grid-template-columns: 1fr;
+  flex: 0.5; /* Yields 50% more space back to the Presentation Container! */
+}
+
+.blank-peo {
+  visibility: hidden; /* Takes up real grid space but is perfectly invisible */
+}
+
+/* Center Wrapper */
+.center-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: flex-start;
+  align-items: center;
+  position: relative;
+  /* Width automatically conforms ONLY to the PC container */
+}
+
+/* Unified PC Container Wrapper to hold exact width */
+.pc-width-keeper {
+  height: calc(50% - 10px);
+  aspect-ratio: 16 / 9;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  flex-shrink: 0;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.pc-width-keeper.metronome-active-wrapper {
+  z-index: 50;
 }
 
 /* Unified PC Container */
 .pc-gt-unified {
-  height: calc(54.5% - 10px);
-  /* Reduced height to make room for margin */
-  margin: 1.5%;
-  /* Same amount of padding added around the PC */
-  aspect-ratio: 16 / 9;
-  flex-shrink: 0; /* CRITICAL: Locks the PC size exactly so it never shrinks */
+  width: 100%;
+  height: 100%;
   align-self: center;
   border: 2px solid #22c55e;
-  /* Green border around both */
   border-radius: 16px;
   display: flex;
   flex-direction: column;
-  background: rgba(0, 0, 0, 0.2);
+  background: #000000;
   box-shadow: var(--glass-shadow);
   position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.pc-gt-unified.metronome-active {
+  width: 100%;
+  height: 100%; /* Show 100% size, blend mode removes black */
+  aspect-ratio: auto; /* override the 16/9 */
+  border: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+/* Toolbox under the PC */
+.toolbox-panel {
+  position: absolute;
+  top: calc(50% + 10px); /* Exactly aligns with the top of row 3 in the peo grid */
+  bottom: 0; /* Extends to the very bottom, matching row 4 */
+  left: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
 }
 
@@ -155,8 +210,9 @@ body {
   padding: 12px;
   border-bottom: 1px solid var(--glass-border);
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
+  position: relative;
 }
 
 .toolbox-header h2 {
@@ -170,21 +226,26 @@ body {
   border: none;
   color: white;
   cursor: pointer;
+  position: absolute;
+  right: 12px;
 }
 
 .toolbox-content {
   flex: 1;
-  overflow-y: auto;
+  overflow-y: hidden;
   padding: 12px;
   display: flex;
   flex-direction: column;
   gap: 16px;
+  min-height: 0;
 }
 
 .toolbox-section {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  flex: 1;
+  min-height: 0;
 }
 
 .ic-section {
@@ -197,20 +258,33 @@ body {
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  margin: 20px 0 0 0;
+  margin: 10px 0 10px 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--glass-border);
   text-align: center;
 }
 
 .gt-buttons-col {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
+  flex-direction: row;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 20px;
 }
 
 .gt-sticker-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 4px;
+  grid-template-columns: repeat(auto-fit, minmax(40px, 1fr));
+  gap: 8px;
+}
+
+.gt-sticker-grid.two-rows {
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  flex: 1;
+  min-height: 0;
+  height: 100%;
 }
 
 .ic-tools-row {
@@ -224,7 +298,7 @@ body {
 .gb-btn {
   background: rgba(255, 255, 255, 0);
   /* Opacity 0 until clicked */
-  border: 1px solid var(--glass-border);
+  border: none;
   color: white;
   padding: 4px 12px;
   border-radius: 20px;
@@ -244,7 +318,7 @@ body {
 
 /* Guest Container (gc) */
 .video-cell {
-  background: var(--glass-bg);
+  background: #000000;
   border-radius: 12px;
   border: 1px solid var(--glass-border);
   position: relative;
@@ -274,8 +348,8 @@ body {
 /* Absolute Positioning for Stickers on GC borders */
 .gc-sticker {
   position: absolute;
-  width: 32px;
-  height: 32px;
+  width: 59px;
+  height: 59px;
   z-index: 10;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
@@ -283,49 +357,108 @@ body {
 /* Antigravity Spatial Map & Priority Stack */
 .gc-sticker.pos-sun {
   top: 50%;
-  right: 0;
-  transform: translateY(-50%);
-  z-index: 50;
-}
-
-.gc-sticker.pos-birthday {
-  top: 4px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 40;
+  right: -9px;
+  margin-top: -30px; /* Vertically centers the 59px sticker without transform */
+  transform: none !important; /* Never moves */
+  transition: none !important; /* Never moves */
+  z-index: 9999 !important; /* Always top priority */
 }
 
 .gc-sticker.pos-crown {
-  top: 4px;
+  top: 0;
   left: 50%;
-  transform: translateX(-50%);
-  z-index: 35;
+  width: 71px;
+  height: 71px;
+  transform: translate(-50%, calc(-50% - 3px));
+  z-index: 40;
 }
 
 .gc-sticker.pos-star {
-  bottom: 4px;
-  left: 4px;
+  top: 0;
+  left: 53px; /* Safe distance from the top-left sticker */
+  width: 44px;
+  height: 44px;
+  transform: translate(-50%, -50%);
+  z-index: 40;
+}
+
+.gc-sticker.pos-star2 {
+  top: 0;
+  right: 62px; /* Moved left another 3px */
+  width: 22px;
+  height: 22px;
+  transform: translate(50%, 0); /* Show full image */
+  z-index: 40;
+}
+
+.gc-sticker.pos-heart {
+  bottom: 0;
+  left: 75%;
+  width: 44px;
+  height: 44px;
+  transform: translate(-50%, 50%);
+  z-index: 40;
+}
+
+.gc-sticker.pos-birthday {
+  top: 10px;
+  right: 15px;
+  width: 83px;
+  height: 83px;
+  transform: translate(50%, -50%);
+  z-index: 40;
+}
+
+.gc-sticker.pos-balloons {
+  top: 50%;
+  left: 0;
+  transform: translate(-50%, -50%);
   z-index: 30;
 }
 
-.gc-sticker.pos-magic {
-  /* Floating edge layer - decorative placeholder */
-  top: 10px;
-  left: 10px;
-  z-index: 25;
+.gc-sticker.pos-confetti {
+  top: 0;
+  left: 0;
+  width: 100% !important;
+  height: 100% !important;
+  transform: none;
+  z-index: 50;
+  pointer-events: none;
 }
 
-.gc-sticker.pos-theme-br {
-  bottom: 4px;
-  right: 4px;
-  z-index: 10;
+.gc-sticker.pos-1 {
+  top: 0;
+  left: 0;
+  transform: translate(-50%, -50%);
+  z-index: 30;
 }
 
-.gc-sticker.pos-theme-bc {
-  bottom: 4px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 10;
+.gc-sticker.pos-2 {
+  top: 0;
+  right: 0;
+  transform: translate(50%, -50%);
+  z-index: 30;
+}
+
+.gc-sticker.pos-3 {
+  bottom: 0;
+  left: 0;
+  transform: translate(-50%, 50%);
+  z-index: 30;
+}
+
+.gc-sticker.pos-4 {
+  bottom: 0;
+  right: 0;
+  transform: translate(50%, 50%);
+  z-index: 30;
+}
+
+.gc-sticker.pos-5 {
+  top: 50%;
+  right: 0;
+  transform: translate(50%, -50%);
+  z-index: 30;
 }
 
 /* Hand Raise Glow Layer */
@@ -361,30 +494,27 @@ body {
 }
 
 .ic-sticker.pos-1 {
-  top: 8px;
+  top: 0;
   left: 25%;
-  transform: translateX(-50%);
+  transform: translate(-50%, -50%);
 }
 
-/* top left center */
 .ic-sticker.pos-2 {
-  top: 8px;
+  top: 0;
   right: 25%;
-  transform: translateX(50%);
+  transform: translate(50%, -50%);
 }
 
-/* top right center */
 .ic-sticker.pos-3 {
   top: 50%;
-  left: 8px;
-  transform: translateY(-50%);
+  left: 0;
+  transform: translate(-50%, -50%);
 }
 
-/* left center */
 .ic-sticker.pos-4 {
   top: 50%;
-  right: 8px;
-  transform: translateY(-50%);
+  right: 0;
+  transform: translate(50%, -50%);
 }
 
 /* right center */
@@ -392,8 +522,7 @@ body {
 /* Sticker Tray / Palette */
 .sticker-item {
   width: 100%;
-  height: auto;
-  aspect-ratio: 1 / 1;
+  height: 100%;
   background: transparent;
   border: none;
   border-radius: 8px;
@@ -403,7 +532,7 @@ body {
   cursor: pointer;
   padding: 4px;
   transition: all 0.2s;
-  flex-shrink: 0;
+  overflow: hidden;
 }
 
 .sticker-item:hover {
@@ -412,8 +541,9 @@ body {
 }
 
 .sticker-item img {
-  max-width: 100%;
-  max-height: 100%;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
   pointer-events: none;
 }
 

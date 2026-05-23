@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { playSynthSound } from '../utils/audioSynth';
 
@@ -88,12 +88,38 @@ export default function PresentationContainer({
     <div className="pc-canvas-area">
       {/* Media Layer */}
       {mediaUrl && (
-        <div className="media-container">
-          <button className="close-media-btn" onClick={onClearMedia}>
-            <X size={20} />
-          </button>
+        <div 
+          className="media-container"
+          style={mediaType === 'iframe' ? { 
+            position: 'absolute',
+            top: '50%',
+            left: 0,
+            transform: 'translateY(-50%)',
+            width: '100%', 
+            height: 0,
+            paddingBottom: '56.25%', // 16:9 aspect ratio
+            maxWidth: '100%', 
+            maxHeight: 'none', 
+            borderRadius: 0, 
+            zIndex: 20
+          } : {}}
+        >
+          {mediaType !== 'iframe' && (
+            <button className="close-media-btn" onClick={onClearMedia}>
+              <X size={20} />
+            </button>
+          )}
           {mediaType === 'video' ? (
             <video src={mediaUrl} controls autoPlay />
+          ) : mediaType === 'iframe' ? (
+            <iframe 
+              src={mediaUrl} 
+              allowTransparency="true"
+              style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none', background: 'transparent', backgroundColor: 'transparent' }} 
+              allowFullScreen 
+              loading="eager"
+              fetchpriority="high"
+            />
           ) : (
             <img src={mediaUrl} alt="Uploaded Media" />
           )}

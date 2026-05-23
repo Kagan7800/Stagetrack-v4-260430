@@ -1,0 +1,50 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="300"
+  height="150"
+  viewBox="0 0 300 150"
+>
+  <defs>
+    <linearGradient id="redGrad" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0%" stop-color="#7b0000" />
+      <stop offset="100%" stop-color="#ff3b3b" />
+    </linearGradient>
+  </defs>
+
+  <!-- Left logo block -->
+  <g transform="translate(10,50)">
+    <text
+      x="0"
+      y="0"
+      fill="url(#redGrad)"
+      font-family="Impact, 'Arial Black', sans-serif"
+      font-size="48"
+      font-weight="700"
+      transform="rotate(-15)"
+    >
+      Stage
+    </text>
+    <text
+      x="135"
+      y="-36"
+      fill="#ffffff"
+      font-family="Impact, 'Arial Black', sans-serif"
+      font-size="48"
+      font-weight="700"
+      transform="rotate(-15)"
+    >
+      track
+    </text>
+    <text
+      x="-16"
+      y="60"
+      fill="url(#redGrad)"
+      font-family="Impact, 'Arial Black', sans-serif"
+      font-size="48"
+      font-weight="700"
+      transform="rotate(-15)"
+    >
+      Studio
+    </text>
+  </g>
+</svg>
