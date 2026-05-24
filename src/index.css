@@ -511,6 +511,7 @@ body {
   right: 0;
   transform: translate(65%, -65%);
   z-index: 9999 !important;
+  padding: 1px;
 }
 
 .gc-sticker.pos-3 {
@@ -594,7 +595,7 @@ body {
 }
 
 .gc-sticker.pos-tr-c {
-  top: 0;
+  top: 3px;
   right: 25%;
   transform: translate(50%, -50%);
   width: 30px !important;
