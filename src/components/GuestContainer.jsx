@@ -9,12 +9,15 @@ export default function GuestContainer({
   nudges = {},
   globalPause
 }) {
-  const isPaused = globalPause;
-  const showGrayscale = buttons.mute;
+  const isClosed = globalPause || buttons.mute;
+  const showActiveGlow = isActive && !isClosed;
+  const showRaiseHandGlow = buttons.raiseHand && !isClosed;
+  const showGreenFilter = buttons.greenFilter && !isClosed;
+  const showGrayscale = isClosed;
 
   return (
     <div 
-      className={`video-cell ${isActive ? 'active-gc' : ''} ${showGrayscale ? 'grayscale-sharp' : ''}`} 
+      className={`video-cell ${showActiveGlow ? 'active-gc' : ''} ${showGrayscale ? 'grayscale-sharp' : ''}`} 
       onClick={() => onClick(participant)}
     >
 
@@ -25,10 +28,10 @@ export default function GuestContainer({
       </div>
 
       {/* Hand Raise Glow Layer (z-index: 15) */}
-      {buttons.raiseHand && <div className="hand-raise-glow"></div>}
+      {showRaiseHandGlow && <div className="hand-raise-glow"></div>}
 
       {/* Neon Green Filter Overlay (z-index: 18) */}
-      {buttons.greenFilter && <div className="neon-green-overlay"></div>}
+      {showGreenFilter && <div className="neon-green-overlay"></div>}
 
       {/* Status Icons (z-index: 20) */}
       {buttons.raiseHand && (
@@ -38,7 +41,7 @@ export default function GuestContainer({
       )}
 
       {/* Pause Overlay (transparent, centered pause icon) */}
-      {isPaused && (
+      {globalPause && (
         <div className="peo-pause-overlay">
           <Pause size={28} color="#ffffff" />
         </div>
