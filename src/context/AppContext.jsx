@@ -23,21 +23,21 @@ export function AppProvider({ children }) {
 
   const [activeGuestId, setActiveGuestId] = useState(() => {
     try {
-      const saved = localStorage.getItem('stagetrack_active_guest_id');
+      const saved = sessionStorage.getItem('stagetrack_active_guest_id');
       return saved ? JSON.parse(saved) : null;
     } catch { return null; }
   });
 
   const [guestButtons, setGuestButtons] = useState(() => {
     try {
-      const saved = localStorage.getItem('stagetrack_guest_buttons');
+      const saved = sessionStorage.getItem('stagetrack_guest_buttons');
       return saved ? JSON.parse(saved) : {};
     } catch { return {}; }
   });
 
   const [guestStickers, setGuestStickers] = useState(() => {
     try {
-      const saved = localStorage.getItem('stagetrack_guest_stickers');
+      const saved = sessionStorage.getItem('stagetrack_guest_stickers');
       return saved ? JSON.parse(saved) : {};
     } catch { return {}; }
   });
@@ -46,14 +46,14 @@ export function AppProvider({ children }) {
   
   const [isDoodling, setIsDoodlingInternal] = useState(() => {
     try {
-      const saved = localStorage.getItem('stagetrack_is_doodling');
+      const saved = sessionStorage.getItem('stagetrack_is_doodling');
       return saved ? JSON.parse(saved) : false;
     } catch { return false; }
   });
 
   const [mediaUrl, setMediaUrlInternal] = useState(() => {
     try {
-      const saved = localStorage.getItem('stagetrack_media_url');
+      const saved = sessionStorage.getItem('stagetrack_media_url');
       if (saved && saved.startsWith('blob:')) return null;
       return saved || null;
     } catch { return null; }
@@ -61,8 +61,8 @@ export function AppProvider({ children }) {
 
   const [mediaType, setMediaTypeInternal] = useState(() => {
     try {
-      const saved = localStorage.getItem('stagetrack_media_type');
-      const url = localStorage.getItem('stagetrack_media_url');
+      const saved = sessionStorage.getItem('stagetrack_media_type');
+      const url = sessionStorage.getItem('stagetrack_media_url');
       if (url && url.startsWith('blob:')) return null;
       return saved || null;
     } catch { return null; }
@@ -70,14 +70,14 @@ export function AppProvider({ children }) {
 
   const [isChatOpen, setIsChatOpen] = useState(() => {
     try {
-      const saved = localStorage.getItem('stagetrack_is_chat_open');
+      const saved = sessionStorage.getItem('stagetrack_is_chat_open');
       return saved ? JSON.parse(saved) : false;
     } catch { return false; }
   });
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
     try {
-      const saved = localStorage.getItem('stagetrack_is_sidebar_open');
+      const saved = sessionStorage.getItem('stagetrack_is_sidebar_open');
       return saved ? JSON.parse(saved) : false;
     } catch { return false; }
   });
@@ -88,7 +88,7 @@ export function AppProvider({ children }) {
   // Chat Moderation State
   const [messages, setMessages] = useState(() => {
     try {
-      const saved = localStorage.getItem('stagetrack_chat_messages');
+      const saved = sessionStorage.getItem('stagetrack_chat_messages');
       return saved ? JSON.parse(saved) : [
         { id: 'initial-1', text: "Hello! Here is a self message in darker purple.", sender: "self", status: "public" },
         { id: 'initial-2', text: "Hello there! This is a guest message in green.", sender: "other", senderName: "Student 1", status: "public" },
@@ -102,14 +102,14 @@ export function AppProvider({ children }) {
   // Metronome State
   const [metronomeBpm, setMetronomeBpm] = useState(() => {
     try {
-      const saved = localStorage.getItem('stagetrack_metronome_bpm');
+      const saved = sessionStorage.getItem('stagetrack_metronome_bpm');
       return saved ? parseInt(saved, 10) : 120;
     } catch { return 120; }
   });
 
   const [isMetronomePlaying, setIsMetronomePlaying] = useState(() => {
     try {
-      const saved = localStorage.getItem('stagetrack_is_metronome_playing');
+      const saved = sessionStorage.getItem('stagetrack_is_metronome_playing');
       return saved ? JSON.parse(saved) : false;
     } catch { return false; }
   });
@@ -117,70 +117,70 @@ export function AppProvider({ children }) {
   // Drawing Canvas Strokes
   const [drawingPaths, setDrawingPaths] = useState(() => {
     try {
-      const saved = localStorage.getItem('stagetrack_drawing_paths');
+      const saved = sessionStorage.getItem('stagetrack_drawing_paths');
       return saved ? JSON.parse(saved) : [];
     } catch { return []; }
   });
 
-  // Sync state changes to localStorage
+  // Sync state changes to sessionStorage
   useEffect(() => {
     if (activeGuestId !== null) {
-      localStorage.setItem('stagetrack_active_guest_id', JSON.stringify(activeGuestId));
+      sessionStorage.setItem('stagetrack_active_guest_id', JSON.stringify(activeGuestId));
     } else {
-      localStorage.removeItem('stagetrack_active_guest_id');
+      sessionStorage.removeItem('stagetrack_active_guest_id');
     }
   }, [activeGuestId]);
 
   useEffect(() => {
-    localStorage.setItem('stagetrack_guest_buttons', JSON.stringify(guestButtons));
+    sessionStorage.setItem('stagetrack_guest_buttons', JSON.stringify(guestButtons));
   }, [guestButtons]);
 
   useEffect(() => {
-    localStorage.setItem('stagetrack_guest_stickers', JSON.stringify(guestStickers));
+    sessionStorage.setItem('stagetrack_guest_stickers', JSON.stringify(guestStickers));
   }, [guestStickers]);
 
   useEffect(() => {
-    localStorage.setItem('stagetrack_is_doodling', JSON.stringify(isDoodling));
+    sessionStorage.setItem('stagetrack_is_doodling', JSON.stringify(isDoodling));
   }, [isDoodling]);
 
   useEffect(() => {
     if (mediaUrl) {
-      localStorage.setItem('stagetrack_media_url', mediaUrl);
+      sessionStorage.setItem('stagetrack_media_url', mediaUrl);
     } else {
-      localStorage.removeItem('stagetrack_media_url');
+      sessionStorage.removeItem('stagetrack_media_url');
     }
   }, [mediaUrl]);
 
   useEffect(() => {
     if (mediaType) {
-      localStorage.setItem('stagetrack_media_type', mediaType);
+      sessionStorage.setItem('stagetrack_media_type', mediaType);
     } else {
-      localStorage.removeItem('stagetrack_media_type');
+      sessionStorage.removeItem('stagetrack_media_type');
     }
   }, [mediaType]);
 
   useEffect(() => {
-    localStorage.setItem('stagetrack_is_chat_open', JSON.stringify(isChatOpen));
+    sessionStorage.setItem('stagetrack_is_chat_open', JSON.stringify(isChatOpen));
   }, [isChatOpen]);
 
   useEffect(() => {
-    localStorage.setItem('stagetrack_is_sidebar_open', JSON.stringify(isSidebarOpen));
+    sessionStorage.setItem('stagetrack_is_sidebar_open', JSON.stringify(isSidebarOpen));
   }, [isSidebarOpen]);
 
   useEffect(() => {
-    localStorage.setItem('stagetrack_chat_messages', JSON.stringify(messages));
+    sessionStorage.setItem('stagetrack_chat_messages', JSON.stringify(messages));
   }, [messages]);
 
   useEffect(() => {
-    localStorage.setItem('stagetrack_metronome_bpm', metronomeBpm.toString());
+    sessionStorage.setItem('stagetrack_metronome_bpm', metronomeBpm.toString());
   }, [metronomeBpm]);
 
   useEffect(() => {
-    localStorage.setItem('stagetrack_is_metronome_playing', JSON.stringify(isMetronomePlaying));
+    sessionStorage.setItem('stagetrack_is_metronome_playing', JSON.stringify(isMetronomePlaying));
   }, [isMetronomePlaying]);
 
   useEffect(() => {
-    localStorage.setItem('stagetrack_drawing_paths', JSON.stringify(drawingPaths));
+    sessionStorage.setItem('stagetrack_drawing_paths', JSON.stringify(drawingPaths));
   }, [drawingPaths]);
 
   // MUTUAL EXCLUSIVITY: Doodling vs Upload
