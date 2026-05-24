@@ -246,6 +246,7 @@ body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  z-index: 100;
 }
 
 .pc-canvas-area {
@@ -405,9 +406,10 @@ body {
   box-shadow: 0 0 15px rgba(99, 102, 241, 0.5);
 }
 
-.video-cell.muted-grayscale {
-  filter: grayscale(100%);
-  opacity: 0.6;
+.video-cell.grayscale-sharp {
+  filter: grayscale(100%) contrast(1.2) brightness(0.95);
+  border-color: rgba(239, 68, 68, 0.65);
+  box-shadow: inset 0 0 15px rgba(239, 68, 68, 0.3), 0 0 10px rgba(239, 68, 68, 0.15);
 }
 
 
@@ -895,3 +897,131 @@ body {
 .mod-btn.show { background: #22c55e; }
 .mod-btn.ignore { background: #ef4444; }
 .mod-btn.reply { background: #f59e0b; }
+
+/* PEO Pause Overlay */
+.peo-pause-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: transparent; /* transparent, not dim */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 12;
+  pointer-events: none;
+}
+
+.peo-pause-overlay svg {
+  filter: drop-shadow(0 0 6px rgba(0, 0, 0, 0.6));
+}
+
+/* Doodle Color Picker */
+.doodle-color-picker {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  padding: 6px 12px;
+  border-radius: 9999px;
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+  z-index: 40;
+}
+
+.color-dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: transform 0.2s, border-color 0.2s;
+  padding: 0;
+}
+
+.color-dot:hover {
+  transform: scale(1.2);
+}
+
+.color-dot.active {
+  border-color: #ffffff;
+  transform: scale(1.25);
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.6);
+}
+
+/* PEO Sticker Grid - exactly 8 columns in 1 row */
+.peo-sticker-grid {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 8px;
+  width: 100%;
+}
+
+/* Instructor Toolbox Sizing & Layout Compactions to fit 100% height */
+.instructor-toolbox .toolbox-header {
+  padding: 8px 12px;
+}
+.instructor-toolbox .toolbox-header h2 {
+  font-size: 0.85rem;
+}
+.instructor-toolbox .toolbox-content {
+  padding: 8px;
+  gap: 8px;
+  overflow: hidden;
+  height: calc(100% - 48px);
+}
+.instructor-toolbox .toolbox-section {
+  gap: 6px;
+  justify-content: space-between;
+  height: 100%;
+}
+.instructor-toolbox .gb-btn {
+  padding: 6px 10px;
+  font-size: 0.8rem;
+}
+.instructor-toolbox .gb-btn-group {
+  gap: 6px !important;
+  margin-top: 0 !important;
+}
+.instructor-toolbox .section-title {
+  font-size: 0.75rem;
+  margin: 4px 0 !important;
+  padding-bottom: 2px;
+}
+.instructor-toolbox .ito-sticker-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+  width: 100%;
+}
+.instructor-toolbox .ito-sticker-grid .sticker-item {
+  aspect-ratio: 1;
+  padding: 2px;
+}
+.instructor-toolbox .upload-dropdown {
+  width: 100%;
+}
+
+/* 15% Chat Font Size Increase */
+.chat-message {
+  font-size: 1.035rem !important;
+}
+.chat-message.system {
+  font-size: 0.92rem !important;
+}
+.chat-input {
+  font-size: 1.035rem !important;
+}
+.chat-sender-name {
+  font-size: 0.8rem !important;
+}
+.chat-private-note {
+  font-size: 0.8rem !important;
+}
+.chat-header h2 {
+  font-size: 1.38rem !important;
+}

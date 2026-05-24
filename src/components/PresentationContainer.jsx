@@ -8,15 +8,34 @@ export default function PresentationContainer({
   onClearMedia
 }) {
   const canvasRef = useRef(null);
+  const contextRef = useRef(null);
   const [isDrawing, setIsDrawing] = useState(false);
-  const [context, setContext] = useState(null);
+
+  const [selectedColor, setSelectedColor] = useState('#ec4899');
+  const selectedColorRef = useRef('#ec4899');
+
+  const popularColors = [
+    { name: 'Pink', value: '#ec4899' },
+    { name: 'Red', value: '#ef4444' },
+    { name: 'Blue', value: '#3b82f6' },
+    { name: 'Green', value: '#22c55e' },
+    { name: 'Yellow', value: '#eab308' }
+  ];
+
+  const handleColorChange = (color) => {
+    setSelectedColor(color);
+    selectedColorRef.current = color;
+    if (contextRef.current) {
+      contextRef.current.strokeStyle = color;
+    }
+  };
 
   useEffect(() => {
     if (!canvasRef.current) return;
     
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
-    setContext(ctx);
+    contextRef.current = ctx;
 
     const resizeCanvas = () => {
       // Save current drawing
@@ -35,7 +54,7 @@ export default function PresentationContainer({
       // Restore drawing and settings
       ctx.lineWidth = 4;
       ctx.lineCap = 'round';
-      ctx.strokeStyle = '#ec4899';
+      ctx.strokeStyle = selectedColorRef.current;
       if (tempCanvas.width > 0 && tempCanvas.height > 0) {
         ctx.drawImage(tempCanvas, 0, 0);
       }
@@ -52,23 +71,23 @@ export default function PresentationContainer({
   }, []);
 
   const startDrawing = (e) => {
-    if (!isDoodling || !context) return;
+    if (!isDoodling || !contextRef.current) return;
     const { offsetX, offsetY } = e.nativeEvent;
-    context.beginPath();
-    context.moveTo(offsetX, offsetY);
+    contextRef.current.beginPath();
+    contextRef.current.moveTo(offsetX, offsetY);
     setIsDrawing(true);
   };
 
   const draw = (e) => {
-    if (!isDrawing || !isDoodling || !context) return;
+    if (!isDrawing || !isDoodling || !contextRef.current) return;
     const { offsetX, offsetY } = e.nativeEvent;
-    context.lineTo(offsetX, offsetY);
-    context.stroke();
+    contextRef.current.lineTo(offsetX, offsetY);
+    contextRef.current.stroke();
   };
 
   const stopDrawing = () => {
-    if (!isDoodling || !context) return;
-    context.closePath();
+    if (!isDoodling || !contextRef.current) return;
+    contextRef.current.closePath();
     setIsDrawing(false);
   };
 
@@ -123,6 +142,22 @@ export default function PresentationContainer({
         onMouseUp={stopDrawing}
         onMouseOut={stopDrawing}
       />
+
+      {/* Doodle Color Picker Overlay */}
+      {isDoodling && (
+        <div className="doodle-color-picker glass-panel">
+          {popularColors.map((color) => (
+            <button
+              key={color.value}
+              className={`color-dot ${selectedColor === color.value ? 'active' : ''}`}
+              style={{ backgroundColor: color.value }}
+              onClick={() => handleColorChange(color.value)}
+              title={color.name}
+              aria-label={`Select ${color.name}`}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

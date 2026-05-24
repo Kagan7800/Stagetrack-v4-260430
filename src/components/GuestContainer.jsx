@@ -1,4 +1,4 @@
-import { Hand, MicOff } from 'lucide-react';
+import { Hand, MicOff, Pause } from 'lucide-react';
 
 export default function GuestContainer({ 
   participant, 
@@ -7,13 +7,16 @@ export default function GuestContainer({
   stickers = [],
   buttons = { raiseHand: false, mute: false },
   nudges = {},
-  globalMute
+  globalMute,
+  globalPause
 }) {
   const isMuted = buttons.mute || globalMute;
+  const isPaused = buttons.mute || globalPause;
+  const showGrayscale = buttons.mute;
 
   return (
     <div 
-      className={`video-cell ${isActive ? 'active-gc' : ''} ${isMuted ? 'muted-grayscale' : ''}`} 
+      className={`video-cell ${isActive ? 'active-gc' : ''} ${showGrayscale ? 'grayscale-sharp' : ''}`} 
       onClick={() => onClick(participant)}
     >
 
@@ -31,6 +34,13 @@ export default function GuestContainer({
         <div className="gc-status-icons">
           {buttons.raiseHand && <Hand size={10} color="#eab308" />}
           {isMuted && <MicOff size={10} color="#ef4444" />}
+        </div>
+      )}
+
+      {/* Pause Overlay (transparent, centered pause icon) */}
+      {isPaused && (
+        <div className="peo-pause-overlay">
+          <Pause size={28} color="#ffffff" />
         </div>
       )}
 

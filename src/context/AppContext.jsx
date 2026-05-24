@@ -32,7 +32,7 @@ export function AppProvider({ children }) {
 
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [globalMute, setGlobalMute] = useState(false);
+  const [globalMute, setGlobalMute] = useState(true);
   const [globalPause, setGlobalPause] = useState(false);
 
   // Chat Moderation State

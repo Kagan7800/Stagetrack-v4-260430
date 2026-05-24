@@ -1,7 +1,6 @@
 import { useRef, useState } from 'react';
 import { Palette, Image as ImageIcon, X, Mic, MicOff, Pause, Play, ChevronLeft, ChevronRight, UploadCloud, HardDrive } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
-import balloonsPng from '../assets/Balloons.png';
 import heartPng from '../assets/RealHeart.png';
 import crownPng from '../assets/RealCrown.png';
 import birthdayPng from '../assets/Happy_Birthday.png';
@@ -21,7 +20,6 @@ export default function InstructorToolbox() {
   const [showUploadMenu, setShowUploadMenu] = useState(false);
 
   const availableStickers = [
-    { id: 'Balloons.png', src: balloonsPng }, 
     { id: 'RealHeart.png', src: heartPng },
     { id: 'Heart2.png', src: heartPng, isSmall: true },
     { id: 'RealCrown.png', src: crownPng }, 
@@ -93,35 +91,8 @@ export default function InstructorToolbox() {
       <div className="toolbox-content" style={{ paddingRight: '8px' }}>
         <div className="toolbox-section">
           
-          {/* Program Activity Section */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
-            <span style={{ fontSize: '0.85rem', opacity: 0.7 }}>Program Activity</span>
-            <div style={{ position: 'relative', display: 'flex', justifyContent: 'center', width: '100%' }}>
-              <button 
-                className="gb-btn" 
-                style={{ margin: '0 auto', width: '80%' }}
-                onClick={() => setShowUploadMenu(!showUploadMenu)}
-              >
-                <ImageIcon size={16} /> Upload
-              </button>
-              {showUploadMenu && (
-                <div className="upload-dropdown glass-panel">
-                  <button onClick={() => fileInputRef.current?.click()}><HardDrive size={14}/> Local Computer</button>
-                  <button onClick={handleDriveUpload}><UploadCloud size={14}/> Google Drive</button>
-                </div>
-              )}
-            </div>
-
-            <input 
-              type="file" 
-              ref={fileInputRef} 
-              style={{ display: 'none' }} 
-              accept="image/*,video/*"
-              onChange={handleFileUpload}
-            />
-          </div>
-
-          <div className="gb-btn-group" style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '16px' }}>
+          {/* Instructor Tools Button Group */}
+          <div className="gb-btn-group" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             <button 
               className={`gb-btn ${isDoodling ? 'active' : ''}`}
               onClick={() => setIsDoodling(!isDoodling)}
@@ -145,9 +116,9 @@ export default function InstructorToolbox() {
             </button>
 
             {showBpmInput && (
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', background: 'rgba(255,255,255,0.05)', padding: '10px', borderRadius: '8px', border: '1px solid var(--glass-border)' }}>
-                <span style={{ fontSize: '0.85rem', textAlign: 'center' }}>How many beats per minute?</span>
-                <div style={{ display: 'flex', gap: '8px', width: '100%' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', background: 'rgba(255,255,255,0.05)', padding: '8px', borderRadius: '8px', border: '1px solid var(--glass-border)' }}>
+                <span style={{ fontSize: '0.8rem', textAlign: 'center' }}>BPM:</span>
+                <div style={{ display: 'flex', gap: '6px', width: '100%' }}>
                   <input 
                     type="number" 
                     value={bpmValue}
@@ -156,11 +127,11 @@ export default function InstructorToolbox() {
                       if (e.key === 'Enter') submitBpm();
                     }}
                     placeholder="#"
-                    style={{ flex: 1, padding: '6px', borderRadius: '4px', border: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.3)', color: 'white', minWidth: '0' }}
+                    style={{ flex: 1, padding: '4px', borderRadius: '4px', border: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.3)', color: 'white', minWidth: '0' }}
                   />
                   <button 
                     onClick={submitBpm}
-                    style={{ padding: '6px 12px', borderRadius: '4px', background: 'var(--primary-color)', color: 'white', border: 'none', cursor: 'pointer' }}
+                    style={{ padding: '4px 8px', borderRadius: '4px', background: 'var(--primary-color)', color: 'white', border: 'none', cursor: 'pointer', fontSize: '0.8rem' }}
                   >
                     Start
                   </button>
@@ -185,15 +156,42 @@ export default function InstructorToolbox() {
             </button>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
-            <h3 className="section-title" style={{ marginTop: 0, textAlign: 'center' }}>Instructor Stickers</h3>
-            <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '12px', marginTop: '15px' }}>
+          {/* Program Activity (Upload) Section */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '8px' }}>
+            <div style={{ position: 'relative', display: 'flex', justifyContent: 'center', width: '100%' }}>
+              <button 
+                className="gb-btn" 
+                style={{ margin: '0 auto', width: '100%' }}
+                onClick={() => setShowUploadMenu(!showUploadMenu)}
+              >
+                <ImageIcon size={16} /> Upload
+              </button>
+              {showUploadMenu && (
+                <div className="upload-dropdown glass-panel" style={{ zIndex: 110 }}>
+                  <button onClick={() => fileInputRef.current?.click()}><HardDrive size={14}/> Local Computer</button>
+                  <button onClick={handleDriveUpload}><UploadCloud size={14}/> Google Drive</button>
+                </div>
+              )}
+            </div>
+
+            <input 
+              type="file" 
+              ref={fileInputRef} 
+              style={{ display: 'none' }} 
+              accept="image/*,video/*"
+              onChange={handleFileUpload}
+            />
+          </div>
+
+          {/* Instructor Stickers Section */}
+          <div style={{ display: 'flex', flexDirection: 'column', marginTop: '8px', minHeight: 0 }}>
+            <h3 className="section-title" style={{ margin: '4px 0', paddingBottom: '4px', fontSize: '0.75rem' }}>Instructor Stickers</h3>
+            <div className="ito-sticker-grid">
               {availableStickers.map((sticker) => (
                 <div 
                   key={sticker.id} 
                   className="sticker-item" 
                   onClick={() => handleAddSticker('instructor', sticker.id, true)}
-                  style={{ width: '60px', height: '60px' }}
                   role="button"
                   aria-label={`Add ${sticker.id}`}
                 >
@@ -214,9 +212,9 @@ export default function InstructorToolbox() {
             <button 
               className="gb-btn"
               onClick={() => handleAddSticker('instructor', 'UNDO_IC', true)}
-              style={{ marginTop: '20px', backgroundColor: '#ff4444', color: 'white' }}
+              style={{ marginTop: '8px', backgroundColor: '#ff4444', color: 'white', padding: '4px 8px', fontSize: '0.8rem' }}
             >
-              <X size={16} /> Undo Last Star/Heart
+              <X size={14} /> Undo Last Star/Heart
             </button>
           </div>
 

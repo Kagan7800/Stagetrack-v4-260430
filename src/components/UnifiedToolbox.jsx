@@ -15,15 +15,18 @@ export default function UnifiedToolbox({
   const fileInputRef = useRef(null);
 
   const guestStickers = [
-    "Balloons 2 2.svg", "Boat 2.svg", "Dancer 2.svg", 
-    "Dog 2.svg", "Drums 2.svg", "Fish 2.svg", "Flowers 6.svg", 
-    "Guitar 2.svg", "Kitten 2.svg", 
-    "Piano 2 3.svg", "Sun with sunglasses 2.svg", "Truck 2 2.svg", 
-    "Trumpet 2.svg", "Xylophone 2.svg", "Confetti.svg"
+    "Balloons 2 2.svg",
+    "Boat 2.svg",
+    "Dancer 2.svg",
+    "Dog 2.svg",
+    "Drums 2.svg",
+    "Fish 2.svg",
+    "Guitar 2.svg",
+    "Sun with sunglasses 2.svg"
   ];
 
   const instructorStickers = [
-    "Balloons 2 2.svg", "Crown 4.svg", "Dancer 2.svg", "Drums 2.svg", 
+    "Crown 4.svg", "Dancer 2.svg", "Drums 2.svg", 
     "Guitar 2.svg", "Happy Birthday 2.svg", "Piano 2 3.svg", 
     "Sun with sunglasses 2.svg", "Trumpet 2.svg"
   ];
@@ -77,7 +80,7 @@ export default function UnifiedToolbox({
 
           <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
             <h3 className="section-title">Stickers</h3>
-            <div className="gt-sticker-grid">
+            <div className="peo-sticker-grid">
               {guestStickers.map((sticker) => (
                 <div 
                   key={sticker} 
