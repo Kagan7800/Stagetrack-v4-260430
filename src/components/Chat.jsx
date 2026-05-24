@@ -24,7 +24,7 @@ export default function Chat({ messages = [], onSendMessage, onModerate, onClose
         <div className="chat-messages">
           {messages.filter(m => m.status !== 'ignored').map(msg => (
             <div key={msg.id} className="chat-message-wrapper">
-              <div className={`chat-message ${msg.sender === 'system' ? 'system' : msg.sender === 'self' ? 'self' : 'other'}`}>
+              <div className={`chat-message ${msg.sender === 'system' ? 'system' : msg.sender === 'self' ? 'self' : 'other'} ${msg.status || ''}`}>
                 {msg.senderName && (
                   <span className="chat-sender-name">
                     {msg.senderName}

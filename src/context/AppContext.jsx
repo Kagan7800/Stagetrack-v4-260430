@@ -36,7 +36,11 @@ export function AppProvider({ children }) {
   const [globalPause, setGlobalPause] = useState(false);
 
   // Chat Moderation State
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState([
+    { id: 'initial-1', text: "Hello! Here is a self message in darker purple.", sender: "self", status: "public" },
+    { id: 'initial-2', text: "Hello there! This is a guest message in green.", sender: "other", senderName: "Student 1", status: "public" },
+    { id: 'initial-3', text: "I have a private question/pending issue in red.", sender: "other", senderName: "Student 2", status: "pending" }
+  ]);
 
   // MUTUAL EXCLUSIVITY: Doodling vs Upload
   const setIsDoodling = useCallback((val) => {
