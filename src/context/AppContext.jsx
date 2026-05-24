@@ -10,30 +10,46 @@ export function AppProvider({ children }) {
     : (MOCK_USER_COUNT % 2 !== 0 ? MOCK_USER_COUNT + 1 : MOCK_USER_COUNT);
 
   const [participants] = useState(() => {
-    return Array.from({ length: totalSlots }, (_, i) => {
-      let isBlank = false;
-      let personIndex = i;
+    // Helper function to map grid index i to 1-based display slot number
+    const getDisplayNumber = (index) => {
+      if (index < 8) {
+        const row = Math.floor(index / 2);
+        const col = index % 2;
+        return row * 4 + col + 1;
+      } else {
+        const localI = index - 8;
+        const row = Math.floor(localI / 2);
+        const col = localI % 2;
+        return row * 4 + col + 3;
+      }
+    };
 
-      if (MOCK_USER_COUNT === 13) {
-        if (i === 5) isBlank = true;
-        else if (i > 5) personIndex = i - 1;
-      } else if (MOCK_USER_COUNT === 14) {
-        if (i === 5 || i === 14) isBlank = true;
-        else if (i > 5 && i < 14) personIndex = i - 1;
-        else if (i > 14) personIndex = i - 2;
+    const list = [];
+    let personCounter = 0;
+
+    for (let i = 0; i < totalSlots; i++) {
+      const slotNum = getDisplayNumber(i);
+      
+      // Determine if this slot is a designated blank slot
+      let isDesignatedBlank = false;
+      if (MOCK_USER_COUNT === 13 && slotNum === 6) {
+        isDesignatedBlank = true;
       }
 
-      if (isBlank || personIndex >= MOCK_USER_COUNT) {
-        return { id: `blank-${i}`, isBlank: true };
+      if (isDesignatedBlank || personCounter >= MOCK_USER_COUNT) {
+        list.push({ id: `blank-${i}`, isBlank: true });
+      } else {
+        const personId = personCounter + 1;
+        list.push({
+          id: personId,
+          name: `${personId}`,
+          color: `hsl(${(personId * 137.5) % 360}, 70%, 60%)`,
+          initial: `${personId}`
+        });
+        personCounter++;
       }
-
-      return {
-        id: personIndex + 1,
-        name: personIndex === 0 ? "You" : `${personIndex}`,
-        color: `hsl(${(personIndex * 137.5) % 360}, 70%, 60%)`,
-        initial: personIndex === 0 ? "Y" : `${personIndex}`
-      };
-    });
+    }
+    return list;
   });
 
   const [activeGuestId, setActiveGuestId] = useState(() => {
@@ -111,8 +127,8 @@ export function AppProvider({ children }) {
       const saved = sessionStorage.getItem('stagetrack_chat_messages');
       return saved ? JSON.parse(saved) : [
         { id: 'initial-1', text: "Hello! Here is a self message in darker purple.", sender: "self", status: "public" },
-        { id: 'initial-2', text: "Hello there! This is a guest message in green.", sender: "other", senderName: "1", status: "public" },
-        { id: 'initial-3', text: "I have a private question/pending issue in red.", sender: "other", senderName: "2", status: "pending" }
+        { id: 'initial-2', text: "Hello there! This is a guest message in green.", sender: "other", senderName: "2", status: "public" },
+        { id: 'initial-3', text: "I have a private question/pending issue in red.", sender: "other", senderName: "3", status: "pending" }
       ];
     } catch {
       return [];
