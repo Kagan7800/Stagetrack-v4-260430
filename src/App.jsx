@@ -95,10 +95,6 @@ function App() {
                    guestButtons={guestButtons}
                    toggleGuestButton={handleToggleGuestButton}
                    onAddSticker={handleAddSticker}
-                   isInstructor={true}
-                   isDoodling={isDoodling}
-                   setIsDoodling={setIsDoodling}
-                   onMediaUpload={setMediaUpload}
                    onClose={() => setActiveGuestId(null)}
                  />
                </div>

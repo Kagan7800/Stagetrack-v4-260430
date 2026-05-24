@@ -1,48 +1,34 @@
-import { useRef } from 'react';
-import { Hand, MicOff, MessageSquare, Palette, Image as ImageIcon, X } from 'lucide-react';
+import { Hand, MicOff, MessageSquare, X } from 'lucide-react';
 
 export default function UnifiedToolbox({ 
   activeGuest, 
   guestButtons, 
   toggleGuestButton, 
   onAddSticker,
-  isInstructor,
-  isDoodling,
-  setIsDoodling,
-  onMediaUpload,
   onClose
 }) {
-  const fileInputRef = useRef(null);
-
   const guestStickers = [
     "Balloons 2 2.svg",
     "Boat 2.svg",
+    "Crown 4.svg",
     "Dancer 2.svg",
     "Dog 2.svg",
     "Drums 2.svg",
     "Fish 2.svg",
+    "Flowers 6.svg",
     "Guitar 2.svg",
-    "Sun with sunglasses 2.svg"
-  ];
-
-  const instructorStickers = [
-    "Crown 4.svg", "Dancer 2.svg", "Drums 2.svg", 
-    "Guitar 2.svg", "Happy Birthday 2.svg", "Piano 2 3.svg", 
-    "Sun with sunglasses 2.svg", "Trumpet 2.svg"
+    "Kitten 2.svg",
+    "Piano 2 3.svg",
+    "Sun with sunglasses 2.svg",
+    "Truck 2 2.svg",
+    "Trumpet 2.svg",
+    "Xylophone 2.svg",
+    "Confetti.svg"
   ];
 
   if (!activeGuest) return null;
 
   const buttons = guestButtons[activeGuest.id] || { raiseHand: false, mute: false, chat: false };
-
-  const handleFileUpload = (e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const url = URL.createObjectURL(file);
-      const type = file.type.startsWith('video/') ? 'video' : 'image';
-      onMediaUpload(url, type);
-    }
-  };
 
   return (
     <div className="unified-toolbox glass-panel" style={{ height: '100%', width: '100%' }}>
@@ -67,7 +53,7 @@ export default function UnifiedToolbox({
               className={`gb-btn ${buttons.mute ? 'active' : ''}`}
               onClick={() => toggleGuestButton(activeGuest.id, 'mute')}
             >
-              <MicOff size={16} /> Mute
+              <MicOff size={16} /> Mute/Pause
             </button>
             <button 
               className={`gb-btn ${buttons.chat ? 'active' : ''}`}
@@ -76,7 +62,6 @@ export default function UnifiedToolbox({
               <MessageSquare size={16} /> Chat
             </button>
           </div>
-
 
           <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
             <h3 className="section-title">Stickers</h3>
@@ -97,53 +82,8 @@ export default function UnifiedToolbox({
             </div>
           </div>
         </div>
-
-        {/* Instructor Tools Section */}
-        {isInstructor && (
-          <div className="toolbox-section ic-section">
-            <h3 className="section-title">Instructor Tools</h3>
-            
-            <div className="ic-tools-row">
-              <button 
-                className={`icon-btn ${isDoodling ? 'active' : ''}`}
-                onClick={() => setIsDoodling(!isDoodling)}
-                title="Doodle Tool"
-              >
-                <Palette size={20} />
-              </button>
-              
-              <button 
-                className="icon-btn" 
-                onClick={() => fileInputRef.current?.click()}
-                title="Upload Media"
-              >
-                <ImageIcon size={20} />
-              </button>
-              
-              <input 
-                type="file" 
-                ref={fileInputRef} 
-                style={{ display: 'none' }} 
-                accept="image/*,video/*"
-                onChange={handleFileUpload}
-              />
-            </div>
-
-            <h3 className="section-title">Global Stickers</h3>
-            <div className="gt-sticker-grid">
-              {instructorStickers.map((sticker) => (
-                <div 
-                  key={sticker} 
-                  className="sticker-item" 
-                  onClick={() => onAddSticker('instructor', sticker, true)}
-                >
-                  <img src={`/assets/svg_stickers/${sticker}`} alt={sticker} />
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
 }
+
