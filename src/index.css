@@ -986,6 +986,22 @@ body {
   filter: drop-shadow(0 0 4px rgba(236, 72, 153, 0.6));
 }
 
+.gb-btn.screenshot-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  opacity: 1;
+}
+
+.gb-btn.screenshot-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+.gb-btn.screenshot-btn:active {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(0);
+}
+
 /* PEO Sticker Grid - exactly 8 columns in 1 row */
 .peo-sticker-grid {
   display: grid;

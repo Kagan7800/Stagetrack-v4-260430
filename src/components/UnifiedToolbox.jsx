@@ -1,4 +1,5 @@
-import { Hand, MicOff, MessageSquare, X } from 'lucide-react';
+import { Hand, MicOff, MessageSquare, X, Camera } from 'lucide-react';
+import html2canvas from 'html2canvas';
 
 export default function UnifiedToolbox({ 
   activeGuest, 
@@ -7,6 +8,39 @@ export default function UnifiedToolbox({
   onAddSticker,
   onClose
 }) {
+  const handleScreenshot = () => {
+    const target = document.querySelector('.app-container');
+    if (!target) return;
+
+    const toolbox = document.querySelector('.toolbox-panel');
+    const closeMedia = document.querySelector('.close-media-btn');
+    
+    if (toolbox) toolbox.style.visibility = 'hidden';
+    if (closeMedia) closeMedia.style.visibility = 'hidden';
+
+    setTimeout(() => {
+      html2canvas(target, {
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#090d16',
+        scale: 2
+      }).then((canvas) => {
+        if (toolbox) toolbox.style.visibility = 'visible';
+        if (closeMedia) closeMedia.style.visibility = 'visible';
+
+        const image = canvas.toDataURL('image/png');
+        const link = document.createElement('a');
+        link.download = `screenshot-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.png`;
+        link.href = image;
+        link.click();
+      }).catch((err) => {
+        console.error("Screenshot failed:", err);
+        if (toolbox) toolbox.style.visibility = 'visible';
+        if (closeMedia) closeMedia.style.visibility = 'visible';
+      });
+    }, 50);
+  };
+
   const guestStickers = [
     "Balloons 2 2.svg",
     "Boat 2.svg",
@@ -59,6 +93,12 @@ export default function UnifiedToolbox({
               onClick={() => toggleGuestButton(activeGuest.id, 'chat')}
             >
               <MessageSquare size={16} /> Chat
+            </button>
+            <button 
+              className="gb-btn screenshot-btn"
+              onClick={handleScreenshot}
+            >
+              <Camera size={16} /> Screenshot
             </button>
           </div>
 
