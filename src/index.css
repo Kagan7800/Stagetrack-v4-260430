@@ -576,11 +576,15 @@ body {
 .gc-sticker.pos-rc-1 {
   top: calc(50% - 24px);
   right: 0;
+  width: 30px !important;
+  height: 30px !important;
 }
 
 .gc-sticker.pos-rc-2 {
   top: calc(50% + 24px);
   right: 0;
+  width: 30px !important;
+  height: 30px !important;
 }
 
 .gc-sticker.pos-tl-c {
@@ -593,6 +597,8 @@ body {
   top: 0;
   right: 25%;
   transform: translate(50%, -50%);
+  width: 30px !important;
+  height: 30px !important;
 }
 
 .gc-sticker.pos-lc {
