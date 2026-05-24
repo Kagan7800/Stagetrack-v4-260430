@@ -116,7 +116,7 @@ export default function UnifiedToolbox({
               className="gb-btn screenshot-btn"
               onClick={handleScreenshot}
             >
-              <Camera size={16} /> Screenshot
+              <Camera size={16} /> Take a Picture
             </button>
           </div>
 
