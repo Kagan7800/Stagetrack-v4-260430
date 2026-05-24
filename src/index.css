@@ -176,7 +176,7 @@ body {
 
 .side-peos[data-columns="1"] {
   grid-template-columns: 1fr;
-  flex: 0.5; /* Yields 50% more space back to the Presentation Container! */
+  flex: 0.33; /* Yields more space back to the Presentation Container! */
 }
 
 .blank-peo {
