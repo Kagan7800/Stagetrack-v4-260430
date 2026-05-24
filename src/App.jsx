@@ -108,7 +108,7 @@ function App() {
            <div className="side-peos">
               {participants.slice(8, 16).map((p, index) => {
                 const actualIndex = 8 + index;
-                const isSpotlightSlot = actualIndex === 14;
+                const isSpotlightSlot = actualIndex === 15;
                 return (
                   <GuestContainer 
                     key={p.id}
