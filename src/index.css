@@ -709,6 +709,10 @@ body {
   object-fit: contain;
 }
 
+.media-container.video-active video {
+  object-fit: cover;
+}
+
 .close-media-btn {
   position: absolute;
   top: 16px;

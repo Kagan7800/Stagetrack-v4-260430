@@ -96,7 +96,7 @@ export default function PresentationContainer({
       {/* Media Layer */}
       {mediaUrl && (
         <div 
-          className="media-container"
+          className={`media-container ${mediaType === 'video' ? 'video-active' : ''}`}
           style={mediaType === 'iframe' ? { 
             position: 'absolute',
             top: '50%',
@@ -108,6 +108,18 @@ export default function PresentationContainer({
             maxWidth: '100%', 
             maxHeight: 'none', 
             borderRadius: 0, 
+            zIndex: 20
+          } : mediaType === 'video' ? {
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            width: '100%',
+            height: '100%',
+            maxWidth: '100%',
+            maxHeight: '100%',
+            borderRadius: 0,
             zIndex: 20
           } : {}}
         >
