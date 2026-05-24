@@ -4,7 +4,8 @@ import { useAppContext } from '../context/AppContext';
 export default function Metronome() {
   const { 
     metronomeBpm, 
-    isMetronomePlaying 
+    isMetronomePlaying,
+    setIsMetronomePlaying
   } = useAppContext();
 
   const audioCtxRef = useRef(null);
@@ -94,11 +95,14 @@ export default function Metronome() {
   }, [isMetronomePlaying, scheduler]);
 
   return (
-    <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 20 }}>
+    <div 
+      onClick={() => setIsMetronomePlaying(!isMetronomePlaying)}
+      style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 20, cursor: 'pointer' }}
+    >
       <iframe 
         src="https://www.figma.com/proto/jiqvv9jZCykXIhtfocAbBO/Metronome?node-id=2-42&embed-host=share&hide-ui=1&hide-controls=1&hide-toolbar=1&scaling=scale-down-width&content-scaling=fixed&frame=0&margin=0"
         allowTransparency="true"
-        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none', background: 'transparent', backgroundColor: 'transparent' }} 
+        style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none', background: 'transparent', backgroundColor: 'transparent', pointerEvents: 'none' }} 
         allowFullScreen 
         loading="eager"
         fetchpriority="high"
