@@ -7,6 +7,7 @@ import { useAppContext } from './context/AppContext';
 
 function App() {
   const {
+    MOCK_USER_COUNT,
     participants,
     activeGuestId, setActiveGuestId,
     guestButtons, handleToggleGuestButton,
@@ -24,8 +25,12 @@ function App() {
   const activeGuest = participants.find(p => p.id === activeGuestId);
 
   const halfLength = participants.length >= 4 ? participants.length / 2 : 8;
-  const leftParticipants = participants.slice(0, halfLength);
-  const rightParticipants = participants.slice(halfLength);
+  const leftParticipants = MOCK_USER_COUNT === 3 
+    ? participants.slice(0, 1) 
+    : participants.slice(0, halfLength);
+  const rightParticipants = MOCK_USER_COUNT === 3 
+    ? participants.slice(1, 3) 
+    : participants.slice(halfLength);
 
   return (
     <div className="app-container">

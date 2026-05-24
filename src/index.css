@@ -192,6 +192,18 @@ body {
   flex: 0.28; /* Reduced by 15% from 0.33 (0.33 * 0.85 ≈ 0.28) */
 }
 
+.side-peos[data-columns="1"]:has(> :only-child) {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.side-peos[data-columns="1"] > :only-child {
+  height: calc(50% - 10px);
+  width: 100%;
+}
+
 .blank-peo {
   visibility: hidden; /* Takes up real grid space but is perfectly invisible */
 }
