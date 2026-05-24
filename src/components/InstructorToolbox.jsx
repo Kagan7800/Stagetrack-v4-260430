@@ -135,8 +135,13 @@ export default function InstructorToolbox() {
                       value={metronomeBpm || ''}
                       onChange={(e) => {
                         const val = parseInt(e.target.value, 10);
-                        if (val >= 40 && val <= 240) setMetronomeBpm(val);
-                        else if (!e.target.value) setMetronomeBpm('');
+                        if (isNaN(val)) setMetronomeBpm('');
+                        else setMetronomeBpm(val);
+                      }}
+                      onBlur={() => {
+                        const val = parseInt(metronomeBpm, 10);
+                        if (isNaN(val) || val < 40) setMetronomeBpm(40);
+                        else if (val > 240) setMetronomeBpm(240);
                       }}
                       placeholder="BPM"
                       style={{ flex: 1, padding: '4px', borderRadius: '4px', border: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.3)', color: 'white', fontSize: '0.8rem', minWidth: '0' }}

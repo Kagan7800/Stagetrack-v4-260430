@@ -91,6 +91,10 @@ export default function Metronome() {
       if (timerIdRef.current) {
         clearInterval(timerIdRef.current);
       }
+      if (audioCtxRef.current) {
+        audioCtxRef.current.close().catch(() => {});
+        audioCtxRef.current = null;
+      }
     };
   }, [isMetronomePlaying, scheduler]);
 

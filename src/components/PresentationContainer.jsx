@@ -68,10 +68,10 @@ export default function PresentationContainer({
       }
       
       const start = path.points[0];
-      ctx.moveTo(start.x, start.y);
+      ctx.moveTo(start.x * canvas.width, start.y * canvas.height);
       for (let i = 1; i < path.points.length; i++) {
         const pt = path.points[i];
-        ctx.lineTo(pt.x, pt.y);
+        ctx.lineTo(pt.x * canvas.width, pt.y * canvas.height);
       }
       ctx.stroke();
     });
@@ -117,8 +117,9 @@ export default function PresentationContainer({
   }, [redrawCanvas]);
 
   const startDrawing = (e) => {
-    if (!isDoodling || !contextRef.current) return;
+    if (!isDoodling || !contextRef.current || !canvasRef.current) return;
     const { offsetX, offsetY } = e.nativeEvent;
+    const canvas = canvasRef.current;
     
     const ctx = contextRef.current;
     ctx.lineCap = 'round';
@@ -135,8 +136,11 @@ export default function PresentationContainer({
     ctx.beginPath();
     ctx.moveTo(offsetX, offsetY);
     
+    const xRatio = canvas.width > 0 ? offsetX / canvas.width : 0;
+    const yRatio = canvas.height > 0 ? offsetY / canvas.height : 0;
+    
     currentPathRef.current = {
-      points: [{ x: offsetX, y: offsetY }],
+      points: [{ x: xRatio, y: yRatio }],
       color: selectedColorRef.current,
       width: selectedColorRef.current === 'eraser' ? brushSize * 3 : brushSize
     };
@@ -146,14 +150,18 @@ export default function PresentationContainer({
   };
 
   const draw = (e) => {
-    if (!isDrawing || !isDoodling || !contextRef.current) return;
+    if (!isDrawing || !isDoodling || !contextRef.current || !canvasRef.current) return;
     const { offsetX, offsetY } = e.nativeEvent;
+    const canvas = canvasRef.current;
     
     contextRef.current.lineTo(offsetX, offsetY);
     contextRef.current.stroke();
     
+    const xRatio = canvas.width > 0 ? offsetX / canvas.width : 0;
+    const yRatio = canvas.height > 0 ? offsetY / canvas.height : 0;
+    
     if (currentPathRef.current) {
-      currentPathRef.current.points.push({ x: offsetX, y: offsetY });
+      currentPathRef.current.points.push({ x: xRatio, y: yRatio });
     }
   };
 
