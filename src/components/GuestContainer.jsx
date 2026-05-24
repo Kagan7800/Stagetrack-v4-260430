@@ -7,8 +7,7 @@ export default function GuestContainer({
   stickers = [],
   buttons = { raiseHand: false, mute: false },
   nudges = {},
-  globalPause,
-  isSpotlight
+  globalPause
 }) {
   const isClosed = globalPause || buttons.mute;
   const showActiveGlow = isActive && !isClosed;
@@ -16,6 +15,7 @@ export default function GuestContainer({
   const showGreenFilter = buttons.greenFilter && !isClosed;
   const showGrayscale = isClosed;
   const isNonInteractive = isClosed || participant.isBlank;
+  const isSpotlight = participant.isBlank;
 
   return (
     <div 
