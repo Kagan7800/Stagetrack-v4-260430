@@ -9,19 +9,28 @@ export function AppProvider({ children }) {
     ? 16 
     : (MOCK_USER_COUNT % 2 !== 0 ? MOCK_USER_COUNT + 1 : MOCK_USER_COUNT);
 
-  const [participants] = useState(
-    Array.from({ length: totalSlots }, (_, i) => {
-      if (i >= MOCK_USER_COUNT) {
+  const [participants] = useState(() => {
+    return Array.from({ length: totalSlots }, (_, i) => {
+      // If we have 13 people, insert a blank slot at slot 6 (index 5)
+      if (MOCK_USER_COUNT === 13 && i === 5) {
+        return { id: 'blank-5', isBlank: true };
+      }
+
+      // Calculate the actual person index (mapping around the blank slot if MOCK_USER_COUNT is 13)
+      const personIndex = (MOCK_USER_COUNT === 13 && i > 5) ? i - 1 : i;
+
+      if (personIndex >= MOCK_USER_COUNT) {
         return { id: `blank-${i}`, isBlank: true };
       }
+
       return {
-        id: i + 1,
-        name: i === 0 ? "You" : `Student ${i}`,
-        color: `hsl(${(i * 137.5) % 360}, 70%, 60%)`,
-        initial: i === 0 ? "Y" : "S"
+        id: personIndex + 1,
+        name: personIndex === 0 ? "You" : `${personIndex}`,
+        color: `hsl(${(personIndex * 137.5) % 360}, 70%, 60%)`,
+        initial: personIndex === 0 ? "Y" : `${personIndex}`
       };
-    })
-  );
+    });
+  });
 
   const [activeGuestId, setActiveGuestId] = useState(() => {
     try {
@@ -98,8 +107,8 @@ export function AppProvider({ children }) {
       const saved = sessionStorage.getItem('stagetrack_chat_messages');
       return saved ? JSON.parse(saved) : [
         { id: 'initial-1', text: "Hello! Here is a self message in darker purple.", sender: "self", status: "public" },
-        { id: 'initial-2', text: "Hello there! This is a guest message in green.", sender: "other", senderName: "Student 1", status: "public" },
-        { id: 'initial-3', text: "I have a private question/pending issue in red.", sender: "other", senderName: "Student 2", status: "pending" }
+        { id: 'initial-2', text: "Hello there! This is a guest message in green.", sender: "other", senderName: "1", status: "public" },
+        { id: 'initial-3', text: "I have a private question/pending issue in red.", sender: "other", senderName: "2", status: "pending" }
       ];
     } catch {
       return [];
