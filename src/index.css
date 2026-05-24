@@ -546,9 +546,9 @@ body {
 .hand-raise-glow {
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
-  border: 3px solid #eab308;
+  border: 3px solid #facc15 !important;
   border-radius: 12px;
-  box-shadow: 0 0 15px rgba(234, 179, 8, 0.6);
+  box-shadow: 0 0 20px rgba(250, 204, 21, 0.95), inset 0 0 12px rgba(250, 204, 21, 0.5) !important;
   pointer-events: none;
   z-index: 15; /* Above theme, below mute/magic */
 }
