@@ -4,7 +4,29 @@ import { createContext, useContext, useState, useMemo, useCallback, useEffect } 
 const AppContext = createContext();
 
 export function AppProvider({ children }) {
-  const MOCK_USER_COUNT = 12; // Change this between 1 and 16 to test dynamic layouts
+  const MOCK_USER_COUNT = useMemo(() => {
+    if (typeof window === 'undefined') return 12;
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const urlVal = params.get('users') || params.get('count');
+      if (urlVal) {
+        const parsed = parseInt(urlVal, 10);
+        if (!isNaN(parsed) && parsed >= 1 && parsed <= 16) {
+          sessionStorage.setItem('stagetrack_mock_user_count', parsed.toString());
+          return parsed;
+        }
+      }
+      const saved = sessionStorage.getItem('stagetrack_mock_user_count');
+      if (saved) {
+        const parsed = parseInt(saved, 10);
+        if (!isNaN(parsed) && parsed >= 1 && parsed <= 16) {
+          return parsed;
+        }
+      }
+    } catch { /* ignore */ }
+    return 12;
+  }, []);
+
   const totalSlots = MOCK_USER_COUNT > 8 
     ? (MOCK_USER_COUNT <= 12 ? 12 : 16)
     : (MOCK_USER_COUNT % 2 !== 0 ? MOCK_USER_COUNT + 1 : MOCK_USER_COUNT);
