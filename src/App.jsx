@@ -23,6 +23,10 @@ function App() {
   const isInstructorSidebarVisible = true;
   const activeGuest = participants.find(p => p.id === activeGuestId);
 
+  const halfLength = participants.length > 8 ? participants.length / 2 : 8;
+  const leftParticipants = participants.slice(0, halfLength);
+  const rightParticipants = participants.slice(halfLength);
+
   return (
     <div className="app-container">
       {/* Top Banner */}
@@ -59,7 +63,7 @@ function App() {
         {/* Center Grid */}
         <div className="center-grid-area">
            <div className="side-peos">
-             {participants.slice(0, 8).map(p => (
+             {leftParticipants.map(p => (
                <GuestContainer 
                  key={p.id}
                  participant={p}
@@ -106,7 +110,7 @@ function App() {
            </div>
            
            <div className="side-peos">
-             {participants.slice(8, 16).map(p => (
+             {rightParticipants.map(p => (
                <GuestContainer 
                  key={p.id}
                  participant={p}

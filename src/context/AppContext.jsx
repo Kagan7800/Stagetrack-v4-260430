@@ -4,9 +4,9 @@ import { createContext, useContext, useState, useMemo, useCallback, useEffect } 
 const AppContext = createContext();
 
 export function AppProvider({ children }) {
-  const MOCK_USER_COUNT = 14; // Change this between 1 and 16 to test dynamic layouts
+  const MOCK_USER_COUNT = 12; // Change this between 1 and 16 to test dynamic layouts
   const totalSlots = MOCK_USER_COUNT > 8 
-    ? 16 
+    ? (MOCK_USER_COUNT <= 12 ? 12 : 16)
     : (MOCK_USER_COUNT % 2 !== 0 ? MOCK_USER_COUNT + 1 : MOCK_USER_COUNT);
 
   const [participants] = useState(() => {
@@ -15,12 +15,13 @@ export function AppProvider({ children }) {
       if (totalSlots <= 8) {
         return slotNum - 1;
       }
+      const halfLength = totalSlots / 2;
       const row = Math.floor((slotNum - 1) / 4);
       const col = (slotNum - 1) % 4;
       if (col < 2) {
         return row * 2 + col;
       } else {
-        return 8 + row * 2 + (col - 2);
+        return halfLength + row * 2 + (col - 2);
       }
     };
 
@@ -468,12 +469,26 @@ export function AppProvider({ children }) {
     const nudges = {};
     participants.forEach(p => nudges[p.id] = {});
 
-    [0, participants.length / 2].forEach(gridStart => {
-      // If we are in 1-column mode, there's no left/right to nudge, and up/down logic is different.
-      // For safety, only apply grid nudges if we actually have 2 columns.
-      if (participants.length <= 8) return;
+    const len = participants.length;
+    if (len <= 8) {
+      participants.forEach(p => {
+         const stickers = guestStickers[p.id] || [];
+         stickers.forEach(s => {
+            if (s.position === 1) nudges[p.id][1] = { ...(nudges[p.id][1] || {}), x: (nudges[p.id][1]?.x || 0) + 20, y: (nudges[p.id][1]?.y || 0) + 20 };
+            if (s.position === 2) nudges[p.id][2] = { ...(nudges[p.id][2] || {}), x: (nudges[p.id][2]?.x || 0) - 20, y: (nudges[p.id][2]?.y || 0) + 20 };
+            if (s.position === 3) nudges[p.id][3] = { ...(nudges[p.id][3] || {}), x: (nudges[p.id][3]?.x || 0) + 20, y: (nudges[p.id][3]?.y || 0) - 20 };
+            if (s.position === 4) nudges[p.id][4] = { ...(nudges[p.id][4] || {}), x: (nudges[p.id][4]?.x || 0) - 20, y: (nudges[p.id][4]?.y || 0) - 20 };
+         });
+      });
+      return nudges;
+    }
 
-      for (let r = 0; r < 3; r++) {
+    const halfLen = len / 2;
+    const numRows = len / 4;
+
+    [0, halfLen].forEach(gridStart => {
+      // Vertical nudges
+      for (let r = 0; r < numRows - 1; r++) {
         for (let c = 0; c < 2; c++) {
           const topGuest = participants[gridStart + r * 2 + c];
           const bottomGuest = participants[gridStart + (r + 1) * 2 + c];
@@ -497,7 +512,8 @@ export function AppProvider({ children }) {
         }
       }
 
-      for (let r = 0; r < 4; r++) {
+      // Horizontal nudges
+      for (let r = 0; r < numRows; r++) {
         const leftGuest = participants[gridStart + r * 2];
         const rightGuest = participants[gridStart + r * 2 + 1];
 
