@@ -538,7 +538,7 @@ body {
   bottom: auto !important;
   top: 50% !important;
   left: auto !important;
-  right: 6px !important;
+  right: -4px !important;
   transform: translateY(-50%) !important;
 }
 
