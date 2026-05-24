@@ -7,6 +7,7 @@ import { useAppContext } from './context/AppContext';
 
 function App() {
   const {
+    MOCK_USER_COUNT,
     participants,
     activeGuestId, setActiveGuestId,
     guestButtons, handleToggleGuestButton,
@@ -59,24 +60,29 @@ function App() {
         {/* Center Grid */}
         <div className="center-grid-area">
            <div className="side-peos">
-             {participants.slice(0, 8).map(p => (
-               <GuestContainer 
-                 key={p.id}
-                 participant={p}
-                 isActive={activeGuestId === p.id}
-                 onClick={() => {
-                   const isMuted = guestButtons[p.id]?.mute;
-                   if (globalPause || isMuted || p.isBlank) return;
-                   setActiveGuestId(p.id);
-                 }}
-                 stickers={guestStickers[p.id] || []}
-                 buttons={guestButtons[p.id] || {}}
-                 nudges={stickerNudges[p.id] || {}}
-                 isDoodling={isDoodling}
-                 globalMute={globalMute}
-                 globalPause={globalPause}
-               />
-             ))}
+             {participants.slice(0, 8).map((p, index) => {
+               const actualIndex = index;
+               const isSpotlightSlot = MOCK_USER_COUNT === 13 && actualIndex === 5;
+               return (
+                 <GuestContainer 
+                   key={p.id}
+                   participant={p}
+                   isActive={activeGuestId === p.id}
+                   onClick={() => {
+                     const isMuted = guestButtons[p.id]?.mute;
+                     if (globalPause || isMuted || p.isBlank) return;
+                     setActiveGuestId(p.id);
+                   }}
+                   stickers={guestStickers[p.id] || []}
+                   buttons={guestButtons[p.id] || {}}
+                   nudges={stickerNudges[p.id] || {}}
+                   isDoodling={isDoodling}
+                   globalMute={globalMute}
+                   globalPause={globalPause}
+                   isSpotlight={isSpotlightSlot}
+                 />
+               );
+             })}
            </div>
 
            <div className="center-wrapper" style={{ justifyContent: activeGuestId !== null ? 'flex-start' : 'center' }}>
@@ -108,7 +114,7 @@ function App() {
            <div className="side-peos">
               {participants.slice(8, 16).map((p, index) => {
                 const actualIndex = 8 + index;
-                const isSpotlightSlot = actualIndex === 15;
+                const isSpotlightSlot = MOCK_USER_COUNT === 14 && actualIndex === 15;
                 return (
                   <GuestContainer 
                     key={p.id}

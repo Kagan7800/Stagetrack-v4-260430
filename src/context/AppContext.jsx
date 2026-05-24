@@ -504,6 +504,7 @@ export function AppProvider({ children }) {
   }, [participants, guestStickers]);
 
   const value = {
+    MOCK_USER_COUNT,
     participants,
     activeGuestId, setActiveGuestId,
     guestButtons, handleToggleGuestButton,
