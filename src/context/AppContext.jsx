@@ -54,7 +54,11 @@ export function AppProvider({ children }) {
       
       // Determine if this slot is a designated blank slot
       let isDesignatedBlank = false;
-      if (MOCK_USER_COUNT === 5) {
+      if (MOCK_USER_COUNT === 3) {
+        if (slotNum === 2) {
+          isDesignatedBlank = true;
+        }
+      } else if (MOCK_USER_COUNT === 5) {
         if (slotNum === 6 || slotNum === 7 || slotNum === 8) {
           isDesignatedBlank = true;
         }
@@ -92,17 +96,22 @@ export function AppProvider({ children }) {
         }
       }
 
-      const customRulesMatch = [6, 7, 9, 10, 11, 13, 14, 15].includes(MOCK_USER_COUNT);
+      const customRulesMatch = [3, 6, 7, 9, 10, 11, 13, 14, 15].includes(MOCK_USER_COUNT);
       const isBlank = isDesignatedBlank || (!customRulesMatch && slotNum > MOCK_USER_COUNT);
 
       if (isBlank) {
         list[idx] = { id: `blank-${idx}`, isBlank: true };
       } else {
+        let nameVal = `${slotNum}`;
+        if (MOCK_USER_COUNT === 3) {
+          if (slotNum === 3) nameVal = "2";
+          if (slotNum === 4) nameVal = "3";
+        }
         list[idx] = {
           id: slotNum,
-          name: `${slotNum}`,
+          name: nameVal,
           color: `hsl(${(slotNum * 137.5) % 360}, 70%, 60%)`,
-          initial: `${slotNum}`
+          initial: nameVal
         };
       }
     }
