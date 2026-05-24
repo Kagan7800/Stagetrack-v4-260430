@@ -4,22 +4,26 @@ import { createContext, useContext, useState, useMemo, useCallback, useEffect } 
 const AppContext = createContext();
 
 export function AppProvider({ children }) {
-  const MOCK_USER_COUNT = 16; // Change this between 1 and 16 to test dynamic layouts
+  const MOCK_USER_COUNT = 14; // Change this between 1 and 16 to test dynamic layouts
   const totalSlots = MOCK_USER_COUNT > 8 
     ? 16 
     : (MOCK_USER_COUNT % 2 !== 0 ? MOCK_USER_COUNT + 1 : MOCK_USER_COUNT);
 
   const [participants] = useState(() => {
     return Array.from({ length: totalSlots }, (_, i) => {
-      // If we have 13 people, insert a blank slot at slot 6 (index 5)
-      if (MOCK_USER_COUNT === 13 && i === 5) {
-        return { id: 'blank-5', isBlank: true };
+      let isBlank = false;
+      let personIndex = i;
+
+      if (MOCK_USER_COUNT === 13) {
+        if (i === 5) isBlank = true;
+        else if (i > 5) personIndex = i - 1;
+      } else if (MOCK_USER_COUNT === 14) {
+        if (i === 5 || i === 14) isBlank = true;
+        else if (i > 5 && i < 14) personIndex = i - 1;
+        else if (i > 14) personIndex = i - 2;
       }
 
-      // Calculate the actual person index (mapping around the blank slot if MOCK_USER_COUNT is 13)
-      const personIndex = (MOCK_USER_COUNT === 13 && i > 5) ? i - 1 : i;
-
-      if (personIndex >= MOCK_USER_COUNT) {
+      if (isBlank || personIndex >= MOCK_USER_COUNT) {
         return { id: `blank-${i}`, isBlank: true };
       }
 
