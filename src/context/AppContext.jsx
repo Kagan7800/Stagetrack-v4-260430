@@ -10,25 +10,25 @@ export function AppProvider({ children }) {
     : (MOCK_USER_COUNT % 2 !== 0 ? MOCK_USER_COUNT + 1 : MOCK_USER_COUNT);
 
   const [participants] = useState(() => {
-    // Helper function to map grid index i to 1-based display slot number
-    const getDisplayNumber = (index) => {
-      if (index < 8) {
-        const row = Math.floor(index / 2);
-        const col = index % 2;
-        return row * 4 + col + 1;
+    // Helper function to map 1-based display slot number to grid index
+    const getArrayIndex = (slotNum) => {
+      if (totalSlots <= 8) {
+        return slotNum - 1;
+      }
+      const row = Math.floor((slotNum - 1) / 4);
+      const col = (slotNum - 1) % 4;
+      if (col < 2) {
+        return row * 2 + col;
       } else {
-        const localI = index - 8;
-        const row = Math.floor(localI / 2);
-        const col = localI % 2;
-        return row * 4 + col + 3;
+        return 8 + row * 2 + (col - 2);
       }
     };
 
-    const list = [];
+    const list = new Array(totalSlots);
     let personCounter = 0;
 
-    for (let i = 0; i < totalSlots; i++) {
-      const slotNum = getDisplayNumber(i);
+    for (let slotNum = 1; slotNum <= totalSlots; slotNum++) {
+      const idx = getArrayIndex(slotNum);
       
       // Determine if this slot is a designated blank slot
       let isDesignatedBlank = false;
@@ -37,15 +37,15 @@ export function AppProvider({ children }) {
       }
 
       if (isDesignatedBlank || personCounter >= MOCK_USER_COUNT) {
-        list.push({ id: `blank-${i}`, isBlank: true });
+        list[idx] = { id: `blank-${idx}`, isBlank: true };
       } else {
         const personId = personCounter + 1;
-        list.push({
+        list[idx] = {
           id: personId,
           name: `${personId}`,
           color: `hsl(${(personId * 137.5) % 360}, 70%, 60%)`,
           initial: `${personId}`
-        });
+        };
         personCounter++;
       }
     }
