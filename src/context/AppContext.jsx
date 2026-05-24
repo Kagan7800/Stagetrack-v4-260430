@@ -24,11 +24,11 @@ export function AppProvider({ children }) {
         }
       }
     } catch { /* ignore */ }
-    return 5;
+    return 4;
   }, []);
 
-  const totalSlots = MOCK_USER_COUNT >= 5 
-    ? (MOCK_USER_COUNT <= 8 ? 8 : (MOCK_USER_COUNT <= 12 ? 12 : 16))
+  const totalSlots = MOCK_USER_COUNT >= 4 
+    ? (MOCK_USER_COUNT <= 4 ? 4 : (MOCK_USER_COUNT <= 8 ? 8 : (MOCK_USER_COUNT <= 12 ? 12 : 16)))
     : (MOCK_USER_COUNT % 2 !== 0 ? MOCK_USER_COUNT + 1 : MOCK_USER_COUNT);
 
   const [participants] = useState(() => {
