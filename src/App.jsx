@@ -62,7 +62,7 @@ function App() {
 
         {/* Center Grid */}
         <div className="center-grid-area">
-           <div className="side-peos">
+           <div className="side-peos" data-columns={halfLength <= 2 ? "1" : "2"}>
              {leftParticipants.map(p => (
                <GuestContainer 
                  key={p.id}
@@ -109,7 +109,7 @@ function App() {
              )}
            </div>
            
-           <div className="side-peos">
+           <div className="side-peos" data-columns={halfLength <= 2 ? "1" : "2"}>
              {rightParticipants.map(p => (
                <GuestContainer 
                  key={p.id}
