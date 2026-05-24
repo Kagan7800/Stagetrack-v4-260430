@@ -183,6 +183,15 @@ export function AppProvider({ children }) {
     sessionStorage.setItem('stagetrack_drawing_paths', JSON.stringify(drawingPaths));
   }, [drawingPaths]);
 
+  // If global pause is activated, close the active student STO panel
+  useEffect(() => {
+    if (globalPause) {
+      setTimeout(() => {
+        setActiveGuestId(null);
+      }, 0);
+    }
+  }, [globalPause]);
+
   // MUTUAL EXCLUSIVITY: Doodling vs Upload
   const setIsDoodling = useCallback((val) => {
     setIsDoodlingInternal(val);
@@ -235,14 +244,23 @@ export function AppProvider({ children }) {
   }, [setMessages]);
 
   const toggleGuestButton = useCallback((guestId, btnName) => {
-    setGuestButtons(prev => ({
-      ...prev,
-      [guestId]: {
-        ...(prev[guestId] || { raiseHand: false, mute: false, chat: false }),
-        [btnName]: !(prev[guestId]?.[btnName])
+    setGuestButtons(prev => {
+      const nextVal = !(prev[guestId]?.[btnName]);
+      
+      // If muting/closing this student, close their active STO panel
+      if (btnName === 'mute' && nextVal === true) {
+        setActiveGuestId(current => current === guestId ? null : current);
       }
-    }));
-  }, [setGuestButtons]);
+      
+      return {
+        ...prev,
+        [guestId]: {
+          ...(prev[guestId] || { raiseHand: false, mute: false, chat: false }),
+          [btnName]: nextVal
+        }
+      };
+    });
+  }, [setGuestButtons, setActiveGuestId]);
 
   const handleToggleGuestButton = useCallback((guestId, btnName) => {
     const currentState = guestButtons[guestId]?.[btnName] || false;
