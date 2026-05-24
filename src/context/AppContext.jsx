@@ -178,13 +178,13 @@ export function AppProvider({ children }) {
         const isSun = stickerName === 'Sun with sunglasses 2.svg';
 
         if (isSun) {
-          // Sun always goes to position 4
-          const targetPos = 4;
+          // Sun always goes to position 3
+          const targetPos = 3;
           const existingStickerAtTarget = current.find(s => s.position === targetPos);
           if (existingStickerAtTarget) {
-            // Move the existing sticker at position 4 to one of the other 3 positions (1, 2, 3)
+            // Move the existing sticker at position 3 to one of the other 3 positions (1, 2, 4)
             const occupiedPositions = current.map(s => s.position);
-            const emptyPos = [1, 2, 3].find(p => !occupiedPositions.includes(p));
+            const emptyPos = [1, 2, 4].find(p => !occupiedPositions.includes(p));
             if (emptyPos !== undefined) {
               existingStickerAtTarget.position = emptyPos;
             } else {
@@ -196,7 +196,7 @@ export function AppProvider({ children }) {
         } else {
           // Normal sticker
           const hasSun = current.some(s => s.name === 'Sun with sunglasses 2.svg');
-          const allowedPositions = hasSun ? [1, 2, 3] : [1, 2, 3, 4];
+          const allowedPositions = hasSun ? [1, 2, 4] : [1, 2, 3, 4];
           
           const normalStickers = current.filter(s => typeof s.position === 'number' && s.name !== 'Sun with sunglasses 2.svg');
 

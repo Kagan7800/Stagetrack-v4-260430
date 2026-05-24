@@ -535,9 +535,11 @@ body {
 }
 
 .gc-sticker.sun-special {
-  right: 0px !important;
+  bottom: auto !important;
+  top: 50% !important;
   left: auto !important;
-  transform: translateY(50%) !important;
+  right: 0px !important;
+  transform: translateY(-50%) !important;
 }
 
 /* Hand Raise Glow Layer */
