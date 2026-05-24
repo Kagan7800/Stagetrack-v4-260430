@@ -48,7 +48,6 @@ export function AppProvider({ children }) {
     };
 
     const list = new Array(totalSlots);
-    let personCounter = 0;
 
     for (let slotNum = 1; slotNum <= totalSlots; slotNum++) {
       const idx = getArrayIndex(slotNum);
@@ -56,7 +55,7 @@ export function AppProvider({ children }) {
       // Determine if this slot is a designated blank slot
       let isDesignatedBlank = false;
       if (MOCK_USER_COUNT === 6) {
-        if (slotNum === 7 || slotNum === 8) {
+        if (slotNum === 5 || slotNum === 8) {
           isDesignatedBlank = true;
         }
       } else if (MOCK_USER_COUNT === 7) {
@@ -89,17 +88,18 @@ export function AppProvider({ children }) {
         }
       }
 
-      if (isDesignatedBlank || personCounter >= MOCK_USER_COUNT) {
+      const customRulesMatch = [6, 7, 9, 10, 11, 13, 14, 15].includes(MOCK_USER_COUNT);
+      const isBlank = isDesignatedBlank || (!customRulesMatch && slotNum > MOCK_USER_COUNT);
+
+      if (isBlank) {
         list[idx] = { id: `blank-${idx}`, isBlank: true };
       } else {
-        const personId = personCounter + 1;
         list[idx] = {
-          id: personId,
-          name: `${personId}`,
-          color: `hsl(${(personId * 137.5) % 360}, 70%, 60%)`,
-          initial: `${personId}`
+          id: slotNum,
+          name: `${slotNum}`,
+          color: `hsl(${(slotNum * 137.5) % 360}, 70%, 60%)`,
+          initial: `${slotNum}`
         };
-        personCounter++;
       }
     }
     return list;
