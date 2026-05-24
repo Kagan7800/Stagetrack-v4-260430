@@ -4,8 +4,8 @@ import { createContext, useContext, useState, useMemo, useCallback, useEffect } 
 const AppContext = createContext();
 
 export function AppProvider({ children }) {
-  const MOCK_USER_COUNT = 13; // Change this between 1 and 16 to test dynamic layouts
-  const totalSlots = MOCK_USER_COUNT === 14 
+  const MOCK_USER_COUNT = 16; // Change this between 1 and 16 to test dynamic layouts
+  const totalSlots = MOCK_USER_COUNT > 8 
     ? 16 
     : (MOCK_USER_COUNT % 2 !== 0 ? MOCK_USER_COUNT + 1 : MOCK_USER_COUNT);
 
