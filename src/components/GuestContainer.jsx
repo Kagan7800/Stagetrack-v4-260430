@@ -27,6 +27,9 @@ export default function GuestContainer({
       {/* Hand Raise Glow Layer (z-index: 15) */}
       {buttons.raiseHand && <div className="hand-raise-glow"></div>}
 
+      {/* Neon Green Filter Overlay (z-index: 18) */}
+      {buttons.greenFilter && <div className="neon-green-overlay"></div>}
+
       {/* Status Icons (z-index: 20) */}
       {buttons.raiseHand && (
         <div className="gc-status-icons">

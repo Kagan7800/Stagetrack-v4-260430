@@ -988,7 +988,6 @@ body {
 
 .gb-btn.screenshot-btn {
   background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
   opacity: 1;
 }
 
@@ -1000,6 +999,20 @@ body {
 .gb-btn.screenshot-btn:active {
   background: rgba(255, 255, 255, 0.3);
   transform: translateY(0);
+}
+
+.neon-green-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(57, 255, 20, 0.22);
+  box-shadow: inset 0 0 15px rgba(57, 255, 20, 0.5);
+  border: 2px solid #39ff14;
+  border-radius: 12px;
+  pointer-events: none;
+  z-index: 18;
 }
 
 /* PEO Sticker Grid - exactly 8 columns in 1 row */

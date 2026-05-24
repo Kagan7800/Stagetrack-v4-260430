@@ -1,4 +1,4 @@
-import { Hand, MicOff, MessageSquare, X, Camera } from 'lucide-react';
+import { Hand, MicOff, MessageSquare, X, Camera, Sparkles } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import { useAppContext } from '../context/AppContext';
 
@@ -111,6 +111,12 @@ export default function UnifiedToolbox({
               onClick={() => toggleGuestButton(activeGuest.id, 'chat')}
             >
               <MessageSquare size={16} /> Chat
+            </button>
+            <button 
+              className={`gb-btn ${buttons.greenFilter ? 'active' : ''}`}
+              onClick={() => toggleGuestButton(activeGuest.id, 'greenFilter')}
+            >
+              <Sparkles size={16} /> Green Filter
             </button>
             <button 
               className="gb-btn screenshot-btn"
