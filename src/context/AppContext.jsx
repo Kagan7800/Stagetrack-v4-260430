@@ -56,7 +56,7 @@ export function AppProvider({ children }) {
       // Determine if this slot is a designated blank slot
       let isDesignatedBlank = false;
       if (MOCK_USER_COUNT === 9) {
-        if (slotNum === 8 || slotNum === 10 || slotNum === 12) {
+        if (slotNum === 10 || slotNum === 11 || slotNum === 12) {
           isDesignatedBlank = true;
         }
       } else if (MOCK_USER_COUNT === 10) {
