@@ -1,4 +1,4 @@
-import { Hand, MicOff, Pause } from 'lucide-react';
+import { Hand, Pause } from 'lucide-react';
 
 export default function GuestContainer({ 
   participant, 
@@ -7,11 +7,9 @@ export default function GuestContainer({
   stickers = [],
   buttons = { raiseHand: false, mute: false },
   nudges = {},
-  globalMute,
   globalPause
 }) {
-  const isMuted = buttons.mute || globalMute;
-  const isPaused = buttons.mute || globalPause;
+  const isPaused = globalPause;
   const showGrayscale = buttons.mute;
 
   return (
@@ -30,10 +28,9 @@ export default function GuestContainer({
       {buttons.raiseHand && <div className="hand-raise-glow"></div>}
 
       {/* Status Icons (z-index: 20) */}
-      {(buttons.raiseHand || isMuted) && (
+      {buttons.raiseHand && (
         <div className="gc-status-icons">
-          {buttons.raiseHand && <Hand size={10} color="#eab308" />}
-          {isMuted && <MicOff size={10} color="#ef4444" />}
+          <Hand size={10} color="#eab308" />
         </div>
       )}
 
@@ -64,14 +61,19 @@ export default function GuestContainer({
            style.marginRight = nudge.x ? `${-nudge.x}px` : undefined;
         }
 
-        const isIcSticker = typeof s.position === 'string' && s.position !== 'confetti';
+        const isIcSticker = typeof s.position === 'string' && s.position !== 'confetti' && s.position !== 'sun' && s.position !== 'birthday' && s.position !== 'crown';
 
         if (isIcSticker) {
-          const xTrans = s.position.includes('tr-c') || s.position.includes('rc-a') || s.position.includes('br-n') || s.position.includes('rc-b') ? '50%' : '-50%';
-          const yTrans = s.position.includes('br-n') || s.position.includes('bl-n') ? '50%' : '-50%';
+          const xTrans = (s.position.includes('tr-c') || s.position.startsWith('rc-')) ? '50%' : '-50%';
+          const yTrans = '-50%';
           const rot = s.rotation || 0;
           const sc = s.scale || 1;
           style.transform = `translate(${xTrans}, ${yTrans}) rotate(${rot}deg) scale(${sc})`;
+        }
+
+        if (s.name === 'Drums 2.svg') {
+          style.width = isIcSticker ? '40px' : '62px';
+          style.height = isIcSticker ? '40px' : '62px';
         }
 
         return (

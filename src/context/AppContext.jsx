@@ -129,6 +129,38 @@ export function AppProvider({ children }) {
         return { ...prev, [targetId]: current };
       }
 
+      if (isInstructor) {
+        if (stickerName === 'UNDO_IC') {
+          const icUndoSlots = ['tc', 'tl-c', 'tr-c', 'lc', 'birthday', 'crown'];
+          const lastIcIndex = current.findLastIndex(s => icUndoSlots.includes(s.position));
+          if (lastIcIndex !== -1) current.splice(lastIcIndex, 1);
+          return { ...prev, [targetId]: current };
+        }
+
+        if (stickerName === 'Happy_Birthday.png') {
+          const hasHb = current.some(s => s.position === 'birthday');
+          if (hasHb) {
+            current = current.filter(s => s.position !== 'birthday' && s.position !== 'crown');
+          } else {
+            current = current.filter(s => s.position !== 2 && s.position !== 'tr-c' && s.position !== 'tc' && s.position !== 'birthday' && s.position !== 'crown');
+            current.push({ id: crypto.randomUUID(), name: 'Happy_Birthday.png', position: 'birthday' });
+            current.push({ id: crypto.randomUUID(), name: 'RealCrown.png', position: 'crown' });
+          }
+          return { ...prev, [targetId]: current };
+        }
+
+        if (stickerName === 'RealCrown.png') {
+          const existingCrownIndex = current.findIndex(s => s.position === 'crown');
+          if (existingCrownIndex !== -1) {
+            current.splice(existingCrownIndex, 1);
+          } else {
+            current = current.filter(s => s.position !== 'tc' && s.position !== 'crown');
+            current.push({ id: crypto.randomUUID(), name: 'RealCrown.png', position: 'crown' });
+          }
+          return { ...prev, [targetId]: current };
+        }
+      }
+
       // Check if the sticker already exists (toggle off)
       const existingIndex = current.findIndex(s => s.name === stickerName);
       if (existingIndex !== -1) {
@@ -136,16 +168,12 @@ export function AppProvider({ children }) {
         return { ...prev, [targetId]: current };
       }
 
-      const icSlots = ['tl-c', 'tr-c', 'lc', 'rc-a', 'br-n', 'bl-n', 'lc-a', 'rc-b', 'lc-b'];
+      const hasSun = current.some(s => s.position === 'sun');
+      const icSlots = hasSun 
+        ? ['tc', 'tl-c', 'tr-c', 'lc']
+        : ['tc', 'tl-c', 'tr-c', 'lc', 'rc-1', 'rc-2'];
 
       if (isInstructor) {
-        if (stickerName === 'UNDO_IC') {
-          // Remove the last added instructor sticker (which occupies one of the 9 slots)
-          const lastIcIndex = current.findLastIndex(s => icSlots.includes(s.position));
-          if (lastIcIndex !== -1) current.splice(lastIcIndex, 1);
-          return { ...prev, [targetId]: current };
-        }
-
         // Calculate consecutive count of active instructor stickers to vary angle and size of each next added sticker
         const activeIcStickersCount = current.filter(s => icSlots.includes(s.position)).length;
         const rotations = [-15, 15, -7, 10, -12, 5, -5, 12, 0];
@@ -158,14 +186,20 @@ export function AppProvider({ children }) {
         const rotation = Number((rotations[activeIcStickersCount % rotations.length] + randomAngle).toFixed(1));
         const scale = Number((scales[activeIcStickersCount % scales.length] + randomScale).toFixed(2));
 
-        // Find the first unoccupied slot among the 9 slots
+        // Find the first unoccupied slot among the active slots
         const occupiedSlots = current.map(s => s.position);
+        if (occupiedSlots.includes('crown')) {
+          occupiedSlots.push('tc');
+        }
+        if (occupiedSlots.includes('birthday')) {
+          occupiedSlots.push('tr-c');
+        }
         const nextSlot = icSlots.find(slot => !occupiedSlots.includes(slot));
 
         if (nextSlot) {
           current.push({ id: crypto.randomUUID(), name: stickerName, position: nextSlot, rotation, scale });
         } else {
-          // All 9 slots are full: remove the oldest instructor sticker (FIFO) and reuse its position
+          // All active slots are full: remove the oldest instructor sticker (FIFO) and reuse its position
           const oldestIcIndex = current.findIndex(s => icSlots.includes(s.position));
           if (oldestIcIndex !== -1) {
             const removed = current[oldestIcIndex];
@@ -178,31 +212,17 @@ export function AppProvider({ children }) {
         const isSun = stickerName === 'Sun with sunglasses 2.svg';
 
         if (isSun) {
-          // Sun always goes to position 3
-          const targetPos = 3;
-          const existingStickerAtTarget = current.find(s => s.position === targetPos);
-          if (existingStickerAtTarget) {
-            // Move the existing sticker at position 3 to one of the other 3 positions (1, 2, 4)
-            const occupiedPositions = current.map(s => s.position);
-            const emptyPos = [1, 2, 4].find(p => !occupiedPositions.includes(p));
-            if (emptyPos !== undefined) {
-              existingStickerAtTarget.position = emptyPos;
-            } else {
-              // All 4 positions are full (1, 2, 3, 4), so the replaced sticker disappears
-              current = current.filter(s => s.id !== existingStickerAtTarget.id);
-            }
-          }
-          current.push({ id: crypto.randomUUID(), name: stickerName, position: targetPos });
+          // Remove any stars in the right-center slots
+          current = current.filter(s => s.position !== 'rc-1' && s.position !== 'rc-2');
+          current.push({ id: crypto.randomUUID(), name: stickerName, position: 'sun' });
         } else {
           // Normal sticker
-          const hasSun = current.some(s => s.name === 'Sun with sunglasses 2.svg');
-          const allowedPositions = hasSun ? [1, 2, 4] : [1, 2, 3, 4];
-          
-          const normalStickers = current.filter(s => typeof s.position === 'number' && s.name !== 'Sun with sunglasses 2.svg');
+          const allowedPositions = [1, 2, 3, 4];
+          const normalStickers = current.filter(s => typeof s.position === 'number');
 
           if (normalStickers.length >= allowedPositions.length) {
             // Remove the oldest normal sticker among allowed positions
-            const oldestNormalIndex = current.findIndex(s => allowedPositions.includes(s.position) && s.name !== 'Sun with sunglasses 2.svg');
+            const oldestNormalIndex = current.findIndex(s => allowedPositions.includes(s.position));
             if (oldestNormalIndex !== -1) {
               current.splice(oldestNormalIndex, 1);
             }

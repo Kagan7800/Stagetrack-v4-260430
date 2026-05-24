@@ -20,7 +20,6 @@ export default function InstructorToolbox() {
   const [showUploadMenu, setShowUploadMenu] = useState(false);
 
   const availableStickers = [
-    { id: 'RealHeart.png', src: heartPng },
     { id: 'Heart2.png', src: heartPng, isSmall: true },
     { id: 'RealCrown.png', src: crownPng }, 
     { id: 'Happy_Birthday.png', src: birthdayPng }, 
@@ -91,8 +90,8 @@ export default function InstructorToolbox() {
       <div className="toolbox-content" style={{ paddingRight: '8px' }}>
         <div className="toolbox-section">
           
-          {/* Instructor Tools Button Group */}
-          <div className="gb-btn-group" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          {/* Container for all buttons above Instructor Stickers */}
+          <div className="ito-buttons-container">
             <button 
               className={`gb-btn ${isDoodling ? 'active' : ''}`}
               onClick={() => setIsDoodling(!isDoodling)}
@@ -108,36 +107,39 @@ export default function InstructorToolbox() {
               🎉 Confetti
             </button>
 
-            <button 
-              className={`gb-btn ${mediaType === 'iframe' && mediaUrl?.includes('figma.com') ? 'active' : ''}`}
-              onClick={handleMetronome}
-            >
-              ⏱️ Metronome
-            </button>
+            <div className="metronome-wrapper" style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              <button 
+                className={`gb-btn ${mediaType === 'iframe' && mediaUrl?.includes('figma.com') ? 'active' : ''}`}
+                onClick={handleMetronome}
+                style={{ width: '100%' }}
+              >
+                ⏱️ Metronome
+              </button>
 
-            {showBpmInput && (
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', background: 'rgba(255,255,255,0.05)', padding: '8px', borderRadius: '8px', border: '1px solid var(--glass-border)' }}>
-                <span style={{ fontSize: '0.8rem', textAlign: 'center' }}>BPM:</span>
-                <div style={{ display: 'flex', gap: '6px', width: '100%' }}>
-                  <input 
-                    type="number" 
-                    value={bpmValue}
-                    onChange={(e) => setBpmValue(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') submitBpm();
-                    }}
-                    placeholder="#"
-                    style={{ flex: 1, padding: '4px', borderRadius: '4px', border: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.3)', color: 'white', minWidth: '0' }}
-                  />
-                  <button 
-                    onClick={submitBpm}
-                    style={{ padding: '4px 8px', borderRadius: '4px', background: 'var(--primary-color)', color: 'white', border: 'none', cursor: 'pointer', fontSize: '0.8rem' }}
-                  >
-                    Start
-                  </button>
+              {showBpmInput && (
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', background: 'rgba(255,255,255,0.05)', padding: '8px', borderRadius: '8px', border: '1px solid var(--glass-border)' }}>
+                  <span style={{ fontSize: '0.8rem', textAlign: 'center' }}>BPM:</span>
+                  <div style={{ display: 'flex', gap: '6px', width: '100%' }}>
+                    <input 
+                      type="number" 
+                      value={bpmValue}
+                      onChange={(e) => setBpmValue(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') submitBpm();
+                      }}
+                      placeholder="#"
+                      style={{ flex: 1, padding: '4px', borderRadius: '4px', border: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.3)', color: 'white', minWidth: '0' }}
+                    />
+                    <button 
+                      onClick={submitBpm}
+                      style={{ padding: '4px 8px', borderRadius: '4px', background: 'var(--primary-color)', color: 'white', border: 'none', cursor: 'pointer', fontSize: '0.8rem' }}
+                    >
+                      Start
+                    </button>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
 
             <button 
               className={`gb-btn ${globalMute ? 'active' : ''}`}
@@ -154,14 +156,11 @@ export default function InstructorToolbox() {
             >
               {globalPause ? <Play size={16} /> : <Pause size={16} />} Pause PEO
             </button>
-          </div>
 
-          {/* Program Activity (Upload) Section */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '8px' }}>
-            <div style={{ position: 'relative', display: 'flex', justifyContent: 'center', width: '100%' }}>
+            <div className="upload-wrapper" style={{ position: 'relative', width: '100%' }}>
               <button 
                 className="gb-btn" 
-                style={{ margin: '0 auto', width: '100%' }}
+                style={{ width: '100%' }}
                 onClick={() => setShowUploadMenu(!showUploadMenu)}
               >
                 <ImageIcon size={16} /> Upload
@@ -184,8 +183,8 @@ export default function InstructorToolbox() {
           </div>
 
           {/* Instructor Stickers Section */}
-          <div style={{ display: 'flex', flexDirection: 'column', marginTop: '8px', minHeight: 0 }}>
-            <h3 className="section-title" style={{ margin: '4px 0', paddingBottom: '4px', fontSize: '0.75rem' }}>Instructor Stickers</h3>
+          <div className="ito-stickers-section">
+            <h3 className="section-title">Instructor Stickers</h3>
             <div className="ito-sticker-grid">
               {availableStickers.map((sticker) => (
                 <div 
