@@ -10,7 +10,6 @@ export default function UnifiedToolbox({
   const guestStickers = [
     "Balloons 2 2.svg",
     "Boat 2.svg",
-    "Crown 4.svg",
     "Dancer 2.svg",
     "Dog 2.svg",
     "Drums 2.svg",
