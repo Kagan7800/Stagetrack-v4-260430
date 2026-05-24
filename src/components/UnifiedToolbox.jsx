@@ -1,5 +1,6 @@
 import { Hand, MicOff, MessageSquare, X, Camera } from 'lucide-react';
 import html2canvas from 'html2canvas';
+import { useAppContext } from '../context/AppContext';
 
 export default function UnifiedToolbox({ 
   activeGuest, 
@@ -8,15 +9,22 @@ export default function UnifiedToolbox({
   onAddSticker,
   onClose
 }) {
+  const { setIsChatOpen, setIsSidebarOpen } = useAppContext();
+
   const handleScreenshot = () => {
     const target = document.querySelector('.app-container');
     if (!target) return;
 
+    // Select the panels to hide immediately on the screen before the picture is taken
     const toolbox = document.querySelector('.toolbox-panel');
+    const chatSidebar = document.querySelector('.right-sidebar');
+    const itoSidebar = document.querySelector('.instructor-left-sidebar');
     const closeMedia = document.querySelector('.close-media-btn');
     
-    if (toolbox) toolbox.style.visibility = 'hidden';
-    if (closeMedia) closeMedia.style.visibility = 'hidden';
+    if (toolbox) toolbox.style.display = 'none';
+    if (chatSidebar) chatSidebar.style.display = 'none';
+    if (itoSidebar) itoSidebar.style.display = 'none';
+    if (closeMedia) closeMedia.style.display = 'none';
 
     setTimeout(() => {
       html2canvas(target, {
@@ -25,8 +33,16 @@ export default function UnifiedToolbox({
         backgroundColor: '#090d16',
         scale: 2
       }).then((canvas) => {
-        if (toolbox) toolbox.style.visibility = 'visible';
-        if (closeMedia) closeMedia.style.visibility = 'visible';
+        // Restore DOM styles in case of re-render/cleanup
+        if (toolbox) toolbox.style.display = '';
+        if (chatSidebar) chatSidebar.style.display = '';
+        if (itoSidebar) itoSidebar.style.display = '';
+        if (closeMedia) closeMedia.style.display = '';
+
+        // Close them on their screen permanently
+        onClose(); // Closes STO
+        setIsChatOpen(false); // Closes chat
+        setIsSidebarOpen(false); // Closes ITO
 
         const image = canvas.toDataURL('image/png');
         const link = document.createElement('a');
@@ -35,8 +51,10 @@ export default function UnifiedToolbox({
         link.click();
       }).catch((err) => {
         console.error("Screenshot failed:", err);
-        if (toolbox) toolbox.style.visibility = 'visible';
-        if (closeMedia) closeMedia.style.visibility = 'visible';
+        if (toolbox) toolbox.style.display = '';
+        if (chatSidebar) chatSidebar.style.display = '';
+        if (itoSidebar) itoSidebar.style.display = '';
+        if (closeMedia) closeMedia.style.display = '';
       });
     }, 50);
   };
