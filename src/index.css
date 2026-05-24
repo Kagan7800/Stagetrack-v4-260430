@@ -1100,3 +1100,270 @@ body {
 .chat-header h2 {
   font-size: 1.38rem !important;
 }
+
+/* Drawing Canvas Picker Dividers, Sliders, and Controls */
+.picker-divider {
+  width: 1px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.15);
+  margin: 0 4px;
+}
+
+.brush-slider-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.brush-slider {
+  width: 70px;
+  height: 4px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.2);
+  outline: none;
+  cursor: pointer;
+  accent-color: #ec4899;
+}
+
+.brush-size-text {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  min-width: 28px;
+}
+
+.doodle-action-btn {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  width: 18px;
+  height: 18px;
+  transition: transform 0.2s, color 0.2s;
+}
+
+.doodle-action-btn:hover:not(:disabled) {
+  transform: scale(1.2);
+  color: #ffffff;
+}
+
+.doodle-action-btn:disabled {
+  color: #475569;
+  cursor: not-allowed;
+}
+
+.doodle-action-btn.clear-btn:hover:not(:disabled) {
+  color: #ef4444;
+}
+
+/* Metronome Container inside Presentation Media Layer */
+.metronome-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(10px);
+  padding: 24px;
+  box-sizing: border-box;
+  gap: 20px;
+  z-index: 20;
+}
+
+/* Beat Pulsing Dots */
+.beat-indicators {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 12px;
+  justify-content: center;
+  align-items: center;
+}
+
+.beat-dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.08s ease-out;
+  box-shadow: none;
+}
+
+.beat-dot.active {
+  background: #3b82f6; /* bright blue */
+  border-color: #93c5fd;
+  transform: scale(1.2);
+  box-shadow: 0 0 16px rgba(59, 130, 246, 0.8);
+}
+
+.beat-dot.active.downbeat {
+  background: #22c55e; /* downbeat green */
+  border-color: #86efac;
+  box-shadow: 0 0 20px rgba(34, 197, 94, 0.9);
+}
+
+/* Pendulum visual track */
+.pendulum-track {
+  width: 200px;
+  height: 80px;
+  position: relative;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.15);
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+.pendulum-arm {
+  width: 4px;
+  height: 70px;
+  background: linear-gradient(to bottom, #ec4899, #3b82f6);
+  transform-origin: top center;
+  position: absolute;
+  top: 0;
+  transform: rotate(0deg);
+}
+
+.pendulum-arm.swinging {
+  animation: pendulum-swing ease-in-out infinite alternate;
+}
+
+@keyframes pendulum-swing {
+  0% {
+    transform: rotate(-35deg);
+  }
+  100% {
+    transform: rotate(35deg);
+  }
+}
+
+/* Metronome Info Display */
+.metronome-info-card {
+  text-align: center;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 12px 24px;
+  border-radius: 16px;
+  min-width: 180px;
+}
+
+.metronome-title {
+  font-size: 0.75rem;
+  color: #94a3b8;
+  letter-spacing: 0.15em;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.metronome-bpm-display {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 4px;
+}
+
+.bpm-number {
+  font-size: 3rem;
+  font-weight: 800;
+  color: white;
+  line-height: 1;
+  font-family: sans-serif;
+}
+
+.bpm-label {
+  font-size: 0.85rem;
+  color: #64748b;
+  font-weight: 600;
+}
+
+/* Controls Area inside Metronome */
+.metronome-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  max-width: 320px;
+}
+
+.metronome-btn {
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.play-pause-btn {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--primary-color);
+  color: white;
+  box-shadow: 0 4px 10px rgba(99, 102, 241, 0.4);
+}
+
+.play-pause-btn:hover {
+  transform: scale(1.08);
+  background: #4f46e5;
+  box-shadow: 0 6px 14px rgba(99, 102, 241, 0.6);
+}
+
+.metronome-speed-adjusters {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.speed-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: white;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.speed-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
+}
+
+.metronome-controls .bpm-slider {
+  flex: 1;
+  height: 6px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.15);
+  outline: none;
+  cursor: pointer;
+  accent-color: var(--primary-color);
+}
+
+.tap-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #94a3b8;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.tap-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  transform: scale(1.04);
+}

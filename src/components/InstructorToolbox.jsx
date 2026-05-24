@@ -12,8 +12,10 @@ export default function InstructorToolbox() {
     globalMute, setGlobalMute,
     globalPause, setGlobalPause,
     isSidebarOpen, setIsSidebarOpen,
-    setMediaUpload, clearMedia, mediaUrl, mediaType,
-    handleAddSticker
+    setMediaUpload, clearMedia, mediaType,
+    handleAddSticker,
+    metronomeBpm, setMetronomeBpm,
+    isMetronomePlaying, setIsMetronomePlaying
   } = useAppContext();
 
   const fileInputRef = useRef(null);
@@ -47,23 +49,12 @@ export default function InstructorToolbox() {
     setShowUploadMenu(false);
   };
 
-  const [showBpmInput, setShowBpmInput] = useState(false);
-  const [bpmValue, setBpmValue] = useState('');
-
   const handleMetronome = () => {
-    if (mediaType === 'iframe' && mediaUrl && mediaUrl.includes('figma.com')) {
+    if (mediaType === 'metronome') {
       clearMedia();
-      setShowBpmInput(false);
-      return;
-    }
-    setShowBpmInput(!showBpmInput);
-  };
-
-  const submitBpm = () => {
-    if (bpmValue) {
-      setMediaUpload('https://www.figma.com/proto/jiqvv9jZCykXIhtfocAbBO/Metronome?node-id=2-42&embed-host=share&hide-ui=1&hide-controls=1&hide-toolbar=1&scaling=scale-down-width&content-scaling=fixed&frame=0&margin=0', 'iframe');
-      setShowBpmInput(false);
-      setBpmValue('');
+      setIsMetronomePlaying(false);
+    } else {
+      setMediaUpload('metronome', 'metronome');
     }
   };
 
@@ -107,34 +98,68 @@ export default function InstructorToolbox() {
               🎉 Confetti
             </button>
 
-            <div className="metronome-wrapper" style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <div className="metronome-wrapper" style={{ display: 'flex', flexDirection: 'column', gap: '4px', width: '100%' }}>
               <button 
-                className={`gb-btn ${mediaType === 'iframe' && mediaUrl?.includes('figma.com') ? 'active' : ''}`}
+                className={`gb-btn ${mediaType === 'metronome' ? 'active' : ''}`}
                 onClick={handleMetronome}
                 style={{ width: '100%' }}
               >
                 ⏱️ Metronome
               </button>
 
-              {showBpmInput && (
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px', background: 'rgba(255,255,255,0.05)', padding: '8px', borderRadius: '8px', border: '1px solid var(--glass-border)' }}>
-                  <span style={{ fontSize: '0.8rem', textAlign: 'center' }}>BPM:</span>
+              {mediaType === 'metronome' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', background: 'rgba(255,255,255,0.05)', padding: '8px', borderRadius: '8px', border: '1px solid var(--glass-border)', width: '100%' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>BPM: {metronomeBpm}</span>
+                    <button 
+                      onClick={() => setIsMetronomePlaying(!isMetronomePlaying)}
+                      style={{ padding: '2px 8px', borderRadius: '4px', background: isMetronomePlaying ? '#ef4444' : '#22c55e', color: 'white', border: 'none', cursor: 'pointer', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '4px' }}
+                    >
+                      {isMetronomePlaying ? <Pause size={10} /> : <Play size={10} />}
+                      {isMetronomePlaying ? 'Stop' : 'Start'}
+                    </button>
+                  </div>
+                  
+                  <input 
+                    type="range"
+                    min="40"
+                    max="240"
+                    value={metronomeBpm}
+                    onChange={(e) => setMetronomeBpm(parseInt(e.target.value, 10))}
+                    style={{ width: '100%', accentColor: 'var(--primary-color)' }}
+                  />
+
                   <div style={{ display: 'flex', gap: '6px', width: '100%' }}>
                     <input 
                       type="number" 
-                      value={bpmValue}
-                      onChange={(e) => setBpmValue(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') submitBpm();
+                      value={metronomeBpm || ''}
+                      onChange={(e) => {
+                        const val = parseInt(e.target.value, 10);
+                        if (val >= 40 && val <= 240) setMetronomeBpm(val);
+                        else if (!e.target.value) setMetronomeBpm('');
                       }}
-                      placeholder="#"
-                      style={{ flex: 1, padding: '4px', borderRadius: '4px', border: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.3)', color: 'white', minWidth: '0' }}
+                      placeholder="BPM"
+                      style={{ flex: 1, padding: '4px', borderRadius: '4px', border: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.3)', color: 'white', fontSize: '0.8rem', minWidth: '0' }}
                     />
                     <button 
-                      onClick={submitBpm}
-                      style={{ padding: '4px 8px', borderRadius: '4px', background: 'var(--primary-color)', color: 'white', border: 'none', cursor: 'pointer', fontSize: '0.8rem' }}
+                      onClick={() => {
+                        const now = performance.now();
+                        if (!window.tapTimes) window.tapTimes = [];
+                        window.tapTimes.push(now);
+                        if (window.tapTimes.length > 4) window.tapTimes.shift();
+                        if (window.tapTimes.length >= 2) {
+                          const intervals = [];
+                          for (let i = 1; i < window.tapTimes.length; i++) {
+                            intervals.push(window.tapTimes[i] - window.tapTimes[i-1]);
+                          }
+                          const avg = intervals.reduce((a,b)=>a+b,0) / intervals.length;
+                          const calculated = Math.round(60000 / avg);
+                          if (calculated >= 40 && calculated <= 240) setMetronomeBpm(calculated);
+                        }
+                      }}
+                      style={{ padding: '4px 8px', borderRadius: '4px', background: 'rgba(255,255,255,0.1)', color: 'white', border: '1px solid var(--glass-border)', cursor: 'pointer', fontSize: '0.75rem' }}
                     >
-                      Start
+                      TAP
                     </button>
                   </div>
                 </div>

@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useContext, useState, useMemo, useCallback } from 'react';
+import { createContext, useContext, useState, useMemo, useCallback, useEffect } from 'react';
 
 const AppContext = createContext();
 
@@ -21,26 +21,167 @@ export function AppProvider({ children }) {
     })
   );
 
-  const [activeGuestId, setActiveGuestId] = useState(null);
-  const [guestButtons, setGuestButtons] = useState({});
-  const [guestStickers, setGuestStickers] = useState({});
+  const [activeGuestId, setActiveGuestId] = useState(() => {
+    try {
+      const saved = localStorage.getItem('stagetrack_active_guest_id');
+      return saved ? JSON.parse(saved) : null;
+    } catch { return null; }
+  });
+
+  const [guestButtons, setGuestButtons] = useState(() => {
+    try {
+      const saved = localStorage.getItem('stagetrack_guest_buttons');
+      return saved ? JSON.parse(saved) : {};
+    } catch { return {}; }
+  });
+
+  const [guestStickers, setGuestStickers] = useState(() => {
+    try {
+      const saved = localStorage.getItem('stagetrack_guest_stickers');
+      return saved ? JSON.parse(saved) : {};
+    } catch { return {}; }
+  });
+
   const [equippedSticker, setEquippedSticker] = useState(null);
   
-  const [isDoodling, setIsDoodlingInternal] = useState(false);
-  const [mediaUrl, setMediaUrlInternal] = useState(null);
-  const [mediaType, setMediaTypeInternal] = useState(null);
+  const [isDoodling, setIsDoodlingInternal] = useState(() => {
+    try {
+      const saved = localStorage.getItem('stagetrack_is_doodling');
+      return saved ? JSON.parse(saved) : false;
+    } catch { return false; }
+  });
 
-  const [isChatOpen, setIsChatOpen] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [mediaUrl, setMediaUrlInternal] = useState(() => {
+    try {
+      const saved = localStorage.getItem('stagetrack_media_url');
+      if (saved && saved.startsWith('blob:')) return null;
+      return saved || null;
+    } catch { return null; }
+  });
+
+  const [mediaType, setMediaTypeInternal] = useState(() => {
+    try {
+      const saved = localStorage.getItem('stagetrack_media_type');
+      const url = localStorage.getItem('stagetrack_media_url');
+      if (url && url.startsWith('blob:')) return null;
+      return saved || null;
+    } catch { return null; }
+  });
+
+  const [isChatOpen, setIsChatOpen] = useState(() => {
+    try {
+      const saved = localStorage.getItem('stagetrack_is_chat_open');
+      return saved ? JSON.parse(saved) : false;
+    } catch { return false; }
+  });
+
+  const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
+    try {
+      const saved = localStorage.getItem('stagetrack_is_sidebar_open');
+      return saved ? JSON.parse(saved) : false;
+    } catch { return false; }
+  });
+
   const [globalMute, setGlobalMute] = useState(true);
   const [globalPause, setGlobalPause] = useState(false);
 
   // Chat Moderation State
-  const [messages, setMessages] = useState([
-    { id: 'initial-1', text: "Hello! Here is a self message in darker purple.", sender: "self", status: "public" },
-    { id: 'initial-2', text: "Hello there! This is a guest message in green.", sender: "other", senderName: "Student 1", status: "public" },
-    { id: 'initial-3', text: "I have a private question/pending issue in red.", sender: "other", senderName: "Student 2", status: "pending" }
-  ]);
+  const [messages, setMessages] = useState(() => {
+    try {
+      const saved = localStorage.getItem('stagetrack_chat_messages');
+      return saved ? JSON.parse(saved) : [
+        { id: 'initial-1', text: "Hello! Here is a self message in darker purple.", sender: "self", status: "public" },
+        { id: 'initial-2', text: "Hello there! This is a guest message in green.", sender: "other", senderName: "Student 1", status: "public" },
+        { id: 'initial-3', text: "I have a private question/pending issue in red.", sender: "other", senderName: "Student 2", status: "pending" }
+      ];
+    } catch {
+      return [];
+    }
+  });
+
+  // Metronome State
+  const [metronomeBpm, setMetronomeBpm] = useState(() => {
+    try {
+      const saved = localStorage.getItem('stagetrack_metronome_bpm');
+      return saved ? parseInt(saved, 10) : 120;
+    } catch { return 120; }
+  });
+
+  const [isMetronomePlaying, setIsMetronomePlaying] = useState(() => {
+    try {
+      const saved = localStorage.getItem('stagetrack_is_metronome_playing');
+      return saved ? JSON.parse(saved) : false;
+    } catch { return false; }
+  });
+
+  // Drawing Canvas Strokes
+  const [drawingPaths, setDrawingPaths] = useState(() => {
+    try {
+      const saved = localStorage.getItem('stagetrack_drawing_paths');
+      return saved ? JSON.parse(saved) : [];
+    } catch { return []; }
+  });
+
+  // Sync state changes to localStorage
+  useEffect(() => {
+    if (activeGuestId !== null) {
+      localStorage.setItem('stagetrack_active_guest_id', JSON.stringify(activeGuestId));
+    } else {
+      localStorage.removeItem('stagetrack_active_guest_id');
+    }
+  }, [activeGuestId]);
+
+  useEffect(() => {
+    localStorage.setItem('stagetrack_guest_buttons', JSON.stringify(guestButtons));
+  }, [guestButtons]);
+
+  useEffect(() => {
+    localStorage.setItem('stagetrack_guest_stickers', JSON.stringify(guestStickers));
+  }, [guestStickers]);
+
+  useEffect(() => {
+    localStorage.setItem('stagetrack_is_doodling', JSON.stringify(isDoodling));
+  }, [isDoodling]);
+
+  useEffect(() => {
+    if (mediaUrl) {
+      localStorage.setItem('stagetrack_media_url', mediaUrl);
+    } else {
+      localStorage.removeItem('stagetrack_media_url');
+    }
+  }, [mediaUrl]);
+
+  useEffect(() => {
+    if (mediaType) {
+      localStorage.setItem('stagetrack_media_type', mediaType);
+    } else {
+      localStorage.removeItem('stagetrack_media_type');
+    }
+  }, [mediaType]);
+
+  useEffect(() => {
+    localStorage.setItem('stagetrack_is_chat_open', JSON.stringify(isChatOpen));
+  }, [isChatOpen]);
+
+  useEffect(() => {
+    localStorage.setItem('stagetrack_is_sidebar_open', JSON.stringify(isSidebarOpen));
+  }, [isSidebarOpen]);
+
+  useEffect(() => {
+    localStorage.setItem('stagetrack_chat_messages', JSON.stringify(messages));
+  }, [messages]);
+
+  useEffect(() => {
+    localStorage.setItem('stagetrack_metronome_bpm', metronomeBpm.toString());
+  }, [metronomeBpm]);
+
+  useEffect(() => {
+    localStorage.setItem('stagetrack_is_metronome_playing', JSON.stringify(isMetronomePlaying));
+  }, [isMetronomePlaying]);
+
+  useEffect(() => {
+    localStorage.setItem('stagetrack_drawing_paths', JSON.stringify(drawingPaths));
+  }, [drawingPaths]);
 
   // MUTUAL EXCLUSIVITY: Doodling vs Upload
   const setIsDoodling = useCallback((val) => {
@@ -328,7 +469,10 @@ export function AppProvider({ children }) {
     handleModerateMessage,
     handleSendChatMessage,
     equippedSticker,
-    setEquippedSticker
+    setEquippedSticker,
+    metronomeBpm, setMetronomeBpm,
+    isMetronomePlaying, setIsMetronomePlaying,
+    drawingPaths, setDrawingPaths
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
