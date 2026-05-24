@@ -7,7 +7,8 @@ export default function GuestContainer({
   stickers = [],
   buttons = { raiseHand: false, mute: false },
   nudges = {},
-  globalPause
+  globalPause,
+  isSpotlight
 }) {
   const isClosed = globalPause || buttons.mute;
   const showActiveGlow = isActive && !isClosed;
@@ -18,7 +19,7 @@ export default function GuestContainer({
 
   return (
     <div 
-      className={`video-cell ${showActiveGlow ? 'active-gc' : ''} ${showGrayscale ? 'grayscale-sharp' : ''} ${isNonInteractive ? 'non-interactive' : ''}`} 
+      className={`video-cell ${showActiveGlow ? 'active-gc' : ''} ${showGrayscale ? 'grayscale-sharp' : ''} ${isNonInteractive ? 'non-interactive' : ''} ${isSpotlight ? 'spotlight-cell' : ''}`} 
       onClick={() => onClick(participant)}
     >
 

@@ -106,25 +106,30 @@ function App() {
            </div>
            
            <div className="side-peos">
-             {participants.slice(8, 16).map(p => (
-               <GuestContainer 
-                 key={p.id}
-                 participant={p}
-                 isActive={activeGuestId === p.id}
-                 onClick={() => {
-                   const isMuted = guestButtons[p.id]?.mute;
-                   if (globalPause || isMuted || p.isBlank) return;
-                   setActiveGuestId(p.id);
-                 }}
-                 stickers={guestStickers[p.id] || []}
-                 buttons={guestButtons[p.id] || {}}
-                 nudges={stickerNudges[p.id] || {}}
-                 isDoodling={isDoodling}
-                 globalMute={globalMute}
-                 globalPause={globalPause}
-               />
-             ))}
-           </div>
+              {participants.slice(8, 16).map((p, index) => {
+                const actualIndex = 8 + index;
+                const isSpotlightSlot = actualIndex === 14;
+                return (
+                  <GuestContainer 
+                    key={p.id}
+                    participant={p}
+                    isActive={activeGuestId === p.id}
+                    onClick={() => {
+                      const isMuted = guestButtons[p.id]?.mute;
+                      if (globalPause || isMuted || p.isBlank) return;
+                      setActiveGuestId(p.id);
+                    }}
+                    stickers={guestStickers[p.id] || []}
+                    buttons={guestButtons[p.id] || {}}
+                    nudges={stickerNudges[p.id] || {}}
+                    isDoodling={isDoodling}
+                    globalMute={globalMute}
+                    globalPause={globalPause}
+                    isSpotlight={isSpotlightSlot}
+                  />
+                );
+              })}
+            </div>
         </div>
 
         {/* Right Sidebar */}

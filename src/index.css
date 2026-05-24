@@ -464,6 +464,12 @@ body {
   box-shadow: none !important;
 }
 
+.video-cell.spotlight-cell {
+  background-image: url('/spotlights.png');
+  background-size: cover;
+  background-position: center;
+}
+
 
 .gc-sticker {
   position: absolute;

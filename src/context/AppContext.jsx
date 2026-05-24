@@ -5,7 +5,9 @@ const AppContext = createContext();
 
 export function AppProvider({ children }) {
   const MOCK_USER_COUNT = 16; // Change this between 1 and 16 to test dynamic layouts
-  const totalSlots = MOCK_USER_COUNT % 2 !== 0 ? MOCK_USER_COUNT + 1 : MOCK_USER_COUNT;
+  const totalSlots = MOCK_USER_COUNT === 14 
+    ? 16 
+    : (MOCK_USER_COUNT % 2 !== 0 ? MOCK_USER_COUNT + 1 : MOCK_USER_COUNT);
 
   const [participants] = useState(
     Array.from({ length: totalSlots }, (_, i) => {
