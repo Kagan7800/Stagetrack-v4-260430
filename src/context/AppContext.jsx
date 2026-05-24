@@ -83,7 +83,12 @@ export function AppProvider({ children }) {
   });
 
   const [globalMute, setGlobalMute] = useState(true);
-  const [globalPause, setGlobalPause] = useState(false);
+  const [globalPause, setGlobalPause] = useState(() => {
+    try {
+      const saved = sessionStorage.getItem('stagetrack_global_pause');
+      return saved ? JSON.parse(saved) : false;
+    } catch { return false; }
+  });
 
   // Chat Moderation State
   const [messages, setMessages] = useState(() => {
@@ -183,14 +188,33 @@ export function AppProvider({ children }) {
     sessionStorage.setItem('stagetrack_drawing_paths', JSON.stringify(drawingPaths));
   }, [drawingPaths]);
 
-  // If global pause is activated, close the active student STO panel
+  useEffect(() => {
+    sessionStorage.setItem('stagetrack_global_pause', JSON.stringify(globalPause));
+  }, [globalPause]);
+
+  // If global pause is activated, close the active student STO panel, clear all student stickers and buttons
   useEffect(() => {
     if (globalPause) {
       setTimeout(() => {
         setActiveGuestId(null);
+        setGuestStickers({});
+        setGuestButtons({});
       }, 0);
     }
   }, [globalPause]);
+
+  // Enforce active guest validity (cannot be blank, muted, or active during global pause)
+  useEffect(() => {
+    if (activeGuestId !== null) {
+      const activeGuest = participants.find(p => p.id === activeGuestId);
+      const isMuted = guestButtons[activeGuestId]?.mute;
+      if (!activeGuest || activeGuest.isBlank || isMuted || globalPause) {
+        setTimeout(() => {
+          setActiveGuestId(null);
+        }, 0);
+      }
+    }
+  }, [activeGuestId, participants, guestButtons, globalPause]);
 
   // MUTUAL EXCLUSIVITY: Doodling vs Upload
   const setIsDoodling = useCallback((val) => {
@@ -244,32 +268,29 @@ export function AppProvider({ children }) {
   }, [setMessages]);
 
   const toggleGuestButton = useCallback((guestId, btnName) => {
-    setGuestButtons(prev => {
-      const nextVal = !(prev[guestId]?.[btnName]);
-      
-      // If muting/closing this student, close their active STO panel
-      if (btnName === 'mute' && nextVal === true) {
-        setActiveGuestId(current => current === guestId ? null : current);
+    setGuestButtons(prev => ({
+      ...prev,
+      [guestId]: {
+        ...(prev[guestId] || { raiseHand: false, mute: false, chat: false }),
+        [btnName]: !(prev[guestId]?.[btnName])
       }
-      
-      return {
-        ...prev,
-        [guestId]: {
-          ...(prev[guestId] || { raiseHand: false, mute: false, chat: false }),
-          [btnName]: nextVal
-        }
-      };
-    });
-  }, [setGuestButtons, setActiveGuestId]);
+    }));
+  }, [setGuestButtons]);
 
   const handleToggleGuestButton = useCallback((guestId, btnName) => {
     const currentState = guestButtons[guestId]?.[btnName] || false;
     const newState = !currentState;
+    
     toggleGuestButton(guestId, btnName);
+    
+    if (btnName === 'mute' && newState === true) {
+      setActiveGuestId(null);
+    }
+    
     if (btnName === 'chat') {
       setIsChatOpen(newState);
     }
-  }, [guestButtons, toggleGuestButton]);
+  }, [guestButtons, toggleGuestButton, setActiveGuestId]);
 
   const handleAddSticker = useCallback((targetId, stickerName, isInstructor) => {
     // If it's the instructor adding a sticker to the instructor container

@@ -14,10 +14,11 @@ export default function GuestContainer({
   const showRaiseHandGlow = buttons.raiseHand && !isClosed;
   const showGreenFilter = buttons.greenFilter && !isClosed;
   const showGrayscale = isClosed;
+  const isNonInteractive = isClosed || participant.isBlank;
 
   return (
     <div 
-      className={`video-cell ${showActiveGlow ? 'active-gc' : ''} ${showGrayscale ? 'grayscale-sharp' : ''}`} 
+      className={`video-cell ${showActiveGlow ? 'active-gc' : ''} ${showGrayscale ? 'grayscale-sharp' : ''} ${isNonInteractive ? 'non-interactive' : ''}`} 
       onClick={() => onClick(participant)}
     >
 

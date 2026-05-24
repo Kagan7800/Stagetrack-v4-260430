@@ -455,6 +455,15 @@ body {
   box-shadow: inset 0 0 15px rgba(239, 68, 68, 0.3), 0 0 10px rgba(239, 68, 68, 0.15);
 }
 
+.video-cell.non-interactive {
+  cursor: default !important;
+}
+
+.video-cell.non-interactive:hover {
+  transform: none !important;
+  box-shadow: none !important;
+}
+
 
 .gc-sticker {
   position: absolute;

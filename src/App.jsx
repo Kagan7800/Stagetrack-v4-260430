@@ -64,7 +64,11 @@ function App() {
                  key={p.id}
                  participant={p}
                  isActive={activeGuestId === p.id}
-                 onClick={() => setActiveGuestId(p.id)}
+                 onClick={() => {
+                   const isMuted = guestButtons[p.id]?.mute;
+                   if (globalPause || isMuted || p.isBlank) return;
+                   setActiveGuestId(p.id);
+                 }}
                  stickers={guestStickers[p.id] || []}
                  buttons={guestButtons[p.id] || {}}
                  nudges={stickerNudges[p.id] || {}}
@@ -107,7 +111,11 @@ function App() {
                  key={p.id}
                  participant={p}
                  isActive={activeGuestId === p.id}
-                 onClick={() => setActiveGuestId(p.id)}
+                 onClick={() => {
+                   const isMuted = guestButtons[p.id]?.mute;
+                   if (globalPause || isMuted || p.isBlank) return;
+                   setActiveGuestId(p.id);
+                 }}
                  stickers={guestStickers[p.id] || []}
                  buttons={guestButtons[p.id] || {}}
                  nudges={stickerNudges[p.id] || {}}
