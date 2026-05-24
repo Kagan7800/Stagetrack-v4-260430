@@ -24,17 +24,17 @@ export function AppProvider({ children }) {
         }
       }
     } catch { /* ignore */ }
-    return 9;
+    return 8;
   }, []);
 
-  const totalSlots = MOCK_USER_COUNT > 8 
-    ? (MOCK_USER_COUNT <= 12 ? 12 : 16)
+  const totalSlots = MOCK_USER_COUNT >= 8 
+    ? (MOCK_USER_COUNT <= 8 ? 8 : (MOCK_USER_COUNT <= 12 ? 12 : 16))
     : (MOCK_USER_COUNT % 2 !== 0 ? MOCK_USER_COUNT + 1 : MOCK_USER_COUNT);
 
   const [participants] = useState(() => {
     // Helper function to map 1-based display slot number to grid index
     const getArrayIndex = (slotNum) => {
-      if (totalSlots <= 8) {
+      if (totalSlots < 8) {
         return slotNum - 1;
       }
       const halfLength = totalSlots / 2;
@@ -504,7 +504,7 @@ export function AppProvider({ children }) {
     participants.forEach(p => nudges[p.id] = {});
 
     const len = participants.length;
-    if (len <= 8) {
+    if (len < 8) {
       participants.forEach(p => {
          const stickers = guestStickers[p.id] || [];
          stickers.forEach(s => {

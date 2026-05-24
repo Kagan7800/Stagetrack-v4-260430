@@ -23,7 +23,7 @@ function App() {
   const isInstructorSidebarVisible = true;
   const activeGuest = participants.find(p => p.id === activeGuestId);
 
-  const halfLength = participants.length > 8 ? participants.length / 2 : 8;
+  const halfLength = participants.length >= 8 ? participants.length / 2 : 8;
   const leftParticipants = participants.slice(0, halfLength);
   const rightParticipants = participants.slice(halfLength);
 
