@@ -98,31 +98,36 @@ export default function UnifiedToolbox({
               className={`gb-btn ${buttons.raiseHand ? 'active' : ''}`}
               onClick={() => toggleGuestButton(activeGuest.id, 'raiseHand')}
             >
-              <Hand size={16} /> Raise Hand
+              <Hand size={18} />
+              <span>Raise Hand</span>
             </button>
             <button 
               className={`gb-btn ${buttons.mute ? 'active' : ''}`}
               onClick={() => toggleGuestButton(activeGuest.id, 'mute')}
             >
-              <MicOff size={16} /> Mute/Pause
+              <MicOff size={18} />
+              <span>Mute/Pause</span>
             </button>
             <button 
               className={`gb-btn ${buttons.chat ? 'active' : ''}`}
               onClick={() => toggleGuestButton(activeGuest.id, 'chat')}
             >
-              <MessageSquare size={16} /> Chat
+              <MessageSquare size={18} />
+              <span>Chat</span>
             </button>
             <button 
               className={`gb-btn ${buttons.greenFilter ? 'active' : ''}`}
               onClick={() => toggleGuestButton(activeGuest.id, 'greenFilter')}
             >
-              <Sparkles size={16} /> Green Filter
+              <Sparkles size={18} />
+              <span>Green Filter</span>
             </button>
             <button 
               className="gb-btn screenshot-btn"
               onClick={handleScreenshot}
             >
-              <Camera size={16} /> Take a Picture
+              <Camera size={18} />
+              <span>Take a Picture</span>
             </button>
           </div>
 

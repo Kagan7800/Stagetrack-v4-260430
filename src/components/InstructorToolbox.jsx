@@ -167,11 +167,11 @@ export default function InstructorToolbox() {
             </div>
 
             <button 
-              className={`gb-btn ${globalMute ? 'active' : ''}`}
+              className={`gb-btn ${!globalMute ? 'active' : ''}`}
               onClick={() => setGlobalMute(!globalMute)}
-              aria-pressed={globalMute}
+              aria-pressed={!globalMute}
             >
-              {globalMute ? <MicOff size={16} /> : <Mic size={16} />} Mute All / Unmute All
+              {globalMute ? <MicOff size={16} /> : <Mic size={16} />} {globalMute ? 'Unmute' : 'Mute'}
             </button>
 
             <button 

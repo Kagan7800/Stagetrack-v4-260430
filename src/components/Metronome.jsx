@@ -150,7 +150,9 @@ export default function Metronome() {
             <div 
               key={b} 
               className={`beat-dot ${currentBeat === b ? 'active' : ''} ${b === 0 ? 'downbeat' : ''}`}
-            />
+            >
+              {b + 1}
+            </div>
           ))}
         </div>
 
@@ -159,7 +161,7 @@ export default function Metronome() {
           <div 
             className={`pendulum-arm ${isMetronomePlaying ? 'swinging' : ''}`}
             style={{ 
-              animationDuration: `${60 / metronomeBpm}s` 
+              animationDuration: `${60 / (Number(metronomeBpm) || 120)}s` 
             }}
           />
         </div>
@@ -167,9 +169,18 @@ export default function Metronome() {
 
       <div className="metronome-info-card">
         <span className="metronome-title">NATIVE METRONOME</span>
-        <div className="metronome-bpm-display">
-          <span className="bpm-number">{metronomeBpm}</span>
-          <span className="bpm-label">BPM</span>
+        <div className="metronome-bpm-display" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '20px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <span className="bpm-number">{metronomeBpm || 120}</span>
+            <span className="bpm-label">BPM</span>
+          </div>
+          <div style={{ width: '2px', height: '40px', background: 'rgba(255,255,255,0.1)' }}></div>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <span className="bpm-number" style={{ color: currentBeat === 0 ? '#22c55e' : currentBeat > 0 ? '#3b82f6' : '#64748b' }}>
+              {currentBeat >= 0 ? currentBeat + 1 : '-'}
+            </span>
+            <span className="bpm-label">BEAT</span>
+          </div>
         </div>
       </div>
 

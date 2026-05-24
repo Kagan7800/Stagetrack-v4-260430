@@ -328,10 +328,53 @@ body {
 .gt-buttons-col {
   display: flex;
   flex-direction: row;
+  align-items: stretch;
+  gap: 8px;
+  margin-top: 16px;
+  width: 100%;
+}
+
+.unified-toolbox .gb-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 20px;
+  text-align: center;
+  gap: 6px;
+  padding: 8px 4px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  min-width: 0;
+  color: white;
+  transition: all 0.2s;
+  opacity: 1 !important;
+}
+
+.unified-toolbox .gb-btn:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+  transform: translateY(-1px);
+}
+
+.unified-toolbox .gb-btn:active {
+  transform: translateY(0);
+}
+
+.unified-toolbox .gb-btn.active {
+  background: var(--accent-color) !important;
+  border-color: var(--accent-color) !important;
+}
+
+.unified-toolbox .gb-btn.screenshot-btn {
+  background: transparent !important;
+  border: none !important;
+}
+
+.unified-toolbox .gb-btn.screenshot-btn:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
 }
 
 .gt-sticker-grid {
@@ -1185,13 +1228,20 @@ body {
 }
 
 .beat-dot {
-  width: 24px;
-  height: 24px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.1);
   border: 2px solid rgba(255, 255, 255, 0.2);
   transition: all 0.08s ease-out;
   box-shadow: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: 700;
+  font-size: 0.95rem;
+  font-family: system-ui, -apple-system, sans-serif;
 }
 
 .beat-dot.active {
@@ -1199,12 +1249,14 @@ body {
   border-color: #93c5fd;
   transform: scale(1.2);
   box-shadow: 0 0 16px rgba(59, 130, 246, 0.8);
+  color: white;
 }
 
 .beat-dot.active.downbeat {
   background: #22c55e; /* downbeat green */
   border-color: #86efac;
   box-shadow: 0 0 20px rgba(34, 197, 94, 0.9);
+  color: white;
 }
 
 /* Pendulum visual track */
