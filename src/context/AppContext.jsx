@@ -4,7 +4,7 @@ import { createContext, useContext, useState, useMemo, useCallback, useEffect } 
 const AppContext = createContext();
 
 export function AppProvider({ children }) {
-  const MOCK_USER_COUNT = 15; // Change this between 1 and 16 to test dynamic layouts
+  const MOCK_USER_COUNT = 14; // Change this between 1 and 16 to test dynamic layouts
   const totalSlots = MOCK_USER_COUNT > 8 
     ? 16 
     : (MOCK_USER_COUNT % 2 !== 0 ? MOCK_USER_COUNT + 1 : MOCK_USER_COUNT);
@@ -32,8 +32,18 @@ export function AppProvider({ children }) {
       
       // Determine if this slot is a designated blank slot
       let isDesignatedBlank = false;
-      if (MOCK_USER_COUNT === 13 && slotNum === 6) {
-        isDesignatedBlank = true;
+      if (MOCK_USER_COUNT === 13) {
+        if (slotNum === 6 || slotNum === 15 || slotNum === 16) {
+          isDesignatedBlank = true;
+        }
+      } else if (MOCK_USER_COUNT === 14) {
+        if (slotNum === 13 || slotNum === 16) {
+          isDesignatedBlank = true;
+        }
+      } else if (MOCK_USER_COUNT === 15) {
+        if (slotNum === 16) {
+          isDesignatedBlank = true;
+        }
       }
 
       if (isDesignatedBlank || personCounter >= MOCK_USER_COUNT) {
