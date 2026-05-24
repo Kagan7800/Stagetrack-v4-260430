@@ -25,10 +25,13 @@ function App() {
   const activeGuest = participants.find(p => p.id === activeGuestId);
 
   const halfLength = participants.length >= 4 ? participants.length / 2 : 8;
-  const leftParticipants = MOCK_USER_COUNT === 3 
+  const activeCount = participants.filter(p => !p.isBlank).length;
+  const isThreePeo = Number(MOCK_USER_COUNT) === 3 || activeCount === 3;
+
+  const leftParticipants = isThreePeo 
     ? participants.slice(0, 1) 
     : participants.slice(0, halfLength);
-  const rightParticipants = MOCK_USER_COUNT === 3 
+  const rightParticipants = isThreePeo 
     ? participants.slice(1, 3) 
     : participants.slice(halfLength);
 
