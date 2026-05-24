@@ -575,14 +575,14 @@ body {
 }
 
 .gc-sticker.pos-rc-1 {
-  top: calc(50% - 24px);
+  top: calc(50% - 14px);
   right: 0;
   width: 30px !important;
   height: 30px !important;
 }
 
 .gc-sticker.pos-rc-2 {
-  top: calc(50% + 24px);
+  top: calc(50% + 14px);
   right: 0;
   width: 30px !important;
   height: 30px !important;
