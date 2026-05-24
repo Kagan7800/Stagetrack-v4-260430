@@ -987,17 +987,17 @@ body {
 }
 
 .gb-btn.screenshot-btn {
-  background: rgba(255, 255, 255, 0.1);
+  background: transparent;
   opacity: 1;
 }
 
 .gb-btn.screenshot-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.1);
   transform: translateY(-1px);
 }
 
 .gb-btn.screenshot-btn:active {
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.2);
   transform: translateY(0);
 }
 
