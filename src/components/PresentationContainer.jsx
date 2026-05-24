@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from 'react';
-import { X } from 'lucide-react';
+import { X, Eraser } from 'lucide-react';
 
 export default function PresentationContainer({ 
   isDoodling, 
@@ -26,7 +26,14 @@ export default function PresentationContainer({
     setSelectedColor(color);
     selectedColorRef.current = color;
     if (contextRef.current) {
-      contextRef.current.strokeStyle = color;
+      if (color === 'eraser') {
+        contextRef.current.globalCompositeOperation = 'destination-out';
+        contextRef.current.lineWidth = 16;
+      } else {
+        contextRef.current.globalCompositeOperation = 'source-over';
+        contextRef.current.strokeStyle = color;
+        contextRef.current.lineWidth = 4;
+      }
     }
   };
 
@@ -52,9 +59,15 @@ export default function PresentationContainer({
       canvas.height = canvas.offsetHeight;
 
       // Restore drawing and settings
-      ctx.lineWidth = 4;
       ctx.lineCap = 'round';
-      ctx.strokeStyle = selectedColorRef.current;
+      if (selectedColorRef.current === 'eraser') {
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.lineWidth = 16;
+      } else {
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.strokeStyle = selectedColorRef.current;
+        ctx.lineWidth = 4;
+      }
       if (tempCanvas.width > 0 && tempCanvas.height > 0) {
         ctx.drawImage(tempCanvas, 0, 0);
       }
@@ -73,6 +86,16 @@ export default function PresentationContainer({
   const startDrawing = (e) => {
     if (!isDoodling || !contextRef.current) return;
     const { offsetX, offsetY } = e.nativeEvent;
+    
+    if (selectedColorRef.current === 'eraser') {
+      contextRef.current.globalCompositeOperation = 'destination-out';
+      contextRef.current.lineWidth = 16;
+    } else {
+      contextRef.current.globalCompositeOperation = 'source-over';
+      contextRef.current.strokeStyle = selectedColorRef.current;
+      contextRef.current.lineWidth = 4;
+    }
+    
     contextRef.current.beginPath();
     contextRef.current.moveTo(offsetX, offsetY);
     setIsDrawing(true);
@@ -148,7 +171,7 @@ export default function PresentationContainer({
       {/* Drawing Canvas Layer */}
       <canvas
         ref={canvasRef}
-        className={`doodle-canvas ${isDoodling ? 'active' : ''}`}
+        className={`doodle-canvas ${isDoodling ? 'active' : ''} ${selectedColor === 'eraser' ? 'eraser-active' : ''}`}
         onMouseDown={startDrawing}
         onMouseMove={draw}
         onMouseUp={stopDrawing}
@@ -168,6 +191,14 @@ export default function PresentationContainer({
               aria-label={`Select ${color.name}`}
             />
           ))}
+          <button
+            className={`eraser-btn ${selectedColor === 'eraser' ? 'active' : ''}`}
+            onClick={() => handleColorChange('eraser')}
+            title="Eraser"
+            aria-label="Select Eraser"
+          >
+            <Eraser size={14} />
+          </button>
         </div>
       )}
     </div>

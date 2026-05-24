@@ -752,6 +752,10 @@ body {
   cursor: crosshair;
 }
 
+.doodle-canvas.active.eraser-active {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21'/><path d='M22 21H7'/><path d='m5 11 9 9'/></svg>") 2 20, pointer;
+}
+
 /* Scrollbar customization */
 ::-webkit-scrollbar {
   width: 6px;
@@ -927,6 +931,7 @@ body {
   left: 50%;
   transform: translateX(-50%);
   display: flex;
+  align-items: center;
   gap: 10px;
   padding: 6px 12px;
   border-radius: 9999px;
@@ -954,6 +959,31 @@ body {
   border-color: #ffffff;
   transform: scale(1.25);
   box-shadow: 0 0 6px rgba(255, 255, 255, 0.6);
+}
+
+.eraser-btn {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  width: 18px;
+  height: 18px;
+  transition: transform 0.2s, color 0.2s;
+}
+
+.eraser-btn:hover {
+  transform: scale(1.2);
+  color: #ffffff;
+}
+
+.eraser-btn.active {
+  color: #ec4899;
+  transform: scale(1.25);
+  filter: drop-shadow(0 0 4px rgba(236, 72, 153, 0.6));
 }
 
 /* PEO Sticker Grid - exactly 8 columns in 1 row */
