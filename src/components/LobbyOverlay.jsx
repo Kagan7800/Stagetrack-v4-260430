@@ -103,19 +103,6 @@ export default function LobbyOverlay() {
       >
         <img src="/assets/Lobby.svg" className="lobby-svg-img" alt="Lobby Background" />
 
-        {/* Extracted optimized raster assets absolute positioned on top */}
-        <img src="/assets/lobby_image_0.png" className="lobby-deco-img-0" alt="" />
-        <img src="/assets/lobby_image_1.png" className="lobby-deco-img-1" alt="" />
-        <img src="/assets/lobby_image_1.png" className="lobby-deco-img-2" alt="" />
-        <img src="/assets/lobby_image_2.png" className="lobby-deco-img-3" alt="" />
-
-        {/* Mask out labels drawn in the background SVG */}
-        <div className="lobby-label-mask-1"></div>
-        <div className="lobby-label-mask-2"></div>
-
-        {/* Mask out the crown icon from the Pick your icons section */}
-        <div className="lobby-crown-mask"></div>
-
         {lobbyStatus === 'initial' && (
           <form onSubmit={handleSubmit}>
              {/* Input 1: My Name (Adult) */}
@@ -123,6 +110,7 @@ export default function LobbyOverlay() {
               type="text" 
               className="lobby-overlay-input-1"
               required 
+              placeholder="Adult's 1st Name"
               value={myName}
               onChange={(e) => setMyName(e.target.value.slice(0, 15))}
               maxLength={15}
@@ -133,23 +121,10 @@ export default function LobbyOverlay() {
               type="text" 
               className="lobby-overlay-input-2"
               required 
+              placeholder="Child's 1st Name"
               value={myLittleOne}
               onChange={(e) => setMyLittleOne(e.target.value.slice(0, 15))}
               maxLength={15}
-            />
-
-            {/* Right arrow buttons next to the inputs acting as submit links */}
-            <button 
-              type="submit" 
-              className="lobby-arrow-submit-btn arrow-1" 
-              title="Join Session"
-              disabled={!myName.trim() || !myLittleOne.trim()}
-            />
-            <button 
-              type="submit" 
-              className="lobby-arrow-submit-btn arrow-2" 
-              title="Join Session"
-              disabled={!myName.trim() || !myLittleOne.trim()}
             />
 
             {/* Camera feed overlay inside the container below the inputs */}
@@ -165,14 +140,6 @@ export default function LobbyOverlay() {
                   <span>Webcam Preview</span>
                 </div>
               )}
-              {/* Selected Icon Overlay */}
-              {selectedIconFile && (
-                <img 
-                  src={`/assets/svg_stickers/${selectedIconFile}`}
-                  alt="Selected Icon"
-                  className="lobby-camera-icon-overlay"
-                />
-              )}
               {/* Name Overlay */}
               {myName && (
                 <div className="lobby-camera-name-badge">
@@ -181,50 +148,15 @@ export default function LobbyOverlay() {
               )}
             </div>
 
-            {/* Mask out original Pick your icons section on the SVG background */}
-            <div className="lobby-icons-mask"></div>
-
-            {/* STO stickers selection grid */}
-            <div className="lobby-icons-grid">
-              {STO_STICKERS.map((sticker) => (
-                <button
-                  key={sticker}
-                  type="button"
-                  className={`lobby-icon-swatch ${selectedIcon === sticker ? 'selected' : ''}`}
-                  onClick={() => setSelectedIcon(sticker)}
-                  title={sticker.replace('.svg', '').replace('.png', '')}
-                >
-                  <img 
-                    src={`/assets/svg_stickers/${sticker}`} 
-                    alt={sticker} 
-                    className="lobby-icon-swatch-img" 
-                  />
-                </button>
-              ))}
-            </div>
-
-            {/* Border selector buttons on the "Pick your Border" card */}
-            <div className="lobby-border-picker">
-              {BORDERS.map((border) => (
-                <button
-                  key={border.value}
-                  type="button"
-                  className={`border-option-btn ${selectedBorder === border.value ? 'selected' : ''}`}
-                  style={{ '--border-glow': border.value, borderColor: border.value }}
-                  onClick={() => setSelectedBorder(border.value)}
-                >
-                  {border.name}
-                </button>
-              ))}
-            </div>
-
-            {/* Click to Join Session click zone covering Column 3 printed text and right arrow */}
+            {/* Join Session Button positioned in Column 3 */}
             <button 
               type="submit" 
-              className="lobby-join-button-click-zone"
+              className="lobby-join-button"
               disabled={!myName.trim() || !myLittleOne.trim()}
-              title="Click to Join Session"
-            />
+              title="Join Session"
+            >
+              Join Session
+            </button>
           </form>
         )}
 

@@ -1833,34 +1833,55 @@ body {
 
 .lobby-overlay-input-1 {
   position: absolute;
-  left: 3.984%;
+  left: 11.204%;
   top: 41.977%;
   width: 18.683%;
   height: 6.141%;
-  background: transparent;
-  border: none;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: calc(3px * var(--lobby-scale)) solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: calc(14px * var(--lobby-scale)) !important;
   outline: none;
   color: white;
-  font-size: calc(85px * var(--lobby-scale));
-  padding: 0 calc(50px * var(--lobby-scale));
+  font-size: calc(48px * var(--lobby-scale));
+  padding: 0 calc(35px * var(--lobby-scale));
   font-family: 'Risque', serif;
   box-sizing: border-box;
+  transition: all 0.3s;
+}
+
+.lobby-overlay-input-1:focus {
+  background: rgba(255, 255, 255, 0.15) !important;
+  border-color: rgba(255, 255, 255, 0.65) !important;
+  box-shadow: 0 0 calc(20px * var(--lobby-scale)) rgba(255, 255, 255, 0.15) !important;
 }
 
 .lobby-overlay-input-2 {
   position: absolute;
-  left: 3.984%;
+  left: 11.204%;
   top: 51.313%;
   width: 18.683%;
   height: 6.141%;
-  background: transparent;
-  border: none;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: calc(3px * var(--lobby-scale)) solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: calc(14px * var(--lobby-scale)) !important;
   outline: none;
   color: white;
-  font-size: calc(85px * var(--lobby-scale));
-  padding: 0 calc(50px * var(--lobby-scale));
+  font-size: calc(48px * var(--lobby-scale));
+  padding: 0 calc(35px * var(--lobby-scale));
   font-family: 'Risque', serif;
   box-sizing: border-box;
+  transition: all 0.3s;
+}
+
+.lobby-overlay-input-2:focus {
+  background: rgba(255, 255, 255, 0.15) !important;
+  border-color: rgba(255, 255, 255, 0.65) !important;
+  box-shadow: 0 0 calc(20px * var(--lobby-scale)) rgba(255, 255, 255, 0.15) !important;
+}
+
+.lobby-overlay-input-1::placeholder,
+.lobby-overlay-input-2::placeholder {
+  color: rgba(255, 255, 255, 0.4) !important;
 }
 
 .lobby-overlay-colors {
@@ -1933,10 +1954,10 @@ body {
 /* Lobby Waiting & Denied Views overlay on the form */
 .lobby-overlay-status {
   position: absolute;
-  left: 3.763%;
+  left: 10.983%;
   top: 40%;
   width: 19.777%;
-  height: 52%;
+  height: 54%;
   background: rgba(23, 69, 185, 0.96);
   border-radius: calc(24px * var(--lobby-scale));
   border: calc(5px * var(--lobby-scale)) solid rgba(255, 255, 255, 0.15);
@@ -2269,10 +2290,10 @@ body {
 /* Camera preview container styled as a PEO video cell */
 .lobby-camera-preview-container {
   position: absolute;
-  left: 3.984%;
-  top: 59.5%;
-  width: 18.683%;
-  height: 34.5%;
+  left: 10.983%;
+  top: 62.383%;
+  width: 19.777%;
+  height: 30.99%;
   background: #000000;
   border-radius: calc(24px * var(--lobby-scale));
   border: calc(6px * var(--lobby-scale)) solid #22c55e;
@@ -2390,60 +2411,40 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
-/* Join Button Click Zone covering the right arrow and Join session text */
-.lobby-join-button-click-zone {
+/* HTML-drawn Join Session Button positioned on the right (Column 3) */
+.lobby-join-button {
   position: absolute;
   left: 54.0%;
-  top: 72.0%;
+  top: 59.5%;
   width: 18.683%;
-  height: 20%;
-  background: transparent;
+  height: 8.5%;
+  background: #22c55e;
   border: none;
+  border-radius: calc(20px * var(--lobby-scale));
+  font-size: calc(36px * var(--lobby-scale));
+  font-weight: bold;
+  color: white;
   cursor: pointer;
   outline: none;
   z-index: 10;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.2s, background-color 0.2s;
-  border-radius: calc(30px * var(--lobby-scale));
+  transition: all 0.2s;
+  font-family: 'Risque', serif;
+  box-shadow: 0 calc(10px * var(--lobby-scale)) calc(30px * var(--lobby-scale)) rgba(34, 197, 94, 0.4);
 }
 
-.lobby-join-button-click-zone:hover:not(:disabled) {
-  transform: scale(1.05);
-  background: rgba(255, 255, 255, 0.08);
+.lobby-join-button:hover:not(:disabled) {
+  background: #16a34a;
+  transform: translateY(calc(-4px * var(--lobby-scale)));
+  box-shadow: 0 calc(15px * var(--lobby-scale)) calc(40px * var(--lobby-scale)) rgba(34, 197, 94, 0.6);
 }
 
-.lobby-join-button-click-zone:disabled {
-  cursor: not-allowed;
+.lobby-join-button:disabled {
   opacity: 0.5;
-}
-
-/* Arrow submit buttons next to input fields */
-.lobby-arrow-submit-btn {
-  position: absolute;
-  width: 3.5%;
-  height: 6.141%;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  outline: none;
-  z-index: 5;
-  transition: transform 0.2s;
-}
-
-.lobby-arrow-submit-btn:hover:not(:disabled) {
-  transform: scale(1.15) translateX(3px);
-}
-
-.lobby-arrow-submit-btn.arrow-1 {
-  left: 22.8%;
-  top: 41.977%;
-}
-
-.lobby-arrow-submit-btn.arrow-2 {
-  left: 22.8%;
-  top: 51.313%;
+  cursor: not-allowed;
+  box-shadow: none;
 }
 
 /* Sparkle filter animation for instructor pending PEO cell */
