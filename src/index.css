@@ -58,7 +58,7 @@ body {
   gap: 10px;
   padding: 10px;
   overflow: hidden;
-  background-image: url('/b2.png');
+  background-image: url('/assets/background_modern.png');
   background-size: cover;
   background-position: center;
 }
