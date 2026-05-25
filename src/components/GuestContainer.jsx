@@ -400,17 +400,48 @@ export default function GuestContainer({
           style.height = isIcSticker ? '48px' : '74px';
         }
 
-        if (s.name === 'Guitar 2.svg' || s.name === 'Dog 2.svg') {
-          style.width = isIcSticker ? '55px' : '85px';
-          style.height = isIcSticker ? '55px' : '85px';
+        if (s.name === 'Trumpet 2.svg') {
+          let xT = 0;
+          let yT = 0;
+          let hasCustomTransform = false;
+
+          if (s.position === 1) { xT = -65; yT = -65; hasCustomTransform = true; }
+          else if (s.position === 2) { xT = 65; yT = -65; hasCustomTransform = true; }
+          else if (s.position === 3) { xT = -65; yT = 65; hasCustomTransform = true; }
+          else if (s.position === 4) { xT = 65; yT = 65; hasCustomTransform = true; }
+          else if (s.position === 5) { xT = 50; yT = -50; hasCustomTransform = true; }
+          else if (s.position === 'crown') {
+            style.top = '13px';
+          }
+          else if (s.position === 'star') { xT = -50; yT = -50; hasCustomTransform = true; }
+          else if (s.position === 'star2') { xT = 50; yT = 0; hasCustomTransform = true; }
+          else if (s.position === 'heart') { xT = -50; yT = 50; hasCustomTransform = true; }
+          else if (s.position === 'birthday') { xT = 50; yT = -50; hasCustomTransform = true; }
+          else if (s.position === 'balloons') { xT = -50; yT = -50; hasCustomTransform = true; }
+          else if (isIcSticker) {
+            xT = (s.position.includes('tr-c') || s.position.startsWith('rc-')) ? 50 : -50;
+            yT = -50;
+            hasCustomTransform = true;
+          }
+
+          if (hasCustomTransform) {
+            const xTInward = xT * 0.85;
+            const yTInward = yT * 0.85;
+            const rot = s.rotation || 0;
+            const sc = s.scale || 1;
+            style.transform = `translate(${xTInward}%, ${yTInward}%) rotate(${rot}deg) scale(${sc})`;
+          }
         }
+
+        const isLargeSticker = s.name === 'Guitar 2.svg' || s.name === 'Dog 2.svg' || s.name === 'Trumpet 2.svg';
+        const isTrumpet = s.name === 'Trumpet 2.svg';
 
         return (
           <img 
             key={s.id} 
             src={`/assets/svg_stickers/${s.name}`} 
             alt={s.name} 
-            className={`gc-sticker pos-${s.position} ${isIcSticker ? 'ic-placed' : ''} ${(s.name === 'Sun with sunglasses 2.svg' && typeof s.position === 'number') ? 'sun-special' : ''}`} 
+            className={`gc-sticker pos-${s.position} ${isIcSticker ? 'ic-placed' : ''} ${(s.name === 'Sun with sunglasses 2.svg' && typeof s.position === 'number') ? 'sun-special' : ''} ${isLargeSticker ? 'large-sticker' : ''} ${isTrumpet ? 'trumpet-special' : ''}`} 
             style={{ ...style, zIndex: 11 }}
           />
         );

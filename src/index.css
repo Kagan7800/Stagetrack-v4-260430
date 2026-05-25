@@ -525,6 +525,16 @@ body {
   height: 46px;
 }
 
+.gc-sticker.large-sticker {
+  width: 85px !important;
+  height: 85px !important;
+}
+
+.gc-sticker.large-sticker.ic-placed {
+  width: 55px !important;
+  height: 55px !important;
+}
+
 /* Antigravity Spatial Map & Priority Stack */
 .gc-sticker.pos-sun {
   top: 50%;
