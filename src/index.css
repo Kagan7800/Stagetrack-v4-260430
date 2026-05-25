@@ -460,8 +460,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: visible;
-  /* To allow stickers on borders */
+  overflow: hidden;
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
 
@@ -536,7 +535,7 @@ body {
 /* Antigravity Spatial Map & Priority Stack */
 .gc-sticker.pos-sun {
   top: 50%;
-  right: -9px;
+  right: 4px;
   margin-top: -30px; /* Vertically centers the 59px sticker without transform */
   transform: none !important; /* Never moves */
   transition: none !important; /* Never moves */
@@ -544,55 +543,55 @@ body {
 }
 
 .gc-sticker.pos-crown {
-  top: 0;
+  top: 4px;
   left: 50%;
   width: 71px;
   height: 71px;
-  transform: translate(-50%, calc(-50% - 3px));
+  transform: translateX(-50%);
   z-index: 9999 !important; /* Always wins/overlaps STO */
 }
 
 .gc-sticker.pos-star {
-  top: 0;
+  top: 4px;
   left: 53px; /* Safe distance from the top-left sticker */
   width: 44px;
   height: 44px;
-  transform: translate(-50%, -50%);
+  transform: none;
   z-index: 40;
 }
 
 .gc-sticker.pos-star2 {
-  top: 0;
+  top: 4px;
   right: 62px; /* Moved left another 3px */
   width: 22px;
   height: 22px;
-  transform: translate(50%, 0); /* Show full image */
+  transform: none; /* Show full image */
   z-index: 40;
 }
 
 .gc-sticker.pos-heart {
-  bottom: 0;
+  bottom: 4px;
   left: 75%;
   width: 44px;
   height: 44px;
-  transform: translate(-50%, 50%);
+  transform: translateX(-50%);
   z-index: 40;
 }
 
 .gc-sticker.pos-birthday {
-  top: 10px;
-  right: 15px;
+  top: 4px;
+  right: 4px;
   width: 83px;
   height: 83px;
-  transform: translate(50%, -50%);
+  transform: none;
   z-index: 9999 !important; /* Always wins/overlaps STO */
   padding: 1px;
 }
 
 .gc-sticker.pos-balloons {
   top: 50%;
-  left: 0;
-  transform: translate(-50%, -50%);
+  left: 4px;
+  transform: translateY(-50%);
   z-index: 30;
 }
 
@@ -607,38 +606,38 @@ body {
 }
 
 .gc-sticker.pos-1 {
-  top: 0;
-  left: 0;
-  transform: translate(-65%, -65%);
+  top: 4px;
+  left: 4px;
+  transform: none;
   z-index: 9999 !important;
 }
 
 .gc-sticker.pos-2 {
-  top: 0;
-  right: 0;
-  transform: translate(65%, -65%);
+  top: 4px;
+  right: 4px;
+  transform: none;
   z-index: 9999 !important;
   padding: 1px;
 }
 
 .gc-sticker.pos-3 {
-  bottom: 0;
-  left: 0;
-  transform: translate(-65%, 65%);
+  bottom: 4px;
+  left: 4px;
+  transform: none;
   z-index: 9999 !important;
 }
 
 .gc-sticker.pos-4 {
-  bottom: 0;
-  right: 0;
-  transform: translate(65%, 65%);
+  bottom: 4px;
+  right: 4px;
+  transform: none;
   z-index: 9999 !important;
 }
 
 .gc-sticker.pos-5 {
   top: 50%;
-  right: 0;
-  transform: translate(50%, -50%);
+  right: 4px;
+  transform: translateY(-50%);
   z-index: 9999 !important;
 }
 
@@ -646,7 +645,7 @@ body {
   bottom: auto !important;
   top: 50% !important;
   left: auto !important;
-  right: -9px !important;
+  right: 4px !important;
   transform: translateY(-50%) !important;
 }
 
@@ -676,43 +675,43 @@ body {
 
 /* GC Sticker Positions for Instructor-Added Slots */
 .gc-sticker.pos-tc {
-  top: 0;
+  top: 4px;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translateX(-50%);
 }
 
 .gc-sticker.pos-rc-1 {
-  top: calc(50% - 14px);
-  right: 0;
+  top: calc(50% - 18px);
+  right: 4px;
   width: 30px !important;
   height: 30px !important;
 }
 
 .gc-sticker.pos-rc-2 {
-  top: calc(50% + 14px);
-  right: 0;
+  top: calc(50% + 18px);
+  right: 4px;
   width: 30px !important;
   height: 30px !important;
 }
 
 .gc-sticker.pos-tl-c {
-  top: 0;
+  top: 4px;
   left: 25%;
-  transform: translate(-50%, -50%);
+  transform: translateX(-50%);
 }
 
 .gc-sticker.pos-tr-c {
-  top: 3px;
+  top: 4px;
   right: 25%;
-  transform: translate(50%, -50%);
+  transform: translateX(50%);
   width: 30px !important;
   height: 30px !important;
 }
 
 .gc-sticker.pos-lc {
   top: 50%;
-  left: 0;
-  transform: translate(-50%, -50%);
+  left: 4px;
+  transform: translateY(-50%);
 }
 
 /* right center */
@@ -1784,6 +1783,51 @@ body {
   display: block;
 }
 
+/* Position extracted raster images over the clean vector background */
+.lobby-deco-img-0 {
+  position: absolute;
+  left: 45.4685%;
+  top: 67.4589%;
+  width: 0.4608%;
+  height: 0.8164%;
+  object-fit: fill;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.lobby-deco-img-1 {
+  position: absolute;
+  left: 30.7603%;
+  top: 42.2548%;
+  width: 1.2672%;
+  height: 2.9463%;
+  object-fit: fill;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.lobby-deco-img-2 {
+  position: absolute;
+  left: 30.7603%;
+  top: 51.3425%;
+  width: 1.2672%;
+  height: 2.9463%;
+  object-fit: fill;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.lobby-deco-img-3 {
+  position: absolute;
+  left: 83.0261%;
+  top: 64.6787%;
+  width: 6.2980%;
+  height: 9.1941%;
+  object-fit: fill;
+  pointer-events: none;
+  z-index: 2;
+}
+
 .lobby-overlay-input-1 {
   position: absolute;
   left: 3.984%;
@@ -2084,4 +2128,371 @@ body {
   background: #ef4444;
   color: white;
   transform: translateY(-1px);
+}
+
+/* Mask background SVG labels */
+.lobby-label-mask-1 {
+  position: absolute;
+  left: 3.984%;
+  top: 38.5%;
+  width: 18.683%;
+  height: 3%;
+  background: #1745B9;
+  z-index: 1;
+}
+
+.lobby-label-mask-2 {
+  position: absolute;
+  left: 3.984%;
+  top: 48.0%;
+  width: 18.683%;
+  height: 3%;
+  background: #1745B9;
+  z-index: 1;
+}
+
+/* Mask background SVG icons */
+.lobby-icons-mask {
+  position: absolute;
+  left: 28.0%;
+  top: 57.5%;
+  width: 22.0%;
+  height: 12.0%;
+  background: #1745B9;
+  z-index: 1;
+}
+
+/* STO Stickers grid in lobby card 2 */
+.lobby-icons-grid {
+  position: absolute;
+  left: 28.0%;
+  top: 43.25%;
+  width: 22.0%;
+  height: 24.0%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-content: space-around;
+  gap: calc(6px * var(--lobby-scale));
+  padding: calc(12px * var(--lobby-scale));
+  box-sizing: border-box;
+  z-index: 5;
+  
+  /* Yellow glassmorphic filter overlay */
+  background: rgba(247, 242, 124, 0.07);
+  border: calc(3px * var(--lobby-scale)) solid rgba(247, 242, 124, 0.25);
+  border-radius: calc(20px * var(--lobby-scale));
+  box-shadow: 
+    0 0 calc(20px * var(--lobby-scale)) rgba(247, 242, 124, 0.08),
+    inset 0 0 calc(15px * var(--lobby-scale)) rgba(247, 242, 124, 0.1);
+}
+
+.lobby-icon-swatch {
+  width: 17%;
+  aspect-ratio: 1 / 1;
+  background: rgba(255, 255, 255, 0.05);
+  border: calc(2px * var(--lobby-scale)) solid rgba(255, 255, 255, 0.15);
+  border-radius: calc(12px * var(--lobby-scale));
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: calc(4px * var(--lobby-scale));
+  transition: all 0.2s;
+  outline: none;
+}
+
+.lobby-icon-swatch:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: scale(1.15);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.lobby-icon-swatch.selected {
+  border-color: #22c55e;
+  background: rgba(34, 197, 94, 0.15);
+  box-shadow: 0 0 calc(12px * var(--lobby-scale)) #22c55e;
+  transform: scale(1.08);
+}
+
+.lobby-icon-swatch-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+/* Border Selection on Card 2 */
+.lobby-border-picker {
+  position: absolute;
+  left: 28.0%;
+  top: 78.5%;
+  width: 22.0%;
+  height: 8.0%;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  box-sizing: border-box;
+  z-index: 5;
+}
+
+.border-option-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: calc(4px * var(--lobby-scale)) solid var(--border-glow);
+  color: white;
+  padding: calc(10px * var(--lobby-scale)) calc(20px * var(--lobby-scale));
+  border-radius: calc(30px * var(--lobby-scale));
+  cursor: pointer;
+  font-size: calc(26px * var(--lobby-scale));
+  font-family: 'Risque', serif;
+  font-weight: bold;
+  transition: all 0.2s;
+  box-shadow: 0 0 calc(10px * var(--lobby-scale)) rgba(0, 0, 0, 0.3);
+}
+
+.border-option-btn:hover {
+  transform: scale(1.1);
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 calc(20px * var(--lobby-scale)) var(--border-glow);
+}
+
+.border-option-btn.selected {
+  background: var(--border-glow);
+  color: #000000;
+  box-shadow: 0 0 calc(30px * var(--lobby-scale)) var(--border-glow);
+  transform: scale(1.08);
+}
+
+/* Camera preview container styled as a PEO video cell */
+.lobby-camera-preview-container {
+  position: absolute;
+  left: 3.984%;
+  top: 59.5%;
+  width: 18.683%;
+  height: 34.5%;
+  background: #000000;
+  border-radius: calc(24px * var(--lobby-scale));
+  border: calc(6px * var(--lobby-scale)) solid #22c55e;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 calc(10px * var(--lobby-scale)) calc(30px * var(--lobby-scale)) rgba(0,0,0,0.5);
+  z-index: 3;
+}
+
+.lobby-camera-video-elem {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.lobby-camera-blocked-fallback {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: calc(10px * var(--lobby-scale));
+  color: #ef4444;
+  font-size: calc(24px * var(--lobby-scale));
+}
+
+.camera-icon-fallback {
+  width: calc(48px * var(--lobby-scale));
+  height: calc(48px * var(--lobby-scale));
+}
+
+.lobby-camera-icon-overlay {
+  position: absolute;
+  top: calc(15px * var(--lobby-scale));
+  right: calc(15px * var(--lobby-scale));
+  width: calc(65px * var(--lobby-scale));
+  height: calc(65px * var(--lobby-scale));
+  z-index: 5;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+}
+
+.lobby-camera-name-badge {
+  position: absolute;
+  bottom: calc(15px * var(--lobby-scale));
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.65);
+  color: white;
+  padding: calc(6px * var(--lobby-scale)) calc(16px * var(--lobby-scale));
+  border-radius: calc(10px * var(--lobby-scale));
+  font-size: calc(26px * var(--lobby-scale));
+  font-weight: bold;
+  font-family: 'Risque', serif;
+  white-space: nowrap;
+  z-index: 5;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* Card 3 Profile Live Preview */
+.lobby-live-peo-preview {
+  position: absolute;
+  left: 54.0%;
+  top: 35.0%;
+  width: 18.683%;
+  height: 34.5%;
+  background: #000000;
+  border-radius: calc(24px * var(--lobby-scale));
+  border: calc(6px * var(--lobby-scale)) solid #22c55e;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 calc(10px * var(--lobby-scale)) calc(30px * var(--lobby-scale)) rgba(0,0,0,0.5);
+  z-index: 3;
+}
+
+.lobby-preview-video-elem {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.lobby-preview-camera-blocked {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ef4444;
+}
+
+.lobby-preview-sticker {
+  position: absolute;
+  top: calc(15px * var(--lobby-scale));
+  right: calc(15px * var(--lobby-scale));
+  width: calc(65px * var(--lobby-scale));
+  height: calc(65px * var(--lobby-scale));
+  z-index: 5;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+}
+
+.lobby-preview-name-badge {
+  position: absolute;
+  bottom: calc(15px * var(--lobby-scale));
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.65);
+  color: white;
+  padding: calc(6px * var(--lobby-scale)) calc(16px * var(--lobby-scale));
+  border-radius: calc(10px * var(--lobby-scale));
+  font-size: calc(26px * var(--lobby-scale));
+  font-weight: bold;
+  font-family: 'Risque', serif;
+  white-space: nowrap;
+  z-index: 5;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* Join Button Click Zone covering the right arrow and Join session text */
+.lobby-join-button-click-zone {
+  position: absolute;
+  left: 54.0%;
+  top: 72.0%;
+  width: 18.683%;
+  height: 20%;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  outline: none;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s, background-color 0.2s;
+  border-radius: calc(30px * var(--lobby-scale));
+}
+
+.lobby-join-button-click-zone:hover:not(:disabled) {
+  transform: scale(1.05);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.lobby-join-button-click-zone:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Arrow submit buttons next to input fields */
+.lobby-arrow-submit-btn {
+  position: absolute;
+  width: 3.5%;
+  height: 6.141%;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  outline: none;
+  z-index: 5;
+  transition: transform 0.2s;
+}
+
+.lobby-arrow-submit-btn:hover:not(:disabled) {
+  transform: scale(1.15) translateX(3px);
+}
+
+.lobby-arrow-submit-btn.arrow-1 {
+  left: 22.8%;
+  top: 41.977%;
+}
+
+.lobby-arrow-submit-btn.arrow-2 {
+  left: 22.8%;
+  top: 51.313%;
+}
+
+/* Sparkle filter animation for instructor pending PEO cell */
+.sparkle-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 8;
+  overflow: hidden;
+}
+
+.sparkle {
+  position: absolute;
+  background: radial-gradient(circle, #ffffff 10%, rgba(254, 240, 138, 0.3) 50%, transparent 70%);
+  clip-path: polygon(50% 0%, 63% 37%, 100% 50%, 63% 63%, 50% 100%, 37% 63%, 0% 50%, 37% 37%);
+  animation: glisten 2s infinite ease-in-out;
+  opacity: 0;
+}
+
+@keyframes glisten {
+  0%, 100% {
+    transform: scale(0) rotate(0deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.25) rotate(180deg);
+    opacity: 0.95;
+    filter: drop-shadow(0 0 10px rgba(254, 240, 138, 0.9));
+  }
+}
+
+/* Classroom guest container active video and selected icon badge styling */
+.gc-video-element {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 11px;
+  z-index: 1;
+}
+
+.gc-joined-icon-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  z-index: 12;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.45));
 }

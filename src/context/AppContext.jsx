@@ -142,6 +142,8 @@ export function AppProvider({ children }) {
               id: `active-joined-restored`,
               name: `${parsed.joinedUser.myName} & ${parsed.joinedUser.myLittleOne}`,
               color: parsed.joinedUser.color,
+              selectedIcon: parsed.joinedUser.selectedIcon,
+              selectedBorder: parsed.joinedUser.selectedBorder,
               initial: parsed.joinedUser.myName[0] || '?'
             };
           }
@@ -649,9 +651,9 @@ export function AppProvider({ children }) {
     return nudges;
   }, [participants, guestStickers]);
 
-  const requestAccess = useCallback((myName, myLittleOne, color) => {
+  const requestAccess = useCallback((myName, myLittleOne, color, selectedIcon, selectedBorder) => {
     setLobbyStatus('waiting');
-    const reqData = { myName, myLittleOne, color };
+    const reqData = { myName, myLittleOne, color, selectedIcon, selectedBorder };
     localStorage.setItem('stagetrack_lobby_request', JSON.stringify(reqData));
     localStorage.setItem('stagetrack_lobby_response', JSON.stringify({ status: 'pending' }));
   }, []);
@@ -668,6 +670,8 @@ export function AppProvider({ children }) {
           id: `active-joined-${Date.now()}`,
           name: `${pendingRequest.myName} & ${pendingRequest.myLittleOne}`,
           color: pendingRequest.color,
+          selectedIcon: pendingRequest.selectedIcon,
+          selectedBorder: pendingRequest.selectedBorder,
           initial: pendingRequest.myName[0] || '?'
         };
       }
@@ -680,7 +684,9 @@ export function AppProvider({ children }) {
       joinedUser: {
         myName: pendingRequest.myName,
         myLittleOne: pendingRequest.myLittleOne,
-        color: pendingRequest.color
+        color: pendingRequest.color,
+        selectedIcon: pendingRequest.selectedIcon,
+        selectedBorder: pendingRequest.selectedBorder
       }
     }));
     localStorage.removeItem('stagetrack_lobby_request');
@@ -719,6 +725,8 @@ export function AppProvider({ children }) {
                   id: `active-joined-local`,
                   name: `${res.joinedUser.myName} & ${res.joinedUser.myLittleOne}`,
                   color: res.joinedUser.color,
+                  selectedIcon: res.joinedUser.selectedIcon,
+                  selectedBorder: res.joinedUser.selectedBorder,
                   initial: res.joinedUser.myName[0] || '?'
                 };
               }

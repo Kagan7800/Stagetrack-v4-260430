@@ -1,27 +1,47 @@
 import { useState, useRef, useEffect } from 'react';
 import { useAppContext } from '../context/AppContext';
-import { Loader2, ShieldAlert } from 'lucide-react';
+import { Loader2, ShieldAlert, Camera } from 'lucide-react';
 
-const PALETTE = [
-  { name: 'Pink Glow', value: 'hsl(330, 85%, 60%)' },
-  { name: 'Electric Blue', value: 'hsl(210, 85%, 60%)' },
-  { name: 'Neon Green', value: 'hsl(140, 80%, 55%)' },
-  { name: 'Sunshine', value: 'hsl(45, 90%, 55%)' },
-  { name: 'Purple Ray', value: 'hsl(270, 85%, 65%)' },
-  { name: 'Sunset', value: 'hsl(15, 90%, 60%)' },
-  { name: 'Cyan Breeze', value: 'hsl(180, 80%, 50%)' },
-  { name: 'Ruby Red', value: 'hsl(0, 80%, 60%)' }
+const BORDERS = [
+  { name: 'Green', value: '#22c55e' },
+  { name: 'Purple', value: '#a855f7' },
+  { name: 'Orange', value: '#f97316' },
+  { name: 'Pink', value: '#ec4899' },
+  { name: 'Blue', value: '#3b82f6' }
+];
+
+const STO_STICKERS = [
+  'Balloons 2 2.svg',
+  'Boat 2.svg',
+  'Dancer 2.svg',
+  'Dog 2.svg',
+  'Drums 2.svg',
+  'Fish 2.svg',
+  'Flowers 6.svg',
+  'Guitar 2.svg',
+  'Kitten 2.svg',
+  'Piano 2 3.svg',
+  'Sun with sunglasses 2.svg',
+  'Truck 2 2.svg',
+  'Trumpet 2.svg',
+  'Xylophone 2.svg'
 ];
 
 export default function LobbyOverlay() {
   const { lobbyStatus, requestAccess, setLobbyStatus } = useAppContext();
   const [myName, setMyName] = useState('');
   const [myLittleOne, setMyLittleOne] = useState('');
-  const [selectedColor, setSelectedColor] = useState(PALETTE[0].value);
+  const [selectedBorder, setSelectedBorder] = useState(BORDERS[0].value);
+  const [selectedIcon, setSelectedIcon] = useState(STO_STICKERS[2]);
   
   const containerRef = useRef(null);
   const [scale, setScale] = useState(1);
 
+  // Webcam states
+  const localVideoRef = useRef(null);
+  const [stream, setStream] = useState(null);
+
+  // ResizeObserver for scale calculations
   useEffect(() => {
     if (!containerRef.current) return;
     const observer = new ResizeObserver((entries) => {
@@ -34,15 +54,45 @@ export default function LobbyOverlay() {
     return () => observer.disconnect();
   }, []);
 
+  // Request webcam access
+  useEffect(() => {
+    let activeStream = null;
+    navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+      .then((mediaStream) => {
+        activeStream = mediaStream;
+        setStream(mediaStream);
+        if (localVideoRef.current) localVideoRef.current.srcObject = mediaStream;
+      })
+      .catch((err) => {
+        console.log("Webcam access blocked:", err);
+      });
+
+    return () => {
+      if (activeStream) {
+        activeStream.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, [lobbyStatus]);
+
+  // Sync video stream when elements mount/lobbyStatus transitions
+  useEffect(() => {
+    if (stream) {
+      if (localVideoRef.current) localVideoRef.current.srcObject = stream;
+    }
+  }, [stream, lobbyStatus]);
+
   const handleSubmit = (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     if (!myName.trim() || !myLittleOne.trim()) return;
-    requestAccess(myName.trim(), myLittleOne.trim(), selectedColor);
+    // Request access with name info, selected border color, and selected icon
+    requestAccess(myName.trim(), myLittleOne.trim(), selectedBorder, selectedIcon, selectedBorder);
   };
 
   const handleRetry = () => {
     setLobbyStatus('initial');
   };
+
+  const selectedIconFile = selectedIcon;
 
   return (
     <div className="lobby-backdrop">
@@ -53,14 +103,26 @@ export default function LobbyOverlay() {
       >
         <img src="/assets/Lobby.svg" className="lobby-svg-img" alt="Lobby Background" />
 
+        {/* Extracted optimized raster assets absolute positioned on top */}
+        <img src="/assets/lobby_image_0.png" className="lobby-deco-img-0" alt="" />
+        <img src="/assets/lobby_image_1.png" className="lobby-deco-img-1" alt="" />
+        <img src="/assets/lobby_image_1.png" className="lobby-deco-img-2" alt="" />
+        <img src="/assets/lobby_image_2.png" className="lobby-deco-img-3" alt="" />
+
+        {/* Mask out labels drawn in the background SVG */}
+        <div className="lobby-label-mask-1"></div>
+        <div className="lobby-label-mask-2"></div>
+
+        {/* Mask out the crown icon from the Pick your icons section */}
+        <div className="lobby-crown-mask"></div>
+
         {lobbyStatus === 'initial' && (
           <form onSubmit={handleSubmit}>
-            {/* Input 1: My Name (Adult) */}
+             {/* Input 1: My Name (Adult) */}
             <input 
               type="text" 
               className="lobby-overlay-input-1"
               required 
-              placeholder="Enter Adult Name" 
               value={myName}
               onChange={(e) => setMyName(e.target.value.slice(0, 15))}
               maxLength={15}
@@ -71,34 +133,98 @@ export default function LobbyOverlay() {
               type="text" 
               className="lobby-overlay-input-2"
               required 
-              placeholder="Enter Child Name" 
               value={myLittleOne}
               onChange={(e) => setMyLittleOne(e.target.value.slice(0, 15))}
               maxLength={15}
             />
 
-            {/* Color Swatches Grid */}
-            <div className="lobby-overlay-colors">
-              {PALETTE.map((color) => (
-                <button
-                  key={color.value}
-                  type="button"
-                  className={`color-swatch-circle ${selectedColor === color.value ? 'selected' : ''}`}
-                  style={{ backgroundColor: color.value, '--glow-color': color.value }}
-                  onClick={() => setSelectedColor(color.value)}
-                  title={color.name}
+            {/* Right arrow buttons next to the inputs acting as submit links */}
+            <button 
+              type="submit" 
+              className="lobby-arrow-submit-btn arrow-1" 
+              title="Join Session"
+              disabled={!myName.trim() || !myLittleOne.trim()}
+            />
+            <button 
+              type="submit" 
+              className="lobby-arrow-submit-btn arrow-2" 
+              title="Join Session"
+              disabled={!myName.trim() || !myLittleOne.trim()}
+            />
+
+            {/* Camera feed overlay inside the container below the inputs */}
+            <div 
+              className="lobby-camera-preview-container"
+              style={{ borderColor: selectedBorder }}
+            >
+              {stream ? (
+                <video ref={localVideoRef} autoPlay playsInline muted className="lobby-camera-video-elem" />
+              ) : (
+                <div className="lobby-camera-blocked-fallback">
+                  <Camera className="camera-icon-fallback" />
+                  <span>Webcam Preview</span>
+                </div>
+              )}
+              {/* Selected Icon Overlay */}
+              {selectedIconFile && (
+                <img 
+                  src={`/assets/svg_stickers/${selectedIconFile}`}
+                  alt="Selected Icon"
+                  className="lobby-camera-icon-overlay"
                 />
+              )}
+              {/* Name Overlay */}
+              {myName && (
+                <div className="lobby-camera-name-badge">
+                  {myName}
+                </div>
+              )}
+            </div>
+
+            {/* Mask out original Pick your icons section on the SVG background */}
+            <div className="lobby-icons-mask"></div>
+
+            {/* STO stickers selection grid */}
+            <div className="lobby-icons-grid">
+              {STO_STICKERS.map((sticker) => (
+                <button
+                  key={sticker}
+                  type="button"
+                  className={`lobby-icon-swatch ${selectedIcon === sticker ? 'selected' : ''}`}
+                  onClick={() => setSelectedIcon(sticker)}
+                  title={sticker.replace('.svg', '').replace('.png', '')}
+                >
+                  <img 
+                    src={`/assets/svg_stickers/${sticker}`} 
+                    alt={sticker} 
+                    className="lobby-icon-swatch-img" 
+                  />
+                </button>
               ))}
             </div>
 
-            {/* Request Access Button */}
+            {/* Border selector buttons on the "Pick your Border" card */}
+            <div className="lobby-border-picker">
+              {BORDERS.map((border) => (
+                <button
+                  key={border.value}
+                  type="button"
+                  className={`border-option-btn ${selectedBorder === border.value ? 'selected' : ''}`}
+                  style={{ '--border-glow': border.value, borderColor: border.value }}
+                  onClick={() => setSelectedBorder(border.value)}
+                >
+                  {border.name}
+                </button>
+              ))}
+            </div>
+
+            {/* Click to Join Session click zone covering Column 3 printed text and right arrow */}
             <button 
               type="submit" 
-              className="lobby-overlay-btn"
+              className="lobby-join-button-click-zone"
               disabled={!myName.trim() || !myLittleOne.trim()}
-            >
-              Request Access
-            </button>
+              title="Click to Join Session"
+            />
           </form>
         )}
 

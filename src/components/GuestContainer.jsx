@@ -1,6 +1,7 @@
 import { Hand, Pause } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAppContext } from '../context/AppContext';
+
 
 export default function GuestContainer({ 
   participant, 
@@ -17,6 +18,67 @@ export default function GuestContainer({
   // Local state for forms
   const [tempCoverUrl, setTempCoverUrl] = useState('');
   const [tempLink, setTempLink] = useState('');
+
+  // Webcams state
+  const [pendingStream, setPendingStream] = useState(null);
+  const pendingVideoRef = useRef(null);
+
+  const [joinedStream, setJoinedStream] = useState(null);
+  const joinedVideoRef = useRef(null);
+
+  const isClosed = globalPause || (buttons && buttons.mute) || false;
+  const isPending = participant.isBlank && participant.blankIndex === 1 && pendingRequest !== null;
+  const isJoinedUser = !participant.isBlank && participant.id && String(participant.id).startsWith('active-joined');
+
+  // Handle webcam stream for pending request slot (Instructor view)
+  useEffect(() => {
+    let activeStream = null;
+    if (isPending) {
+      navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+        .then((s) => {
+          activeStream = s;
+          setPendingStream(s);
+          if (pendingVideoRef.current) {
+            pendingVideoRef.current.srcObject = s;
+          }
+        })
+        .catch((err) => {
+          console.log("Webcam access blocked in instructor pending view:", err);
+        });
+    } else {
+      setPendingStream(null);
+    }
+    return () => {
+      if (activeStream) {
+        activeStream.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, [isPending]);
+
+  // Handle webcam stream for active joined participant
+  useEffect(() => {
+    let activeStream = null;
+    if (isJoinedUser && !isClosed) {
+      navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+        .then((s) => {
+          activeStream = s;
+          setJoinedStream(s);
+          if (joinedVideoRef.current) {
+            joinedVideoRef.current.srcObject = s;
+          }
+        })
+        .catch((err) => {
+          console.log("Webcam access blocked in joined student view:", err);
+        });
+    } else {
+      setJoinedStream(null);
+    }
+    return () => {
+      if (activeStream) {
+        activeStream.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, [isJoinedUser, isClosed]);
 
   // Fetch current values when form is opened
   useEffect(() => {
@@ -36,16 +98,52 @@ export default function GuestContainer({
       return (
         <div 
           className="video-cell blank-peo-container pending-request-cell"
-          style={{ backgroundColor: pendingRequest.color, border: '2px solid #22c55e', cursor: 'default' }}
+          style={{ 
+            backgroundColor: pendingRequest.color, 
+            borderColor: pendingRequest.selectedBorder || '#22c55e', 
+            borderWidth: '3px',
+            borderStyle: 'solid',
+            boxShadow: pendingRequest.selectedBorder ? `0 0 15px ${pendingRequest.selectedBorder}` : '0 0 15px rgba(34, 197, 94, 0.45)',
+            cursor: 'default' 
+          }}
         >
-          <div className="pending-names-wrapper">
+          {/* Live webcam feed background */}
+          {pendingStream && (
+            <video 
+              ref={pendingVideoRef} 
+              autoPlay 
+              playsInline 
+              muted 
+              className="gc-video-element"
+            />
+          )}
+
+          {/* Sparkle glisten overlay (only visible to IC) */}
+          <div className="sparkle-overlay">
+            <div className="sparkle" style={{ top: '15%', left: '20%', width: '25px', height: '25px', animationDelay: '0s', animationDuration: '2s' }} />
+            <div className="sparkle" style={{ top: '40%', left: '75%', width: '18px', height: '18px', animationDelay: '0.5s', animationDuration: '1.8s' }} />
+            <div className="sparkle" style={{ top: '75%', left: '30%', width: '22px', height: '22px', animationDelay: '1.1s', animationDuration: '2.2s' }} />
+            <div className="sparkle" style={{ top: '25%', left: '60%', width: '15px', height: '15px', animationDelay: '0.3s', animationDuration: '1.5s' }} />
+            <div className="sparkle" style={{ top: '65%', left: '80%', width: '20px', height: '20px', animationDelay: '0.8s', animationDuration: '2.1s' }} />
+          </div>
+
+          {/* Icon Badge Overlay */}
+          {pendingRequest.selectedIcon && (
+            <img 
+              src={`/assets/svg_stickers/${pendingRequest.selectedIcon}`}
+              alt="Selected Icon"
+              className="gc-joined-icon-badge"
+            />
+          )}
+
+          <div className="pending-names-wrapper" style={{ zIndex: 10 }}>
             <span className="pending-label-title">Access Request</span>
             <span className="pending-adult-name">{pendingRequest.myName}</span>
             <span className="pending-connector">&</span>
             <span className="pending-child-name">{pendingRequest.myLittleOne}</span>
           </div>
 
-          <div className="pending-approval-overlay">
+          <div className="pending-approval-overlay" style={{ zIndex: 10 }}>
             <button className="accept-request-btn" onClick={(e) => { e.stopPropagation(); approveRequest(); }}>
               Accept
             </button>
@@ -198,7 +296,6 @@ export default function GuestContainer({
     );
   }
 
-  const isClosed = globalPause || buttons.mute;
   const showActiveGlow = isActive && !isClosed;
   const showRaiseHandGlow = buttons.raiseHand && !isClosed;
   const showGreenFilter = buttons.greenFilter && !isClosed;
@@ -206,16 +303,44 @@ export default function GuestContainer({
   const isNonInteractive = isClosed || participant.isBlank;
   const isSpotlight = participant.isBlank;
 
+  const borderStyle = participant.selectedBorder && !isClosed ? {
+    borderColor: participant.selectedBorder,
+    borderWidth: '3px',
+    borderStyle: 'solid',
+    boxShadow: showActiveGlow 
+      ? `0 0 20px #ffffff, 0 0 10px ${participant.selectedBorder}`
+      : `0 0 12px ${participant.selectedBorder}`
+  } : {};
+
   return (
     <div 
       className={`video-cell ${showActiveGlow ? 'active-gc' : ''} ${showGrayscale ? 'grayscale-sharp' : ''} ${isNonInteractive ? 'non-interactive' : ''} ${isSpotlight ? 'spotlight-cell' : ''}`} 
       onClick={() => onClick(participant)}
+      style={borderStyle}
     >
+      {/* Joined user live webcam video stream feed */}
+      {isJoinedUser && !isClosed && joinedStream && (
+        <video 
+          ref={joinedVideoRef} 
+          autoPlay 
+          playsInline 
+          muted 
+          className="gc-video-element"
+        />
+      )}
 
+      {/* Selected Icon Sticker Overlay Badge */}
+      {participant.selectedIcon && (
+        <img 
+          src={`/assets/svg_stickers/${participant.selectedIcon}`}
+          alt="Selected Icon"
+          className="gc-joined-icon-badge"
+        />
+      )}
 
       {/* Name Badge */}
       {participant.name && (
-        <div className="gc-name-badge">
+        <div className="gc-name-badge" style={{ zIndex: 12 }}>
           {participant.name}
         </div>
       )}
@@ -235,7 +360,7 @@ export default function GuestContainer({
 
       {/* Pause Overlay (transparent, centered pause icon) */}
       {globalPause && (
-        <div className="peo-pause-overlay">
+        <div className="peo-pause-overlay" style={{ zIndex: 12 }}>
           <Pause size={28} color="#ffffff" />
         </div>
       )}
@@ -263,8 +388,21 @@ export default function GuestContainer({
         const isIcSticker = typeof s.position === 'string' && s.position !== 'confetti' && s.position !== 'sun' && s.position !== 'birthday' && s.position !== 'crown';
 
         if (isIcSticker) {
-          const xTrans = (s.position.includes('tr-c') || s.position.startsWith('rc-')) ? '50%' : '-50%';
-          const yTrans = '-50%';
+          let xTrans = '0%';
+          let yTrans = '0%';
+          if (s.position === 'tc' || s.position === 'tl-c') {
+            xTrans = '-50%';
+            yTrans = '0%';
+          } else if (s.position === 'tr-c') {
+            xTrans = '50%';
+            yTrans = '0%';
+          } else if (s.position === 'lc') {
+            xTrans = '0%';
+            yTrans = '-50%';
+          } else if (s.position === 'rc-1' || s.position === 'rc-2') {
+            xTrans = '0%';
+            yTrans = '0%';
+          }
           const rot = s.rotation || 0;
           const sc = s.scale || 1;
           style.transform = `translate(${xTrans}, ${yTrans}) rotate(${rot}deg) scale(${sc})`;
@@ -281,7 +419,7 @@ export default function GuestContainer({
             src={`/assets/svg_stickers/${s.name}`} 
             alt={s.name} 
             className={`gc-sticker pos-${s.position} ${isIcSticker ? 'ic-placed' : ''} ${(s.name === 'Sun with sunglasses 2.svg' && typeof s.position === 'number') ? 'sun-special' : ''}`} 
-            style={style}
+            style={{ ...style, zIndex: 11 }}
           />
         );
       })}
