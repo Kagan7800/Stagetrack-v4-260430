@@ -19,9 +19,12 @@ export function AppProvider({ children }) {
     return 1;
   }, []);
 
-  const totalSlots = MOCK_USER_COUNT >= 4 
-    ? (MOCK_USER_COUNT <= 4 ? 4 : (MOCK_USER_COUNT <= 8 ? 8 : (MOCK_USER_COUNT <= 12 ? 12 : 16)))
-    : (MOCK_USER_COUNT % 2 !== 0 ? MOCK_USER_COUNT + 1 : MOCK_USER_COUNT);
+  const totalSlots = MOCK_USER_COUNT === 1
+    ? 3
+    : (MOCK_USER_COUNT >= 4 
+        ? (MOCK_USER_COUNT <= 4 ? 4 : (MOCK_USER_COUNT <= 8 ? 8 : (MOCK_USER_COUNT <= 12 ? 12 : 16)))
+        : (MOCK_USER_COUNT % 2 !== 0 ? MOCK_USER_COUNT + 1 : MOCK_USER_COUNT)
+      );
 
   const [participants] = useState(() => {
     // Helper function to map 1-based display slot number to grid index
