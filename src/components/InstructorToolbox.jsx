@@ -88,7 +88,7 @@ export default function InstructorToolbox() {
               onClick={() => setIsDoodling(!isDoodling)}
               aria-pressed={isDoodling}
             >
-              <Palette size={20} /> Doodling
+              <Palette size={26} /> Doodling
             </button>
 
             <button 
@@ -176,7 +176,7 @@ export default function InstructorToolbox() {
               onClick={() => setGlobalMute(!globalMute)}
               aria-pressed={!globalMute}
             >
-              {globalMute ? <MicOff size={20} /> : <Mic size={20} />} {globalMute ? 'Unmute' : 'Mute'}
+              {globalMute ? <MicOff size={26} /> : <Mic size={26} />} {globalMute ? 'Unmute' : 'Mute'}
             </button>
 
             <button 
@@ -184,7 +184,7 @@ export default function InstructorToolbox() {
               onClick={() => setGlobalPause(!globalPause)}
               aria-pressed={globalPause}
             >
-              {globalPause ? <Play size={20} /> : <Pause size={20} />} Pause PEO
+              {globalPause ? <Play size={26} /> : <Pause size={26} />} Pause PEO
             </button>
 
             <div className="upload-wrapper" style={{ position: 'relative', width: '100%' }}>
@@ -193,7 +193,7 @@ export default function InstructorToolbox() {
                 style={{ width: '100%' }}
                 onClick={() => setShowUploadMenu(!showUploadMenu)}
               >
-                <ImageIcon size={20} /> Upload
+                <ImageIcon size={26} /> Upload
               </button>
               {showUploadMenu && (
                 <div className="upload-dropdown glass-panel" style={{ zIndex: 110 }}>
@@ -241,9 +241,9 @@ export default function InstructorToolbox() {
             <button 
               className="gb-btn"
               onClick={() => handleAddSticker('instructor', 'UNDO_IC', true)}
-              style={{ marginTop: '8px', backgroundColor: '#ff4444', color: 'white', padding: '4px 8px', fontSize: '1.04rem' }}
+              style={{ marginTop: '8px', backgroundColor: '#ff4444', color: 'white', padding: '4px 8px', fontSize: '1.35rem' }}
             >
-              <X size={18} /> Undo Last Star/Heart
+              <X size={24} /> Undo Last Star/Heart
             </button>
           </div>
 
