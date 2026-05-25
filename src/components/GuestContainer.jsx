@@ -11,7 +11,7 @@ export default function GuestContainer({
   nudges = {},
   globalPause
 }) {
-  const { blankCovers, setBlankCovers } = useAppContext();
+  const { blankCovers, setBlankCovers, MOCK_USER_COUNT } = useAppContext();
   const [isEditing, setIsEditing] = useState(false);
   
   // Local state for forms
@@ -26,6 +26,8 @@ export default function GuestContainer({
       setTempLink(coverData.hyperlink || '');
     }
   }, [isEditing, participant.id, participant.isBlank, blankCovers]);
+
+  const canEditBlank = Number(MOCK_USER_COUNT) === 1;
 
   if (participant.isBlank) {
     const coverData = blankCovers[participant.id] || {};
@@ -92,14 +94,14 @@ export default function GuestContainer({
         }}
       >
         {/* Label for 1st or 2nd blank PEO container */}
-        {!hasCover && (
+        {canEditBlank && !hasCover && (
           <div className="blank-peo-label">
-            {participant.blankIndex === 1 ? "1st Blank" : "2nd Blank"} PEO
+            {participant.blankIndex === 1 ? "Upload 1" : "Upload 2"}
           </div>
         )}
 
         {/* Upload Cover Trigger */}
-        {!isEditing && (
+        {canEditBlank && !isEditing && (
           <button 
             className={`edit-blank-btn ${hasCover ? 'has-cover-btn' : ''}`}
             onClick={(e) => {
