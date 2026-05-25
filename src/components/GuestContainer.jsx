@@ -396,8 +396,8 @@ export default function GuestContainer({
         }
 
         if (s.name === 'Drums 2.svg') {
-          style.width = isIcSticker ? '40px' : '62px';
-          style.height = isIcSticker ? '40px' : '62px';
+          style.width = isIcSticker ? '48px' : '74px';
+          style.height = isIcSticker ? '48px' : '74px';
         }
 
         return (

@@ -514,22 +514,22 @@ body {
 
 .gc-sticker {
   position: absolute;
-  width: 59px;
-  height: 59px;
+  width: 71px;
+  height: 71px;
   z-index: 10;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .gc-sticker.ic-placed {
-  width: 38px;
-  height: 38px;
+  width: 46px;
+  height: 46px;
 }
 
 /* Antigravity Spatial Map & Priority Stack */
 .gc-sticker.pos-sun {
   top: 50%;
   right: -9px;
-  margin-top: -30px; /* Vertically centers the 59px sticker without transform */
+  margin-top: -36px; /* Vertically centers the 71px sticker without transform */
   transform: none !important; /* Never moves */
   transition: none !important; /* Never moves */
   z-index: 9999 !important; /* Always top priority */
@@ -538,8 +538,8 @@ body {
 .gc-sticker.pos-crown {
   top: 0;
   left: 50%;
-  width: 71px;
-  height: 71px;
+  width: 85px;
+  height: 85px;
   transform: translate(-50%, calc(-50% - 3px));
   z-index: 9999 !important; /* Always wins/overlaps STO */
 }
@@ -547,8 +547,8 @@ body {
 .gc-sticker.pos-star {
   top: 0;
   left: 53px; /* Safe distance from the top-left sticker */
-  width: 44px;
-  height: 44px;
+  width: 53px;
+  height: 53px;
   transform: translate(-50%, -50%);
   z-index: 40;
 }
@@ -556,8 +556,8 @@ body {
 .gc-sticker.pos-star2 {
   top: 0;
   right: 62px; /* Moved left another 3px */
-  width: 22px;
-  height: 22px;
+  width: 26px;
+  height: 26px;
   transform: translate(50%, 0); /* Show full image */
   z-index: 40;
 }
@@ -565,8 +565,8 @@ body {
 .gc-sticker.pos-heart {
   bottom: 0;
   left: 75%;
-  width: 44px;
-  height: 44px;
+  width: 53px;
+  height: 53px;
   transform: translate(-50%, 50%);
   z-index: 40;
 }
@@ -574,8 +574,8 @@ body {
 .gc-sticker.pos-birthday {
   top: 10px;
   right: 15px;
-  width: 83px;
-  height: 83px;
+  width: 100px;
+  height: 100px;
   transform: translate(50%, -50%);
   z-index: 9999 !important; /* Always wins/overlaps STO */
   padding: 1px;
@@ -674,17 +674,17 @@ body {
 }
 
 .gc-sticker.pos-rc-1 {
-  top: calc(50% - 14px);
+  top: calc(50% - 18px);
   right: 0;
-  width: 30px !important;
-  height: 30px !important;
+  width: 36px !important;
+  height: 36px !important;
 }
 
 .gc-sticker.pos-rc-2 {
-  top: calc(50% + 14px);
+  top: calc(50% + 18px);
   right: 0;
-  width: 30px !important;
-  height: 30px !important;
+  width: 36px !important;
+  height: 36px !important;
 }
 
 .gc-sticker.pos-tl-c {
@@ -697,8 +697,8 @@ body {
   top: 3px;
   right: 25%;
   transform: translate(50%, -50%);
-  width: 30px !important;
-  height: 30px !important;
+  width: 36px !important;
+  height: 36px !important;
 }
 
 .gc-sticker.pos-lc {
