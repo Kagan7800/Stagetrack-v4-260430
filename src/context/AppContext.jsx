@@ -43,6 +43,7 @@ export function AppProvider({ children }) {
     };
 
     const list = new Array(totalSlots);
+    let blankCounter = 0;
 
     for (let slotNum = 1; slotNum <= totalSlots; slotNum++) {
       const idx = getArrayIndex(slotNum);
@@ -95,7 +96,8 @@ export function AppProvider({ children }) {
       const isBlank = isDesignatedBlank || (!customRulesMatch && slotNum > MOCK_USER_COUNT);
 
       if (isBlank) {
-        list[idx] = { id: `blank-${idx}`, isBlank: true };
+        blankCounter++;
+        list[idx] = { id: `blank-${idx}`, isBlank: true, blankIndex: blankCounter };
       } else {
         let nameVal = `${slotNum}`;
         if (MOCK_USER_COUNT === 3) {
@@ -219,6 +221,13 @@ export function AppProvider({ children }) {
     } catch { return []; }
   });
 
+  const [blankCovers, setBlankCovers] = useState(() => {
+    try {
+      const saved = sessionStorage.getItem('stagetrack_blank_covers');
+      return saved ? JSON.parse(saved) : {};
+    } catch { return {}; }
+  });
+
   // Sync state changes to sessionStorage
   useEffect(() => {
     if (activeGuestId !== null) {
@@ -235,6 +244,10 @@ export function AppProvider({ children }) {
   useEffect(() => {
     sessionStorage.setItem('stagetrack_guest_stickers', JSON.stringify(guestStickers));
   }, [guestStickers]);
+
+  useEffect(() => {
+    sessionStorage.setItem('stagetrack_blank_covers', JSON.stringify(blankCovers));
+  }, [blankCovers]);
 
   useEffect(() => {
     sessionStorage.setItem('stagetrack_is_doodling', JSON.stringify(isDoodling));
@@ -619,7 +632,8 @@ export function AppProvider({ children }) {
     setEquippedSticker,
     metronomeBpm, setMetronomeBpm,
     isMetronomePlaying, setIsMetronomePlaying,
-    drawingPaths, setDrawingPaths
+    drawingPaths, setDrawingPaths,
+    blankCovers, setBlankCovers
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
