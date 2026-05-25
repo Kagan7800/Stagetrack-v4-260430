@@ -400,6 +400,11 @@ export default function GuestContainer({
           style.height = isIcSticker ? '48px' : '74px';
         }
 
+        if (s.name === 'Guitar 2.svg' || s.name === 'Dog 2.svg') {
+          style.width = isIcSticker ? '55px' : '85px';
+          style.height = isIcSticker ? '55px' : '85px';
+        }
+
         return (
           <img 
             key={s.id} 
