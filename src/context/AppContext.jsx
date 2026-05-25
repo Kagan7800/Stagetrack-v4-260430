@@ -16,7 +16,7 @@ export function AppProvider({ children }) {
         }
       }
     } catch { /* ignore */ }
-    return 2;
+    return 1;
   }, []);
 
   const totalSlots = MOCK_USER_COUNT >= 4 
@@ -92,12 +92,7 @@ export function AppProvider({ children }) {
       const isBlank = isDesignatedBlank || (!customRulesMatch && slotNum > MOCK_USER_COUNT);
 
       if (isBlank) {
-        const nameVal = (MOCK_USER_COUNT === 1 && slotNum === 2) ? "2" : undefined;
-        list[idx] = { 
-          id: `blank-${idx}`, 
-          isBlank: true,
-          name: nameVal
-        };
+        list[idx] = { id: `blank-${idx}`, isBlank: true };
       } else {
         let nameVal = `${slotNum}`;
         if (MOCK_USER_COUNT === 3) {
