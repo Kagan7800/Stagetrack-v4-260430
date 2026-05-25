@@ -460,7 +460,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
+  overflow: visible;
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
 
@@ -528,7 +528,7 @@ body {
 /* Antigravity Spatial Map & Priority Stack */
 .gc-sticker.pos-sun {
   top: 50%;
-  right: 4px;
+  right: -9px;
   margin-top: -30px; /* Vertically centers the 59px sticker without transform */
   transform: none !important; /* Never moves */
   transition: none !important; /* Never moves */
@@ -536,55 +536,55 @@ body {
 }
 
 .gc-sticker.pos-crown {
-  top: 4px;
+  top: 0;
   left: 50%;
   width: 71px;
   height: 71px;
-  transform: translateX(-50%);
+  transform: translate(-50%, calc(-50% - 3px));
   z-index: 9999 !important; /* Always wins/overlaps STO */
 }
 
 .gc-sticker.pos-star {
-  top: 4px;
+  top: 0;
   left: 53px; /* Safe distance from the top-left sticker */
   width: 44px;
   height: 44px;
-  transform: none;
+  transform: translate(-50%, -50%);
   z-index: 40;
 }
 
 .gc-sticker.pos-star2 {
-  top: 4px;
+  top: 0;
   right: 62px; /* Moved left another 3px */
   width: 22px;
   height: 22px;
-  transform: none; /* Show full image */
+  transform: translate(50%, 0); /* Show full image */
   z-index: 40;
 }
 
 .gc-sticker.pos-heart {
-  bottom: 4px;
+  bottom: 0;
   left: 75%;
   width: 44px;
   height: 44px;
-  transform: translateX(-50%);
+  transform: translate(-50%, 50%);
   z-index: 40;
 }
 
 .gc-sticker.pos-birthday {
-  top: 4px;
-  right: 4px;
+  top: 10px;
+  right: 15px;
   width: 83px;
   height: 83px;
-  transform: none;
+  transform: translate(50%, -50%);
   z-index: 9999 !important; /* Always wins/overlaps STO */
   padding: 1px;
 }
 
 .gc-sticker.pos-balloons {
   top: 50%;
-  left: 4px;
-  transform: translateY(-50%);
+  left: 0;
+  transform: translate(-50%, -50%);
   z-index: 30;
 }
 
@@ -599,38 +599,38 @@ body {
 }
 
 .gc-sticker.pos-1 {
-  top: 4px;
-  left: 4px;
-  transform: none;
+  top: 0;
+  left: 0;
+  transform: translate(-65%, -65%);
   z-index: 9999 !important;
 }
 
 .gc-sticker.pos-2 {
-  top: 4px;
-  right: 4px;
-  transform: none;
+  top: 0;
+  right: 0;
+  transform: translate(65%, -65%);
   z-index: 9999 !important;
   padding: 1px;
 }
 
 .gc-sticker.pos-3 {
-  bottom: 4px;
-  left: 4px;
-  transform: none;
+  bottom: 0;
+  left: 0;
+  transform: translate(-65%, 65%);
   z-index: 9999 !important;
 }
 
 .gc-sticker.pos-4 {
-  bottom: 4px;
-  right: 4px;
-  transform: none;
+  bottom: 0;
+  right: 0;
+  transform: translate(65%, 65%);
   z-index: 9999 !important;
 }
 
 .gc-sticker.pos-5 {
   top: 50%;
-  right: 4px;
-  transform: translateY(-50%);
+  right: 0;
+  transform: translate(50%, -50%);
   z-index: 9999 !important;
 }
 
@@ -638,7 +638,7 @@ body {
   bottom: auto !important;
   top: 50% !important;
   left: auto !important;
-  right: 4px !important;
+  right: -9px !important;
   transform: translateY(-50%) !important;
 }
 
@@ -668,43 +668,43 @@ body {
 
 /* GC Sticker Positions for Instructor-Added Slots */
 .gc-sticker.pos-tc {
-  top: 4px;
+  top: 0;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translate(-50%, -50%);
 }
 
 .gc-sticker.pos-rc-1 {
-  top: calc(50% - 18px);
-  right: 4px;
+  top: calc(50% - 14px);
+  right: 0;
   width: 30px !important;
   height: 30px !important;
 }
 
 .gc-sticker.pos-rc-2 {
-  top: calc(50% + 18px);
-  right: 4px;
+  top: calc(50% + 14px);
+  right: 0;
   width: 30px !important;
   height: 30px !important;
 }
 
 .gc-sticker.pos-tl-c {
-  top: 4px;
+  top: 0;
   left: 25%;
-  transform: translateX(-50%);
+  transform: translate(-50%, -50%);
 }
 
 .gc-sticker.pos-tr-c {
-  top: 4px;
+  top: 3px;
   right: 25%;
-  transform: translateX(50%);
+  transform: translate(50%, -50%);
   width: 30px !important;
   height: 30px !important;
 }
 
 .gc-sticker.pos-lc {
   top: 50%;
-  left: 4px;
-  transform: translateY(-50%);
+  left: 0;
+  transform: translate(-50%, -50%);
 }
 
 /* right center */

@@ -388,21 +388,8 @@ export default function GuestContainer({
         const isIcSticker = typeof s.position === 'string' && s.position !== 'confetti' && s.position !== 'sun' && s.position !== 'birthday' && s.position !== 'crown';
 
         if (isIcSticker) {
-          let xTrans = '0%';
-          let yTrans = '0%';
-          if (s.position === 'tc' || s.position === 'tl-c') {
-            xTrans = '-50%';
-            yTrans = '0%';
-          } else if (s.position === 'tr-c') {
-            xTrans = '50%';
-            yTrans = '0%';
-          } else if (s.position === 'lc') {
-            xTrans = '0%';
-            yTrans = '-50%';
-          } else if (s.position === 'rc-1' || s.position === 'rc-2') {
-            xTrans = '0%';
-            yTrans = '0%';
-          }
+          const xTrans = (s.position.includes('tr-c') || s.position.startsWith('rc-')) ? '50%' : '-50%';
+          const yTrans = '-50%';
           const rot = s.rotation || 0;
           const sc = s.scale || 1;
           style.transform = `translate(${xTrans}, ${yTrans}) rotate(${rot}deg) scale(${sc})`;
