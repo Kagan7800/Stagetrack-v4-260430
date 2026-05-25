@@ -25,9 +25,11 @@ export default function GuestContainer({
 
 
       {/* Name Badge */}
-      <div className="gc-name-badge">
-        {participant.name}
-      </div>
+      {participant.name && (
+        <div className="gc-name-badge">
+          {participant.name}
+        </div>
+      )}
 
       {/* Hand Raise Glow Layer (z-index: 15) */}
       {showRaiseHandGlow && <div className="hand-raise-glow"></div>}

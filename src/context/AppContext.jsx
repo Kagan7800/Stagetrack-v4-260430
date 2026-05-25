@@ -8,23 +8,15 @@ export function AppProvider({ children }) {
     if (typeof window === 'undefined') return 12;
     try {
       const params = new URLSearchParams(window.location.search);
-      const urlVal = params.get('users') || params.get('count');
+      const urlVal = params.get('users') || params.get('user') || params.get('count') || params.get('peo') || params.get('peos');
       if (urlVal) {
         const parsed = parseInt(urlVal, 10);
-        if (!isNaN(parsed) && parsed >= 1 && parsed <= 16) {
-          sessionStorage.setItem('stagetrack_mock_user_count', parsed.toString());
-          return parsed;
-        }
-      }
-      const saved = sessionStorage.getItem('stagetrack_mock_user_count');
-      if (saved) {
-        const parsed = parseInt(saved, 10);
         if (!isNaN(parsed) && parsed >= 1 && parsed <= 16) {
           return parsed;
         }
       }
     } catch { /* ignore */ }
-    return 4;
+    return 2;
   }, []);
 
   const totalSlots = MOCK_USER_COUNT >= 4 
@@ -100,7 +92,12 @@ export function AppProvider({ children }) {
       const isBlank = isDesignatedBlank || (!customRulesMatch && slotNum > MOCK_USER_COUNT);
 
       if (isBlank) {
-        list[idx] = { id: `blank-${idx}`, isBlank: true };
+        const nameVal = (MOCK_USER_COUNT === 1 && slotNum === 2) ? "2" : undefined;
+        list[idx] = { 
+          id: `blank-${idx}`, 
+          isBlank: true,
+          name: nameVal
+        };
       } else {
         let nameVal = `${slotNum}`;
         if (MOCK_USER_COUNT === 3) {

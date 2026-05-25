@@ -24,9 +24,9 @@ function App() {
   const isInstructorSidebarVisible = true;
   const activeGuest = participants.find(p => p.id === activeGuestId);
 
-  const halfLength = participants.length >= 4 ? participants.length / 2 : 8;
+  const halfLength = participants.length / 2;
   const activeCount = participants.filter(p => !p.isBlank).length;
-  const isThreePeo = Number(MOCK_USER_COUNT) === 3 || activeCount === 3;
+  const isThreePeo = Number(MOCK_USER_COUNT) === 3 || (participants.length === 4 && activeCount === 3);
 
   const leftParticipants = isThreePeo 
     ? [participants[0]] 
