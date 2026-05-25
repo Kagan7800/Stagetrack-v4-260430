@@ -1,0 +1,13 @@
+<svg width="2348" height="473" viewBox="0 0 2348 473" xmlns="http://www.w3.org/2000/svg">
+  <!-- Mask defines the visible area (removes dark-blue outside the light-blue border) -->
+  <mask id="crop">
+    <rect width="2348" height="473" rx="25" fill="white"/>
+  </mask>
+
+  <!-- Original image, but clipped to mask -->
+  <image
+    width="2348"
+    height="473"
+    mask="url(#crop)"
+    href="/assets/logo_modern.png" />
+</svg>
