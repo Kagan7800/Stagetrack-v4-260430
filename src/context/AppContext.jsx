@@ -439,6 +439,37 @@ export function AppProvider({ children }) {
   const handleAddSticker = useCallback((targetId, stickerName, isInstructor) => {
     // If it's the instructor adding a sticker to the instructor container
     if (isInstructor && targetId === 'instructor') {
+      if (stickerName === 'Confetti.svg') {
+        setGuestStickers(prev => {
+          const nextStickers = { ...prev };
+          
+          // Check if any participant does NOT have confetti
+          const anyoneMissingConfetti = participants.some(p => {
+            const current = prev[p.id] || [];
+            return !current.some(s => s.position === 'confetti');
+          });
+
+          participants.forEach(p => {
+            let current = [...(prev[p.id] || [])];
+            const existingConfettiIdx = current.findIndex(s => s.position === 'confetti');
+            
+            if (anyoneMissingConfetti) {
+              if (existingConfettiIdx === -1) {
+                current.push({ id: crypto.randomUUID(), name: 'Confetti.svg', position: 'confetti' });
+              }
+            } else {
+              if (existingConfettiIdx !== -1) {
+                current.splice(existingConfettiIdx, 1);
+              }
+            }
+            nextStickers[p.id] = current;
+          });
+          
+          return nextStickers;
+        });
+        return;
+      }
+
       if (activeGuestId === null) return;
       targetId = activeGuestId;
     }
@@ -565,7 +596,7 @@ export function AppProvider({ children }) {
 
       return { ...prev, [targetId]: current };
     });
-  }, [activeGuestId]);
+  }, [activeGuestId, participants]);
 
   const stickerNudges = useMemo(() => {
     const nudges = {};
