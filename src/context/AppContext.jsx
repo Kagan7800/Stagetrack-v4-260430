@@ -26,7 +26,24 @@ export function AppProvider({ children }) {
         : (MOCK_USER_COUNT % 2 !== 0 ? MOCK_USER_COUNT + 1 : MOCK_USER_COUNT)
       );
 
-  const [participants] = useState(() => {
+  const [isJoined, setIsJoined] = useState(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const hasUserParam = params.get('users') || params.get('user') || params.get('count') || params.get('peo') || params.get('peos');
+      if (hasUserParam) return true;
+
+      const res = localStorage.getItem('stagetrack_lobby_response');
+      if (res && JSON.parse(res).status === 'accepted') {
+        return true;
+      }
+    } catch { /* ignore */ }
+    return false;
+  });
+
+  const [lobbyStatus, setLobbyStatus] = useState('initial'); // 'initial' | 'waiting' | 'denied'
+  const [pendingRequest, setPendingRequest] = useState(null);
+
+  const [participants, setParticipants] = useState(() => {
     // Helper function to map 1-based display slot number to grid index
     const getArrayIndex = (slotNum) => {
       if (totalSlots < 8) {
@@ -112,6 +129,26 @@ export function AppProvider({ children }) {
         };
       }
     }
+
+    // Try to restore accepted student into the first blank slot if isJoined is true on reload
+    try {
+      const res = localStorage.getItem('stagetrack_lobby_response');
+      if (res) {
+        const parsed = JSON.parse(res);
+        if (parsed.status === 'accepted') {
+          const blankIdx = list.findIndex(p => p.isBlank);
+          if (blankIdx !== -1) {
+            list[blankIdx] = {
+              id: `active-joined-restored`,
+              name: `${parsed.joinedUser.myName} & ${parsed.joinedUser.myLittleOne}`,
+              color: parsed.joinedUser.color,
+              initial: parsed.joinedUser.myName[0] || '?'
+            };
+          }
+        }
+      }
+    } catch { /* ignore */ }
+
     return list;
   });
 
@@ -612,6 +649,109 @@ export function AppProvider({ children }) {
     return nudges;
   }, [participants, guestStickers]);
 
+  const requestAccess = useCallback((myName, myLittleOne, color) => {
+    setLobbyStatus('waiting');
+    const reqData = { myName, myLittleOne, color };
+    localStorage.setItem('stagetrack_lobby_request', JSON.stringify(reqData));
+    localStorage.setItem('stagetrack_lobby_response', JSON.stringify({ status: 'pending' }));
+  }, []);
+
+  const approveRequest = useCallback(() => {
+    if (!pendingRequest) return;
+    
+    // Find the first blank participant
+    setParticipants(prev => {
+      const next = [...prev];
+      const blankIdx = next.findIndex(p => p.isBlank);
+      if (blankIdx !== -1) {
+        next[blankIdx] = {
+          id: `active-joined-${Date.now()}`,
+          name: `${pendingRequest.myName} & ${pendingRequest.myLittleOne}`,
+          color: pendingRequest.color,
+          initial: pendingRequest.myName[0] || '?'
+        };
+      }
+      return next;
+    });
+
+    // Write accepted response
+    localStorage.setItem('stagetrack_lobby_response', JSON.stringify({
+      status: 'accepted',
+      joinedUser: {
+        myName: pendingRequest.myName,
+        myLittleOne: pendingRequest.myLittleOne,
+        color: pendingRequest.color
+      }
+    }));
+    localStorage.removeItem('stagetrack_lobby_request');
+    setPendingRequest(null);
+  }, [pendingRequest]);
+
+  const denyRequest = useCallback(() => {
+    localStorage.setItem('stagetrack_lobby_response', JSON.stringify({ status: 'denied' }));
+    localStorage.removeItem('stagetrack_lobby_request');
+    setPendingRequest(null);
+  }, []);
+
+  // Listen to cross-tab storage actions
+  useEffect(() => {
+    const handleStorage = (e) => {
+      // For instructor: listen for new requests
+      if (e.key === 'stagetrack_lobby_request') {
+        if (e.newValue) {
+          setPendingRequest(JSON.parse(e.newValue));
+        } else {
+          setPendingRequest(null);
+        }
+      }
+      // For student: listen for response
+      if (e.key === 'stagetrack_lobby_response') {
+        if (e.newValue) {
+          const res = JSON.parse(e.newValue);
+          if (res.status === 'accepted') {
+            setLobbyStatus('initial');
+            setIsJoined(true);
+            setParticipants(prev => {
+              const next = [...prev];
+              const blankIdx = next.findIndex(p => p.isBlank);
+              if (blankIdx !== -1) {
+                next[blankIdx] = {
+                  id: `active-joined-local`,
+                  name: `${res.joinedUser.myName} & ${res.joinedUser.myLittleOne}`,
+                  color: res.joinedUser.color,
+                  initial: res.joinedUser.myName[0] || '?'
+                };
+              }
+              return next;
+            });
+          } else if (res.status === 'denied') {
+            setLobbyStatus('denied');
+          }
+        }
+      }
+    };
+
+    window.addEventListener('storage', handleStorage);
+    
+    // Initial check on load
+    try {
+      const req = localStorage.getItem('stagetrack_lobby_request');
+      if (req) setPendingRequest(JSON.parse(req));
+      
+      const res = localStorage.getItem('stagetrack_lobby_response');
+      if (res) {
+        const parsedRes = JSON.parse(res);
+        if (parsedRes.status === 'pending') {
+          setLobbyStatus('waiting');
+        } else if (parsedRes.status === 'denied') {
+          setLobbyStatus('denied');
+        }
+      }
+    } catch { /* ignore */ }
+
+    return () => window.removeEventListener('storage', handleStorage);
+  }, []);
+
   const value = {
     MOCK_USER_COUNT,
     participants,
@@ -633,7 +773,11 @@ export function AppProvider({ children }) {
     metronomeBpm, setMetronomeBpm,
     isMetronomePlaying, setIsMetronomePlaying,
     drawingPaths, setDrawingPaths,
-    blankCovers, setBlankCovers
+    blankCovers, setBlankCovers,
+    isJoined, setIsJoined,
+    lobbyStatus, setLobbyStatus,
+    pendingRequest, setPendingRequest,
+    requestAccess, approveRequest, denyRequest
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

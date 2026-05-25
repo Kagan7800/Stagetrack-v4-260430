@@ -11,7 +11,7 @@ export default function GuestContainer({
   nudges = {},
   globalPause
 }) {
-  const { blankCovers, setBlankCovers, MOCK_USER_COUNT } = useAppContext();
+  const { blankCovers, setBlankCovers, MOCK_USER_COUNT, pendingRequest, approveRequest, denyRequest } = useAppContext();
   const [isEditing, setIsEditing] = useState(false);
   
   // Local state for forms
@@ -30,6 +30,33 @@ export default function GuestContainer({
   const canEditBlank = Number(MOCK_USER_COUNT) === 1;
 
   if (participant.isBlank) {
+    const isPending = participant.blankIndex === 1 && pendingRequest !== null;
+
+    if (isPending) {
+      return (
+        <div 
+          className="video-cell blank-peo-container pending-request-cell"
+          style={{ backgroundColor: pendingRequest.color, border: '2px solid #22c55e', cursor: 'default' }}
+        >
+          <div className="pending-names-wrapper">
+            <span className="pending-label-title">Access Request</span>
+            <span className="pending-adult-name">{pendingRequest.myName}</span>
+            <span className="pending-connector">&</span>
+            <span className="pending-child-name">{pendingRequest.myLittleOne}</span>
+          </div>
+
+          <div className="pending-approval-overlay">
+            <button className="accept-request-btn" onClick={(e) => { e.stopPropagation(); approveRequest(); }}>
+              Accept
+            </button>
+            <button className="deny-request-btn" onClick={(e) => { e.stopPropagation(); denyRequest(); }}>
+              No access
+            </button>
+          </div>
+        </div>
+      );
+    }
+
     const coverData = blankCovers[participant.id] || {};
     const hasCover = !!coverData.coverUrl;
 

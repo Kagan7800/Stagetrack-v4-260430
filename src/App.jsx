@@ -3,6 +3,7 @@ import Chat from './components/Chat';
 import GuestContainer from './components/GuestContainer';
 import UnifiedToolbox from './components/UnifiedToolbox';
 import InstructorToolbox from './components/InstructorToolbox';
+import LobbyOverlay from './components/LobbyOverlay';
 import { useAppContext } from './context/AppContext';
 
 function App() {
@@ -18,7 +19,8 @@ function App() {
     isSidebarOpen, setIsSidebarOpen,
     globalMute, setGlobalMute,
     globalPause, setGlobalPause,
-    messages, handleModerateMessage, handleSendChatMessage
+    messages, handleModerateMessage, handleSendChatMessage,
+    isJoined
   } = useAppContext();
 
   const isInstructorSidebarVisible = true;
@@ -37,6 +39,7 @@ function App() {
 
   return (
     <div className="app-container">
+      {!isJoined && <LobbyOverlay />}
       {/* Top Banner */}
       <div className="top-banner" style={{ backgroundImage: "url('/banner.png')", backgroundSize: '100% 100%', position: 'relative' }}>
         
