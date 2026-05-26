@@ -1848,6 +1848,8 @@ body {
   object-fit: fill;
   pointer-events: none;
   z-index: 2;
+  padding: calc(30px * var(--lobby-scale));
+  box-sizing: border-box;
 }
 
 .lobby-card-panel-2 {
@@ -1859,6 +1861,8 @@ body {
   object-fit: fill;
   pointer-events: none;
   z-index: 2;
+  padding: calc(30px * var(--lobby-scale));
+  box-sizing: border-box;
 }
 
 .lobby-overlay-input-1 {
