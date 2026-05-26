@@ -80,19 +80,12 @@ function App() {
             inset: 0,
             zIndex: 5,
             pointerEvents: 'none',
-            overflow: 'hidden'
+            overflow: 'hidden',
+            backgroundImage: "url('/assets/svg_stickers/Confetti.svg')",
+            backgroundSize: '250px 250px',
+            backgroundRepeat: 'repeat'
           }}
-        >
-          <img 
-            src="/assets/svg_stickers/Confetti.svg" 
-            alt="Confetti Background" 
-            style={{ 
-              width: '100%', 
-              height: '100%', 
-              objectFit: 'cover' 
-            }} 
-          />
-        </div>
+        />
       )}
 
       {/* LAYER 2: INTERACTIVE UI HOUSING */}
