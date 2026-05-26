@@ -161,7 +161,10 @@ function App() {
 
            <div className="center-wrapper" style={{ justifyContent: activeGuestId !== null ? 'flex-start' : 'center' }}>
              <div className="pc-width-keeper">
-               <div className={`pc-gt-unified ${mediaType === 'iframe' || mediaType === 'metronome' ? 'metronome-active' : ''}`}>
+                <div 
+                  className={`pc-gt-unified ${mediaType === 'iframe' || mediaType === 'metronome' ? 'metronome-active' : ''}`}
+                  style={{ borderColor: activeTheme === 'sor' ? '#dc2626' : '#22c55e' }}
+                >
                    <PresentationContainer 
                      isDoodling={isDoodling}
                      mediaUrl={mediaUrl}
