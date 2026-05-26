@@ -2341,9 +2341,13 @@ body {
 }
 
 .lobby-camera-video-elem {
-  width: 100%;
-  height: 100%;
+  position: absolute;
+  top: 3%;
+  left: 3%;
+  width: 94%;
+  height: 94%;
   object-fit: cover;
+  border-radius: calc(18px * var(--lobby-scale));
 }
 
 .lobby-camera-blocked-fallback {
@@ -2569,8 +2573,11 @@ body {
   justify-content: center;
 }
 
-.lobby-card-title {
+.lobby-stickers-grid .lobby-card-title {
   grid-column: span 3;
+}
+
+.lobby-card-title {
   font-size: calc(66px * var(--lobby-scale));
   font-weight: bold;
   color: white;
@@ -2627,19 +2634,31 @@ body {
   padding: calc(140px * var(--lobby-scale)) calc(80px * var(--lobby-scale)) calc(30px * var(--lobby-scale)) calc(80px * var(--lobby-scale));
   box-sizing: border-box;
   z-index: 5;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: repeat(5, 1fr);
+  gap: calc(20px * var(--lobby-scale));
   align-items: center;
 }
 
+.lobby-colors-grid .lobby-card-title {
+  grid-column: span 1;
+}
+
 .lobby-lines-stack {
+  grid-row: span 3;
   width: 100%;
-  flex: 1;
+  height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   margin-top: 0;
-  margin-bottom: calc(10px * var(--lobby-scale));
+  margin-bottom: 0;
+}
+
+.lobby-colors-grid .lobby-join-container {
+  grid-row: span 1;
+  margin-top: 0;
 }
 
 .lobby-line-button {
