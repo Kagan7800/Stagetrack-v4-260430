@@ -2659,6 +2659,9 @@ body {
   justify-content: space-between;
   margin-top: calc(90px * var(--lobby-scale));
   margin-bottom: 0;
+  padding-top: calc(30px * var(--lobby-scale));
+  padding-bottom: calc(30px * var(--lobby-scale));
+  box-sizing: border-box;
 }
 
 
