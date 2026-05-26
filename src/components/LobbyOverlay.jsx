@@ -1,13 +1,18 @@
 import { useState, useRef, useEffect } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { Loader2, ShieldAlert, Camera } from 'lucide-react';
+import PeoBorder from './PeoBorder';
 
 const BORDERS = [
-  { name: 'Green', value: '#22c55e' },
-  { name: 'Purple', value: '#a855f7' },
-  { name: 'Orange', value: '#f97316' },
-  { name: 'Pink', value: '#ec4899' },
-  { name: 'Blue', value: '#3b82f6' }
+  { name: 'Yellow Line', value: '#F7F27C', file: 'Line 179.svg', color: '#F7F27C' },
+  { name: 'Cyan Line', value: '#00FCFC', file: 'Line 180.svg', color: '#00FCFC' },
+  { name: 'Red Line', value: '#FC0000', file: 'Line 181.svg', color: '#FC0000' },
+  { name: 'Mint Line', value: '#87E9C0', file: 'Line 182.svg', color: '#87E9C0' },
+  { name: 'Pink Line', value: '#EC7AD3', file: 'Line 183.svg', color: '#EC7AD3' },
+  { name: 'Black Line', value: '#000000', file: 'Line 184.svg', color: '#000000' },
+  { name: 'Yellow Gradient Line', value: 'url(#peo-gradient-185)', file: 'Line 185.svg', color: '#F7F27C' },
+  { name: 'Red Yellow Gradient Line', value: 'url(#peo-gradient-186)', file: 'Line 186.svg', color: '#FC0000' },
+  { name: 'Yellow Line 2', value: '#F7F27C_2', file: 'Line 187.svg', color: '#F7F27C' }
 ];
 
 const STO_STICKERS = [
@@ -130,10 +135,7 @@ export default function LobbyOverlay() {
             />
 
              {/* Camera feed overlay inside the container below the inputs */}
-            <div 
-              className="lobby-camera-preview-container"
-              style={{ borderColor: selectedBorder }}
-            >
+            <div className="lobby-camera-preview-container">
               {stream ? (
                 <video ref={localVideoRef} autoPlay playsInline muted className="lobby-camera-video-elem" />
               ) : (
@@ -148,6 +150,8 @@ export default function LobbyOverlay() {
                   {myName}
                 </div>
               )}
+              {/* SVG-based PEO Border component */}
+              <PeoBorder color={selectedBorder} />
             </div>
 
             {/* STO Stickers selection grid mapped over Card 1 (Left Side Box) */}
@@ -173,18 +177,24 @@ export default function LobbyOverlay() {
             {/* Border Color selection grid mapped over Card 2 (Right Side Box) */}
             <div className="lobby-colors-grid">
               <div className="lobby-card-title">Choose your border color</div>
-              {BORDERS.map((b) => (
-                <button
-                  key={b.value}
-                  type="button"
-                  className={`lobby-color-swatch ${selectedBorder === b.value ? 'selected' : ''}`}
-                  style={{ '--swatch-color': b.value }}
-                  onClick={() => setSelectedBorder(b.value)}
-                  title={b.name}
-                >
-                  <span className="lobby-color-circle-inner" style={{ backgroundColor: b.value }} />
-                </button>
-              ))}
+              <div className="lobby-lines-stack">
+                {BORDERS.map((b) => (
+                  <button
+                    key={b.value}
+                    type="button"
+                    className={`lobby-line-button ${selectedBorder === b.value ? 'selected' : ''}`}
+                    style={{ '--line-glow-color': b.color }}
+                    onClick={() => setSelectedBorder(b.value)}
+                    title={b.name}
+                  >
+                    <img 
+                      src={`/assets/All/${b.file}`} 
+                      className="lobby-line-img" 
+                      alt={b.name} 
+                    />
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Join Session Button positioned in Column 3 */}

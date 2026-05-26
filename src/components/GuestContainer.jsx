@@ -1,6 +1,15 @@
 import { Hand, Pause } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { useAppContext } from '../context/AppContext';
+import PeoBorder from './PeoBorder';
+
+const getGlowColor = (color) => {
+  if (!color) return 'rgba(34, 197, 94, 0.45)';
+  if (color.includes('185')) return '#F7F27C';
+  if (color.includes('186')) return '#FC0000';
+  if (color.endsWith('_2')) return color.substring(0, color.length - 2);
+  return color;
+};
 
 
 export default function GuestContainer({ 
@@ -95,18 +104,17 @@ export default function GuestContainer({
     const isPending = participant.blankIndex === 1 && pendingRequest !== null;
 
     if (isPending) {
+      const glowColor = getGlowColor(pendingRequest.selectedBorder);
       return (
         <div 
           className="video-cell blank-peo-container pending-request-cell"
           style={{ 
             backgroundColor: pendingRequest.color, 
-            borderColor: pendingRequest.selectedBorder || '#22c55e', 
-            borderWidth: '3px',
-            borderStyle: 'solid',
-            boxShadow: pendingRequest.selectedBorder ? `0 0 15px ${pendingRequest.selectedBorder}` : '0 0 15px rgba(34, 197, 94, 0.45)',
+            boxShadow: `0 0 15px ${glowColor}`,
             cursor: 'default' 
           }}
         >
+          <PeoBorder color={pendingRequest.selectedBorder} />
           {/* Live webcam feed background */}
           {pendingStream && (
             <video 
@@ -303,13 +311,11 @@ export default function GuestContainer({
   const isNonInteractive = isClosed || participant.isBlank;
   const isSpotlight = participant.isBlank;
 
+  const glowColor = getGlowColor(participant.selectedBorder);
   const borderStyle = participant.selectedBorder && !isClosed ? {
-    borderColor: participant.selectedBorder,
-    borderWidth: '3px',
-    borderStyle: 'solid',
     boxShadow: showActiveGlow 
-      ? `0 0 20px #ffffff, 0 0 10px ${participant.selectedBorder}`
-      : `0 0 12px ${participant.selectedBorder}`
+      ? `0 0 20px #ffffff, 0 0 10px ${glowColor}`
+      : `0 0 12px ${glowColor}`
   } : {};
 
   return (
@@ -318,6 +324,10 @@ export default function GuestContainer({
       onClick={() => onClick(participant)}
       style={borderStyle}
     >
+      {/* SVG-based PEO Border component */}
+      {participant.selectedBorder && !isClosed && (
+        <PeoBorder color={participant.selectedBorder} />
+      )}
       {/* Joined user live webcam video stream feed */}
       {isJoinedUser && !isClosed && joinedStream && (
         <video 
