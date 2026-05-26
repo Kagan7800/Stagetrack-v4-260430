@@ -1848,7 +1848,7 @@ body {
   object-fit: fill;
   pointer-events: none;
   z-index: 2;
-  padding: calc(30px * var(--lobby-scale));
+  padding: calc(80px * var(--lobby-scale));
   box-sizing: border-box;
 }
 
@@ -1861,7 +1861,7 @@ body {
   object-fit: fill;
   pointer-events: none;
   z-index: 2;
-  padding: calc(30px * var(--lobby-scale));
+  padding: calc(80px * var(--lobby-scale));
   box-sizing: border-box;
 }
 
