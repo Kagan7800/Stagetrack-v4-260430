@@ -2450,7 +2450,7 @@ body {
 /* Join Session Section styled with SVG assets */
 .lobby-join-title-img {
   position: absolute;
-  left: 77.746%;
+  left: 71.755%;
   top: 50.585%;
   width: 6.701%;
   height: auto;
@@ -2460,7 +2460,7 @@ body {
 
 .lobby-join-arrow-button {
   position: absolute;
-  left: 77.946%;
+  left: 71.755%;
   top: 64.678%;
   width: 6.298%;
   height: 9.194%;
@@ -2630,12 +2630,12 @@ body {
 
 .lobby-lines-stack {
   width: 100%;
+  flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: stretch;
-  justify-content: center;
-  gap: calc(10px * var(--lobby-scale));
+  justify-content: space-between;
   margin-top: calc(35px * var(--lobby-scale));
+  margin-bottom: calc(10px * var(--lobby-scale));
 }
 
 .lobby-line-button {
