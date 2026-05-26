@@ -169,6 +169,7 @@ export function AppProvider({ children }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [globalMute, setGlobalMute] = useState(true);
   const [globalPause, setGlobalPause] = useState(false);
+  const [activeTheme, setActiveTheme] = useState('music-fun'); // 'music-fun' | 'sor'
 
   // Chat Moderation State
   const [messages, setMessages] = useState([
@@ -732,7 +733,8 @@ export function AppProvider({ children }) {
     lobbyStatus, setLobbyStatus,
     pendingRequest, setPendingRequest,
     requestAccess, approveRequest, denyRequest,
-    resetStudentState
+    resetStudentState,
+    activeTheme, setActiveTheme
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

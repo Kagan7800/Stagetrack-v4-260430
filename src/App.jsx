@@ -20,7 +20,8 @@ function App() {
     globalMute, setGlobalMute,
     globalPause, setGlobalPause,
     messages, handleModerateMessage, handleSendChatMessage,
-    isJoined
+    isJoined,
+    activeTheme
   } = useAppContext();
 
   const isInstructorSidebarVisible = true;
@@ -38,8 +39,40 @@ function App() {
     : participants.slice(halfLength);
 
   return (
-    <div className="app-container">
+    <div className="app-container" style={{ position: 'relative', overflow: 'hidden' }}>
       {!isJoined && <LobbyOverlay />}
+
+      {/* LAYER 0: BASE MUSIC FUN BACKGROUND */}
+      <div 
+        style={{
+          position: 'absolute',
+          inset: 0,
+          zIndex: 0,
+          backgroundImage: "url('/assets/background_modern.png')",
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          pointerEvents: 'none'
+        }}
+      />
+
+      {/* LAYER 1: SOR BACKGROUND OVERLAY */}
+      <div 
+        style={{
+          position: 'absolute',
+          inset: 0,
+          backgroundImage: "url('/assets/SORbackground.png')",
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          zIndex: 1, 
+          pointerEvents: 'none',
+          transition: 'opacity 0.5s ease-in-out',
+          opacity: activeTheme === 'sor' ? 1 : 0
+        }}
+      />
+
+      {/* LAYER 2: INTERACTIVE UI HOUSING */}
+      <div style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', height: '100%', width: '100%' }}>
       {/* Top Banner */}
       <div className="top-banner" style={{ backgroundImage: "url('/banner.png')", backgroundSize: '100% 100%', position: 'relative' }}>
         
@@ -153,6 +186,7 @@ function App() {
              />
           </div>
         )}
+      </div>
       </div>
     </div>
   );

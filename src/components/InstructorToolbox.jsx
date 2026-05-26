@@ -15,7 +15,8 @@ export default function InstructorToolbox() {
     setMediaUpload, clearMedia, mediaType, mediaUrl,
     handleAddSticker,
     metronomeBpm, setMetronomeBpm,
-    isMetronomePlaying, setIsMetronomePlaying
+    isMetronomePlaying, setIsMetronomePlaying,
+    activeTheme, setActiveTheme
   } = useAppContext();
 
   const fileInputRef = useRef(null);
@@ -222,6 +223,21 @@ export default function InstructorToolbox() {
               accept="image/*,video/*"
               onChange={handleFileUpload}
             />
+          </div>
+
+          {/* --- STUDIO THEME SELECTOR --- */}
+          <div className="ito-theme-selector-container">
+            <label className="ito-theme-label">
+              Studio Theme
+            </label>
+            <select 
+              value={activeTheme} 
+              onChange={(e) => setActiveTheme(e.target.value)}
+              className="ito-theme-select"
+            >
+              <option value="music-fun">🎵 Music Fun (Default)</option>
+              <option value="sor">🚀 SOR Theme</option>
+            </select>
           </div>
 
           {/* Instructor Stickers Section */}

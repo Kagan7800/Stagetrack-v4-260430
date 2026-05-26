@@ -58,9 +58,7 @@ body {
   gap: 10px;
   padding: 10px;
   overflow: hidden;
-  background-image: url('/assets/background_modern.png');
-  background-size: cover;
-  background-position: center;
+  background: transparent;
 }
 
 /* Top Banner */
@@ -2704,4 +2702,40 @@ body {
   height: calc(480px * var(--lobby-scale));
   z-index: 12;
   filter: drop-shadow(0 calc(12px * var(--lobby-scale)) calc(24px * var(--lobby-scale)) rgba(0, 0, 0, 0.45));
+}
+
+.ito-theme-selector-container {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  width: 100%;
+}
+
+.ito-theme-label {
+  display: block;
+  font-size: 11px;
+  font-weight: bold;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.ito-theme-select {
+  width: 100%;
+  background-color: rgba(15, 23, 42, 0.8);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 6px;
+  padding: 8px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  outline: none;
+  transition: border-color 0.2s;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.ito-theme-select:focus {
+  border-color: #c084fc;
 }
