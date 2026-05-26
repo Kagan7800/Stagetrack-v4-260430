@@ -1848,8 +1848,6 @@ body {
   object-fit: fill;
   pointer-events: none;
   z-index: 2;
-  padding: calc(80px * var(--lobby-scale));
-  box-sizing: border-box;
 }
 
 .lobby-card-panel-2 {
@@ -1861,14 +1859,12 @@ body {
   object-fit: fill;
   pointer-events: none;
   z-index: 2;
-  padding: calc(80px * var(--lobby-scale));
-  box-sizing: border-box;
 }
 
 .lobby-overlay-input-1 {
   position: absolute;
   left: 11.204%;
-  top: 24.896%;
+  top: 27.582%;
   width: 18.683%;
   height: 6.141%;
   background: rgba(255, 255, 255, 0.08) !important;
@@ -1893,7 +1889,7 @@ body {
 .lobby-overlay-input-2 {
   position: absolute;
   left: 11.204%;
-  top: 34.232%;
+  top: 36.918%;
   width: 18.683%;
   height: 6.141%;
   background: rgba(255, 255, 255, 0.08) !important;
@@ -2326,7 +2322,7 @@ body {
 .lobby-camera-preview-container {
   position: absolute;
   left: 10.983%;
-  top: 45.302%;
+  top: 47.988%;
   width: 19.777%;
   height: 30.99%;
   background: transparent;
@@ -2587,7 +2583,7 @@ body {
 
 .lobby-sticker-swatch {
   width: 100%;
-  height: 100%;
+  aspect-ratio: 1 / 1;
   background: transparent !important;
   border: calc(3px * var(--lobby-scale)) solid transparent !important;
   cursor: pointer;
