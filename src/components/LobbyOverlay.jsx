@@ -28,7 +28,7 @@ const STO_STICKERS = [
 ];
 
 export default function LobbyOverlay() {
-  const { lobbyStatus, requestAccess, setLobbyStatus } = useAppContext();
+  const { lobbyStatus, requestAccess, setLobbyStatus, resetStudentState } = useAppContext();
   const [myName, setMyName] = useState('');
   const [myLittleOne, setMyLittleOne] = useState('');
   const [selectedBorder, setSelectedBorder] = useState(BORDERS[0].value);
@@ -89,7 +89,7 @@ export default function LobbyOverlay() {
   };
 
   const handleRetry = () => {
-    setLobbyStatus('initial');
+    resetStudentState();
   };
 
   const selectedIconFile = selectedIcon;

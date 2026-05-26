@@ -43,7 +43,7 @@ export function AppProvider({ children }) {
   const [lobbyStatus, setLobbyStatus] = useState('initial'); // 'initial' | 'waiting' | 'denied'
   const [pendingRequest, setPendingRequest] = useState(null);
 
-  const [participants, setParticipants] = useState(() => {
+  const generateDefaultParticipants = useCallback((includeRestored = true) => {
     // Helper function to map 1-based display slot number to grid index
     const getArrayIndex = (slotNum) => {
       if (totalSlots < 8) {
@@ -130,29 +130,33 @@ export function AppProvider({ children }) {
       }
     }
 
-    // Try to restore accepted student into the first blank slot if isJoined is true on reload
-    try {
-      const res = localStorage.getItem('stagetrack_lobby_response');
-      if (res) {
-        const parsed = JSON.parse(res);
-        if (parsed.status === 'accepted') {
-          const blankIdx = list.findIndex(p => p.isBlank);
-          if (blankIdx !== -1) {
-            list[blankIdx] = {
-              id: `active-joined-restored`,
-              name: `${parsed.joinedUser.myName} & ${parsed.joinedUser.myLittleOne}`,
-              color: parsed.joinedUser.color,
-              selectedIcon: parsed.joinedUser.selectedIcon,
-              selectedBorder: parsed.joinedUser.selectedBorder,
-              initial: parsed.joinedUser.myName[0] || '?'
-            };
+    if (includeRestored) {
+      // Try to restore accepted student into the first blank slot if isJoined is true on reload
+      try {
+        const res = localStorage.getItem('stagetrack_lobby_response');
+        if (res) {
+          const parsed = JSON.parse(res);
+          if (parsed.status === 'accepted') {
+            const blankIdx = list.findIndex(p => p.isBlank);
+            if (blankIdx !== -1) {
+              list[blankIdx] = {
+                id: `active-joined-restored`,
+                name: `${parsed.joinedUser.myName} & ${parsed.joinedUser.myLittleOne}`,
+                color: parsed.joinedUser.color,
+                selectedIcon: parsed.joinedUser.selectedIcon,
+                selectedBorder: parsed.joinedUser.selectedBorder,
+                initial: parsed.joinedUser.myName[0] || '?'
+              };
+            }
           }
         }
-      }
-    } catch { /* ignore */ }
+      } catch { /* ignore */ }
+    }
 
     return list;
-  });
+  }, [totalSlots, MOCK_USER_COUNT]);
+
+  const [participants, setParticipants] = useState(() => generateDefaultParticipants(true));
 
   const [activeGuestId, setActiveGuestId] = useState(() => {
     try {
@@ -682,12 +686,61 @@ export function AppProvider({ children }) {
     return nudges;
   }, [participants, guestStickers]);
 
+  const resetStudentState = useCallback(() => {
+    // Clear sessionStorage
+    sessionStorage.removeItem('stagetrack_guest_stickers');
+    sessionStorage.removeItem('stagetrack_guest_buttons');
+    sessionStorage.removeItem('stagetrack_is_doodling');
+    sessionStorage.removeItem('stagetrack_media_url');
+    sessionStorage.removeItem('stagetrack_media_type');
+    sessionStorage.removeItem('stagetrack_is_chat_open');
+    sessionStorage.removeItem('stagetrack_chat_messages');
+    sessionStorage.removeItem('stagetrack_metronome_bpm');
+    sessionStorage.removeItem('stagetrack_is_metronome_playing');
+    sessionStorage.removeItem('stagetrack_drawing_paths');
+    sessionStorage.removeItem('stagetrack_active_guest_id');
+
+    // Reset state hooks
+    setGuestStickers({});
+    setGuestButtons({});
+    setIsDoodlingInternal(false);
+    if (mediaUrl) URL.revokeObjectURL(mediaUrl);
+    setMediaUrlInternal(null);
+    setMediaTypeInternal(null);
+    setIsChatOpen(false);
+    setMessages([
+      { id: 'initial-1', text: "Hello! Here is a self message in darker purple.", sender: "self", status: "public" },
+      { id: 'initial-2', text: "Hello there! This is a guest message in green.", sender: "other", senderName: "2", status: "public" },
+      { id: 'initial-3', text: "I have a private question/pending issue in red.", sender: "other", senderName: "3", status: "pending" }
+    ]);
+    setMetronomeBpm(120);
+    setIsMetronomePlaying(false);
+    setDrawingPaths([]);
+    setActiveGuestId(null);
+    setIsJoined(false);
+    setLobbyStatus('initial');
+    setEquippedSticker(null);
+    setParticipants(generateDefaultParticipants(false));
+
+    // Clear localStorage request/response
+    localStorage.removeItem('stagetrack_lobby_request');
+    localStorage.removeItem('stagetrack_lobby_response');
+  }, [mediaUrl, generateDefaultParticipants]);
+
+  // If not joined and we are in 'initial' lobby state, ensure student state is reset
+  useEffect(() => {
+    if (!isJoined && lobbyStatus === 'initial') {
+      resetStudentState();
+    }
+  }, [isJoined, lobbyStatus, resetStudentState]);
+
   const requestAccess = useCallback((myName, myLittleOne, color, selectedIcon, selectedBorder) => {
+    resetStudentState();
     setLobbyStatus('waiting');
     const reqData = { myName, myLittleOne, color, selectedIcon, selectedBorder };
     localStorage.setItem('stagetrack_lobby_request', JSON.stringify(reqData));
     localStorage.setItem('stagetrack_lobby_response', JSON.stringify({ status: 'pending' }));
-  }, []);
+  }, [resetStudentState]);
 
   const approveRequest = useCallback(() => {
     if (!pendingRequest) return;
@@ -816,7 +869,8 @@ export function AppProvider({ children }) {
     isJoined, setIsJoined,
     lobbyStatus, setLobbyStatus,
     pendingRequest, setPendingRequest,
-    requestAccess, approveRequest, denyRequest
+    requestAccess, approveRequest, denyRequest,
+    resetStudentState
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
