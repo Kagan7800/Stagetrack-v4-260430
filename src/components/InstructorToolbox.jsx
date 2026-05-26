@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { Palette, Image as ImageIcon, X, Mic, MicOff, Pause, Play, ChevronLeft, ChevronRight, UploadCloud, HardDrive } from 'lucide-react';
+import { Palette, Image as ImageIcon, X, Mic, MicOff, Pause, Play, ChevronLeft, ChevronRight, UploadCloud, HardDrive, RotateCw } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import heartPng from '../assets/RealHeart.png';
 import crownPng from '../assets/RealCrown.png';
@@ -178,7 +178,7 @@ export default function InstructorToolbox() {
               onClick={() => setGlobalMute(!globalMute)}
               aria-pressed={!globalMute}
             >
-              {globalMute ? <MicOff size={26} /> : <Mic size={26} />} {globalMute ? 'Unmute' : 'Mute'}
+              {globalMute ? <MicOff size={18} /> : <Mic size={18} />} {globalMute ? 'Unmute' : 'Mute'}
             </button>
 
             <button 
@@ -186,7 +186,7 @@ export default function InstructorToolbox() {
               onClick={() => setGlobalPause(!globalPause)}
               aria-pressed={globalPause}
             >
-              {globalPause ? <Play size={26} /> : <Pause size={26} />} Pause PEO
+              {globalPause ? <Play size={18} /> : <Pause size={18} />} Pause PEO
             </button>
 
             <div style={{ display: 'flex', gap: '8px', width: '100%' }}>
@@ -196,7 +196,7 @@ export default function InstructorToolbox() {
                   style={{ width: '100%' }}
                   onClick={() => setShowUploadMenu(!showUploadMenu)}
                 >
-                  <ImageIcon size={26} /> Upload
+                  <ImageIcon size={18} /> Upload
                 </button>
                 {showUploadMenu && (
                   <div className="upload-dropdown glass-panel" style={{ zIndex: 110 }}>
@@ -212,7 +212,7 @@ export default function InstructorToolbox() {
                   style={{ width: 'auto', padding: '0 16px', display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: '#ff4444', color: 'white' }}
                   title="Clear Media"
                 >
-                  <X size={26} />
+                  <X size={18} />
                 </button>
               )}
             </div>
@@ -227,18 +227,24 @@ export default function InstructorToolbox() {
           </div>
 
           {/* --- STUDIO THEME SELECTOR --- */}
-          <div className="ito-theme-selector-container">
-            <label className="ito-theme-label">
-              Studio Theme
-            </label>
+          <div className="ito-theme-selector-container" style={{ display: 'flex', gap: '6px', alignItems: 'center', width: '100%' }}>
             <select 
               value={activeTheme} 
               onChange={(e) => setActiveTheme(e.target.value)}
               className="ito-theme-select"
+              style={{ flex: 1 }}
             >
               <option value="music-fun">🎵 Music Fun (Default)</option>
               <option value="sor">🚀 SOR Theme</option>
             </select>
+            <button 
+              className="gb-btn"
+              onClick={resetStudentState}
+              style={{ width: 'auto', padding: '6px 10px', display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: '#dc2626', color: 'white', borderRadius: '4px' }}
+              title="Reset Room / Refresh Session"
+            >
+              <RotateCw size={16} />
+            </button>
           </div>
 
           {/* Instructor Stickers Section */}
@@ -289,16 +295,6 @@ export default function InstructorToolbox() {
                 title="Double click to clear all PEO stickers"
               >
                 Undo all peo
-              </button>
-            </div>
-            
-            <div style={{ width: '100%', marginTop: '12px' }}>
-              <button 
-                className="gb-btn"
-                onClick={resetStudentState}
-                style={{ width: '100%', backgroundColor: '#dc2626', color: 'white', padding: '10px 8px', fontSize: '0.9rem', fontWeight: 'bold', border: 'none', borderRadius: '6px', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '6px' }}
-              >
-                Reset Room / Clear Session
               </button>
             </div>
           </div>

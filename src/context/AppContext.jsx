@@ -130,29 +130,6 @@ export function AppProvider({ children }) {
       }
     }
 
-    if (includeRestored) {
-      // Try to restore accepted student into the first blank slot if isJoined is true on reload
-      try {
-        const res = localStorage.getItem('stagetrack_lobby_response');
-        if (res) {
-          const parsed = JSON.parse(res);
-          if (parsed.status === 'accepted') {
-            const blankIdx = list.findIndex(p => p.isBlank);
-            if (blankIdx !== -1) {
-              list[blankIdx] = {
-                id: `active-joined-restored`,
-                name: `${parsed.joinedUser.myName} & ${parsed.joinedUser.myLittleOne}`,
-                color: parsed.joinedUser.color,
-                selectedIcon: null,
-                selectedBorder: parsed.joinedUser.selectedBorder,
-                initial: parsed.joinedUser.myName[0] || '?'
-              };
-            }
-          }
-        }
-      } catch { /* ignore */ }
-    }
-
     return list;
   }, [totalSlots, MOCK_USER_COUNT]);
 
@@ -160,26 +137,7 @@ export function AppProvider({ children }) {
 
   const [activeGuestId, setActiveGuestId] = useState(null);
   const [guestButtons, setGuestButtons] = useState({});
-  const [guestStickers, setGuestStickers] = useState(() => {
-    try {
-      const res = localStorage.getItem('stagetrack_lobby_response');
-      if (res) {
-        const parsed = JSON.parse(res);
-        if (parsed.status === 'accepted' && parsed.joinedUser.selectedIcon) {
-          return {
-            'active-joined-restored': [
-              {
-                id: crypto.randomUUID(),
-                name: parsed.joinedUser.selectedIcon,
-                position: 1
-              }
-            ]
-          };
-        }
-      }
-    } catch { /* ignore */ }
-    return {};
-  });
+  const [guestStickers, setGuestStickers] = useState({});
   const [equippedSticker, setEquippedSticker] = useState(null);
   const [isDoodling, setIsDoodlingInternal] = useState(false);
   const [mediaUrl, setMediaUrlInternal] = useState(null);
