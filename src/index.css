@@ -2620,17 +2620,17 @@ body {
 
 .lobby-lines-stack {
   width: 100%;
-  flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  margin-top: calc(20px * var(--lobby-scale));
-  margin-bottom: calc(10px * var(--lobby-scale));
+  align-items: stretch;
+  justify-content: center;
+  gap: calc(10px * var(--lobby-scale));
+  margin-top: calc(35px * var(--lobby-scale));
 }
 
 .lobby-line-button {
   width: 100%;
-  height: calc(30px * var(--lobby-scale));
+  height: calc(5px * var(--lobby-scale));
   background: transparent !important;
   border: none !important;
   cursor: pointer;
@@ -2648,14 +2648,14 @@ body {
 
 .lobby-line-img {
   width: 100%;
-  height: calc(10px * var(--lobby-scale));
+  height: calc(5px * var(--lobby-scale));
   object-fit: fill;
   pointer-events: none;
-  border-radius: calc(5px * var(--lobby-scale));
+  border-radius: calc(2px * var(--lobby-scale));
   transition: all 0.2s;
 }
 
 .lobby-line-button.selected .lobby-line-img {
-  filter: drop-shadow(0 0 calc(10px * var(--lobby-scale)) var(--line-glow-color, #ffffff));
-  height: calc(14px * var(--lobby-scale));
+  filter: drop-shadow(0 0 calc(8px * var(--lobby-scale)) var(--line-glow-color, #ffffff));
+  height: calc(7px * var(--lobby-scale));
 }

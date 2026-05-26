@@ -26,7 +26,8 @@ export default function PeoBorder({ color }) {
         height: '100%',
         pointerEvents: 'none',
         zIndex: 5,
-        borderRadius: 'inherit'
+        borderRadius: 'inherit',
+        overflow: 'hidden'
       }}
     >
       <defs>
@@ -44,12 +45,20 @@ export default function PeoBorder({ color }) {
       {/* 
         All border lines are grouped into a single <g> element.
         Instead of applying stroke to each path individually, we apply it to the group.
+        The strokeWidth is set to 10px (with scale fallback) and vectorEffect ensures it doesn't scale with size.
       */}
-      <g stroke={strokeColor} strokeWidth="5" fill="none">
-        <line x1="0" y1="2.5" x2="100" y2="2.5" />
-        <line x1="97.5" y1="0" x2="97.5" y2="100" />
-        <line x1="100" y1="97.5" x2="0" y2="97.5" />
-        <line x1="2.5" y1="100" x2="2.5" y2="0" />
+      <g 
+        stroke={strokeColor} 
+        fill="none"
+        style={{
+          strokeWidth: 'calc(10px * var(--lobby-scale, 1))',
+          vectorEffect: 'non-scaling-stroke'
+        }}
+      >
+        <line x1="0" y1="5" x2="100" y2="5" />
+        <line x1="95" y1="0" x2="95" y2="100" />
+        <line x1="100" y1="95" x2="0" y2="95" />
+        <line x1="5" y1="100" x2="5" y2="0" />
       </g>
     </svg>
   );
