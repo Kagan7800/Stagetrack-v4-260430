@@ -2544,6 +2544,7 @@ body {
   top: 19.216%;
   width: 19.777%;
   height: 74.157%;
+  margin-top: calc(50px * var(--lobby-scale));
   padding: calc(125px * var(--lobby-scale)) calc(70px * var(--lobby-scale)) calc(70px * var(--lobby-scale)) calc(70px * var(--lobby-scale));
   box-sizing: border-box;
   z-index: 5;
