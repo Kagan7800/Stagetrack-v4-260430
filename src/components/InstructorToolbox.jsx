@@ -16,7 +16,8 @@ export default function InstructorToolbox() {
     handleAddSticker,
     metronomeBpm, setMetronomeBpm,
     isMetronomePlaying, setIsMetronomePlaying,
-    activeTheme, setActiveTheme
+    activeTheme, setActiveTheme,
+    resetStudentState
   } = useAppContext();
 
   const fileInputRef = useRef(null);
@@ -288,6 +289,16 @@ export default function InstructorToolbox() {
                 title="Double click to clear all PEO stickers"
               >
                 Undo all peo
+              </button>
+            </div>
+            
+            <div style={{ width: '100%', marginTop: '12px' }}>
+              <button 
+                className="gb-btn"
+                onClick={resetStudentState}
+                style={{ width: '100%', backgroundColor: '#dc2626', color: 'white', padding: '10px 8px', fontSize: '0.9rem', fontWeight: 'bold', border: 'none', borderRadius: '6px', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '6px' }}
+              >
+                Reset Room / Clear Session
               </button>
             </div>
           </div>
