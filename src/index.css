@@ -1868,7 +1868,7 @@ body {
 .lobby-overlay-input-1 {
   position: absolute;
   left: 11.204%;
-  top: 30.596%;
+  top: 32.016%;
   width: 18.683%;
   height: 6.141%;
   background: rgba(255, 255, 255, 0.08) !important;
@@ -1893,7 +1893,7 @@ body {
 .lobby-overlay-input-2 {
   position: absolute;
   left: 11.204%;
-  top: 39.932%;
+  top: 41.352%;
   width: 18.683%;
   height: 6.141%;
   background: rgba(255, 255, 255, 0.08) !important;
@@ -2326,7 +2326,7 @@ body {
 .lobby-camera-preview-container {
   position: absolute;
   left: 10.983%;
-  top: 51.002%;
+  top: 52.422%;
   width: 19.777%;
   height: 30.99%;
   background: transparent;
@@ -2498,13 +2498,11 @@ body {
   object-fit: contain;
   pointer-events: none;
   filter: brightness(0) invert(1);
-  opacity: 0.8;
   transition: all 0.2s;
 }
 
 .lobby-join-arrow-button:hover:not(:disabled) .lobby-join-arrow-img {
   filter: brightness(0) invert(1) drop-shadow(0 0 calc(15px * var(--lobby-scale)) rgba(255, 255, 255, 0.6));
-  opacity: 1;
 }
 
 /* Sparkle filter animation for instructor pending PEO cell */
@@ -2568,7 +2566,7 @@ body {
   top: 24.896%;
   width: 19.777%;
   height: 68.477%;
-  padding: calc(125px * var(--lobby-scale)) calc(70px * var(--lobby-scale)) calc(70px * var(--lobby-scale)) calc(70px * var(--lobby-scale));
+  padding: calc(15px * var(--lobby-scale)) calc(70px * var(--lobby-scale)) calc(70px * var(--lobby-scale)) calc(70px * var(--lobby-scale));
   box-sizing: border-box;
   z-index: 5;
   display: grid;
@@ -2634,7 +2632,7 @@ body {
   top: 24.896%;
   width: 19.777%;
   height: 68.477%;
-  padding: calc(125px * var(--lobby-scale)) calc(70px * var(--lobby-scale)) calc(70px * var(--lobby-scale)) calc(70px * var(--lobby-scale));
+  padding: calc(15px * var(--lobby-scale)) calc(70px * var(--lobby-scale)) calc(70px * var(--lobby-scale)) calc(70px * var(--lobby-scale));
   box-sizing: border-box;
   z-index: 5;
   display: flex;
@@ -2653,7 +2651,7 @@ body {
 }
 
 .lobby-line-button {
-  width: 120%;
+  width: 100%;
   height: calc(6px * var(--lobby-scale));
   background: transparent !important;
   border: none !important;
