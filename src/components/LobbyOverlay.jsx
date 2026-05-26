@@ -32,7 +32,7 @@ export default function LobbyOverlay() {
   const [myName, setMyName] = useState('');
   const [myLittleOne, setMyLittleOne] = useState('');
   const [selectedBorder, setSelectedBorder] = useState(BORDERS[0].value);
-  const [selectedIcon, setSelectedIcon] = useState(STO_STICKERS[2]);
+  const [selectedIcon, setSelectedIcon] = useState(null);
   
   const containerRef = useRef(null);
   const [scale, setScale] = useState(1);
@@ -150,11 +150,31 @@ export default function LobbyOverlay() {
               )}
             </div>
 
+            {/* STO Stickers selection grid mapped over Card 1 (Left Side Box) */}
+            <div className="lobby-stickers-grid">
+              <div className="lobby-card-title">Choose your Sticker</div>
+              {STO_STICKERS.map((sticker) => (
+                <button
+                  key={sticker}
+                  type="button"
+                  className={`lobby-sticker-swatch ${selectedIcon === sticker ? 'selected' : ''}`}
+                  onClick={() => setSelectedIcon(sticker)}
+                  title={`Select ${sticker.replace('.svg', '')}`}
+                >
+                  <img 
+                    src={`/assets/svg_stickers/${sticker}`} 
+                    className="lobby-sticker-swatch-img" 
+                    alt={sticker} 
+                  />
+                </button>
+              ))}
+            </div>
+
             {/* Join Session Button positioned in Column 3 */}
             <button 
               type="submit" 
               className="lobby-join-button"
-              disabled={!myName.trim() || !myLittleOne.trim()}
+              disabled={!myName.trim() || !myLittleOne.trim() || !selectedIcon}
               title="Join Session"
             >
               Join Session
