@@ -1839,6 +1839,19 @@ body {
   z-index: 2;
 }
 
+.lobby-card-panel-1 {
+  position: absolute;
+  left: 31.240%;
+  top: 23.121%;
+  width: 19.777%;
+  height: 70.252%;
+  object-fit: fill;
+  pointer-events: none;
+  z-index: 2;
+  padding: calc(80px * var(--lobby-scale));
+  box-sizing: border-box;
+}
+
 .lobby-card-panel-2 {
   position: absolute;
   left: 51.498%;
