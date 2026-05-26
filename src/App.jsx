@@ -71,8 +71,10 @@ function App() {
       {/* LAYER 2: INTERACTIVE UI HOUSING */}
       <div style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', height: '100%', width: '100%' }}>
       {/* Top Banner */}
-      <div className="top-banner" style={{ backgroundImage: activeTheme === 'sor' ? 'none' : "url('/banner.png')", backgroundSize: '100% 100%', position: 'relative' }}>
-        {activeTheme !== 'sor' && (
+      <div className="top-banner" style={{ backgroundImage: activeTheme === 'sor' ? "url('/assets/SOR/black_banner.svg')" : "url('/banner.png')", backgroundSize: '100% 100%', position: 'relative' }}>
+        {activeTheme === 'sor' ? (
+          <img src="/assets/SOR/SOR_Logo.svg" alt="SOR Logo" style={{ height: '70%', width: 'auto', objectFit: 'contain' }} />
+        ) : (
           <>
             {/* Left Side Logo */}
             <div style={{ position: 'absolute', left: '70px', height: '100%', display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
