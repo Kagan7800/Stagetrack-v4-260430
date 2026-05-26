@@ -2700,9 +2700,9 @@ body {
 .lobby-camera-icon-badge {
   position: absolute;
   top: calc(30px * var(--lobby-scale));
-  right: calc(30px * var(--lobby-scale));
-  width: calc(160px * var(--lobby-scale));
-  height: calc(160px * var(--lobby-scale));
+  left: calc(30px * var(--lobby-scale));
+  width: calc(320px * var(--lobby-scale));
+  height: calc(320px * var(--lobby-scale));
   z-index: 12;
-  filter: drop-shadow(0 calc(4px * var(--lobby-scale)) calc(8px * var(--lobby-scale)) rgba(0, 0, 0, 0.45));
+  filter: drop-shadow(0 calc(8px * var(--lobby-scale)) calc(16px * var(--lobby-scale)) rgba(0, 0, 0, 0.45));
 }
