@@ -74,14 +74,17 @@ function App() {
       {/* LAYER 2: INTERACTIVE UI HOUSING */}
       <div style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', height: '100%', width: '100%' }}>
       {/* Top Banner */}
-      <div className="top-banner" style={{ backgroundImage: "url('/banner.png')", backgroundSize: '100% 100%', position: 'relative' }}>
-        
-        {/* Left Side Logo */}
-        <div style={{ position: 'absolute', left: '70px', height: '100%', display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
-          <img src="/greenStagetrack_studio.png" alt="Stagetrack Studio" style={{ height: '70%', maxWidth: '100%', objectFit: 'contain' }} />
-        </div>
+      <div className="top-banner" style={{ backgroundImage: activeTheme === 'sor' ? 'none' : "url('/banner.png')", backgroundSize: '100% 100%', position: 'relative' }}>
+        {activeTheme !== 'sor' && (
+          <>
+            {/* Left Side Logo */}
+            <div style={{ position: 'absolute', left: '70px', height: '100%', display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
+              <img src="/greenStagetrack_studio.png" alt="Stagetrack Studio" style={{ height: '70%', maxWidth: '100%', objectFit: 'contain' }} />
+            </div>
 
-        <img src="/assets/logo_modern.svg" alt="Music Fun Logo" style={{ height: '100%', width: 'auto', objectFit: 'contain' }} />
+            <img src="/assets/logo_modern.svg" alt="Music Fun Logo" style={{ height: '100%', width: 'auto', objectFit: 'contain' }} />
+          </>
+        )}
       </div>
 
       {/* Main Content Layout */}
