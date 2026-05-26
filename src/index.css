@@ -2658,9 +2658,9 @@ body {
   flex-direction: column;
   justify-content: space-between;
   margin-top: calc(90px * var(--lobby-scale));
-  margin-bottom: 0;
+  margin-bottom: calc(30px * var(--lobby-scale));
   padding-top: calc(35px * var(--lobby-scale));
-  padding-bottom: calc(5px * var(--lobby-scale));
+  padding-bottom: 0;
   box-sizing: border-box;
 }
 
