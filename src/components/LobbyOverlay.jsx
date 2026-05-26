@@ -149,6 +149,14 @@ export default function LobbyOverlay() {
                   {myName}
                 </div>
               )}
+              {/* Selected Sticker Badge */}
+              {selectedIcon && (
+                <img 
+                  src={`/assets/svg_stickers/${selectedIcon}`}
+                  className="lobby-camera-icon-badge" 
+                  alt="Selected Icon Badge" 
+                />
+              )}
               {/* SVG-based PEO Border component */}
               <PeoBorder color={selectedBorder} />
             </div>
