@@ -31,7 +31,7 @@ function App() {
   const isThreePeo = Number(MOCK_USER_COUNT) === 3 || (participants.length === 4 && activeCount === 3);
 
   const leftParticipants = isThreePeo 
-    ? [participants[0]] 
+    ? [participants[0], participants[1]] 
     : participants.slice(0, halfLength);
   const rightParticipants = isThreePeo 
     ? [participants[2], participants[3]] 
