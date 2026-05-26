@@ -157,21 +157,23 @@ export default function LobbyOverlay() {
             {/* STO Stickers selection grid mapped over Card 1 (Left Side Box) */}
             <div className="lobby-stickers-grid">
               <div className="lobby-card-title">Choose 1 sticker</div>
-              {STO_STICKERS.map((sticker) => (
-                <button
-                  key={sticker}
-                  type="button"
-                  className={`lobby-sticker-swatch ${selectedIcon === sticker ? 'selected' : ''}`}
-                  onClick={() => setSelectedIcon(sticker)}
-                  title={`Select ${sticker.replace('.svg', '')}`}
-                >
-                  <img 
-                    src={`/assets/svg_stickers/${sticker}`} 
-                    className="lobby-sticker-swatch-img" 
-                    alt={sticker} 
-                  />
-                </button>
-              ))}
+              <div className="lobby-stickers-container">
+                {STO_STICKERS.map((sticker) => (
+                  <button
+                    key={sticker}
+                    type="button"
+                    className={`lobby-sticker-swatch ${selectedIcon === sticker ? 'selected' : ''}`}
+                    onClick={() => setSelectedIcon(sticker)}
+                    title={`Select ${sticker.replace('.svg', '')}`}
+                  >
+                    <img 
+                      src={`/assets/svg_stickers/${sticker}`} 
+                      className="lobby-sticker-swatch-img" 
+                      alt={sticker} 
+                    />
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Border Color selection grid mapped over Card 2 (Right Side Box) */}
