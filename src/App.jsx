@@ -60,10 +60,7 @@ function App() {
         style={{
           position: 'absolute',
           inset: 0,
-          backgroundImage: "url('/assets/SORbackground.png')",
-          backgroundSize: '100% 100%',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
+          backgroundColor: '#000000',
           zIndex: 1, 
           pointerEvents: 'none',
           transition: 'opacity 0.5s ease-in-out',
