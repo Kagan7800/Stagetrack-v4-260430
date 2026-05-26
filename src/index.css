@@ -1868,7 +1868,7 @@ body {
 .lobby-overlay-input-1 {
   position: absolute;
   left: 11.204%;
-  top: 39.137%;
+  top: 30.596%;
   width: 18.683%;
   height: 6.141%;
   background: rgba(255, 255, 255, 0.08) !important;
@@ -1893,7 +1893,7 @@ body {
 .lobby-overlay-input-2 {
   position: absolute;
   left: 11.204%;
-  top: 48.473%;
+  top: 39.932%;
   width: 18.683%;
   height: 6.141%;
   background: rgba(255, 255, 255, 0.08) !important;
@@ -2326,8 +2326,9 @@ body {
 .lobby-camera-preview-container {
   position: absolute;
   left: 10.983%;
-  top: 59.543%;
+  top: 51.002%;
   width: 19.777%;
+  height: 30.99%;
   background: transparent;
   border-radius: calc(24px * var(--lobby-scale));
   border: none;
@@ -2451,7 +2452,7 @@ body {
   position: absolute;
   left: 71.755%;
   top: 19.216%;
-  width: 18.683%;
+  width: 6.701%;
   height: 74.157%;
   display: flex;
   flex-direction: column;
@@ -2497,11 +2498,13 @@ body {
   object-fit: contain;
   pointer-events: none;
   filter: brightness(0) invert(1);
+  opacity: 0.8;
   transition: all 0.2s;
 }
 
 .lobby-join-arrow-button:hover:not(:disabled) .lobby-join-arrow-img {
   filter: brightness(0) invert(1) drop-shadow(0 0 calc(15px * var(--lobby-scale)) rgba(255, 255, 255, 0.6));
+  opacity: 1;
 }
 
 /* Sparkle filter animation for instructor pending PEO cell */
