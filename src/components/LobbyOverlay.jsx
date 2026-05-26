@@ -4,7 +4,6 @@ import { Loader2, ShieldAlert, Camera } from 'lucide-react';
 import PeoBorder from './PeoBorder';
 
 const BORDERS = [
-  { name: 'Yellow Line', value: '#F7F27C', file: 'Line 179.svg', color: '#F7F27C' },
   { name: 'Cyan Line', value: '#00FCFC', file: 'Line 180.svg', color: '#00FCFC' },
   { name: 'Red Line', value: '#FC0000', file: 'Line 181.svg', color: '#FC0000' },
   { name: 'Mint Line', value: '#87E9C0', file: 'Line 182.svg', color: '#87E9C0' },
