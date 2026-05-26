@@ -1864,7 +1864,7 @@ body {
 .lobby-overlay-input-1 {
   position: absolute;
   left: 11.204%;
-  top: 43.397%;
+  top: 34.327%;
   width: 18.683%;
   height: 6.141%;
   background: rgba(255, 255, 255, 0.08) !important;
@@ -1873,7 +1873,7 @@ body {
   outline: none;
   color: white;
   font-size: calc(48px * var(--lobby-scale));
-  padding: 0 calc(35px * var(--lobby-scale));
+  padding: calc(15px * var(--lobby-scale)) calc(35px * var(--lobby-scale)) 0 calc(35px * var(--lobby-scale));
   font-family: 'Risque', serif;
   box-sizing: border-box;
   transition: all 0.3s;
@@ -1889,7 +1889,7 @@ body {
 .lobby-overlay-input-2 {
   position: absolute;
   left: 11.204%;
-  top: 52.733%;
+  top: 43.663%;
   width: 18.683%;
   height: 6.141%;
   background: rgba(255, 255, 255, 0.08) !important;
@@ -1898,7 +1898,7 @@ body {
   outline: none;
   color: white;
   font-size: calc(48px * var(--lobby-scale));
-  padding: 0 calc(35px * var(--lobby-scale));
+  padding: calc(15px * var(--lobby-scale)) calc(35px * var(--lobby-scale)) 0 calc(35px * var(--lobby-scale));
   font-family: 'Risque', serif;
   box-sizing: border-box;
   transition: all 0.3s;
@@ -2322,7 +2322,7 @@ body {
 .lobby-camera-preview-container {
   position: absolute;
   left: 10.983%;
-  top: 63.803%;
+  top: 54.733%;
   width: 19.777%;
   height: 30.99%;
   background: transparent;
@@ -2452,14 +2452,18 @@ body {
 
 /* Join Session Section styled with SVG assets */
 .lobby-join-container {
+  position: absolute;
+  left: 71.755%;
+  top: 19.216%;
+  width: 6.701%;
+  height: 74.157%;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: calc(20px * var(--lobby-scale));
-  margin-top: 0;
   z-index: 10;
   box-sizing: border-box;
-  width: 100%;
 }
 
 .lobby-join-title-img {
@@ -2563,7 +2567,7 @@ body {
   top: 19.216%;
   width: 19.777%;
   height: 74.157%;
-  padding: calc(15px * var(--lobby-scale)) calc(80px * var(--lobby-scale)) calc(40px * var(--lobby-scale)) calc(80px * var(--lobby-scale));
+  padding: calc(140px * var(--lobby-scale)) calc(80px * var(--lobby-scale)) calc(40px * var(--lobby-scale)) calc(80px * var(--lobby-scale));
   box-sizing: border-box;
   z-index: 5;
   display: flex;
@@ -2637,7 +2641,7 @@ body {
   top: 19.216%;
   width: 19.777%;
   height: 74.157%;
-  padding: calc(15px * var(--lobby-scale)) calc(80px * var(--lobby-scale)) calc(30px * var(--lobby-scale)) calc(80px * var(--lobby-scale));
+  padding: calc(140px * var(--lobby-scale)) calc(80px * var(--lobby-scale)) calc(30px * var(--lobby-scale)) calc(80px * var(--lobby-scale));
   box-sizing: border-box;
   z-index: 5;
   display: flex;

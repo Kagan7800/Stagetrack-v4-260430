@@ -197,27 +197,27 @@ export default function LobbyOverlay() {
                   </button>
                 ))}
               </div>
+            </div>
 
-              {/* Join Session Section (moved inside border color card) */}
-              <div className="lobby-join-container">
+            {/* Join Session Section (Column 4) */}
+            <div className="lobby-join-container">
+              <img 
+                src="/assets/Lobby/Click to join session.svg" 
+                className="lobby-join-title-img" 
+                alt="Click to join session" 
+              />
+              <button 
+                type="submit" 
+                className="lobby-join-arrow-button"
+                disabled={!myName.trim() || !myLittleOne.trim() || !selectedIcon}
+                title="Join Session"
+              >
                 <img 
-                  src="/assets/Lobby/Click to join session.svg" 
-                  className="lobby-join-title-img" 
-                  alt="Click to join session" 
+                  src="/assets/Lobby/Arrow.svg" 
+                  className="lobby-join-arrow-img" 
+                  alt="Join Arrow" 
                 />
-                <button 
-                  type="submit" 
-                  className="lobby-join-arrow-button"
-                  disabled={!myName.trim() || !myLittleOne.trim() || !selectedIcon}
-                  title="Join Session"
-                >
-                  <img 
-                    src="/assets/Lobby/Arrow.svg" 
-                    className="lobby-join-arrow-img" 
-                    alt="Join Arrow" 
-                  />
-                </button>
-              </div>
+              </button>
             </div>
           </form>
         )}
