@@ -140,7 +140,7 @@ export default function GuestContainer({
             <img 
               src={`/assets/svg_stickers/${pendingRequest.selectedIcon}`}
               alt="Selected Icon"
-              className="gc-joined-icon-badge"
+              className="gc-sticker pos-1 lobby-selected-sticker-placed"
             />
           )}
 
@@ -344,7 +344,7 @@ export default function GuestContainer({
         <img 
           src={`/assets/svg_stickers/${participant.selectedIcon}`}
           alt="Selected Icon"
-          className="gc-joined-icon-badge"
+          className="gc-sticker pos-1 lobby-selected-sticker-placed"
         />
       )}
 
