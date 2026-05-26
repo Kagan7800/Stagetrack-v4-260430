@@ -1864,7 +1864,7 @@ body {
 .lobby-overlay-input-1 {
   position: absolute;
   left: 11.204%;
-  top: 27.582%;
+  top: 32.016%;
   width: 18.683%;
   height: 6.141%;
   background: rgba(255, 255, 255, 0.08) !important;
@@ -1889,7 +1889,7 @@ body {
 .lobby-overlay-input-2 {
   position: absolute;
   left: 11.204%;
-  top: 36.918%;
+  top: 41.352%;
   width: 18.683%;
   height: 6.141%;
   background: rgba(255, 255, 255, 0.08) !important;
@@ -2322,13 +2322,16 @@ body {
 .lobby-camera-preview-container {
   position: absolute;
   left: 10.983%;
-  top: 47.988%;
+  top: 52.422%;
   width: 19.777%;
   height: 30.99%;
   background: transparent;
   border-radius: calc(24px * var(--lobby-scale));
   border: none;
   overflow: hidden;
+  isolation: isolate;
+  transform: translateZ(0);
+  -webkit-mask-image: -webkit-radial-gradient(white, black);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2445,18 +2448,14 @@ body {
 
 /* Join Session Section styled with SVG assets */
 .lobby-join-container {
-  position: absolute;
-  left: 71.755%;
-  top: 19.216%;
-  width: 6.701%;
-  height: 74.157%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: calc(30px * var(--lobby-scale));
+  gap: calc(20px * var(--lobby-scale));
+  margin-top: calc(30px * var(--lobby-scale));
   z-index: 10;
   box-sizing: border-box;
+  width: 100%;
 }
 
 .lobby-join-title-img {
@@ -2560,7 +2559,7 @@ body {
   top: 19.216%;
   width: 19.777%;
   height: 74.157%;
-  padding: calc(140px * var(--lobby-scale)) calc(55px * var(--lobby-scale)) calc(40px * var(--lobby-scale)) calc(55px * var(--lobby-scale));
+  padding: calc(140px * var(--lobby-scale)) calc(80px * var(--lobby-scale)) calc(40px * var(--lobby-scale)) calc(80px * var(--lobby-scale));
   box-sizing: border-box;
   z-index: 5;
   display: grid;
@@ -2625,7 +2624,7 @@ body {
   top: 19.216%;
   width: 19.777%;
   height: 74.157%;
-  padding: calc(140px * var(--lobby-scale)) calc(70px * var(--lobby-scale)) calc(40px * var(--lobby-scale)) calc(70px * var(--lobby-scale));
+  padding: calc(140px * var(--lobby-scale)) calc(80px * var(--lobby-scale)) calc(30px * var(--lobby-scale)) calc(80px * var(--lobby-scale));
   box-sizing: border-box;
   z-index: 5;
   display: flex;
