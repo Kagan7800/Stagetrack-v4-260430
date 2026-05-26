@@ -75,7 +75,9 @@ function App() {
       <div style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', height: '100%', width: '100%' }}>
       {/* Top Banner */}
       <div className="top-banner" style={{ backgroundImage: activeTheme === 'sor' ? 'none' : "url('/banner.png')", backgroundSize: '100% 100%', position: 'relative' }}>
-        {activeTheme !== 'sor' && (
+        {activeTheme === 'sor' ? (
+          <img src="/greenStagetrack_studio.png" alt="Stagetrack Studio" style={{ height: '70%', width: 'auto', objectFit: 'contain' }} />
+        ) : (
           <>
             {/* Left Side Logo */}
             <div style={{ position: 'absolute', left: '70px', height: '100%', display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
