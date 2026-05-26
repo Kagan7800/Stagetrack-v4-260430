@@ -1839,28 +1839,6 @@ body {
   z-index: 2;
 }
 
-.lobby-card-panel-1 {
-  position: absolute;
-  left: 10.983%;
-  top: 23.121%;
-  width: 19.777%;
-  height: 70.252%;
-  object-fit: fill;
-  pointer-events: none;
-  z-index: 2;
-}
-
-.lobby-card-panel-2 {
-  position: absolute;
-  left: 30.7603%;
-  top: 23.121%;
-  width: 19.777%;
-  height: 70.252%;
-  object-fit: fill;
-  pointer-events: none;
-  z-index: 2;
-}
-
 .lobby-overlay-input-1 {
   position: absolute;
   left: 11.204%;
