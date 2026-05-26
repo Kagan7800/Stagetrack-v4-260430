@@ -1868,7 +1868,7 @@ body {
 .lobby-overlay-input-1 {
   position: absolute;
   left: 11.204%;
-  top: 41.977%;
+  top: 39.137%;
   width: 18.683%;
   height: 6.141%;
   background: rgba(255, 255, 255, 0.08) !important;
@@ -1893,7 +1893,7 @@ body {
 .lobby-overlay-input-2 {
   position: absolute;
   left: 11.204%;
-  top: 51.313%;
+  top: 48.473%;
   width: 18.683%;
   height: 6.141%;
   background: rgba(255, 255, 255, 0.08) !important;
@@ -2323,11 +2323,10 @@ body {
   transform: scale(1.08);
 }
 
-/* Camera preview container styled as a PEO video cell */
 .lobby-camera-preview-container {
   position: absolute;
   left: 10.983%;
-  top: 62.383%;
+  top: 59.543%;
   width: 19.777%;
   height: 30.99%;
   background: #000000;
@@ -2339,6 +2338,7 @@ body {
   justify-content: center;
   box-shadow: 0 calc(10px * var(--lobby-scale)) calc(30px * var(--lobby-scale)) rgba(0,0,0,0.5);
   z-index: 3;
+  box-sizing: border-box;
 }
 
 .lobby-camera-video-elem {
