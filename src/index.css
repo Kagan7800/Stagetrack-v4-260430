@@ -2328,10 +2328,9 @@ body {
   background: transparent;
   border-radius: calc(24px * var(--lobby-scale));
   border: none;
-  overflow: hidden;
+  overflow: visible;
   isolation: isolate;
   transform: translateZ(0);
-  -webkit-mask-image: -webkit-radial-gradient(white, black);
   display: flex;
   align-items: center;
   justify-content: center;
