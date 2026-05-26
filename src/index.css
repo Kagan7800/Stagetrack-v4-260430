@@ -1863,7 +1863,7 @@ body {
 
 .lobby-overlay-input-1 {
   position: absolute;
-  left: 31.787%;
+  left: 11.204%;
   top: 41.977%;
   width: 18.683%;
   height: 6.141%;
@@ -1888,7 +1888,7 @@ body {
 
 .lobby-overlay-input-2 {
   position: absolute;
-  left: 31.787%;
+  left: 11.204%;
   top: 51.313%;
   width: 18.683%;
   height: 6.141%;
@@ -1986,7 +1986,7 @@ body {
 /* Lobby Waiting & Denied Views overlay on the form */
 .lobby-overlay-status {
   position: absolute;
-  left: 31.240%;
+  left: 10.983%;
   top: 40%;
   width: 19.777%;
   height: 54%;
@@ -2446,7 +2446,7 @@ body {
 /* HTML-drawn Join Session Button positioned on the right (Column 3) */
 .lobby-join-button {
   position: absolute;
-  left: 52.045%;
+  left: 71.755%;
   top: 59.5%;
   width: 18.683%;
   height: 8.5%;
