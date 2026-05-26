@@ -1868,7 +1868,7 @@ body {
 .lobby-overlay-input-1 {
   position: absolute;
   left: 11.204%;
-  top: 19.216%;
+  top: 24.896%;
   width: 18.683%;
   height: 6.141%;
   background: rgba(255, 255, 255, 0.08) !important;
@@ -1893,7 +1893,7 @@ body {
 .lobby-overlay-input-2 {
   position: absolute;
   left: 11.204%;
-  top: 28.552%;
+  top: 34.232%;
   width: 18.683%;
   height: 6.141%;
   background: rgba(255, 255, 255, 0.08) !important;
@@ -2326,7 +2326,7 @@ body {
 .lobby-camera-preview-container {
   position: absolute;
   left: 10.983%;
-  top: 39.622%;
+  top: 45.302%;
   width: 19.777%;
   height: 30.99%;
   background: transparent;
@@ -2488,7 +2488,6 @@ body {
 }
 
 .lobby-join-arrow-button:disabled {
-  opacity: 0.6;
   cursor: not-allowed;
 }
 
@@ -2562,18 +2561,17 @@ body {
 .lobby-stickers-grid {
   position: absolute;
   left: 31.240%;
-  top: 24.896%;
+  top: 19.216%;
   width: 19.777%;
-  height: 68.477%;
-  padding: calc(15px * var(--lobby-scale)) calc(70px * var(--lobby-scale)) calc(70px * var(--lobby-scale)) calc(70px * var(--lobby-scale));
+  height: 74.157%;
+  padding: calc(140px * var(--lobby-scale)) calc(55px * var(--lobby-scale)) calc(40px * var(--lobby-scale)) calc(55px * var(--lobby-scale));
   box-sizing: border-box;
   z-index: 5;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  grid-auto-rows: min-content;
-  gap: calc(24px * var(--lobby-scale));
+  grid-template-rows: repeat(5, 1fr);
+  gap: calc(20px * var(--lobby-scale));
   justify-content: center;
-  align-content: start;
 }
 
 .lobby-card-title {
@@ -2589,7 +2587,7 @@ body {
 
 .lobby-sticker-swatch {
   width: 100%;
-  aspect-ratio: 1 / 1;
+  height: 100%;
   background: transparent !important;
   border: calc(3px * var(--lobby-scale)) solid transparent !important;
   cursor: pointer;
@@ -2628,10 +2626,10 @@ body {
 .lobby-colors-grid {
   position: absolute;
   left: 51.498%;
-  top: 24.896%;
+  top: 19.216%;
   width: 19.777%;
-  height: 68.477%;
-  padding: calc(15px * var(--lobby-scale)) calc(70px * var(--lobby-scale)) calc(70px * var(--lobby-scale)) calc(70px * var(--lobby-scale));
+  height: 74.157%;
+  padding: calc(140px * var(--lobby-scale)) calc(70px * var(--lobby-scale)) calc(40px * var(--lobby-scale)) calc(70px * var(--lobby-scale));
   box-sizing: border-box;
   z-index: 5;
   display: flex;
