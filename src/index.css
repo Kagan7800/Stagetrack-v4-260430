@@ -2328,8 +2328,7 @@ body {
   left: 10.983%;
   top: 59.543%;
   width: 19.777%;
-  height: 30.99%;
-  background: #000000;
+  background: transparent;
   border-radius: calc(24px * var(--lobby-scale));
   border: none;
   overflow: hidden;
@@ -2448,27 +2447,34 @@ body {
 }
 
 /* Join Session Section styled with SVG assets */
-.lobby-join-title-img {
+.lobby-join-container {
   position: absolute;
   left: 71.755%;
-  top: 50.585%;
-  width: 6.701%;
+  top: 19.216%;
+  width: 18.683%;
+  height: 74.157%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: calc(30px * var(--lobby-scale));
+  z-index: 10;
+  box-sizing: border-box;
+}
+
+.lobby-join-title-img {
+  width: calc(349px * var(--lobby-scale));
   height: auto;
   pointer-events: none;
-  z-index: 10;
 }
 
 .lobby-join-arrow-button {
-  position: absolute;
-  left: 71.755%;
-  top: 64.678%;
-  width: 6.298%;
-  height: 9.194%;
+  width: calc(328px * var(--lobby-scale));
+  height: calc(259px * var(--lobby-scale));
   background: transparent !important;
   border: none !important;
   cursor: pointer;
   outline: none;
-  z-index: 10;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2478,7 +2484,6 @@ body {
 
 .lobby-join-arrow-button:hover:not(:disabled) {
   transform: scale(1.08);
-  filter: drop-shadow(0 0 calc(15px * var(--lobby-scale)) rgba(255, 255, 255, 0.4));
 }
 
 .lobby-join-arrow-button:disabled {
@@ -2491,6 +2496,12 @@ body {
   height: 100%;
   object-fit: contain;
   pointer-events: none;
+  filter: brightness(0) invert(1);
+  transition: all 0.2s;
+}
+
+.lobby-join-arrow-button:hover:not(:disabled) .lobby-join-arrow-img {
+  filter: brightness(0) invert(1) drop-shadow(0 0 calc(15px * var(--lobby-scale)) rgba(255, 255, 255, 0.6));
 }
 
 /* Sparkle filter animation for instructor pending PEO cell */
@@ -2639,8 +2650,8 @@ body {
 }
 
 .lobby-line-button {
-  width: 100%;
-  height: calc(5px * var(--lobby-scale));
+  width: 120%;
+  height: calc(6px * var(--lobby-scale));
   background: transparent !important;
   border: none !important;
   cursor: pointer;
@@ -2658,7 +2669,7 @@ body {
 
 .lobby-line-img {
   width: 100%;
-  height: calc(5px * var(--lobby-scale));
+  height: calc(6px * var(--lobby-scale));
   object-fit: fill;
   pointer-events: none;
   border-radius: calc(2px * var(--lobby-scale));
@@ -2667,5 +2678,5 @@ body {
 
 .lobby-line-button.selected .lobby-line-img {
   filter: drop-shadow(0 0 calc(8px * var(--lobby-scale)) var(--line-glow-color, #ffffff));
-  height: calc(7px * var(--lobby-scale));
+  height: calc(8px * var(--lobby-scale));
 }
