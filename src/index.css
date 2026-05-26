@@ -2643,7 +2643,7 @@ body {
   top: 19.216%;
   width: 19.777%;
   height: 74.157%;
-  padding: calc(140px * var(--lobby-scale)) calc(48px * var(--lobby-scale)) calc(30px * var(--lobby-scale)) calc(48px * var(--lobby-scale));
+  padding: calc(140px * var(--lobby-scale)) calc(48px * var(--lobby-scale)) calc(45px * var(--lobby-scale)) calc(48px * var(--lobby-scale));
   box-sizing: border-box;
   z-index: 5;
   display: flex;
