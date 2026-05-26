@@ -347,6 +347,16 @@ export function AppProvider({ children }) {
           return { ...prev, [targetId]: current };
         }
 
+        if (stickerName === 'UNDO_ALL_IC') {
+          const icUndoSlots = ['tc', 'tl-c', 'tr-c', 'lc', 'birthday', 'crown'];
+          current = current.filter(s => !icUndoSlots.includes(s.position));
+          return { ...prev, [targetId]: current };
+        }
+
+        if (stickerName === 'UNDO_ALL_PEO') {
+          return { ...prev, [targetId]: [] };
+        }
+
         if (stickerName === 'Happy_Birthday.png') {
           const hasHb = current.some(s => s.position === 'birthday');
           if (hasHb) {

@@ -250,13 +250,29 @@ export default function InstructorToolbox() {
               ))}
             </div>
             
-            <button 
-              className="gb-btn"
-              onClick={() => handleAddSticker('instructor', 'UNDO_IC', true)}
-              style={{ marginTop: '8px', backgroundColor: '#ff4444', color: 'white', padding: '4px 8px', fontSize: '1.35rem' }}
-            >
-              <X size={24} /> Undo Last Star/Heart
-            </button>
+            <div style={{ display: 'flex', gap: '6px', marginTop: '8px', width: '100%' }}>
+              <button 
+                className="gb-btn"
+                onClick={() => handleAddSticker('instructor', 'UNDO_IC', true)}
+                style={{ flex: 1, backgroundColor: '#ff4444', color: 'white', padding: '8px 4px', fontSize: '0.85rem', whiteSpace: 'normal', height: 'auto', minWidth: 0, display: 'flex', justifyContent: 'center', alignItems: 'center', textAlign: 'center', lineHeight: '1.2' }}
+              >
+                Undo Last Sticker
+              </button>
+              <button 
+                className="gb-btn"
+                onClick={() => handleAddSticker('instructor', 'UNDO_ALL_IC', true)}
+                style={{ flex: 1, backgroundColor: '#ff4444', color: 'white', padding: '8px 4px', fontSize: '0.85rem', whiteSpace: 'normal', height: 'auto', minWidth: 0, display: 'flex', justifyContent: 'center', alignItems: 'center', textAlign: 'center', lineHeight: '1.2' }}
+              >
+                Undo all Stickers
+              </button>
+              <button 
+                className="gb-btn"
+                onClick={() => handleAddSticker('instructor', 'UNDO_ALL_PEO', true)}
+                style={{ flex: 1, backgroundColor: '#ff4444', color: 'white', padding: '8px 4px', fontSize: '0.85rem', whiteSpace: 'normal', height: 'auto', minWidth: 0, display: 'flex', justifyContent: 'center', alignItems: 'center', textAlign: 'center', lineHeight: '1.2' }}
+              >
+                Undo all peo
+              </button>
+            </div>
           </div>
 
         </div>
