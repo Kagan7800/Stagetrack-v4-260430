@@ -2576,6 +2576,7 @@ body {
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(5, 1fr);
   gap: calc(20px * var(--lobby-scale));
+  margin-top: calc(90px * var(--lobby-scale));
   box-sizing: border-box;
 }
 
@@ -2585,7 +2586,7 @@ body {
   color: white;
   text-align: center;
   font-family: 'Risque', serif;
-  margin-bottom: calc(30px * var(--lobby-scale));
+  margin-bottom: 0;
   text-shadow: 0 calc(2px * var(--lobby-scale)) calc(4px * var(--lobby-scale)) rgba(0, 0, 0, 0.5);
 }
 
@@ -2650,7 +2651,7 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  margin-top: 0;
+  margin-top: calc(90px * var(--lobby-scale));
   margin-bottom: calc(20px * var(--lobby-scale));
 }
 
