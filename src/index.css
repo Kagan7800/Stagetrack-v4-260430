@@ -2699,8 +2699,8 @@ body {
 
 .lobby-camera-icon-badge {
   position: absolute;
-  top: calc(50px * var(--lobby-scale));
-  left: calc(50px * var(--lobby-scale));
+  top: calc(15px * var(--lobby-scale));
+  left: calc(15px * var(--lobby-scale));
   width: calc(480px * var(--lobby-scale));
   height: calc(480px * var(--lobby-scale));
   z-index: 12;
