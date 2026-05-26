@@ -106,7 +106,7 @@ export default function LobbyOverlay() {
         ref={containerRef}
         style={{ '--lobby-scale': scale }}
       >
-        <img src="/assets/Lobby.svg?v=2" className="lobby-svg-img" alt="Lobby Background" />
+        <img src="/assets/Lobby.svg?v=3" className="lobby-svg-img" alt="Lobby Background" />
         <img src="/assets/lobby_rect.png" className="lobby-card-panel-1" alt="" />
         <img src="/assets/lobby_rect.png" className="lobby-card-panel-2" alt="" />
 
