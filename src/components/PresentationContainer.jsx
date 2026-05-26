@@ -229,11 +229,7 @@ export default function PresentationContainer({
             zIndex: 20
           } : {}}
         >
-          {mediaType !== 'iframe' && (
-            <button className="close-media-btn" onClick={onClearMedia}>
-              <X size={20} />
-            </button>
-          )}
+
           {mediaType === 'video' ? (
             <video src={mediaUrl} controls autoPlay />
           ) : mediaType === 'iframe' ? (

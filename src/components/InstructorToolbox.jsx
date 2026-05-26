@@ -12,7 +12,7 @@ export default function InstructorToolbox() {
     globalMute, setGlobalMute,
     globalPause, setGlobalPause,
     isSidebarOpen, setIsSidebarOpen,
-    setMediaUpload, clearMedia, mediaType,
+    setMediaUpload, clearMedia, mediaType, mediaUrl,
     handleAddSticker,
     metronomeBpm, setMetronomeBpm,
     isMetronomePlaying, setIsMetronomePlaying
@@ -187,19 +187,31 @@ export default function InstructorToolbox() {
               {globalPause ? <Play size={26} /> : <Pause size={26} />} Pause PEO
             </button>
 
-            <div className="upload-wrapper" style={{ position: 'relative', width: '100%' }}>
-              <button 
-                className="gb-btn" 
-                style={{ width: '100%' }}
-                onClick={() => setShowUploadMenu(!showUploadMenu)}
-              >
-                <ImageIcon size={26} /> Upload
-              </button>
-              {showUploadMenu && (
-                <div className="upload-dropdown glass-panel" style={{ zIndex: 110 }}>
-                  <button onClick={() => fileInputRef.current?.click()}><HardDrive size={14}/> Local Computer</button>
-                  <button onClick={handleDriveUpload}><UploadCloud size={14}/> Google Drive</button>
-                </div>
+            <div style={{ display: 'flex', gap: '8px', width: '100%' }}>
+              <div className="upload-wrapper" style={{ position: 'relative', flex: 1 }}>
+                <button 
+                  className="gb-btn" 
+                  style={{ width: '100%' }}
+                  onClick={() => setShowUploadMenu(!showUploadMenu)}
+                >
+                  <ImageIcon size={26} /> Upload
+                </button>
+                {showUploadMenu && (
+                  <div className="upload-dropdown glass-panel" style={{ zIndex: 110 }}>
+                    <button onClick={() => fileInputRef.current?.click()}><HardDrive size={14}/> Local Computer</button>
+                    <button onClick={handleDriveUpload}><UploadCloud size={14}/> Google Drive</button>
+                  </div>
+                )}
+              </div>
+              {mediaUrl && (
+                <button 
+                  className="gb-btn"
+                  onClick={clearMedia}
+                  style={{ width: 'auto', padding: '0 16px', display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: '#ff4444', color: 'white' }}
+                  title="Clear Media"
+                >
+                  <X size={26} />
+                </button>
               )}
             </div>
 
