@@ -38,6 +38,10 @@ function App() {
     ? [participants[2], participants[3]] 
     : participants.slice(halfLength);
 
+  const isConfettiActive = Object.values(guestStickers || {}).some(stickersList => 
+    Array.isArray(stickersList) && stickersList.some(s => s.position === 'confetti' || s.name === 'Confetti.svg')
+  );
+
   return (
     <div className="app-container" style={{ position: 'relative', overflow: 'hidden' }}>
       {!isJoined && <LobbyOverlay />}
@@ -67,6 +71,29 @@ function App() {
           opacity: activeTheme === 'sor' ? 1 : 0
         }}
       />
+
+      {/* LAYER 1.5: GLOBAL CONFETTI OVERLAY FOR SOR THEME */}
+      {activeTheme === 'sor' && isConfettiActive && (
+        <div 
+          style={{
+            position: 'absolute',
+            inset: 0,
+            zIndex: 5,
+            pointerEvents: 'none',
+            overflow: 'hidden'
+          }}
+        >
+          <img 
+            src="/assets/svg_stickers/Confetti.svg" 
+            alt="Confetti Background" 
+            style={{ 
+              width: '100%', 
+              height: '100%', 
+              objectFit: 'cover' 
+            }} 
+          />
+        </div>
+      )}
 
       {/* LAYER 2: INTERACTIVE UI HOUSING */}
       <div style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', height: '100%', width: '100%' }}>

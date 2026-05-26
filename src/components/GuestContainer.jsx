@@ -21,7 +21,7 @@ export default function GuestContainer({
   nudges = {},
   globalPause
 }) {
-  const { blankCovers, setBlankCovers, MOCK_USER_COUNT, pendingRequest, approveRequest, denyRequest } = useAppContext();
+  const { blankCovers, setBlankCovers, MOCK_USER_COUNT, pendingRequest, approveRequest, denyRequest, activeTheme } = useAppContext();
   const [isEditing, setIsEditing] = useState(false);
   
   // Local state for forms
@@ -377,7 +377,7 @@ export default function GuestContainer({
 
 
       {/* Stickers */}
-      {stickers.map((s) => {
+      {stickers.filter(s => !(activeTheme === 'sor' && (s.position === 'confetti' || s.name === 'Confetti.svg'))).map((s) => {
         const nudge = nudges[s.position] || {};
         let style = {};
         
