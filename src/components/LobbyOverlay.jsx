@@ -197,14 +197,23 @@ export default function LobbyOverlay() {
               </div>
             </div>
 
-            {/* Join Session Button positioned in Column 3 */}
+            {/* Join Session Arrow Button and text */}
+            <img 
+              src="/assets/Lobby/Click to join session.svg" 
+              className="lobby-join-title-img" 
+              alt="Click to join session" 
+            />
             <button 
               type="submit" 
-              className="lobby-join-button"
+              className="lobby-join-arrow-button"
               disabled={!myName.trim() || !myLittleOne.trim() || !selectedIcon}
               title="Join Session"
             >
-              Join Session
+              <img 
+                src="/assets/Lobby/Arrow.svg" 
+                className="lobby-join-arrow-img" 
+                alt="Join Arrow" 
+              />
             </button>
           </form>
         )}

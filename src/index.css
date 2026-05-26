@@ -2447,40 +2447,50 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
-/* HTML-drawn Join Session Button positioned on the right (Column 3) */
-.lobby-join-button {
+/* Join Session Section styled with SVG assets */
+.lobby-join-title-img {
   position: absolute;
-  left: 71.755%;
-  top: 59.5%;
-  width: 18.683%;
-  height: 8.5%;
-  background: #22c55e;
-  border: none;
-  border-radius: calc(20px * var(--lobby-scale));
-  font-size: calc(36px * var(--lobby-scale));
-  font-weight: bold;
-  color: white;
+  left: 77.746%;
+  top: 50.585%;
+  width: 6.701%;
+  height: auto;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.lobby-join-arrow-button {
+  position: absolute;
+  left: 77.946%;
+  top: 64.678%;
+  width: 6.298%;
+  height: 9.194%;
+  background: transparent !important;
+  border: none !important;
   cursor: pointer;
   outline: none;
   z-index: 10;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s;
-  font-family: 'Risque', serif;
-  box-shadow: 0 calc(10px * var(--lobby-scale)) calc(30px * var(--lobby-scale)) rgba(34, 197, 94, 0.4);
+  padding: 0;
+  transition: transform 0.2s, filter 0.2s;
 }
 
-.lobby-join-button:hover:not(:disabled) {
-  background: #16a34a;
-  transform: translateY(calc(-4px * var(--lobby-scale)));
-  box-shadow: 0 calc(15px * var(--lobby-scale)) calc(40px * var(--lobby-scale)) rgba(34, 197, 94, 0.6);
+.lobby-join-arrow-button:hover:not(:disabled) {
+  transform: scale(1.08);
+  filter: drop-shadow(0 0 calc(15px * var(--lobby-scale)) rgba(255, 255, 255, 0.4));
 }
 
-.lobby-join-button:disabled {
-  opacity: 0.5;
+.lobby-join-arrow-button:disabled {
+  opacity: 0.35;
   cursor: not-allowed;
-  box-shadow: none;
+}
+
+.lobby-join-arrow-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
 }
 
 /* Sparkle filter animation for instructor pending PEO cell */
