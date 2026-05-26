@@ -15,20 +15,20 @@ const BORDERS = [
 ];
 
 const STO_STICKERS = [
-  'Balloons 2 2.svg',
-  'Boat 2.svg',
-  'Dancer 2.svg',
-  'Dog 2.svg',
-  'Drums 2.svg',
-  'Fish 2.svg',
+  'Balloons.svg',
+  'Boat.svg',
+  'Dancer.svg',
+  'Dog.svg',
+  'Drums.svg',
+  'Fish.svg',
   'Flowers 6.svg',
-  'Guitar 2.svg',
-  'Kitten 2.svg',
-  'Piano 2 3.svg',
-  'Sun with sunglasses 2.svg',
-  'Truck 2 2.svg',
-  'Trumpet 2.svg',
-  'Xylophone 2.svg'
+  'Guitar.svg',
+  'Kitten.svg',
+  'Piano.svg',
+  'Sun with sunglasses.svg',
+  'Truck.svg',
+  'Trumpet.svg',
+  'Xylophone.svg'
 ];
 
 export default function LobbyOverlay() {

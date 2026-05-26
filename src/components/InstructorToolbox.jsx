@@ -22,11 +22,11 @@ export default function InstructorToolbox() {
   const [showUploadMenu, setShowUploadMenu] = useState(false);
 
   const availableStickers = [
-    { id: 'Heart2.png', src: heartPng, isSmall: true },
+    { id: 'Heart.png', src: heartPng, isSmall: true },
     { id: 'RealCrown.png', src: crownPng }, 
     { id: 'Happy_Birthday.png', src: birthdayPng }, 
     { id: 'Star.png', src: starPng },
-    { id: 'Star2.png', src: starPng, isSmall: true },
+    { id: 'Star_Small.png', src: starPng, isSmall: true },
     { id: 'Star_LightBlue.svg', src: '/assets/svg_stickers/Star_LightBlue.svg' },
     { id: 'Star_Green.svg', src: '/assets/svg_stickers/Star_Green.svg' },
     { id: 'Star_Pink.svg', src: '/assets/svg_stickers/Star_Pink.svg' },

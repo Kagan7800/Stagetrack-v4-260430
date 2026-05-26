@@ -405,12 +405,12 @@ export default function GuestContainer({
           style.transform = `translate(${xTrans}, ${yTrans}) rotate(${rot}deg) scale(${sc})`;
         }
 
-        if (s.name === 'Drums 2.svg') {
+        if (s.name === 'Drums.svg') {
           style.width = isIcSticker ? '48px' : '74px';
           style.height = isIcSticker ? '48px' : '74px';
         }
 
-        if (s.name === 'Trumpet 2.svg') {
+        if (s.name === 'Trumpet.svg') {
           let xT = 0;
           let yT = 0;
           let hasCustomTransform = false;
@@ -443,15 +443,15 @@ export default function GuestContainer({
           }
         }
 
-        const isLargeSticker = s.name === 'Guitar 2.svg' || s.name === 'Dog 2.svg' || s.name === 'Trumpet 2.svg';
-        const isTrumpet = s.name === 'Trumpet 2.svg';
+        const isLargeSticker = s.name === 'Guitar.svg' || s.name === 'Dog.svg' || s.name === 'Trumpet.svg';
+        const isTrumpet = s.name === 'Trumpet.svg';
 
         return (
           <img 
             key={s.id} 
             src={`/assets/svg_stickers/${s.name}`} 
             alt={s.name} 
-            className={`gc-sticker pos-${s.position} ${isIcSticker ? 'ic-placed' : ''} ${(s.name === 'Sun with sunglasses 2.svg' && typeof s.position === 'number') ? 'sun-special' : ''} ${isLargeSticker ? 'large-sticker' : ''} ${isTrumpet ? 'trumpet-special' : ''}`} 
+            className={`gc-sticker pos-${s.position} ${isIcSticker ? 'ic-placed' : ''} ${(s.name === 'Sun with sunglasses.svg' && typeof s.position === 'number') ? 'sun-special' : ''} ${isLargeSticker ? 'large-sticker' : ''} ${isTrumpet ? 'trumpet-special' : ''}`} 
             style={{ ...style, zIndex: 11 }}
           />
         );

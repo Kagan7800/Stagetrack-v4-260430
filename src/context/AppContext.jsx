@@ -429,7 +429,7 @@ export function AppProvider({ children }) {
         }
       } else {
         // Guest sticker logic
-        const isSun = stickerName === 'Sun with sunglasses 2.svg';
+        const isSun = stickerName === 'Sun with sunglasses.svg';
 
         if (isSun) {
           // Remove any stars in the right-center slots
