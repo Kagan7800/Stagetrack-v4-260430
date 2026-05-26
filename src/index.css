@@ -2659,15 +2659,15 @@ body {
   justify-content: space-between;
   margin-top: calc(90px * var(--lobby-scale));
   margin-bottom: 0;
-  padding-top: calc(40px * var(--lobby-scale));
-  padding-bottom: 0;
+  padding-top: calc(35px * var(--lobby-scale));
+  padding-bottom: calc(5px * var(--lobby-scale));
   box-sizing: border-box;
 }
 
 
 .lobby-line-button {
   width: 100%;
-  height: calc(12px * var(--lobby-scale));
+  height: calc(24px * var(--lobby-scale));
   background: transparent !important;
   border: none !important;
   cursor: pointer;
@@ -2685,7 +2685,7 @@ body {
 
 .lobby-line-img {
   width: 100%;
-  height: calc(12px * var(--lobby-scale));
+  height: calc(24px * var(--lobby-scale));
   object-fit: fill;
   pointer-events: none;
   border-radius: calc(2px * var(--lobby-scale));
@@ -2694,5 +2694,5 @@ body {
 
 .lobby-line-button.selected .lobby-line-img {
   filter: drop-shadow(0 0 calc(10px * var(--lobby-scale)) var(--line-glow-color, #ffffff));
-  height: calc(17px * var(--lobby-scale));
+  height: calc(32px * var(--lobby-scale));
 }
