@@ -213,7 +213,7 @@ export default function LobbyOverlay() {
                 title="Join Session"
               >
                 <img 
-                  src="/assets/Lobby/Arrow.svg" 
+                  src="/assets/Lobby/Arrow.svg?v=2" 
                   className="lobby-join-arrow-img" 
                   alt="Join Arrow" 
                 />
