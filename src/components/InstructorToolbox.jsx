@@ -267,8 +267,9 @@ export default function InstructorToolbox() {
               </button>
               <button 
                 className="gb-btn"
-                onClick={() => handleAddSticker('instructor', 'UNDO_ALL_PEO', true)}
+                onDoubleClick={() => handleAddSticker('instructor', 'UNDO_ALL_PEO', true)}
                 style={{ flex: 1, backgroundColor: '#ff4444', color: 'white', padding: '8px 4px', fontSize: '0.85rem', whiteSpace: 'normal', height: 'auto', minWidth: 0, display: 'flex', justifyContent: 'center', alignItems: 'center', textAlign: 'center', lineHeight: '1.2' }}
+                title="Double click to clear all PEO stickers"
               >
                 Undo all peo
               </button>
