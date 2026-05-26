@@ -2476,13 +2476,15 @@ body {
   width: calc(328px * var(--lobby-scale));
   height: calc(259px * var(--lobby-scale));
   background: transparent !important;
-  border: none !important;
+  border: calc(5px * var(--lobby-scale)) solid #000000 !important;
+  border-radius: calc(30px * var(--lobby-scale)) !important;
   cursor: pointer;
   outline: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0;
+  padding: calc(15px * var(--lobby-scale)) !important;
+  box-sizing: border-box;
   transition: transform 0.2s, filter 0.2s;
 }
 
