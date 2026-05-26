@@ -93,7 +93,17 @@ function App() {
       {/* Top Banner */}
       <div className="top-banner" style={{ backgroundImage: activeTheme === 'sor' ? "url('/assets/SOR/red_bkgr.svg')" : "url('/banner.png')", backgroundSize: '100% 100%', backgroundRepeat: 'no-repeat', backgroundPosition: 'center', position: 'relative' }}>
         {activeTheme === 'sor' ? (
-          <img src="/assets/SOR/logo_alpha.svg" alt="SOR Logo" style={{ height: '70%', width: 'auto', objectFit: 'contain' }} />
+          <img 
+            src="/assets/SOR/logo_alpha.svg" 
+            alt="SOR Logo" 
+            style={{ 
+              height: '70%', 
+              width: 'auto', 
+              objectFit: 'contain',
+              maskImage: 'linear-gradient(90deg, transparent, white 20%, white 80%, transparent)',
+              WebkitMaskImage: 'linear-gradient(90deg, transparent, white 20%, white 80%, transparent)'
+            }} 
+          />
         ) : (
           <>
             {/* Left Side Logo */}

@@ -143,7 +143,7 @@ export function AppProvider({ children }) {
                 id: `active-joined-restored`,
                 name: `${parsed.joinedUser.myName} & ${parsed.joinedUser.myLittleOne}`,
                 color: parsed.joinedUser.color,
-                selectedIcon: parsed.joinedUser.selectedIcon,
+                selectedIcon: null,
                 selectedBorder: parsed.joinedUser.selectedBorder,
                 initial: parsed.joinedUser.myName[0] || '?'
               };
@@ -160,7 +160,26 @@ export function AppProvider({ children }) {
 
   const [activeGuestId, setActiveGuestId] = useState(null);
   const [guestButtons, setGuestButtons] = useState({});
-  const [guestStickers, setGuestStickers] = useState({});
+  const [guestStickers, setGuestStickers] = useState(() => {
+    try {
+      const res = localStorage.getItem('stagetrack_lobby_response');
+      if (res) {
+        const parsed = JSON.parse(res);
+        if (parsed.status === 'accepted' && parsed.joinedUser.selectedIcon) {
+          return {
+            'active-joined-restored': [
+              {
+                id: crypto.randomUUID(),
+                name: parsed.joinedUser.selectedIcon,
+                position: 1
+              }
+            ]
+          };
+        }
+      }
+    } catch { /* ignore */ }
+    return {};
+  });
   const [equippedSticker, setEquippedSticker] = useState(null);
   const [isDoodling, setIsDoodlingInternal] = useState(false);
   const [mediaUrl, setMediaUrlInternal] = useState(null);
@@ -603,22 +622,37 @@ export function AppProvider({ children }) {
   const approveRequest = useCallback(() => {
     if (!pendingRequest) return;
     
+    const activeId = `active-joined-${Date.now()}`;
+
     // Find the first blank participant
     setParticipants(prev => {
       const next = [...prev];
       const blankIdx = next.findIndex(p => p.isBlank);
       if (blankIdx !== -1) {
         next[blankIdx] = {
-          id: `active-joined-${Date.now()}`,
+          id: activeId,
           name: `${pendingRequest.myName} & ${pendingRequest.myLittleOne}`,
           color: pendingRequest.color,
-          selectedIcon: pendingRequest.selectedIcon,
+          selectedIcon: null,
           selectedBorder: pendingRequest.selectedBorder,
           initial: pendingRequest.myName[0] || '?'
         };
       }
       return next;
     });
+
+    if (pendingRequest.selectedIcon) {
+      setGuestStickers(prev => ({
+        ...prev,
+        [activeId]: [
+          {
+            id: crypto.randomUUID(),
+            name: pendingRequest.selectedIcon,
+            position: 1
+          }
+        ]
+      }));
+    }
 
     // Write accepted response
     localStorage.setItem('stagetrack_lobby_response', JSON.stringify({
@@ -659,21 +693,35 @@ export function AppProvider({ children }) {
           if (res.status === 'accepted') {
             setLobbyStatus('initial');
             setIsJoined(true);
+            const activeId = `active-joined-local`;
             setParticipants(prev => {
               const next = [...prev];
               const blankIdx = next.findIndex(p => p.isBlank);
               if (blankIdx !== -1) {
                 next[blankIdx] = {
-                  id: `active-joined-local`,
+                  id: activeId,
                   name: `${res.joinedUser.myName} & ${res.joinedUser.myLittleOne}`,
                   color: res.joinedUser.color,
-                  selectedIcon: res.joinedUser.selectedIcon,
+                  selectedIcon: null,
                   selectedBorder: res.joinedUser.selectedBorder,
                   initial: res.joinedUser.myName[0] || '?'
                 };
               }
               return next;
             });
+
+            if (res.joinedUser.selectedIcon) {
+              setGuestStickers(prev => ({
+                ...prev,
+                [activeId]: [
+                  {
+                    id: crypto.randomUUID(),
+                    name: res.joinedUser.selectedIcon,
+                    position: 1
+                  }
+                ]
+              }));
+            }
           } else if (res.status === 'denied') {
             setLobbyStatus('denied');
             setIsJoined(false);
