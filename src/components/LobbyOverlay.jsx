@@ -129,24 +129,7 @@ export default function LobbyOverlay() {
               maxLength={15}
             />
 
-             {/* Border Color Selection inside Column 1 (Name Box stack) */}
-            <div className="lobby-border-color-section">
-              <div className="lobby-border-color-title">choose your border color</div>
-              <div className="lobby-border-color-picker">
-                {BORDERS.map((b) => (
-                  <button
-                    key={b.value}
-                    type="button"
-                    className={`color-swatch-circle ${selectedBorder === b.value ? 'selected' : ''}`}
-                    style={{ backgroundColor: b.value, '--glow-color': b.value }}
-                    onClick={() => setSelectedBorder(b.value)}
-                    title={b.name}
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* Camera feed overlay inside the container below the inputs */}
+             {/* Camera feed overlay inside the container below the inputs */}
             <div 
               className="lobby-camera-preview-container"
               style={{ borderColor: selectedBorder }}
@@ -183,6 +166,23 @@ export default function LobbyOverlay() {
                     className="lobby-sticker-swatch-img" 
                     alt={sticker} 
                   />
+                </button>
+              ))}
+            </div>
+
+            {/* Border Color selection grid mapped over Card 2 (Right Side Box) */}
+            <div className="lobby-colors-grid">
+              <div className="lobby-card-title">Choose your border color</div>
+              {BORDERS.map((b) => (
+                <button
+                  key={b.value}
+                  type="button"
+                  className={`lobby-color-swatch ${selectedBorder === b.value ? 'selected' : ''}`}
+                  style={{ '--swatch-color': b.value }}
+                  onClick={() => setSelectedBorder(b.value)}
+                  title={b.name}
+                >
+                  <span className="lobby-color-circle-inner" style={{ backgroundColor: b.value }} />
                 </button>
               ))}
             </div>
