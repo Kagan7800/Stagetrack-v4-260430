@@ -1841,7 +1841,7 @@ body {
 
 .lobby-card-panel-1 {
   position: absolute;
-  left: 31.240%;
+  left: 32.392%;
   top: 19.216%;
   width: 19.777%;
   height: 74.157%;
@@ -1852,7 +1852,7 @@ body {
 
 .lobby-card-panel-2 {
   position: absolute;
-  left: 51.498%;
+  left: 53.802%;
   top: 19.216%;
   width: 19.777%;
   height: 74.157%;
@@ -2453,7 +2453,7 @@ body {
 /* Join Session Section styled with SVG assets */
 .lobby-join-container {
   position: absolute;
-  left: 71.755%;
+  left: 75.211%;
   top: 19.216%;
   width: 6.701%;
   height: 74.157%;
@@ -2563,11 +2563,11 @@ body {
 /* STO Stickers grid in lobby Card 1 (Left Side Box) */
 .lobby-stickers-grid {
   position: absolute;
-  left: 31.240%;
+  left: 32.392%;
   top: 19.216%;
   width: 19.777%;
   height: 74.157%;
-  padding: calc(140px * var(--lobby-scale)) calc(108px * var(--lobby-scale)) calc(40px * var(--lobby-scale)) calc(108px * var(--lobby-scale));
+  padding: calc(140px * var(--lobby-scale)) calc(48px * var(--lobby-scale)) calc(40px * var(--lobby-scale)) calc(48px * var(--lobby-scale));
   box-sizing: border-box;
   z-index: 5;
   display: flex;
@@ -2639,11 +2639,11 @@ body {
 /* Border Color Selection inside Card 2 (Right Side Box) */
 .lobby-colors-grid {
   position: absolute;
-  left: 51.498%;
+  left: 53.802%;
   top: 19.216%;
   width: 19.777%;
   height: 74.157%;
-  padding: calc(140px * var(--lobby-scale)) calc(108px * var(--lobby-scale)) calc(45px * var(--lobby-scale)) calc(108px * var(--lobby-scale));
+  padding: calc(140px * var(--lobby-scale)) calc(48px * var(--lobby-scale)) calc(30px * var(--lobby-scale)) calc(48px * var(--lobby-scale));
   box-sizing: border-box;
   z-index: 5;
   display: flex;
