@@ -2705,8 +2705,3 @@ body {
   z-index: 12;
   filter: drop-shadow(0 calc(12px * var(--lobby-scale)) calc(24px * var(--lobby-scale)) rgba(0, 0, 0, 0.45));
 }
-
-.gc-sticker.lobby-selected-sticker-placed {
-  width: 142px !important;
-  height: 142px !important;
-}
