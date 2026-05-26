@@ -2544,55 +2544,56 @@ body {
   top: 19.216%;
   width: 19.777%;
   height: 74.157%;
-  padding: calc(115px * var(--lobby-scale)) calc(95px * var(--lobby-scale)) calc(95px * var(--lobby-scale)) calc(95px * var(--lobby-scale));
+  padding: calc(125px * var(--lobby-scale)) calc(95px * var(--lobby-scale)) calc(95px * var(--lobby-scale)) calc(95px * var(--lobby-scale));
   box-sizing: border-box;
   z-index: 5;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   grid-auto-rows: min-content;
-  gap: calc(30px * var(--lobby-scale));
+  gap: calc(24px * var(--lobby-scale));
   justify-content: center;
   align-content: start;
 }
 
 .lobby-card-title {
-  grid-column: span 3;
+  grid-column: span 4;
   font-size: calc(44px * var(--lobby-scale));
   font-weight: bold;
   color: white;
   text-align: center;
   font-family: 'Risque', serif;
-  margin-bottom: calc(10px * var(--lobby-scale));
+  margin-bottom: calc(15px * var(--lobby-scale));
   text-shadow: 0 calc(2px * var(--lobby-scale)) calc(4px * var(--lobby-scale)) rgba(0, 0, 0, 0.5);
 }
 
 .lobby-sticker-swatch {
   width: 100%;
   aspect-ratio: 1 / 1;
-  background: rgba(255, 255, 255, 0.05);
-  border: calc(3px * var(--lobby-scale)) solid rgba(255, 255, 255, 0.15) !important;
-  border-radius: calc(20px * var(--lobby-scale));
+  background: transparent !important;
+  border: calc(3px * var(--lobby-scale)) solid transparent !important;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: calc(16px * var(--lobby-scale));
+  padding: 0;
   transition: all 0.2s;
   outline: none;
   box-sizing: border-box;
 }
 
 .lobby-sticker-swatch:hover {
-  background: rgba(255, 255, 255, 0.15);
-  transform: scale(1.1);
-  border-color: rgba(255, 255, 255, 0.45);
+  background: transparent !important;
+  transform: scale(1.15);
+  border-color: transparent !important;
 }
 
 .lobby-sticker-swatch.selected {
-  border-color: #22c55e;
-  background: rgba(34, 197, 94, 0.15);
+  border-color: #22c55e !important;
+  background: rgba(34, 197, 94, 0.15) !important;
+  border-radius: calc(20px * var(--lobby-scale));
   box-shadow: 0 0 calc(25px * var(--lobby-scale)) rgba(34, 197, 94, 0.5);
-  transform: scale(1.05);
+  transform: scale(1.1);
+  padding: calc(12px * var(--lobby-scale));
 }
 
 .lobby-sticker-swatch-img {

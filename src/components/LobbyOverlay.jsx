@@ -152,7 +152,7 @@ export default function LobbyOverlay() {
 
             {/* STO Stickers selection grid mapped over Card 1 (Left Side Box) */}
             <div className="lobby-stickers-grid">
-              <div className="lobby-card-title">Choose your Sticker</div>
+              <div className="lobby-card-title">Choose 1 sticker</div>
               {STO_STICKERS.map((sticker) => (
                 <button
                   key={sticker}
