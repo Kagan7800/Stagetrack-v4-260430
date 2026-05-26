@@ -1868,7 +1868,7 @@ body {
 .lobby-overlay-input-1 {
   position: absolute;
   left: 11.204%;
-  top: 39.137%;
+  top: 37.0%;
   width: 18.683%;
   height: 6.141%;
   background: rgba(255, 255, 255, 0.08) !important;
@@ -1893,7 +1893,7 @@ body {
 .lobby-overlay-input-2 {
   position: absolute;
   left: 11.204%;
-  top: 48.473%;
+  top: 45.4%;
   width: 18.683%;
   height: 6.141%;
   background: rgba(255, 255, 255, 0.08) !important;
@@ -2326,9 +2326,9 @@ body {
 .lobby-camera-preview-container {
   position: absolute;
   left: 10.983%;
-  top: 59.543%;
+  top: 61.5%;
   width: 19.777%;
-  height: 30.99%;
+  height: 29.0%;
   background: #000000;
   border-radius: calc(24px * var(--lobby-scale));
   border: calc(6px * var(--lobby-scale)) solid #22c55e;
@@ -2541,10 +2541,9 @@ body {
 .lobby-stickers-grid {
   position: absolute;
   left: 31.240%;
-  top: 19.216%;
+  top: 20.991%;
   width: 19.777%;
-  height: 74.157%;
-  margin-top: calc(50px * var(--lobby-scale));
+  height: 72.382%;
   padding: calc(125px * var(--lobby-scale)) calc(70px * var(--lobby-scale)) calc(70px * var(--lobby-scale)) calc(70px * var(--lobby-scale));
   box-sizing: border-box;
   z-index: 5;
@@ -2558,7 +2557,7 @@ body {
 
 .lobby-card-title {
   grid-column: span 3;
-  font-size: calc(44px * var(--lobby-scale));
+  font-size: calc(66px * var(--lobby-scale));
   font-weight: bold;
   color: white;
   text-align: center;
@@ -2602,4 +2601,55 @@ body {
   height: 100%;
   object-fit: contain;
   pointer-events: none;
+}
+
+/* Border Color Selection inside Column 1 (Name Box stack) */
+.lobby-border-color-section {
+  position: absolute;
+  left: 10.983%;
+  top: 53.4%;
+  width: 19.777%;
+  height: 6.8%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 3;
+}
+
+.lobby-border-color-title {
+  font-size: calc(26px * var(--lobby-scale));
+  font-weight: bold;
+  color: white;
+  font-family: 'Risque', serif;
+  text-transform: lowercase;
+  text-shadow: 0 calc(2px * var(--lobby-scale)) calc(4px * var(--lobby-scale)) rgba(0, 0, 0, 0.4);
+}
+
+.lobby-border-color-picker {
+  display: flex;
+  justify-content: center;
+  gap: calc(18px * var(--lobby-scale));
+  align-items: center;
+}
+
+.color-swatch-circle {
+  width: calc(42px * var(--lobby-scale));
+  height: calc(42px * var(--lobby-scale));
+  border-radius: 50%;
+  border: calc(3px * var(--lobby-scale)) solid transparent;
+  cursor: pointer;
+  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.color-swatch-circle:hover {
+  transform: scale(1.2);
+}
+
+.color-swatch-circle.selected {
+  border-color: white !important;
+  transform: scale(1.15);
+  box-shadow: 0 0 calc(20px * var(--lobby-scale)) var(--glow-color);
 }

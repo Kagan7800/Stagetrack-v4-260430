@@ -129,6 +129,23 @@ export default function LobbyOverlay() {
               maxLength={15}
             />
 
+             {/* Border Color Selection inside Column 1 (Name Box stack) */}
+            <div className="lobby-border-color-section">
+              <div className="lobby-border-color-title">choose your border color</div>
+              <div className="lobby-border-color-picker">
+                {BORDERS.map((b) => (
+                  <button
+                    key={b.value}
+                    type="button"
+                    className={`color-swatch-circle ${selectedBorder === b.value ? 'selected' : ''}`}
+                    style={{ backgroundColor: b.value, '--glow-color': b.value }}
+                    onClick={() => setSelectedBorder(b.value)}
+                    title={b.name}
+                  />
+                ))}
+              </div>
+            </div>
+
             {/* Camera feed overlay inside the container below the inputs */}
             <div 
               className="lobby-camera-preview-container"
