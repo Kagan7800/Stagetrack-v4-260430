@@ -111,7 +111,7 @@ function App() {
               <img src="/greenStagetrack_studio.png" alt="Stagetrack Studio" style={{ height: '70%', maxWidth: '100%', objectFit: 'contain' }} />
             </div>
 
-            <img src="/assets/logo_modern.svg" alt="Music Fun Logo" style={{ height: '100%', width: 'auto', objectFit: 'contain' }} />
+            <img src="/assets/logo_modern.png" alt="Music Fun Logo" style={{ height: '100%', width: 'auto', objectFit: 'contain' }} />
           </>
         )}
       </div>

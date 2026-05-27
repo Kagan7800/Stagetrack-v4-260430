@@ -39,6 +39,7 @@
     "print_step_2067": "node C:/Users/richa/.gemini/antigravity/brain/976494d5-56ff-4519-800d-f4e23a4a9a09/scratch/print_step_2067.cjs"
   },
   "dependencies": {
+    "firebase": "^12.13.0",
     "html2canvas": "^1.4.1",
     "lucide-react": "^1.16.0",
     "react": "^19.2.6",
