@@ -103,7 +103,7 @@ function App() {
           <img src="/assets/logo_modern.png" alt="Music Fun Logo" style={{ height: '100%', width: 'auto', objectFit: 'contain' }} />
         </div>
       ) : (
-        <div className="top-banner" style={{ background: 'transparent', height: '18vh' }} />
+        <div className="top-banner" style={{ background: 'transparent', height: '15vh' }} />
       )}
 
       {/* Main Content Layout */}
