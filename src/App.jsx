@@ -59,17 +59,35 @@ function App() {
         }}
       />
 
-      {/* LAYER 1: SOR BACKGROUND OVERLAY */}
+      {/* LAYER 1: SOR BACKGROUND BASE */}
       <div 
         style={{
           position: 'absolute',
           inset: 0,
-          backgroundColor: '#660000',
           backgroundImage: "url('/assets/ui-SOR_bkgd.png')",
-          backgroundSize: '100% auto',
-          backgroundPosition: 'top center',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
           zIndex: 1, 
+          pointerEvents: 'none',
+          transition: 'opacity 0.5s ease-in-out',
+          opacity: activeTheme === 'sor' ? 1 : 0
+        }}
+      />
+
+      {/* LAYER 1.1: SOR BANNER TOP */}
+      <div 
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '15vh',
+          backgroundImage: "url('/assets/ui-SOR_bkgd.png')",
+          backgroundPosition: 'center top',
+          backgroundSize: 'contain',
+          backgroundRepeat: 'no-repeat',
+          zIndex: 2, 
           pointerEvents: 'none',
           transition: 'opacity 0.5s ease-in-out',
           opacity: activeTheme === 'sor' ? 1 : 0
