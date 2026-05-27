@@ -93,7 +93,7 @@ function App() {
       {/* LAYER 2: INTERACTIVE UI HOUSING */}
       <div style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', height: '100%', width: '100%' }}>
       {/* Top Banner */}
-      {activeTheme !== 'sor' && (
+      {activeTheme !== 'sor' ? (
         <div className="top-banner" style={{ backgroundImage: "url('/banner.png')", backgroundSize: '100% 100%', backgroundRepeat: 'no-repeat', backgroundPosition: 'center', position: 'relative' }}>
           {/* Left Side Logo */}
           <div style={{ position: 'absolute', left: '70px', height: '100%', display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
@@ -102,6 +102,8 @@ function App() {
 
           <img src="/assets/logo_modern.png" alt="Music Fun Logo" style={{ height: '100%', width: 'auto', objectFit: 'contain' }} />
         </div>
+      ) : (
+        <div className="top-banner" style={{ background: 'transparent', height: '18vh' }} />
       )}
 
       {/* Main Content Layout */}
