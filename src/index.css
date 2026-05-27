@@ -555,8 +555,8 @@ body {
 .gc-sticker.pos-star {
   top: 0;
   left: 53px; /* Safe distance from the top-left sticker */
-  width: 53px;
-  height: 53px;
+  width: 30px;
+  height: 30px;
   transform: translate(-50%, -50%);
   z-index: 40;
 }
