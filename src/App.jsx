@@ -64,7 +64,7 @@ function App() {
         style={{
           position: 'absolute',
           inset: 0,
-          backgroundImage: "url('/assets/SOR/sor_full_bg.svg')",
+          backgroundImage: "url('/assets/ui-SOR_bkgd.png')",
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           zIndex: 1, 
