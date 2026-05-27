@@ -2754,12 +2754,17 @@ body {
 .unified-toolbox h3,
 .unified-toolbox .section-title,
 .unified-toolbox .close-btn,
-.unified-toolbox .gb-btn {
+.unified-toolbox .gb-btn,
+.chat-sidebar,
+.chat-sidebar h2,
+.chat-sidebar span,
+.chat-sidebar .close-btn {
   color: #cbd5e1 !important;
 }
 
 /* Background override for Instructor Toolbox (ITO) and Student Toolbox (STO) */
 .instructor-toolbox,
-.unified-toolbox {
+.unified-toolbox,
+.chat-sidebar {
   background: rgba(0, 0, 0, 0.3) !important;
 }
