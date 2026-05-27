@@ -76,6 +76,7 @@ function App() {
       />
 
       {/* LAYER 1.1: SOR BANNER TOP */}
+      {/* Black horizontal banner background */}
       <div 
         style={{
           position: 'absolute',
@@ -83,11 +84,27 @@ function App() {
           left: 0,
           width: '100%',
           height: '15vh',
+          backgroundColor: 'rgba(0, 0, 0, 0.7)',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
+          zIndex: 2,
+          pointerEvents: 'none',
+          transition: 'opacity 0.5s ease-in-out',
+          opacity: activeTheme === 'sor' ? 1 : 0
+        }}
+      />
+      {/* Logo container in the center with reduced width */}
+      <div 
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: '20%',
+          width: '60%',
+          height: '15vh',
           backgroundImage: "url('/assets/ui-SOR_bkgd.png')",
           backgroundPosition: 'center top',
           backgroundSize: 'contain',
           backgroundRepeat: 'no-repeat',
-          zIndex: 2, 
+          zIndex: 3, 
           pointerEvents: 'none',
           transition: 'opacity 0.5s ease-in-out',
           opacity: activeTheme === 'sor' ? 1 : 0
