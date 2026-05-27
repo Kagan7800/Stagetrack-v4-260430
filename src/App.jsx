@@ -64,7 +64,9 @@ function App() {
         style={{
           position: 'absolute',
           inset: 0,
-          backgroundColor: '#000000',
+          backgroundImage: "url('/assets/SOR/sor_full_bg.svg')",
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
           zIndex: 1, 
           pointerEvents: 'none',
           transition: 'opacity 0.5s ease-in-out',
@@ -91,30 +93,16 @@ function App() {
       {/* LAYER 2: INTERACTIVE UI HOUSING */}
       <div style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', height: '100%', width: '100%' }}>
       {/* Top Banner */}
-      <div className="top-banner" style={{ backgroundImage: activeTheme === 'sor' ? "url('/assets/SOR/red_bkgr.svg')" : "url('/banner.png')", backgroundSize: '100% 100%', backgroundRepeat: 'no-repeat', backgroundPosition: 'center', position: 'relative' }}>
-        {activeTheme === 'sor' ? (
-          <img 
-            src="/assets/SOR/logo_alpha.svg" 
-            alt="SOR Logo" 
-            style={{ 
-              height: '70%', 
-              width: 'auto', 
-              objectFit: 'contain',
-              maskImage: 'linear-gradient(90deg, transparent, white 20%, white 80%, transparent)',
-              WebkitMaskImage: 'linear-gradient(90deg, transparent, white 20%, white 80%, transparent)'
-            }} 
-          />
-        ) : (
-          <>
-            {/* Left Side Logo */}
-            <div style={{ position: 'absolute', left: '70px', height: '100%', display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
-              <img src="/greenStagetrack_studio.png" alt="Stagetrack Studio" style={{ height: '70%', maxWidth: '100%', objectFit: 'contain' }} />
-            </div>
+      {activeTheme !== 'sor' && (
+        <div className="top-banner" style={{ backgroundImage: "url('/banner.png')", backgroundSize: '100% 100%', backgroundRepeat: 'no-repeat', backgroundPosition: 'center', position: 'relative' }}>
+          {/* Left Side Logo */}
+          <div style={{ position: 'absolute', left: '70px', height: '100%', display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
+            <img src="/greenStagetrack_studio.png" alt="Stagetrack Studio" style={{ height: '70%', maxWidth: '100%', objectFit: 'contain' }} />
+          </div>
 
-            <img src="/assets/logo_modern.png" alt="Music Fun Logo" style={{ height: '100%', width: 'auto', objectFit: 'contain' }} />
-          </>
-        )}
-      </div>
+          <img src="/assets/logo_modern.png" alt="Music Fun Logo" style={{ height: '100%', width: 'auto', objectFit: 'contain' }} />
+        </div>
+      )}
 
       {/* Main Content Layout */}
       <div className="main-content">
