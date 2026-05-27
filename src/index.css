@@ -372,11 +372,11 @@ body {
   text-align: center;
   gap: 6px;
   padding: 8px 4px;
-  font-size: 0.72rem;
+  font-size: 0.86rem;
   font-weight: 600;
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.05) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border: none !important;
   min-width: 0;
   color: white;
   transition: all 0.2s;
@@ -1156,8 +1156,9 @@ body {
 }
 .instructor-toolbox .gb-btn {
   padding: 6px 8px;
-  font-size: 0.95rem;
+  font-size: 1.14rem;
   width: 100%;
+  border: none !important;
 }
 .instructor-toolbox .ito-buttons-container {
   display: flex;
