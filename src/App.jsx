@@ -66,7 +66,7 @@ function App() {
           inset: 0,
           backgroundImage: "url('/assets/ui-SOR_bkgd.png')",
           backgroundSize: 'cover',
-          backgroundPosition: 'center',
+          backgroundPosition: 'top center',
           zIndex: 1, 
           pointerEvents: 'none',
           transition: 'opacity 0.5s ease-in-out',
