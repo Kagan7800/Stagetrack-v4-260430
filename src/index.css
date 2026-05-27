@@ -394,7 +394,7 @@ body {
 
 .unified-toolbox .gb-btn.active {
   background: var(--accent-color) !important;
-  border-color: var(--accent-color) !important;
+  border: none !important;
 }
 
 .unified-toolbox .gb-btn.screenshot-btn {
