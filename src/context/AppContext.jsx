@@ -146,7 +146,20 @@ export function AppProvider({ children }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [globalMute, setGlobalMute] = useState(true);
   const [globalPause, setGlobalPause] = useState(false);
-  const [activeTheme, setActiveTheme] = useState('music-fun'); // 'music-fun' | 'sor'
+  const [activeTheme, setActiveTheme] = useState(() => {
+    try {
+      const saved = localStorage.getItem('stagetrack_active_theme');
+      return saved === 'sor' ? 'sor' : 'music-fun';
+    } catch {
+      return 'music-fun';
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('stagetrack_active_theme', activeTheme);
+    } catch { /* ignore */ }
+  }, [activeTheme]);
 
   // Chat Moderation State
   const [messages, setMessages] = useState([
