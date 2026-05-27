@@ -2757,3 +2757,9 @@ body {
 .unified-toolbox .gb-btn {
   color: #cbd5e1 !important;
 }
+
+/* Background override for Instructor Toolbox (ITO) and Student Toolbox (STO) */
+.instructor-toolbox,
+.unified-toolbox {
+  background: rgba(0, 0, 0, 0.3) !important;
+}
