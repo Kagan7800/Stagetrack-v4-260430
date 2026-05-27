@@ -2739,3 +2739,21 @@ body {
 .ito-theme-select:focus {
   border-color: #c084fc;
 }
+
+/* Font color override for Instructor Toolbox (ITO) and Student Toolbox (STO) */
+.instructor-toolbox,
+.instructor-toolbox h2,
+.instructor-toolbox h3,
+.instructor-toolbox .section-title,
+.instructor-toolbox .ito-theme-label,
+.instructor-toolbox .gb-btn:not([style*="color: white"]):not([style*="color:white"]),
+.instructor-toolbox .ito-theme-select,
+.instructor-toolbox span,
+.unified-toolbox,
+.unified-toolbox h2,
+.unified-toolbox h3,
+.unified-toolbox .section-title,
+.unified-toolbox .close-btn,
+.unified-toolbox .gb-btn {
+  color: #091183 !important;
+}
