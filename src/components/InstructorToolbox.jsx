@@ -228,19 +228,26 @@ export default function InstructorToolbox() {
 
           {/* --- STUDIO THEME SELECTOR --- */}
           <div className="ito-theme-selector-container" style={{ display: 'flex', gap: '6px', alignItems: 'center', width: '100%' }}>
-            <select 
-              value={activeTheme} 
-              onChange={(e) => setActiveTheme(e.target.value)}
-              className="ito-theme-select"
-              style={{ flex: 1 }}
-            >
-              <option value="music-fun">🎵 Music Fun (Default)</option>
-              <option value="sor">🚀 SOR Theme</option>
-            </select>
+            <div style={{ display: 'flex', gap: '4px', flex: 1 }}>
+              <button 
+                className={`gb-btn ${activeTheme === 'music-fun' ? 'active' : ''}`}
+                onClick={() => setActiveTheme('music-fun')}
+                style={{ flex: 1, padding: '6px 4px', fontSize: '0.78rem', whiteSpace: 'nowrap', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '2px', border: 'none' }}
+              >
+                🎵 Music
+              </button>
+              <button 
+                className={`gb-btn ${activeTheme === 'sor' ? 'active' : ''}`}
+                onClick={() => setActiveTheme('sor')}
+                style={{ flex: 1, padding: '6px 4px', fontSize: '0.78rem', whiteSpace: 'nowrap', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '2px', border: 'none' }}
+              >
+                🚀 SOR
+              </button>
+            </div>
             <button 
               className="gb-btn"
               onClick={resetStudentState}
-              style={{ width: 'auto', padding: '6px 10px', display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: '#dc2626', color: 'white', borderRadius: '4px' }}
+              style={{ width: 'auto', padding: '6px 10px', display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: '#dc2626', color: 'white', borderRadius: '4px', border: 'none' }}
               title="Reset Room / Refresh Session"
             >
               <RotateCw size={16} />
