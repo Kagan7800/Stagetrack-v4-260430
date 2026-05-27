@@ -64,8 +64,9 @@ function App() {
         style={{
           position: 'absolute',
           inset: 0,
+          backgroundColor: '#660000',
           backgroundImage: "url('/assets/ui-SOR_bkgd.png')",
-          backgroundSize: '50% 50%',
+          backgroundSize: '100% auto',
           backgroundPosition: 'top center',
           backgroundRepeat: 'no-repeat',
           zIndex: 1, 
