@@ -37,7 +37,7 @@ export function AppProvider({ children }) {
         return true;
       }
     } catch { /* ignore */ }
-    return false;
+    return true;
   });
 
   const [lobbyStatus, setLobbyStatus] = useState('initial'); // 'initial' | 'waiting' | 'denied'
@@ -136,16 +136,44 @@ export function AppProvider({ children }) {
   const [participants, setParticipants] = useState(() => generateDefaultParticipants(true));
 
   const [activeGuestId, setActiveGuestId] = useState(null);
-  const [guestButtons, setGuestButtons] = useState({});
-  const [guestStickers, setGuestStickers] = useState({});
+  const [activeToolbox, setActiveToolbox] = useState('instructor');
+  const [guestButtons, setGuestButtons] = useState(() => {
+    try {
+      const saved = localStorage.getItem('stagetrack_guest_buttons');
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
+  const [guestStickers, setGuestStickers] = useState(() => {
+    try {
+      const saved = localStorage.getItem('stagetrack_guest_stickers');
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
   const [equippedSticker, setEquippedSticker] = useState(null);
   const [isDoodling, setIsDoodlingInternal] = useState(false);
   const [mediaUrl, setMediaUrlInternal] = useState(null);
   const [mediaType, setMediaTypeInternal] = useState(null);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [globalMute, setGlobalMute] = useState(true);
-  const [globalPause, setGlobalPause] = useState(false);
+  const [globalMute, setGlobalMute] = useState(() => {
+    try {
+      const saved = localStorage.getItem('stagetrack_global_mute');
+      return saved === null ? true : saved === 'true';
+    } catch {
+      return true;
+    }
+  });
+  const [globalPause, setGlobalPause] = useState(() => {
+    try {
+      return localStorage.getItem('stagetrack_global_pause') === 'true';
+    } catch {
+      return false;
+    }
+  });
   const [activeTheme, setActiveTheme] = useState(() => {
     try {
       const saved = localStorage.getItem('stagetrack_active_theme');
@@ -160,6 +188,30 @@ export function AppProvider({ children }) {
       localStorage.setItem('stagetrack_active_theme', activeTheme);
     } catch { /* ignore */ }
   }, [activeTheme]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('stagetrack_guest_buttons', JSON.stringify(guestButtons));
+    } catch { /* ignore */ }
+  }, [guestButtons]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('stagetrack_guest_stickers', JSON.stringify(guestStickers));
+    } catch { /* ignore */ }
+  }, [guestStickers]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('stagetrack_global_mute', String(globalMute));
+    } catch { /* ignore */ }
+  }, [globalMute]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('stagetrack_global_pause', String(globalPause));
+    } catch { /* ignore */ }
+  }, [globalPause]);
 
   // Chat Moderation State
   const [messages, setMessages] = useState([
@@ -254,13 +306,25 @@ export function AppProvider({ children }) {
   }, [setMessages]);
 
   const toggleGuestButton = useCallback((guestId, btnName) => {
-    setGuestButtons(prev => ({
-      ...prev,
-      [guestId]: {
-        ...(prev[guestId] || { raiseHand: false, mute: false, chat: false }),
-        [btnName]: !(prev[guestId]?.[btnName])
+    setGuestButtons(prev => {
+      const current = prev[guestId] || { raiseHand: false, mute: false, chat: false };
+      const nextVal = !current[btnName];
+      const updated = { ...current, [btnName]: nextVal };
+      
+      const filterKeys = ['greenFilter', 'blueFilter', 'purpleFilter', 'orangeFilter'];
+      if (filterKeys.includes(btnName) && nextVal) {
+        filterKeys.forEach(k => {
+          if (k !== btnName) {
+            updated[k] = false;
+          }
+        });
       }
-    }));
+      
+      return {
+        ...prev,
+        [guestId]: updated
+      };
+    });
   }, [setGuestButtons]);
 
   const handleToggleGuestButton = useCallback((guestId, btnName) => {
@@ -326,6 +390,14 @@ export function AppProvider({ children }) {
           current.splice(existingConfetti, 1);
         } else {
           current.push({ id: crypto.randomUUID(), name: stickerName, position: 'confetti' });
+        }
+        return { ...prev, [targetId]: current };
+      }
+
+      if (!isInstructor && stickerName === 'UNDO_LAST_PEO') {
+        const lastPeoIndex = current.findLastIndex(s => typeof s.position === 'number');
+        if (lastPeoIndex !== -1) {
+          current.splice(lastPeoIndex, 1);
         }
         return { ...prev, [targetId]: current };
       }
@@ -547,6 +619,7 @@ export function AppProvider({ children }) {
     sessionStorage.removeItem('stagetrack_is_metronome_playing');
     sessionStorage.removeItem('stagetrack_drawing_paths');
     sessionStorage.removeItem('stagetrack_active_guest_id');
+    sessionStorage.removeItem('stagetrack_role');
 
     // Reset state hooks
     setGuestStickers({});
@@ -573,6 +646,10 @@ export function AppProvider({ children }) {
     // Clear localStorage request/response
     localStorage.removeItem('stagetrack_lobby_request');
     localStorage.removeItem('stagetrack_lobby_response');
+    localStorage.removeItem('stagetrack_guest_stickers');
+    localStorage.removeItem('stagetrack_guest_buttons');
+    localStorage.removeItem('stagetrack_global_mute');
+    localStorage.removeItem('stagetrack_global_pause');
   }, [mediaUrl, generateDefaultParticipants]);
 
   // If not joined and we are in 'initial' lobby state, ensure student state is reset
@@ -584,6 +661,7 @@ export function AppProvider({ children }) {
 
   const requestAccess = useCallback((myName, myLittleOne, color, selectedIcon, selectedBorder) => {
     resetStudentState();
+    sessionStorage.setItem('stagetrack_role', 'student');
     setLobbyStatus('waiting');
     const reqData = { myName, myLittleOne, color, selectedIcon, selectedBorder };
     localStorage.setItem('stagetrack_lobby_request', JSON.stringify(reqData));
@@ -629,6 +707,7 @@ export function AppProvider({ children }) {
     localStorage.setItem('stagetrack_lobby_response', JSON.stringify({
       status: 'accepted',
       joinedUser: {
+        id: activeId,
         myName: pendingRequest.myName,
         myLittleOne: pendingRequest.myLittleOne,
         color: pendingRequest.color,
@@ -664,7 +743,7 @@ export function AppProvider({ children }) {
           if (res.status === 'accepted') {
             setLobbyStatus('initial');
             setIsJoined(true);
-            const activeId = `active-joined-local`;
+            const activeId = res.joinedUser.id || `active-joined-local`;
             setParticipants(prev => {
               const next = [...prev];
               const blankIdx = next.findIndex(p => p.isBlank);
@@ -703,33 +782,54 @@ export function AppProvider({ children }) {
           setIsJoined(false);
         }
       }
+      if (e.key === 'stagetrack_guest_stickers') {
+        try {
+          setGuestStickers(e.newValue ? JSON.parse(e.newValue) : {});
+        } catch { /* ignore */ }
+      }
+      if (e.key === 'stagetrack_guest_buttons') {
+        try {
+          setGuestButtons(e.newValue ? JSON.parse(e.newValue) : {});
+        } catch { /* ignore */ }
+      }
+      if (e.key === 'stagetrack_active_theme') {
+        setActiveTheme(e.newValue === 'sor' ? 'sor' : 'music-fun');
+      }
+      if (e.key === 'stagetrack_global_mute') {
+        setGlobalMute(e.newValue === 'true');
+      }
+      if (e.key === 'stagetrack_global_pause') {
+        setGlobalPause(e.newValue === 'true');
+      }
+    };
+
+    const handleBeforeUnload = () => {
+      try {
+        localStorage.removeItem('stagetrack_lobby_request');
+        localStorage.removeItem('stagetrack_lobby_response');
+      } catch { /* ignore */ }
     };
 
     window.addEventListener('storage', handleStorage);
+    window.addEventListener('beforeunload', handleBeforeUnload);
     
-    // Initial check on load
+    // Initial check on load: close any join requests when refresh
     try {
-      const req = localStorage.getItem('stagetrack_lobby_request');
-      if (req) setPendingRequest(JSON.parse(req));
-      
-      const res = localStorage.getItem('stagetrack_lobby_response');
-      if (res) {
-        const parsedRes = JSON.parse(res);
-        if (parsedRes.status === 'pending') {
-          setLobbyStatus('waiting');
-        } else if (parsedRes.status === 'denied') {
-          setLobbyStatus('denied');
-        }
-      }
+      localStorage.removeItem('stagetrack_lobby_request');
+      localStorage.removeItem('stagetrack_lobby_response');
     } catch { /* ignore */ }
 
-    return () => window.removeEventListener('storage', handleStorage);
+    return () => {
+      window.removeEventListener('storage', handleStorage);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
   }, []);
 
   const value = {
     MOCK_USER_COUNT,
     participants,
     activeGuestId, setActiveGuestId,
+    activeToolbox, setActiveToolbox,
     guestButtons, handleToggleGuestButton,
     guestStickers, handleAddSticker,
     stickerNudges,

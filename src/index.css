@@ -1,8 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Risque&display=swap');
 
 :root {
-  --bg-gradient-start: #0f172a;
-  --bg-gradient-end: #1e1b4b;
+  --bg-gradient-start: #090a0f;
+  --bg-gradient-end: #121318;
   --glass-bg: rgba(255, 255, 255, 0.4);
   --glass-border: rgba(255, 255, 255, 0.2);
   --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
@@ -64,7 +64,7 @@ body {
 /* Top Banner */
 .top-banner {
   width: 100%;
-  height: 13vh;
+  height: 10.84vh; /* Reduced by another 15% */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -81,13 +81,16 @@ body {
 .instructor-left-sidebar {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: calc(100% + 20px) !important;
+  margin-top: -10px;
+  margin-bottom: -10px;
+  margin-left: -10px;
   flex-shrink: 0;
   transition: width 0.3s ease;
 }
 
 .instructor-left-sidebar.open {
-  width: 250px;
+  width: 380px;
 }
 
 .instructor-left-sidebar.closed {
@@ -98,6 +101,7 @@ body {
 
 .instructor-toolbox {
   width: 100%;
+  opacity: 0.7;
 }
 
 .sidebar-handle {
@@ -293,7 +297,7 @@ body {
   flex: 1;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .toolbox-header {
@@ -323,7 +327,7 @@ body {
 .toolbox-content {
   flex: 1;
   overflow-y: hidden;
-  padding: 12px;
+  padding: 12px 15px;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -482,8 +486,12 @@ body {
   box-shadow: 0 0 15px rgba(255, 255, 255, 0.8), inset 0 0 10px rgba(255, 255, 255, 0.4) !important;
 }
 
-.video-cell.grayscale-sharp {
+.video-cell.grayscale-sharp .gc-video-element,
+.video-cell.grayscale-sharp .peo-background-cover {
   filter: grayscale(100%) contrast(1.2) brightness(0.95);
+}
+
+.video-cell.grayscale-sharp {
   border-color: rgba(239, 68, 68, 0.65);
   box-shadow: inset 0 0 15px rgba(239, 68, 68, 0.3), 0 0 10px rgba(239, 68, 68, 0.15);
 }
@@ -512,8 +520,8 @@ body {
 
 .gc-sticker {
   position: absolute;
-  width: 71px;
-  height: 71px;
+  width: 72px;
+  height: 72px;
   z-index: 10;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
@@ -521,16 +529,31 @@ body {
 .gc-sticker.ic-placed {
   width: 46px;
   height: 46px;
+  z-index: 10000 !important;
 }
 
 .gc-sticker.large-sticker {
-  width: 85px !important;
-  height: 85px !important;
+  width: 86px !important;
+  height: 86px !important;
 }
 
 .gc-sticker.large-sticker.ic-placed {
+  width: 58px !important;
+  height: 58px !important;
+}
+
+.gc-sticker.ic-star-special {
+  z-index: 10000 !important;
+}
+
+.gc-sticker.ic-star-special.ic-placed {
   width: 55px !important;
   height: 55px !important;
+}
+
+.gc-sticker.ic-star-special:not(.ic-placed) {
+  width: 86px !important;
+  height: 86px !important;
 }
 
 /* Antigravity Spatial Map & Priority Stack */
@@ -549,7 +572,7 @@ body {
   width: 85px;
   height: 85px;
   transform: translate(-50%, calc(-50% - 3px));
-  z-index: 9999 !important; /* Always wins/overlaps STO */
+  z-index: 10000 !important; /* Always wins/overlaps STO */
 }
 
 .gc-sticker.pos-star {
@@ -585,7 +608,7 @@ body {
   width: 100px;
   height: 100px;
   transform: translate(50%, -50%);
-  z-index: 9999 !important; /* Always wins/overlaps STO */
+  z-index: 10000 !important; /* Always wins/overlaps STO */
   padding: 1px;
 }
 
@@ -607,30 +630,30 @@ body {
 }
 
 .gc-sticker.pos-1 {
-  top: 0;
-  left: 0;
+  top: 0px;
+  left: 0px;
   transform: translate(-65%, -65%);
   z-index: 9999 !important;
 }
 
 .gc-sticker.pos-2 {
-  top: 0;
-  right: 0;
+  top: 0px;
+  right: 0px;
   transform: translate(65%, -65%);
   z-index: 9999 !important;
   padding: 1px;
 }
 
 .gc-sticker.pos-3 {
-  bottom: 0;
-  left: 0;
+  bottom: 0px;
+  left: 0px;
   transform: translate(-65%, 65%);
   z-index: 9999 !important;
 }
 
 .gc-sticker.pos-4 {
-  bottom: 0;
-  right: 0;
+  bottom: 0px;
+  right: 0px;
   transform: translate(65%, 65%);
   z-index: 9999 !important;
 }
@@ -906,7 +929,7 @@ body {
   background: rgba(0,0,0,0.6);
   padding: 2px 6px;
   border-radius: 4px;
-  font-size: 0.65rem;
+  font-size: 1.34rem;
   max-width: 80%;
   white-space: nowrap;
   overflow: hidden;
@@ -1128,12 +1151,72 @@ body {
   z-index: 18;
 }
 
-/* PEO Sticker Grid - exactly 8 columns in 1 row */
+.neon-blue-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 191, 255, 0.22);
+  box-shadow: inset 0 0 15px rgba(0, 191, 255, 0.5);
+  border: 2px solid #00bfff;
+  border-radius: 12px;
+  pointer-events: none;
+  z-index: 18;
+}
+
+.neon-purple-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(186, 85, 211, 0.22);
+  box-shadow: inset 0 0 15px rgba(186, 85, 211, 0.5);
+  border: 2px solid #ba55d3;
+  border-radius: 12px;
+  pointer-events: none;
+  z-index: 18;
+}
+
+.neon-orange-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 140, 0, 0.22);
+  box-shadow: inset 0 0 15px rgba(255, 140, 0, 0.5);
+  border: 2px solid #ff8c00;
+  border-radius: 12px;
+  pointer-events: none;
+  z-index: 18;
+}
+
+/* PEO Sticker Grid - responsive auto-fit grid */
 .peo-sticker-grid {
   display: grid;
-  grid-template-columns: repeat(8, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(68px, 1fr));
   gap: 8px;
   width: 100%;
+}
+.peo-sticker-grid .sticker-item {
+  aspect-ratio: 1;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid transparent;
+  border-radius: 8px;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+  overflow: visible;
+}
+.peo-sticker-grid .sticker-item:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: transparent;
+  transform: scale(1.08);
 }
 
 /* Instructor Toolbox Sizing & Layout Compactions to fit 100% height */
@@ -1144,15 +1227,15 @@ body {
   font-size: 0.85rem;
 }
 .instructor-toolbox .toolbox-content {
-  padding: 8px;
+  padding: 8px 15px;
   gap: 8px;
-  overflow: hidden;
+  overflow-y: auto;
   height: calc(100% - 48px);
 }
 .instructor-toolbox .toolbox-section {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: auto;
 }
 .instructor-toolbox .gb-btn {
   padding: 6px 8px;
@@ -1164,10 +1247,99 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  flex: 1;
+  flex: none;
   min-height: 0;
   margin-bottom: 12px;
   gap: 6px;
+}
+/* Tic-Tac-Toe Grid for Instructor Toolbox */
+.ttt-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  width: 100%;
+  margin: 0 auto 12px auto; /* Centered with margin at the bottom */
+  border-radius: 8px;
+  background: transparent; /* Dark background inherited from the panel behind it */
+  border: 1px solid var(--glass-border);
+  overflow: hidden;
+  flex: 1;
+  min-height: 0;
+}
+.ttt-grid-3x3 {
+  grid-template-rows: repeat(3, 1fr);
+  flex: 3;
+}
+.ttt-grid-3x2 {
+  grid-template-rows: repeat(2, 1fr);
+  flex: 2;
+}
+.ttt-grid-3x5 {
+  grid-template-rows: repeat(5, 1fr);
+  flex: 5;
+}
+.ttt-grid-3x1 {
+  grid-template-rows: repeat(1, 1fr);
+  flex: 1;
+}
+.ttt-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+/* Tic-Tac-Toe internal grid lines - generic row/column aware borders */
+.ttt-cell:not(:nth-child(3n)) {
+  border-right: 1px solid var(--glass-border);
+}
+/* Apply bottom borders to cells in all rows EXCEPT the last one */
+/* For 3x2 grid (6 items) */
+.ttt-grid-3x2 .ttt-cell:nth-child(-n+3) {
+  border-bottom: 1px solid var(--glass-border);
+}
+/* For 3x3 grid (9 items) */
+.ttt-grid-3x3 .ttt-cell:nth-child(-n+6) {
+  border-bottom: 1px solid var(--glass-border);
+}
+/* For 3x5 grid (15 items) */
+.ttt-grid-3x5 .ttt-cell:nth-child(-n+12) {
+  border-bottom: 1px solid var(--glass-border);
+}
+/* Theme grid is 3x1 (3 items), it has no bottom borders */
+.ttt-btn {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border: none;
+  color: #cbd5e1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  cursor: pointer;
+  font-size: 0.85rem; /* Reduced to fit better */
+  font-weight: 500;
+  transition: all 0.2s ease;
+  padding: 4px 2px;
+  min-height: 0;
+}
+.ttt-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: white;
+}
+.ttt-btn:active {
+  background: rgba(255, 255, 255, 0.15);
+  transform: scale(0.95);
+}
+.ttt-btn.active {
+  background: rgba(34, 197, 94, 0.2) !important;
+  color: #22c55e !important;
+  box-shadow: inset 0 0 10px rgba(34, 197, 94, 0.2);
+}
+.ttt-btn.active-danger {
+  background: rgba(239, 68, 68, 0.2) !important;
+  color: #ef4444 !important;
+  box-shadow: inset 0 0 10px rgba(239, 68, 68, 0.2);
 }
 .instructor-toolbox .ito-stickers-section {
   display: flex;
@@ -1177,19 +1349,34 @@ body {
   margin-top: 12px;
 }
 .instructor-toolbox .section-title {
-  font-size: 0.75rem;
+  font-size: 0.78rem;
   margin: 4px 0 !important;
   padding-bottom: 2px;
 }
 .instructor-toolbox .ito-sticker-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(68px, 1fr));
   gap: 8px;
   width: 100%;
+  margin: 0 0 12px 0;
 }
 .instructor-toolbox .ito-sticker-grid .sticker-item {
   aspect-ratio: 1;
-  padding: 4px;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid transparent;
+  border-radius: 8px;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+  overflow: visible;
+}
+.instructor-toolbox .ito-sticker-grid .sticker-item:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: transparent;
+  transform: scale(1.08);
 }
 .instructor-toolbox .upload-dropdown {
   width: 100%;
@@ -2546,6 +2733,7 @@ body {
   object-fit: cover;
   border-radius: 11px;
   z-index: 1;
+  pointer-events: none;
 }
 
 .gc-joined-icon-badge {
@@ -2706,9 +2894,8 @@ body {
 }
 
 .ito-theme-selector-container {
-  margin-top: 24px;
-  padding-top: 16px;
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  margin-top: 0px;
+  padding-top: 1px;
   width: 100%;
 }
 
@@ -2768,4 +2955,117 @@ body {
 .unified-toolbox,
 .chat-sidebar {
   background: rgba(0, 0, 0, 0.6) !important;
+}
+
+/* Edge-to-Edge Gradient Bar under SOR Logo */
+.gradient-divider-bar {
+  width: 100%;
+  height: 6px;
+  background: linear-gradient(
+    90deg, 
+    rgba(218, 25, 32, 1) 0%,
+    rgba(140, 10, 15, 1) 50%,
+    rgba(218, 25, 32, 1) 100%
+  );
+  position: relative;
+  z-index: 999;
+  filter: brightness(0.8);
+}
+
+/* Remove grid borders for stickers section only */
+.ttt-grid-no-border {
+  border: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+.ttt-grid-no-border .ttt-cell {
+  border-right: none !important;
+  border-bottom: none !important;
+}
+
+/* Floating Sticker Picker Popover */
+.sticker-picker-popover {
+  position: absolute;
+  bottom: 80px; /* Position it nicely above the triggers */
+  left: 15px;
+  right: 15px;
+  background: rgba(9, 13, 22, 0.98);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 350px;
+  animation: popoverFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.sticker-picker-content {
+  overflow-y: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-right: 4px;
+}
+
+.sticker-picker-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--glass-border);
+  padding-bottom: 6px;
+}
+
+.sticker-picker-header h4 {
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.sticker-picker-close {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background 0.2s, color 0.2s;
+}
+
+.sticker-picker-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+@keyframes popoverFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Active Theme Buttons: Red & Squared Edges */
+.ito-theme-selector-container .gb-btn {
+  border-radius: 4px !important;
+}
+.ito-theme-selector-container .gb-btn.active {
+  background: #dc2626 !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  opacity: 1 !important;
 }

@@ -16,6 +16,7 @@ export default function GuestContainer({
   participant, 
   isActive, 
   onClick, 
+  onDoubleClick,
   stickers = [],
   buttons = { raiseHand: false, mute: false },
   nudges = {},
@@ -219,13 +220,30 @@ export default function GuestContainer({
     return (
       <div 
         className={`video-cell spotlight-cell blank-peo-container ${hasCover ? 'has-cover' : ''}`}
-        style={hasCover ? { backgroundImage: `url(${coverData.coverUrl})`, backgroundSize: 'cover', backgroundPosition: 'center', cursor: 'pointer' } : {}}
+        style={hasCover && coverData.hyperlink ? { cursor: 'pointer' } : {}}
         onClick={(e) => {
           if (hasCover && coverData.hyperlink && !e.target.closest('.blank-peo-edit-form') && !e.target.closest('.edit-blank-btn')) {
             window.open(coverData.hyperlink, '_blank');
           }
         }}
       >
+        {hasCover && (
+          <div 
+            className="peo-background-cover"
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundImage: `url(${coverData.coverUrl})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              zIndex: 1,
+              borderRadius: '12px'
+            }}
+          />
+        )}
         {/* Label for 1st or 2nd blank PEO container */}
         {canEditBlank && !hasCover && (
           <div className="blank-peo-label">
@@ -237,6 +255,7 @@ export default function GuestContainer({
         {canEditBlank && !isEditing && (
           <button 
             className={`edit-blank-btn ${hasCover ? 'has-cover-btn' : ''}`}
+            style={{ zIndex: 2 }}
             onClick={(e) => {
               e.stopPropagation();
               setIsEditing(true);
@@ -248,7 +267,7 @@ export default function GuestContainer({
 
         {/* Edit Form Overlay */}
         {isEditing && (
-          <div className="blank-peo-edit-form" onClick={(e) => e.stopPropagation()}>
+          <div className="blank-peo-edit-form" style={{ zIndex: 10 }} onClick={(e) => e.stopPropagation()}>
             <h4>Upload Cover & Link</h4>
             
             <div className="form-fields">
@@ -307,6 +326,9 @@ export default function GuestContainer({
   const showActiveGlow = isActive && !isClosed;
   const showRaiseHandGlow = buttons.raiseHand && !isClosed;
   const showGreenFilter = buttons.greenFilter && !isClosed;
+  const showBlueFilter = buttons.blueFilter && !isClosed;
+  const showPurpleFilter = buttons.purpleFilter && !isClosed;
+  const showOrangeFilter = buttons.orangeFilter && !isClosed;
   const showGrayscale = isClosed;
   const isNonInteractive = isClosed || participant.isBlank;
   const isSpotlight = participant.isBlank;
@@ -322,6 +344,7 @@ export default function GuestContainer({
     <div 
       className={`video-cell ${showActiveGlow ? 'active-gc' : ''} ${showGrayscale ? 'grayscale-sharp' : ''} ${isNonInteractive ? 'non-interactive' : ''} ${isSpotlight ? 'spotlight-cell' : ''}`} 
       onClick={() => onClick(participant)}
+      onDoubleClick={() => onDoubleClick && onDoubleClick(participant)}
       style={borderStyle}
     >
       {/* SVG-based PEO Border component */}
@@ -360,6 +383,15 @@ export default function GuestContainer({
 
       {/* Neon Green Filter Overlay (z-index: 18) */}
       {showGreenFilter && <div className="neon-green-overlay"></div>}
+
+      {/* Neon Blue Filter Overlay (z-index: 18) */}
+      {showBlueFilter && <div className="neon-blue-overlay"></div>}
+
+      {/* Neon Purple Filter Overlay (z-index: 18) */}
+      {showPurpleFilter && <div className="neon-purple-overlay"></div>}
+
+      {/* Neon Orange Filter Overlay (z-index: 18) */}
+      {showOrangeFilter && <div className="neon-orange-overlay"></div>}
 
       {/* Status Icons (z-index: 20) */}
       {buttons.raiseHand && (
@@ -445,14 +477,16 @@ export default function GuestContainer({
 
         const isLargeSticker = s.name === 'Guitar.svg' || s.name === 'Dog.svg' || s.name === 'Trumpet.svg';
         const isTrumpet = s.name === 'Trumpet.svg';
+        const isSpecialStar = s.name === 'ic star1.png' || s.name === 'ic star1_red.png' || s.name === 'ic_gold_star.png';
+        const isItoSticker = isIcSticker || s.position === 'crown' || s.position === 'birthday';
 
         return (
           <img 
             key={s.id} 
             src={`/assets/svg_stickers/${s.name}`} 
             alt={s.name} 
-            className={`gc-sticker pos-${s.position} ${isIcSticker ? 'ic-placed' : ''} ${(s.name === 'Sun with sunglasses.svg' && typeof s.position === 'number') ? 'sun-special' : ''} ${isLargeSticker ? 'large-sticker' : ''} ${isTrumpet ? 'trumpet-special' : ''}`} 
-            style={{ ...style, zIndex: 11 }}
+            className={`gc-sticker pos-${s.position} ${isIcSticker ? 'ic-placed' : ''} ${(s.name === 'Sun with sunglasses.svg' && typeof s.position === 'number') ? 'sun-special' : ''} ${isLargeSticker ? 'large-sticker' : ''} ${isTrumpet ? 'trumpet-special' : ''} ${isSpecialStar ? 'ic-star-special' : ''}`} 
+            style={{ ...style, zIndex: (isSpecialStar || isItoSticker) ? 10000 : 11 }}
           />
         );
       })}

@@ -28,12 +28,10 @@ export default function InstructorToolbox() {
     { id: 'RealCrown.png', src: crownPng }, 
     { id: 'Happy_Birthday.png', src: birthdayPng }, 
     { id: 'Star.png', src: starPng },
-    { id: 'Star_Small.png', src: starPng, isSmall: true },
-    { id: 'Star_LightBlue.svg', src: '/assets/svg_stickers/Star_LightBlue.svg' },
-    { id: 'Star_Green.svg', src: '/assets/svg_stickers/Star_Green.svg' },
-    { id: 'Star_Pink.svg', src: '/assets/svg_stickers/Star_Pink.svg' },
-    { id: 'Star_Silver.svg', src: '/assets/svg_stickers/Star_Silver.svg' },
-    { id: 'Star_Gold.svg', src: '/assets/svg_stickers/Star_Gold.svg' }
+    { id: 'Piano.svg', src: '/assets/svg_stickers/Piano.svg' },
+    { id: 'ic star1.png', src: '/assets/svg_stickers/ic star1.png' },
+    { id: 'ic star1_red.png', src: '/assets/svg_stickers/ic star1_red.png' },
+    { id: 'ic_gold_star.png', src: '/assets/svg_stickers/ic_gold_star.png' }
   ];
 
   const handleFileUpload = (e) => {
@@ -60,25 +58,9 @@ export default function InstructorToolbox() {
     }
   };
 
-  if (!isSidebarOpen) {
-    return (
-      <div className="sidebar-handle closed" onClick={() => setIsSidebarOpen(true)} role="button" aria-label="Open Instructor Toolbox" tabIndex={0}>
-        <ChevronRight size={20} />
-      </div>
-    );
-  }
-
   return (
     <div className="glass-panel sidebar instructor-toolbox" style={{ height: '100%', borderRight: '1px solid var(--glass-border)', position: 'relative' }}>
       
-      {/* Handle to close */}
-      <div className="sidebar-handle open" onClick={() => setIsSidebarOpen(false)} role="button" aria-label="Close Instructor Toolbox" tabIndex={0}>
-        <ChevronLeft size={20} />
-      </div>
-
-      <div className="toolbox-header">
-        <h2>Instructor Tools</h2>
-      </div>
 
       <div className="toolbox-content" style={{ paddingRight: '8px' }}>
         <div className="toolbox-section">
@@ -226,37 +208,8 @@ export default function InstructorToolbox() {
             />
           </div>
 
-          {/* --- STUDIO THEME SELECTOR --- */}
-          <div className="ito-theme-selector-container" style={{ display: 'flex', gap: '6px', alignItems: 'center', width: '100%' }}>
-            <div style={{ display: 'flex', gap: '4px', flex: 1 }}>
-              <button 
-                className={`gb-btn ${activeTheme === 'music-fun' ? 'active' : ''}`}
-                onClick={() => setActiveTheme('music-fun')}
-                style={{ flex: 1, padding: '6px 4px', fontSize: '0.78rem', whiteSpace: 'nowrap', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '2px', border: 'none' }}
-              >
-                🎵 Music
-              </button>
-              <button 
-                className={`gb-btn ${activeTheme === 'sor' ? 'active' : ''}`}
-                onClick={() => setActiveTheme('sor')}
-                style={{ flex: 1, padding: '6px 4px', fontSize: '0.78rem', whiteSpace: 'nowrap', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '2px', border: 'none' }}
-              >
-                🚀 SOR
-              </button>
-            </div>
-            <button 
-              className="gb-btn"
-              onClick={resetStudentState}
-              style={{ width: 'auto', padding: '6px 10px', display: 'flex', justifyContent: 'center', alignItems: 'center', backgroundColor: '#dc2626', color: 'white', borderRadius: '4px', border: 'none' }}
-              title="Reset Room / Refresh Session"
-            >
-              <RotateCw size={16} />
-            </button>
-          </div>
-
           {/* Instructor Stickers Section */}
           <div className="ito-stickers-section">
-            <h3 className="section-title">Instructor Stickers</h3>
             <div className="ito-sticker-grid">
               {availableStickers.map((sticker) => (
                 <div 
@@ -284,26 +237,54 @@ export default function InstructorToolbox() {
               <button 
                 className="gb-btn"
                 onClick={() => handleAddSticker('instructor', 'UNDO_IC', true)}
-                style={{ flex: 1, backgroundColor: '#ff4444', color: 'white', padding: '8px 4px', fontSize: '0.85rem', whiteSpace: 'normal', height: 'auto', minWidth: 0, display: 'flex', justifyContent: 'center', alignItems: 'center', textAlign: 'center', lineHeight: '1.2' }}
+                style={{ flex: 1, padding: '8px 4px', fontSize: '0.85rem', whiteSpace: 'normal', height: 'auto', minWidth: 0, display: 'flex', justifyContent: 'center', alignItems: 'center', textAlign: 'center', lineHeight: '1.2' }}
               >
                 Undo Last Sticker
               </button>
               <button 
                 className="gb-btn"
                 onClick={() => handleAddSticker('instructor', 'UNDO_ALL_IC', true)}
-                style={{ flex: 1, backgroundColor: '#ff4444', color: 'white', padding: '8px 4px', fontSize: '0.85rem', whiteSpace: 'normal', height: 'auto', minWidth: 0, display: 'flex', justifyContent: 'center', alignItems: 'center', textAlign: 'center', lineHeight: '1.2' }}
+                style={{ flex: 1, padding: '8px 4px', fontSize: '0.85rem', whiteSpace: 'normal', height: 'auto', minWidth: 0, display: 'flex', justifyContent: 'center', alignItems: 'center', textAlign: 'center', lineHeight: '1.2' }}
               >
                 Undo all Stickers
               </button>
               <button 
                 className="gb-btn"
                 onDoubleClick={() => handleAddSticker('instructor', 'UNDO_ALL_PEO', true)}
-                style={{ flex: 1, backgroundColor: '#ff4444', color: 'white', padding: '8px 4px', fontSize: '0.85rem', whiteSpace: 'normal', height: 'auto', minWidth: 0, display: 'flex', justifyContent: 'center', alignItems: 'center', textAlign: 'center', lineHeight: '1.2' }}
+                style={{ flex: 1, padding: '8px 4px', fontSize: '0.85rem', whiteSpace: 'normal', height: 'auto', minWidth: 0, display: 'flex', justifyContent: 'center', alignItems: 'center', textAlign: 'center', lineHeight: '1.2' }}
                 title="Double click to clear all PEO stickers"
               >
                 Undo all peo
               </button>
             </div>
+          </div>
+
+          {/* --- STUDIO THEME SELECTOR --- */}
+          <div className="ito-theme-selector-container" style={{ display: 'flex', gap: '6px', alignItems: 'center', width: '100%', marginTop: '0px', paddingTop: '1px' }}>
+            <div style={{ display: 'flex', gap: '4px', flex: 1 }}>
+              <button 
+                className={`gb-btn ${activeTheme === 'music-fun' ? 'active' : ''}`}
+                onClick={() => setActiveTheme('music-fun')}
+                style={{ flex: 1, padding: '6px 4px', fontSize: '0.78rem', whiteSpace: 'nowrap', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '2px', border: 'none' }}
+              >
+                🎵 Music
+              </button>
+              <button 
+                className={`gb-btn ${activeTheme === 'sor' ? 'active' : ''}`}
+                onClick={() => setActiveTheme('sor')}
+                style={{ flex: 1, padding: '6px 4px', fontSize: '0.78rem', whiteSpace: 'nowrap', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '2px', border: 'none' }}
+              >
+                🚀 SOR
+              </button>
+            </div>
+            <button 
+              className="gb-btn"
+              onClick={resetStudentState}
+              style={{ width: 'auto', padding: '6px 10px', display: 'flex', justifyContent: 'center', alignItems: 'center', borderRadius: '4px', border: 'none' }}
+              title="Reset Room / Refresh Session"
+            >
+              <RotateCw size={16} />
+            </button>
           </div>
 
         </div>

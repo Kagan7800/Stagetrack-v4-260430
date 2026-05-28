@@ -1,8 +1,7 @@
 import PresentationContainer from './components/PresentationContainer';
 import Chat from './components/Chat';
 import GuestContainer from './components/GuestContainer';
-import UnifiedToolbox from './components/UnifiedToolbox';
-import InstructorToolbox from './components/InstructorToolbox';
+import LeftSidebar from './components/LeftSidebar';
 import LobbyOverlay from './components/LobbyOverlay';
 import { useAppContext } from './context/AppContext';
 
@@ -11,6 +10,7 @@ function App() {
     MOCK_USER_COUNT,
     participants,
     activeGuestId, setActiveGuestId,
+    setActiveToolbox,
     guestButtons, handleToggleGuestButton,
     guestStickers, handleAddSticker, stickerNudges,
     isDoodling, setIsDoodling,
@@ -24,6 +24,7 @@ function App() {
     activeTheme
   } = useAppContext();
 
+  const isInstructorClient = sessionStorage.getItem('stagetrack_role') !== 'student';
   const isInstructorSidebarVisible = true;
   const activeGuest = participants.find(p => p.id === activeGuestId);
 
@@ -55,7 +56,8 @@ function App() {
           backgroundImage: "url('/assets/background_modern.png')",
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          pointerEvents: 'none'
+          pointerEvents: 'none',
+          opacity: 0.7
         }}
       />
 
@@ -64,7 +66,7 @@ function App() {
         style={{
           position: 'absolute',
           inset: 0,
-          backgroundImage: "url('/assets/ui-SOR_bkgd.png')",
+          backgroundImage: "url('/assets/SOR/sor_bottom_bg.png')",
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
@@ -75,41 +77,6 @@ function App() {
         }}
       />
 
-      {/* LAYER 1.1: SOR BANNER TOP */}
-      {/* Black horizontal banner background */}
-      <div 
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '15vh',
-          backgroundColor: 'rgba(0, 0, 0, 0.7)',
-          boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
-          zIndex: 2,
-          pointerEvents: 'none',
-          transition: 'opacity 0.5s ease-in-out',
-          opacity: activeTheme === 'sor' ? 1 : 0
-        }}
-      />
-      {/* Logo container in the center with reduced width */}
-      <div 
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: '20%',
-          width: '60%',
-          height: '15vh',
-          backgroundImage: "url('/assets/ui-SOR_bkgd.png')",
-          backgroundPosition: 'center top',
-          backgroundSize: 'contain',
-          backgroundRepeat: 'no-repeat',
-          zIndex: 3, 
-          pointerEvents: 'none',
-          transition: 'opacity 0.5s ease-in-out',
-          opacity: activeTheme === 'sor' ? 1 : 0
-        }}
-      />
 
       {/* LAYER 1.5: GLOBAL CONFETTI OVERLAY FOR SOR THEME */}
       {activeTheme === 'sor' && isConfettiActive && (
@@ -140,53 +107,83 @@ function App() {
           <img src="/assets/logo_modern.png" alt="Music Fun Logo" style={{ height: '100%', width: 'auto', objectFit: 'contain' }} />
         </div>
       ) : (
-        <div className="top-banner" style={{ background: 'transparent', height: '15vh' }} />
+        <>
+          <div className="top-banner" style={{ backgroundImage: "linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), url('/assets/SOR/1ui_sor top banner-052826 3.png')", backgroundSize: '100% 100%', backgroundRepeat: 'no-repeat', backgroundPosition: 'center', height: '95px', display: 'flex', alignItems: 'center', justifyContent: 'center', paddingTop: '0px', marginTop: '7px' }}>
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '95px', transform: 'scale(1.05)', transformOrigin: 'center', zIndex: 1000 }}>
+              <img 
+                src="/assets/SOR/1ui_sor logo-052826.png" 
+                alt="School of Rock Alpharetta" 
+                style={{ 
+                  height: '95px', 
+                  maxHeight: '95px', 
+                  width: 'auto', 
+                  objectFit: 'contain',
+                  filter: 'drop-shadow(0px -1px 0px #fcf6ba) drop-shadow(0px 1px 0px #aa771c) drop-shadow(-1px 0px 0px #bf953f) drop-shadow(1px 0px 0px #bf953f) drop-shadow(0 0 4px #b38728) drop-shadow(2px 2px 3px rgba(0,0,0,0.85))'
+                }} 
+              />
+              <img 
+                src="/assets/SOR/1logo_sor.png" 
+                alt="School of Rock Icon" 
+                style={{ 
+                  position: 'absolute',
+                  height: '42px',
+                  width: 'auto',
+                  objectFit: 'contain',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  top: '22px'
+                }} 
+              />
+            </div>
+          </div>
+          <div className="gradient-divider-bar"></div>
+        </>
       )}
 
       {/* Main Content Layout */}
       <div className="main-content">
-        {/* Left Sidebar for Instructor Tools */}
+        {/* Left Sidebar containing both ITO and STO accordions */}
         {isInstructorSidebarVisible && (
           <div className={`instructor-left-sidebar ${isSidebarOpen ? 'open' : 'closed'}`}>
-            <InstructorToolbox 
-               onAddSticker={handleAddSticker}
-               isDoodling={isDoodling}
-               setIsDoodling={setIsDoodling}
-               globalMute={globalMute}
-               setGlobalMute={setGlobalMute}
-               globalPause={globalPause}
-               setGlobalPause={setGlobalPause}
-               isSidebarOpen={isSidebarOpen}
-               setIsSidebarOpen={setIsSidebarOpen}
-               onMediaUpload={setMediaUpload}
-            />
+            <LeftSidebar />
           </div>
         )}
 
         {/* Center Grid */}
         <div className="center-grid-area" data-columns={halfLength <= 2 ? "1" : "2"}>
            <div className="side-peos" data-columns={halfLength <= 2 ? "1" : "2"}>
-             {leftParticipants.map(p => (
-               <GuestContainer 
-                 key={p.id}
-                 participant={p}
-                 isActive={activeGuestId === p.id}
-                 onClick={() => {
-                   const isMuted = guestButtons[p.id]?.mute;
-                   if (globalPause || isMuted || p.isBlank) return;
-                   setActiveGuestId(p.id);
-                 }}
-                 stickers={guestStickers[p.id] || []}
-                 buttons={guestButtons[p.id] || {}}
-                 nudges={stickerNudges[p.id] || {}}
-                 isDoodling={isDoodling}
-                 globalMute={globalMute}
-                 globalPause={globalPause}
-               />
-             ))}
+             {leftParticipants.map(p => {
+               return (
+                 <GuestContainer 
+                   key={p.id}
+                   participant={p}
+                   isActive={activeGuestId === p.id}
+                   onClick={() => {
+                     if (!isInstructorClient) return;
+                     const isMuted = guestButtons[p.id]?.mute;
+                     if (globalPause || isMuted || p.isBlank) return;
+                      setActiveGuestId(p.id);
+                      setActiveToolbox("student");
+                   }}
+                   onDoubleClick={() => {
+                     if (!isInstructorClient) return;
+                     const isMuted = guestButtons[p.id]?.mute;
+                     if (globalPause || isMuted || p.isBlank) return;
+                      setActiveGuestId(p.id);
+                      setActiveToolbox("instructor");
+                   }}
+                   stickers={guestStickers[p.id] || []}
+                   buttons={guestButtons[p.id] || {}}
+                   nudges={stickerNudges[p.id] || {}}
+                   isDoodling={isDoodling}
+                   globalMute={globalMute}
+                   globalPause={globalPause}
+                 />
+               );
+             })}
            </div>
 
-           <div className="center-wrapper" style={{ justifyContent: activeGuestId !== null ? 'flex-start' : 'center' }}>
+           <div className="center-wrapper" style={{ justifyContent: 'center' }}>
              <div className="pc-width-keeper">
                 <div 
                   className={`pc-gt-unified ${mediaType === 'iframe' || mediaType === 'metronome' ? 'metronome-active' : ''}`}
@@ -200,40 +197,38 @@ function App() {
                    />
                </div>
              </div>
-
-             {/* Unified Toolbox Overlay (STO) */}
-             {activeGuestId !== null && activeGuest && (
-               <div className="toolbox-panel">
-                 <UnifiedToolbox 
-                   activeGuest={activeGuest}
-                   guestButtons={guestButtons}
-                   toggleGuestButton={handleToggleGuestButton}
-                   onAddSticker={handleAddSticker}
-                   onClose={() => setActiveGuestId(null)}
-                 />
-               </div>
-             )}
            </div>
            
            <div className="side-peos" data-columns={halfLength <= 2 ? "1" : "2"}>
-             {rightParticipants.map(p => (
-               <GuestContainer 
-                 key={p.id}
-                 participant={p}
-                 isActive={activeGuestId === p.id}
-                 onClick={() => {
-                   const isMuted = guestButtons[p.id]?.mute;
-                   if (globalPause || isMuted || p.isBlank) return;
-                   setActiveGuestId(p.id);
-                 }}
-                 stickers={guestStickers[p.id] || []}
-                 buttons={guestButtons[p.id] || {}}
-                 nudges={stickerNudges[p.id] || {}}
-                 isDoodling={isDoodling}
-                 globalMute={globalMute}
-                 globalPause={globalPause}
-               />
-             ))}
+             {rightParticipants.map(p => {
+               return (
+                 <GuestContainer 
+                   key={p.id}
+                   participant={p}
+                   isActive={activeGuestId === p.id}
+                   onClick={() => {
+                     if (!isInstructorClient) return;
+                     const isMuted = guestButtons[p.id]?.mute;
+                     if (globalPause || isMuted || p.isBlank) return;
+                      setActiveGuestId(p.id);
+                      setActiveToolbox("student");
+                   }}
+                   onDoubleClick={() => {
+                     if (!isInstructorClient) return;
+                     const isMuted = guestButtons[p.id]?.mute;
+                     if (globalPause || isMuted || p.isBlank) return;
+                      setActiveGuestId(p.id);
+                      setActiveToolbox("instructor");
+                   }}
+                   stickers={guestStickers[p.id] || []}
+                   buttons={guestButtons[p.id] || {}}
+                   nudges={stickerNudges[p.id] || {}}
+                   isDoodling={isDoodling}
+                   globalMute={globalMute}
+                   globalPause={globalPause}
+                 />
+               );
+             })}
             </div>
         </div>
 
