@@ -109,29 +109,15 @@ function App() {
       ) : (
         <>
           <div className="top-banner" style={{ backgroundImage: "linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), url('/assets/SOR/1ui_sor top banner-052826 3.png')", backgroundSize: '100% 100%', backgroundRepeat: 'no-repeat', backgroundPosition: 'center', height: '95px', display: 'flex', alignItems: 'center', justifyContent: 'center', paddingTop: '0px', marginTop: '7px' }}>
-            <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', height: '95px', transform: 'scale(1.05)', transformOrigin: 'center', zIndex: 1000 }}>
-              <img 
-                src="/assets/SOR/1ui_sor logo-052826.png" 
-                alt="School of Rock Alpharetta" 
-                style={{ 
-                  height: '95px', 
-                  maxHeight: '95px', 
-                  width: 'auto', 
-                  objectFit: 'contain',
-                  filter: 'drop-shadow(0px -1px 0px #fcf6ba) drop-shadow(0px 1px 0px #aa771c) drop-shadow(-1px 0px 0px #bf953f) drop-shadow(1px 0px 0px #bf953f) drop-shadow(0 0 4px #b38728) drop-shadow(2px 2px 3px rgba(0,0,0,0.85))'
-                }} 
-              />
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '95px', transform: 'scale(1.05)', transformOrigin: 'center', zIndex: 1000 }}>
               <img 
                 src="/assets/SOR/1logo_sor.png" 
-                alt="School of Rock Icon" 
+                alt="School of Rock Logo" 
                 style={{ 
-                  position: 'absolute',
-                  height: '42px',
-                  width: 'auto',
+                  height: '55px', 
+                  width: 'auto', 
                   objectFit: 'contain',
-                  left: '50%',
-                  transform: 'translateX(-50%)',
-                  top: '22px'
+                  filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.6))'
                 }} 
               />
             </div>

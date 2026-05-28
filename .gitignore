@@ -22,3 +22,10 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Local workspace backups and scripts
+scratch/
+*_original_backup.png
+public/assets/SOR/1ui_sor logo-052826.png
+
+
