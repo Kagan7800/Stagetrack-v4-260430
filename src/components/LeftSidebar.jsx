@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import InstructorToolbox from './InstructorToolbox';
 import UnifiedToolbox from './UnifiedToolbox';
@@ -112,9 +112,7 @@ export default function LeftSidebar() {
             }}
           >
             <span style={{ fontSize: '1.02rem', fontWeight: 600, color: 'white' }}>Instructor Tools</span>
-            <div style={{ position: 'absolute', right: '12px', display: 'flex', alignItems: 'center' }}>
-              {isItoExpanded ? <ChevronUp size={16} color="#94a3b8" /> : <ChevronDown size={16} color="#94a3b8" />}
-            </div>
+
           </div>
           
           {isItoExpanded && (
@@ -152,9 +150,7 @@ export default function LeftSidebar() {
             }}
           >
             <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'white' }}>🎓 {activeGuest.name}'s Tools</span>
-            <div style={{ position: 'absolute', right: '12px', display: 'flex', alignItems: 'center' }}>
-              {isStoExpanded ? <ChevronUp size={16} color="#94a3b8" /> : <ChevronDown size={16} color="#94a3b8" />}
-            </div>
+
           </div>
           
           {isStoExpanded && (

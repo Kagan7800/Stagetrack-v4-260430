@@ -131,16 +131,23 @@ body {
 
 .sidebar-handle.open {
   position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
+  top: 21px;
+  transform: translateY(-50%);
+  right: 32px;
+  width: 20px;
+  height: 20px;
   z-index: 10;
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .sidebar-handle.open:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: none !important;
+  transform: translateY(-50%) scale(1.1);
 }
 
 /* Right Sidebar: Chat (Narrower) */
@@ -316,12 +323,20 @@ body {
 }
 
 .close-btn {
-  background: none;
-  border: none;
+  background: none !important;
+  border: none !important;
   color: white;
   cursor: pointer;
   position: absolute;
-  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  width: 20px;
+  height: 20px;
 }
 
 .toolbox-content {
