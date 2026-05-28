@@ -1378,7 +1378,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.04);
+  background: transparent;
   border: 1px solid transparent;
   border-radius: 8px;
   box-sizing: border-box;
