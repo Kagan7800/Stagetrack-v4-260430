@@ -137,7 +137,16 @@ export default function UnifiedToolbox({
       <div className="toolbox-header">
         <h2>{activeGuest.name}'s Tools</h2>
         <button onClick={onClose} className="close-btn">
-          <X size={16} />
+          <img 
+            src="/assets/Lobby/Arrow.svg" 
+            alt="Close" 
+            style={{ 
+              width: '16px', 
+              height: '16px', 
+              transform: 'rotate(180deg)',
+              objectFit: 'contain'
+            }} 
+          />
         </button>
       </div>
 

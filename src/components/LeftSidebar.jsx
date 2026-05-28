@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, ChevronDown, ChevronUp, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ChevronDown, ChevronUp } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import InstructorToolbox from './InstructorToolbox';
 import UnifiedToolbox from './UnifiedToolbox';
@@ -72,7 +72,16 @@ export default function LeftSidebar() {
         tabIndex={0}
         style={{ zIndex: 100 }}
       >
-        <X size={20} />
+        <img 
+          src="/assets/Lobby/Arrow.svg" 
+          alt="Close" 
+          style={{ 
+            width: '20px', 
+            height: '20px', 
+            transform: 'rotate(180deg)',
+            objectFit: 'contain'
+          }} 
+        />
       </div>
 
       {/* 1. Instructor Tools (ITO) Section */}
