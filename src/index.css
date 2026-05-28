@@ -400,14 +400,7 @@ body {
   border: none !important;
 }
 
-.unified-toolbox .gb-btn.screenshot-btn {
-  background: transparent !important;
-  border: none !important;
-}
 
-.unified-toolbox .gb-btn.screenshot-btn:hover {
-  background: rgba(255, 255, 255, 0.1) !important;
-}
 
 .gt-sticker-grid {
   display: grid;
@@ -1121,20 +1114,7 @@ body {
   filter: drop-shadow(0 0 4px rgba(236, 72, 153, 0.6));
 }
 
-.gb-btn.screenshot-btn {
-  background: transparent;
-  opacity: 1;
-}
 
-.gb-btn.screenshot-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  transform: translateY(-1px);
-}
-
-.gb-btn.screenshot-btn:active {
-  background: rgba(255, 255, 255, 0.2);
-  transform: translateY(0);
-}
 
 .neon-green-overlay {
   position: absolute;
