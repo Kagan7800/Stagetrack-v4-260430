@@ -76,8 +76,8 @@ export default function LeftSidebar() {
           src="/assets/Lobby/Arrow.svg" 
           alt="Close" 
           style={{ 
-            width: '20px', 
-            height: '20px', 
+            width: '40px', 
+            height: '40px', 
             transform: 'rotate(180deg)',
             objectFit: 'contain'
           }} 

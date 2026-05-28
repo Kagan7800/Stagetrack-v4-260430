@@ -141,8 +141,8 @@ export default function UnifiedToolbox({
             src="/assets/Lobby/Arrow.svg" 
             alt="Close" 
             style={{ 
-              width: '16px', 
-              height: '16px', 
+              width: '32px', 
+              height: '32px', 
               transform: 'rotate(180deg)',
               objectFit: 'contain'
             }} 
