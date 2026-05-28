@@ -111,7 +111,7 @@ export default function LeftSidebar() {
               position: 'relative'
             }}
           >
-            <span style={{ fontSize: '1.02rem', fontWeight: 600, color: 'white' }}>Instructor Tools</span>
+            <span style={{ fontSize: '1.02rem', fontWeight: 600, color: '#cbd5e1' }}>Instructor Tools</span>
 
           </div>
           
@@ -149,7 +149,7 @@ export default function LeftSidebar() {
               position: 'relative'
             }}
           >
-            <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'white' }}>🎓 {activeGuest.name}'s Tools</span>
+            <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#cbd5e1' }}>🎓 {activeGuest.name}'s Tools</span>
 
           </div>
           

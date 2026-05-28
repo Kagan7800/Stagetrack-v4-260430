@@ -145,9 +145,18 @@ body {
   justify-content: center;
 }
 
+.sidebar-handle.open img {
+  opacity: 0.65;
+  transition: opacity 0.2s ease;
+}
+
 .sidebar-handle.open:hover {
   background: none !important;
   transform: translateY(-50%) scale(1.1);
+}
+
+.sidebar-handle.open:hover img {
+  opacity: 0.95;
 }
 
 /* Right Sidebar: Chat (Narrower) */
@@ -337,6 +346,15 @@ body {
   padding: 0;
   width: 32px;
   height: 32px;
+}
+
+.close-btn img {
+  opacity: 0.65;
+  transition: opacity 0.2s ease;
+}
+
+.close-btn:hover img {
+  opacity: 0.95;
 }
 
 .toolbox-content {
