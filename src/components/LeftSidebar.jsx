@@ -97,7 +97,7 @@ export default function LeftSidebar() {
           }}
         >
           <div 
-            onClick={() => setIsItoExpanded(!isItoExpanded)}
+            onClick={() => setIsSidebarOpen(false)}
             style={{ 
               padding: '10px 12px', 
               background: 'rgba(0, 0, 0, 0.9)', 
