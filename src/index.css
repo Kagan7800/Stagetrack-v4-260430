@@ -3121,6 +3121,14 @@ body {
   font-weight: 700 !important;
   opacity: 1 !important;
 }
+.ito-theme-selector-container .gb-btn.active.active-music {
+  background: #3b82f6 !important;
+  color: #ffffff !important;
+}
+.ito-theme-selector-container .gb-btn.active.active-sor {
+  background: #ef4444 !important;
+  color: #ffffff !important;
+}
 
 /* Tools switcher grid at the top of the Left Sidebar */
 .tools-grid {

@@ -10,7 +10,15 @@ export default function UnifiedToolbox({
   onAddSticker,
   onClose
 }) {
-  const { setIsChatOpen, setIsSidebarOpen } = useAppContext();
+  const { setIsChatOpen, setIsSidebarOpen, activeTheme } = useAppContext();
+
+  const isSor = activeTheme === 'sor';
+  const themeTextColor = isSor ? '#ef4444' : '#3b82f6';
+  const themeSubtextColor = isSor ? 'rgba(239, 68, 68, 0.7)' : 'rgba(59, 130, 246, 0.7)';
+  const themeTextShadow = isSor ? '0 0 8px rgba(239, 68, 68, 0.18)' : '0 0 8px rgba(59, 130, 246, 0.18)';
+  const themeArrowFilter = isSor 
+    ? 'brightness(0) saturate(100%) invert(37%) sepia(85%) saturate(7467%) hue-rotate(345deg) brightness(98%) contrast(93%)'
+    : 'brightness(0) saturate(100%) invert(47%) sepia(76%) saturate(2256%) hue-rotate(205deg) brightness(101%) contrast(96%)';
   const [showStickerPicker, setShowStickerPicker] = useState(false);
   const [showFilterPicker, setShowFilterPicker] = useState(false);
   const timerRef = useRef(null);
@@ -130,10 +138,10 @@ export default function UnifiedToolbox({
     <div className="unified-toolbox glass-panel" style={{ height: '100%', width: '100%' }}>
       <div className="toolbox-header" style={{ minHeight: '52px', borderBottom: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '12px 16px', position: 'relative' }}>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px', textAlign: 'center' }}>
-          <span className="text-yellow-theme" style={{ fontSize: '1.08rem', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          <span style={{ color: themeTextColor, textShadow: themeTextShadow, fontSize: '1.08rem', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
             {activeGuest ? `${activeGuest.name}'s Tools` : "Student Tools"}
           </span>
-          <span style={{ fontSize: '12px', color: '#a18f5c', textTransform: 'lowercase', letterSpacing: '-0.02em', fontWeight: 500 }}>
+          <span style={{ fontSize: '12px', color: themeSubtextColor, textTransform: 'lowercase', letterSpacing: '-0.02em', fontWeight: 500 }}>
             double-click your box to select ITO
           </span>
         </div>
@@ -146,7 +154,7 @@ export default function UnifiedToolbox({
               height: '32px', 
               transform: 'rotate(180deg)',
               objectFit: 'contain',
-              filter: 'brightness(0) saturate(100%) invert(80%) sepia(35%) saturate(1637%) hue-rotate(352deg) brightness(101%) contrast(99%)'
+              filter: themeArrowFilter
             }} 
           />
         </button>
