@@ -94,29 +94,6 @@ export default function LeftSidebar() {
         width: '380px'
       }}
     >
-      {/* 0. Tab switcher bar (Tools Grid) */}
-      {isInstructorClient && (
-        <div className="tools-grid-sleek">
-          {/* STO Button (Dynamic Instructor/Student Name) */}
-          <button
-            onClick={handleSTO}
-            disabled={activeGuestId === null}
-            className={`tool-btn-sleek border-r-stone ${mode === 'STO' ? 'active-sto' : ''}`}
-            title={activeGuestId === null ? "Select a student to access Student Tools" : "Switch to Student Tools"}
-          >
-            🎓 {activeGuest ? activeGuest.name : "Richard"}'s Tools
-          </button>
-
-          {/* ITO Button (Instructor Tools) */}
-          <button
-            onClick={handleITO}
-            className={`tool-btn-sleek ${mode === 'ITO' ? 'active-ito' : ''}`}
-            title="Switch to Instructor Tools"
-          >
-            🛡️ Instructor Tools
-          </button>
-        </div>
-      )}
 
       {/* 1. Instructor Tools (ITO) Section */}
       {showIto && (

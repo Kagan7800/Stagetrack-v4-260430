@@ -3276,3 +3276,8 @@ body {
   color: #34d399 !important;
   text-shadow: 0 0 8px rgba(52, 211, 153, 0.15);
 }
+
+.text-muted-yellow-class {
+  color: #e5c158 !important;
+  text-shadow: 0 0 8px rgba(229, 193, 88, 0.18);
+}

@@ -128,16 +128,16 @@ export default function UnifiedToolbox({
 
   return (
     <div className="unified-toolbox glass-panel" style={{ height: '100%', width: '100%' }}>
-      <div className="toolbox-header" style={{ minHeight: '52px', borderBottom: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '2px', textAlign: 'left' }}>
-          <span className="text-emerald-400-class" style={{ fontSize: '0.9rem', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+      <div className="toolbox-header" style={{ minHeight: '52px', borderBottom: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '12px 16px', position: 'relative' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px', textAlign: 'center' }}>
+          <span className="text-muted-yellow-class" style={{ fontSize: '1.08rem', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
             🧰 {activeGuest ? `${activeGuest.name}'s Tools` : "Student Tools"}
           </span>
-          <span style={{ fontSize: '10px', color: '#78716c', textTransform: 'lowercase', letterSpacing: '-0.02em', fontWeight: 500 }}>
+          <span style={{ fontSize: '12px', color: '#a18f5c', textTransform: 'lowercase', letterSpacing: '-0.02em', fontWeight: 500 }}>
             double-click your box to select ITO
           </span>
         </div>
-        <button onClick={onClose} className="close-btn" style={{ position: 'relative', top: 'auto', right: 'auto', transform: 'none' }}>
+        <button onClick={onClose} className="close-btn" style={{ position: 'absolute', right: '16px', top: '50%', transform: 'translateY(-50%)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <img 
             src="/assets/Lobby/Arrow.svg" 
             alt="Close" 
@@ -145,7 +145,8 @@ export default function UnifiedToolbox({
               width: '32px', 
               height: '32px', 
               transform: 'rotate(180deg)',
-              objectFit: 'contain'
+              objectFit: 'contain',
+              filter: 'brightness(0) saturate(100%) invert(84%) sepia(49%) saturate(1000%) hue-rotate(11deg) brightness(90%) contrast(101%)'
             }} 
           />
         </button>
