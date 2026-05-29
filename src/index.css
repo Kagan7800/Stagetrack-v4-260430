@@ -3116,8 +3116,7 @@ body {
   border-radius: 4px !important;
 }
 .ito-theme-selector-container .gb-btn.active {
-  background: #fbbf24 !important;
-  color: #1c1917 !important;
+  box-shadow: 0 0 0 2px #fbbf24, 0 0 8px rgba(251, 191, 36, 0.4) !important;
   font-weight: 700 !important;
   opacity: 1 !important;
 }
