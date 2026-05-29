@@ -994,7 +994,7 @@ body {
 .chat-message.self {
   align-self: flex-end;
   background: transparent !important; /* Transparent */
-  border: 1px solid hsla(265, 55%, 48%, 0.4);
+  border: 1px solid transparent;
   color: white;
   border-bottom-right-radius: 4px;
 }
@@ -1002,7 +1002,7 @@ body {
 .chat-message.other {
   align-self: flex-start;
   background: transparent !important; /* Transparent */
-  border: 1px solid hsla(142, 60%, 38%, 0.4);
+  border: 1px solid transparent;
   color: white;
   border-bottom-left-radius: 4px;
 }
@@ -1010,7 +1010,7 @@ body {
 .chat-message.system {
   align-self: center;
   background: transparent !important; /* Transparent */
-  border: 1px solid hsla(343, 65%, 43%, 0.4);
+  border: 1px solid transparent;
   color: white;
   font-style: italic;
   font-size: 0.8rem;
@@ -1019,7 +1019,7 @@ body {
 .chat-message.private,
 .chat-message.pending {
   background: transparent !important; /* Transparent */
-  border: 1px solid hsla(343, 65%, 43%, 0.4);
+  border: 1px solid transparent;
   color: white;
 }
 
