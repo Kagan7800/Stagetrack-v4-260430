@@ -53,9 +53,10 @@ export default function LeftSidebar() {
     <div 
       className="glass-panel sidebar" 
       style={{ 
-        height: '100%', 
+        height: 'calc(100% + 10px)', 
+        marginTop: '-10px',
         borderRight: '1px solid var(--glass-border)', 
-        borderTop: '2px solid rgba(0, 0, 0, 0.95)', 
+        borderTop: 'none', 
         position: 'relative',
         display: 'flex',
         flexDirection: 'column',
@@ -63,27 +64,6 @@ export default function LeftSidebar() {
         width: '380px'
       }}
     >
-      {/* Handle to close sidebar */}
-      <div 
-        className="sidebar-handle open" 
-        onClick={() => setIsSidebarOpen(false)} 
-        role="button" 
-        aria-label="Close Sidebar" 
-        tabIndex={0}
-        style={{ zIndex: 100 }}
-      >
-        <img 
-          src="/assets/Lobby/Arrow.svg" 
-          alt="Close" 
-          style={{ 
-            width: '40px', 
-            height: '40px', 
-            transform: 'rotate(180deg)',
-            objectFit: 'contain'
-          }} 
-        />
-      </div>
-
       {/* 1. Instructor Tools (ITO) Section */}
       {showIto && (
         <div 
@@ -96,29 +76,12 @@ export default function LeftSidebar() {
             overflow: 'hidden'
           }}
         >
-          <div 
-            onClick={() => setIsSidebarOpen(false)}
-            style={{ 
-              padding: '14px 16px', 
-              background: 'rgba(0, 0, 0, 0.6)',
-              cursor: 'pointer', 
-              display: 'flex', 
-              justifyContent: 'center', 
-              alignItems: 'center',
-              userSelect: 'none',
-              borderBottom: '1px solid var(--glass-border)',
-              position: 'relative'
-            }}
-          >
-            <span style={{ fontSize: '1.02rem', fontWeight: 600, color: '#cbd5e1' }}>Instructor Tools</span>
-          </div>
-          
           {isItoExpanded && (
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, background: 'rgba(0, 0, 0, 0.6)', overflow: 'hidden' }}>
-            <InstructorToolbox />
-          </div>
-        )}
-      </div>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, background: 'rgba(0, 0, 0, 0.6)', overflow: 'hidden' }}>
+              <InstructorToolbox />
+            </div>
+          )}
+        </div>
       )}
 
       {/* 2. Student Tools (STO) Section */}

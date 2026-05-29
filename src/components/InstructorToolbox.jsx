@@ -59,8 +59,22 @@ export default function InstructorToolbox() {
   };
 
   return (
-    <div className="glass-panel sidebar instructor-toolbox" style={{ height: '100%', borderRight: '1px solid var(--glass-border)', position: 'relative' }}>
-      
+    <div className="glass-panel sidebar instructor-toolbox" style={{ height: '100%', borderRight: 'none', position: 'relative' }}>
+      <div className="toolbox-header" style={{ minHeight: '52px', borderBottom: '1px solid var(--glass-border)' }}>
+        <h2 style={{ fontSize: '1.02rem', fontWeight: 600, color: '#cbd5e1', margin: 0 }}>Instructor Tools</h2>
+        <button onClick={() => setIsSidebarOpen(false)} className="close-btn">
+          <img 
+            src="/assets/Lobby/Arrow.svg" 
+            alt="Close" 
+            style={{ 
+              width: '32px', 
+              height: '32px', 
+              transform: 'rotate(180deg)',
+              objectFit: 'contain'
+            }} 
+          />
+        </button>
+      </div>
 
       <div className="toolbox-content" style={{ paddingRight: '8px' }}>
         <div className="toolbox-section">
