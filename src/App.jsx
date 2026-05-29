@@ -107,19 +107,17 @@ function App() {
           <img src="/assets/logo_modern.png" alt="Music Fun Logo" style={{ height: '100%', width: 'auto', objectFit: 'contain' }} />
         </div>
       ) : (
-          <div className="top-banner" style={{ backgroundImage: "linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), url('/assets/SOR/1ui_sor top banner-052826 3.png')", backgroundSize: '100% 100%', backgroundRepeat: 'no-repeat', backgroundPosition: 'center', display: 'flex', alignItems: 'center', justifyContent: 'center', paddingTop: '0px', position: 'relative' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', transform: 'scale(1.05)', transformOrigin: 'center', zIndex: 1000 }}>
-              <img 
-                src="/assets/SOR/1logo_sor.png" 
-                alt="School of Rock Logo" 
-                style={{ 
-                  height: '55px', 
-                  width: 'auto', 
-                  objectFit: 'contain',
-                  filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.6))'
-                }} 
-              />
-            </div>
+          <div className="top-banner" style={{ backgroundImage: "linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), url('/assets/SOR/1ui_sor top banner-052826 3.png')", backgroundSize: '100% 100%', backgroundRepeat: 'no-repeat', backgroundPosition: 'center', position: 'relative' }}>
+            <img 
+              src="/assets/SOR/1logo_sor.png" 
+              alt="School of Rock Logo" 
+              style={{ 
+                height: '100%', 
+                width: 'auto', 
+                objectFit: 'contain',
+                filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.6))'
+              }} 
+            />
             <div className="gradient-divider-bar" style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '6px' }}></div>
           </div>
       )}
