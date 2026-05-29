@@ -1,4 +1,4 @@
-import { Hand, Pause } from 'lucide-react';
+import { Pause } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { useAppContext } from '../context/AppContext';
 import PeoBorder from './PeoBorder';
@@ -393,12 +393,7 @@ export default function GuestContainer({
       {/* Neon Orange Filter Overlay (z-index: 18) */}
       {showOrangeFilter && <div className="neon-orange-overlay"></div>}
 
-      {/* Status Icons (z-index: 20) */}
-      {buttons.raiseHand && (
-        <div className="gc-status-icons">
-          <Hand size={10} color="#eab308" />
-        </div>
-      )}
+
 
       {/* Pause Overlay (transparent, centered pause icon) */}
       {globalPause && (
