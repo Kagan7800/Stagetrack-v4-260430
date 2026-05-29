@@ -112,7 +112,7 @@ function App() {
               src="/assets/SOR/1logo_sor.png" 
               alt="School of Rock Logo" 
               style={{ 
-                height: '100%', 
+                height: '90%', 
                 width: 'auto', 
                 objectFit: 'contain',
                 filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.6))'
