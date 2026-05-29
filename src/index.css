@@ -2970,7 +2970,10 @@ body {
 
 /* Background override for Instructor Toolbox (ITO) and Student Toolbox (STO) */
 .instructor-toolbox,
-.unified-toolbox,
+.unified-toolbox {
+  background: transparent !important;
+  border-radius: 0px !important;
+}
 .chat-sidebar {
   background: transparent !important;
 }

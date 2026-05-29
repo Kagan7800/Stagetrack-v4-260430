@@ -57,6 +57,7 @@ export default function LeftSidebar() {
         marginTop: '-10px',
         borderRight: '1px solid var(--glass-border)', 
         borderTop: 'none', 
+        borderRadius: '0px',
         position: 'relative',
         display: 'flex',
         flexDirection: 'column',
