@@ -60,11 +60,16 @@ export default function InstructorToolbox() {
 
   return (
     <div className="glass-panel sidebar instructor-toolbox" style={{ height: '100%', borderRight: 'none', position: 'relative' }}>
-      <div className="toolbox-header" style={{ minHeight: '52px', borderBottom: '1px solid var(--glass-border)' }}>
-        <span className="text-amber-400-class" style={{ fontSize: '0.85rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-          🛡️ Instructor Mode Active
-        </span>
-        <button onClick={() => setIsSidebarOpen(false)} className="close-btn">
+      <div className="toolbox-header" style={{ minHeight: '52px', borderBottom: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '2px', textAlign: 'left' }}>
+          <span className="text-amber-400-class" style={{ fontSize: '0.9rem', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            🧰 Instructor Tools
+          </span>
+          <span style={{ fontSize: '10px', color: '#78716c', textTransform: 'lowercase', letterSpacing: '-0.02em', fontWeight: 500 }}>
+            double-click your box to select STO
+          </span>
+        </div>
+        <button onClick={() => setIsSidebarOpen(false)} className="close-btn" style={{ position: 'relative', top: 'auto', right: 'auto', transform: 'none' }}>
           <img 
             src="/assets/Lobby/Arrow.svg" 
             alt="Close" 

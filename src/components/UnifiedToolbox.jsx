@@ -128,8 +128,16 @@ export default function UnifiedToolbox({
 
   return (
     <div className="unified-toolbox glass-panel" style={{ height: '100%', width: '100%' }}>
-      <div className="toolbox-header" style={{ minHeight: '52px' }}>
-        <button onClick={onClose} className="close-btn">
+      <div className="toolbox-header" style={{ minHeight: '52px', borderBottom: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '2px', textAlign: 'left' }}>
+          <span className="text-emerald-400-class" style={{ fontSize: '0.9rem', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            🧰 {activeGuest ? `${activeGuest.name}'s Tools` : "Student Tools"}
+          </span>
+          <span style={{ fontSize: '10px', color: '#78716c', textTransform: 'lowercase', letterSpacing: '-0.02em', fontWeight: 500 }}>
+            double-click your box to select ITO
+          </span>
+        </div>
+        <button onClick={onClose} className="close-btn" style={{ position: 'relative', top: 'auto', right: 'auto', transform: 'none' }}>
           <img 
             src="/assets/Lobby/Arrow.svg" 
             alt="Close" 
