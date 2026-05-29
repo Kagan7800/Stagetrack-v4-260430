@@ -77,6 +77,7 @@ export default function LeftSidebar() {
   const showIto = activeGuestId === null || activeToolbox === 'instructor';
   
   const transmissionGlowClass = mode === 'ITO' ? 'sidebar-glow-ito' : 'sidebar-glow-sto';
+  const panelGridBorder = mode === 'ITO' ? 'border-t-2-ito' : 'border-t-2-sto';
 
   return (
     <div 
@@ -120,6 +121,7 @@ export default function LeftSidebar() {
       {/* 1. Instructor Tools (ITO) Section */}
       {showIto && (
         <div 
+          className={panelGridBorder}
           style={{ 
             display: 'flex', 
             flexDirection: 'column', 
@@ -140,6 +142,7 @@ export default function LeftSidebar() {
       {/* 2. Student Tools (STO) Section */}
       {showSto && (
         <div 
+          className={panelGridBorder}
           style={{ 
             display: 'flex', 
             flexDirection: 'column', 
@@ -162,7 +165,9 @@ export default function LeftSidebar() {
               position: 'relative'
             }}
           >
-            <span style={{ fontSize: '1.02rem', fontWeight: 600, color: '#cbd5e1' }}>🎓 {activeGuest.name}'s Tools</span>
+            <span className="text-emerald-400-class" style={{ fontSize: '0.85rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              🎓 {activeGuest ? activeGuest.name : "Richard"}'s Console
+            </span>
           </div>
           
           {isStoExpanded && (

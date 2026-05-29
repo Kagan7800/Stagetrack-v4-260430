@@ -3254,3 +3254,25 @@ body {
   border-right: 2px solid rgba(16, 185, 129, 0.7) !important;
   box-shadow: 0 0 15px rgba(16, 185, 129, 0.15) !important;
 }
+
+/* Dynamic border-top accent colors */
+.border-t-2-ito {
+  border-top: 2px solid rgba(245, 158, 11, 0.8) !important;
+  transition: border-color 0.2s ease;
+}
+
+.border-t-2-sto {
+  border-top: 2px solid rgba(16, 185, 129, 0.8) !important;
+  transition: border-color 0.2s ease;
+}
+
+/* Dynamic text colors for sub-panel titles */
+.text-amber-400-class {
+  color: #fbbf24 !important;
+  text-shadow: 0 0 8px rgba(251, 191, 36, 0.15);
+}
+
+.text-emerald-400-class {
+  color: #34d399 !important;
+  text-shadow: 0 0 8px rgba(52, 211, 153, 0.15);
+}
