@@ -4,6 +4,29 @@ import { createContext, useContext, useState, useMemo, useCallback, useEffect } 
 const AppContext = createContext();
 
 export function AppProvider({ children }) {
+  // Detect if this is a fresh session (tab opened/restored or system restarted)
+  if (typeof window !== 'undefined') {
+    try {
+      const sessionActive = sessionStorage.getItem('stagetrack_session_active');
+      if (!sessionActive) {
+        sessionStorage.setItem('stagetrack_session_active', 'true');
+        // If there's no other active tab updating the heartbeat, clear session storage items in localStorage
+        const lastActiveTime = localStorage.getItem('stagetrack_last_active_time');
+        const isMultiTabSession = lastActiveTime && (Date.now() - Number(lastActiveTime) <= 8000);
+        if (!isMultiTabSession) {
+          localStorage.removeItem('stagetrack_guest_stickers');
+          localStorage.removeItem('stagetrack_guest_buttons');
+          localStorage.removeItem('stagetrack_global_pause');
+          localStorage.removeItem('stagetrack_global_mute');
+          localStorage.removeItem('stagetrack_lobby_request');
+          localStorage.removeItem('stagetrack_lobby_response');
+        }
+      }
+    } catch (e) {
+      console.error('Session initialization error:', e);
+    }
+  }
+
   const MOCK_USER_COUNT = useMemo(() => {
     if (typeof window === 'undefined') return 12;
     try {
@@ -188,6 +211,24 @@ export function AppProvider({ children }) {
       localStorage.setItem('stagetrack_active_theme', activeTheme);
     } catch { /* ignore */ }
   }, [activeTheme]);
+
+  // Keep-alive heartbeat interval to identify active sessions across tabs
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      localStorage.setItem('stagetrack_last_active_time', String(Date.now()));
+    } catch { /* ignore */ }
+
+    const interval = setInterval(() => {
+      try {
+        localStorage.setItem('stagetrack_last_active_time', String(Date.now()));
+      } catch { /* ignore */ }
+    }, 2000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
 
   useEffect(() => {
     try {
