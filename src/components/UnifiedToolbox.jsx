@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Hand, MicOff, MessageSquare, X, Camera, Sparkles, Smile } from 'lucide-react';
+import { Hand, MicOff, MessageSquare, X, Camera, Sparkles, Smile, Trash2 } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import { useAppContext } from '../context/AppContext';
 
@@ -336,6 +336,20 @@ export default function UnifiedToolbox({
                   );
                 })}
               </div>
+              <button
+                className="clear-filters-btn"
+                onClick={() => {
+                  ['greenFilter', 'blueFilter', 'purpleFilter', 'orangeFilter'].forEach(fId => {
+                    if (buttons[fId]) {
+                      toggleGuestButton(activeGuest.id, fId);
+                    }
+                  });
+                  resetFilterInactivityTimer();
+                }}
+              >
+                <Trash2 size={14} />
+                <span>Remove Filter</span>
+              </button>
             </div>
           )}
         </div>

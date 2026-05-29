@@ -3077,6 +3077,36 @@ body {
   }
 }
 
+/* Remove Filter popover button */
+.clear-filters-btn {
+  margin-top: 4px;
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: #ef4444;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.clear-filters-btn:hover {
+  background: rgba(239, 68, 68, 0.25);
+  border-color: rgba(239, 68, 68, 0.6);
+  transform: translateY(-1px);
+}
+
+.clear-filters-btn:active {
+  transform: translateY(0);
+}
+
 /* Active Theme Buttons: Red & Squared Edges */
 .ito-theme-selector-container .gb-btn {
   border-radius: 4px !important;
