@@ -3312,7 +3312,7 @@ body {
   background-image: url('/assets/svg_stickers/Confetti.svg');
   background-size: 250px 250px;
   background-repeat: repeat;
-  animation: fall-translate 6s linear infinite;
+  animation: fall-translate 8s linear infinite;
   will-change: transform;
   transform: translate3d(0, 0, 0);
 }
