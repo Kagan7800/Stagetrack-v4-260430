@@ -15,7 +15,9 @@ export default function LeftSidebar() {
     guestButtons,
     handleToggleGuestButton,
     handleAddSticker,
-    setActiveGuestId
+    setActiveGuestId,
+    globalMute,
+    setGlobalMute
   } = useAppContext();
 
   const [isItoExpanded, setIsItoExpanded] = useState(true);
@@ -30,6 +32,30 @@ export default function LeftSidebar() {
       setIsStoExpanded(true); // Automatically expand the student toolbox when selected
     }
   }, [activeGuestId, setIsSidebarOpen]);
+
+  const isInstructorClient = sessionStorage.getItem('stagetrack_role') !== 'student';
+  const mode = (activeGuestId === null || activeToolbox === 'instructor') ? 'ITO' : 'STO';
+
+  // Auto-Muting / Routing Side Effects on Mode Shift
+  useEffect(() => {
+    if (mode === 'ITO') {
+      setGlobalMute(true);
+      console.log("Switching to Admin Channel: Main room stream muted.");
+    } else {
+      setGlobalMute(false);
+      console.log("Switching to Stage Channel: Open broadcast restored.");
+    }
+  }, [mode, setGlobalMute]);
+
+  const handleSTO = () => {
+    if (activeGuestId !== null) {
+      setActiveToolbox('student');
+    }
+  };
+
+  const handleITO = () => {
+    setActiveToolbox('instructor');
+  };
 
   if (!isSidebarOpen) {
     return (
@@ -46,29 +72,18 @@ export default function LeftSidebar() {
     );
   }
 
-  const isInstructorClient = sessionStorage.getItem('stagetrack_role') !== 'student';
-
-  const handleSTO = () => {
-    if (activeGuestId !== null) {
-      setActiveToolbox('student');
-    }
-  };
-
-  const handleITO = () => {
-    setActiveToolbox('instructor');
-  };
-
   // Determine flex values based on expansion states
   const showSto = activeGuestId !== null && activeGuest && activeToolbox === 'student';
   const showIto = activeGuestId === null || activeToolbox === 'instructor';
   
+  const transmissionGlowClass = mode === 'ITO' ? 'sidebar-glow-ito' : 'sidebar-glow-sto';
+
   return (
     <div 
-      className="glass-panel sidebar" 
+      className={`glass-panel sidebar ${transmissionGlowClass}`} 
       style={{ 
         height: 'calc(100% + 10px)', 
         marginTop: '-10px',
-        borderRight: '1px solid var(--glass-border)', 
         borderTop: 'none', 
         borderRadius: '0px',
         position: 'relative',
@@ -80,26 +95,24 @@ export default function LeftSidebar() {
     >
       {/* 0. Tab switcher bar (Tools Grid) */}
       {isInstructorClient && (
-        <div className="tools-grid">
+        <div className="tools-grid-sleek">
           {/* Standard STO Button */}
           <button
             onClick={handleSTO}
             disabled={activeGuestId === null}
-            className={`tool-btn ${activeToolbox === 'student' && activeGuestId !== null ? 'active' : ''}`}
+            className={`tool-btn-sleek border-r-stone ${mode === 'STO' ? 'active-sto' : ''}`}
             title={activeGuestId === null ? "Select a student to access Student Tools" : "Switch to Student Tools"}
           >
-            <GraduationCap size={20} style={{ marginBottom: '4px' }} />
-            <span>STO</span>
+            <span>🎓 STO</span>
           </button>
 
           {/* Exclusive ITO Button */}
           <button
             onClick={handleITO}
-            className={`tool-btn variant-admin ${activeToolbox === 'instructor' || activeGuestId === null ? 'active' : ''}`}
+            className={`tool-btn-sleek ${mode === 'ITO' ? 'active-ito' : ''}`}
             title="Switch to Instructor Tools"
           >
-            <Shield size={20} style={{ marginBottom: '4px' }} />
-            <span>ITO</span>
+            <span>🛡️ ITO</span>
           </button>
         </div>
       )}
