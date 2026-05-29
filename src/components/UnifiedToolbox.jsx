@@ -116,12 +116,6 @@ export default function UnifiedToolbox({
   ];
 
   const specialStickers = [
-    "Star_Small.png",
-    "Star_LightBlue.svg",
-    "Star_Green.svg",
-    "Star_Pink.svg",
-    "Star_Silver.svg",
-    "Star_Gold.svg",
     "Drums.svg",
     "Guitar.svg",
     "Microphone.svg",
@@ -228,7 +222,7 @@ export default function UnifiedToolbox({
                   boxShadow: 'inset 0 0 10px rgba(255, 255, 255, 0.02)'
                 }}>
                   <div style={{ fontSize: '0.78rem', fontWeight: 'bold', color: '#ffd700', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    ✨ Reward Stars & Instruments
+                    ✨ Instruments
                   </div>
                   <div className="peo-sticker-grid">
                     {specialStickers.map((sticker) => (
@@ -246,9 +240,7 @@ export default function UnifiedToolbox({
                           style={
                             sticker.includes('Guitar') || sticker.includes('Drums') || sticker.includes('Trumpet') || sticker.includes('Microphone') 
                               ? { transform: 'scale(1.25)' } 
-                              : sticker.includes('Star_Small') 
-                                ? { transform: 'scale(0.7)' } 
-                                : {}
+                              : {}
                           }
                         />
                       </div>
@@ -259,7 +251,7 @@ export default function UnifiedToolbox({
                 {/* Standard Stickers Grid */}
                 <div>
                   <div style={{ fontSize: '0.78rem', fontWeight: 'bold', color: 'rgba(255, 255, 255, 0.6)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    Standard Stickers
+                    Stickers
                   </div>
                   <div className="peo-sticker-grid">
                     {guestStickers.map((sticker) => (
