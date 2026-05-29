@@ -16,9 +16,6 @@ export default function UnifiedToolbox({
   const themeTextColor = isSor ? '#ef4444' : '#3b82f6';
   const themeSubtextColor = isSor ? 'rgba(239, 68, 68, 0.7)' : 'rgba(59, 130, 246, 0.7)';
   const themeTextShadow = isSor ? '0 0 8px rgba(239, 68, 68, 0.18)' : '0 0 8px rgba(59, 130, 246, 0.18)';
-  const themeArrowFilter = isSor 
-    ? 'brightness(0) saturate(100%) invert(37%) sepia(85%) saturate(7467%) hue-rotate(345deg) brightness(98%) contrast(93%)'
-    : 'brightness(0) saturate(100%) invert(47%) sepia(76%) saturate(2256%) hue-rotate(205deg) brightness(101%) contrast(96%)';
   const [showStickerPicker, setShowStickerPicker] = useState(false);
   const [showFilterPicker, setShowFilterPicker] = useState(false);
   const timerRef = useRef(null);
@@ -146,17 +143,24 @@ export default function UnifiedToolbox({
           </span>
         </div>
         <button onClick={onClose} className="close-btn" style={{ position: 'absolute', right: '16px', top: '50%', transform: 'translateY(-50%)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <img 
-            src="/assets/Lobby/Arrow.svg" 
-            alt="Close" 
+          <svg 
+            width="32" 
+            height="32" 
+            viewBox="0 0 328 259" 
             style={{ 
-              width: '32px', 
-              height: '32px', 
               transform: 'rotate(180deg)',
-              objectFit: 'contain',
-              filter: themeArrowFilter
-            }} 
-          />
+              objectFit: 'contain'
+            }}
+          >
+            <path 
+              d="M 154.88 17.14 L 163.26 21.57 L 301.25 123.09 L 311.60 133.94 L 309.63 138.86 L 162.28 241.86 L 158.83 240.88 L 157.35 235.95 L 152.91 234.96 L 150.94 231.51 L 162.28 174.35 L 31.18 188.15 L 24.78 187.65 L 22.81 182.72 L 18.86 181.74 L 16.40 178.29 L 16.89 77.26 L 23.79 75.29 L 163.75 90.07 L 150.94 22.56 L 151.93 18.62 L 154.39 17.63 Z" 
+              fill={themeTextColor} 
+              stroke="#fbbf24" 
+              strokeWidth="20" 
+              strokeLinejoin="round" 
+              strokeLinecap="round" 
+            />
+          </svg>
         </button>
       </div>
 
