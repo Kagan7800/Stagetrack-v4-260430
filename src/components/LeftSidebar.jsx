@@ -99,20 +99,17 @@ export default function LeftSidebar() {
           <div 
             onClick={() => setIsSidebarOpen(false)}
             style={{ 
-              padding: '10px 12px', 
-              background: 'rgba(0, 0, 0, 0.9)', 
+              padding: '14px 16px', 
               cursor: 'pointer', 
               display: 'flex', 
               justifyContent: 'center', 
               alignItems: 'center',
               userSelect: 'none',
-              borderTop: '2px solid rgba(0, 0, 0, 0.95)',
-              borderBottom: isItoExpanded ? '1px solid var(--glass-border)' : 'none',
+              borderBottom: '1px solid var(--glass-border)',
               position: 'relative'
             }}
           >
             <span style={{ fontSize: '1.02rem', fontWeight: 600, color: '#cbd5e1' }}>Instructor Tools</span>
-
           </div>
           
           {isItoExpanded && (
@@ -137,20 +134,17 @@ export default function LeftSidebar() {
           <div 
             onClick={() => setIsStoExpanded(!isStoExpanded)}
             style={{ 
-              padding: '10px 12px', 
-              background: 'rgba(0, 0, 0, 0.9)', 
+              padding: '14px 16px', 
               cursor: 'pointer', 
               display: 'flex', 
               justifyContent: 'center', 
               alignItems: 'center',
               userSelect: 'none',
-              borderTop: '2px solid rgba(0, 0, 0, 0.95)',
-              borderBottom: isStoExpanded ? '1px solid var(--glass-border)' : 'none',
+              borderBottom: '1px solid var(--glass-border)',
               position: 'relative'
             }}
           >
             <span style={{ fontSize: '1.02rem', fontWeight: 600, color: '#cbd5e1' }}>🎓 {activeGuest.name}'s Tools</span>
-
           </div>
           
           {isStoExpanded && (
