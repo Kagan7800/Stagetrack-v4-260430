@@ -80,18 +80,9 @@ function App() {
 
       {/* LAYER 1.5: GLOBAL CONFETTI OVERLAY FOR SOR THEME */}
       {activeTheme === 'sor' && isConfettiActive && (
-        <div 
-          style={{
-            position: 'absolute',
-            inset: 0,
-            zIndex: 5,
-            pointerEvents: 'none',
-            overflow: 'hidden',
-            backgroundImage: "url('/assets/svg_stickers/Confetti.svg')",
-            backgroundSize: '250px 250px',
-            backgroundRepeat: 'repeat'
-          }}
-        />
+        <div className="global-confetti-container">
+          <div className="confetti-mover" />
+        </div>
       )}
 
       {/* LAYER 2: INTERACTIVE UI HOUSING */}

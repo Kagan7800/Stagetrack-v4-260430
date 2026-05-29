@@ -3293,3 +3293,35 @@ body {
   color: #fbbf24 !important;
   text-shadow: 0 0 8px rgba(251, 191, 36, 0.18);
 }
+
+/* Smooth Hardware-Accelerated Global Confetti Mover */
+.global-confetti-container {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.confetti-mover {
+  position: absolute;
+  top: -250px;
+  left: 0;
+  width: 100%;
+  height: calc(100% + 250px);
+  background-image: url('/assets/svg_stickers/Confetti.svg');
+  background-size: 250px 250px;
+  background-repeat: repeat;
+  animation: fall-translate 6s linear infinite;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+}
+
+@keyframes fall-translate {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(0, 250px, 0);
+  }
+}
