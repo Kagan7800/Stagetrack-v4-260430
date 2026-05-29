@@ -3077,15 +3077,15 @@ body {
   }
 }
 
-/* Remove Filter popover button */
+/* Remove Filter popover button styled to match STO buttons */
 .clear-filters-btn {
   margin-top: 4px;
   width: 100%;
   padding: 8px 12px;
   border-radius: 8px;
-  background: rgba(239, 68, 68, 0.15);
-  border: 1px solid rgba(239, 68, 68, 0.4);
-  color: #ef4444;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid var(--glass-border) !important;
+  color: #cbd5e1 !important;
   font-weight: 600;
   font-size: 0.85rem;
   cursor: pointer;
@@ -3098,8 +3098,9 @@ body {
 }
 
 .clear-filters-btn:hover {
-  background: rgba(239, 68, 68, 0.25);
-  border-color: rgba(239, 68, 68, 0.6);
+  background: rgba(255, 255, 255, 0.12) !important;
+  color: white !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
   transform: translateY(-1px);
 }
 

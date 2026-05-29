@@ -144,12 +144,12 @@ export default function LeftSidebar() {
               justifyContent: 'center', 
               alignItems: 'center',
               userSelect: 'none',
-              borderTop: '3px solid #000000',
+              borderTop: '2px solid rgba(0, 0, 0, 0.95)',
               borderBottom: isStoExpanded ? '1px solid var(--glass-border)' : 'none',
               position: 'relative'
             }}
           >
-            <span style={{ fontSize: '0.85rem', fontWeight: 600, color: '#cbd5e1' }}>🎓 {activeGuest.name}'s Tools</span>
+            <span style={{ fontSize: '1.02rem', fontWeight: 600, color: '#cbd5e1' }}>🎓 {activeGuest.name}'s Tools</span>
 
           </div>
           

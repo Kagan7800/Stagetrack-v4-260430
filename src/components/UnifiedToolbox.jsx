@@ -134,8 +134,7 @@ export default function UnifiedToolbox({
 
   return (
     <div className="unified-toolbox glass-panel" style={{ height: '100%', width: '100%' }}>
-      <div className="toolbox-header">
-        <h2>{activeGuest.name}'s Tools</h2>
+      <div className="toolbox-header" style={{ minHeight: '52px' }}>
         <button onClick={onClose} className="close-btn">
           <img 
             src="/assets/Lobby/Arrow.svg" 
