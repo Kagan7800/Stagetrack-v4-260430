@@ -113,7 +113,7 @@ export default function LeftSidebar() {
           </div>
           
           {isItoExpanded && (
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, background: 'transparent', overflow: 'hidden' }}>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, background: 'rgba(0, 0, 0, 0.6)', overflow: 'hidden' }}>
             <InstructorToolbox />
           </div>
         )}
@@ -148,7 +148,7 @@ export default function LeftSidebar() {
           </div>
           
           {isStoExpanded && (
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, background: 'transparent', overflow: 'hidden' }}>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, background: 'rgba(0, 0, 0, 0.6)', overflow: 'hidden' }}>
               <UnifiedToolbox 
                 activeGuest={activeGuest}
                 guestButtons={guestButtons}
