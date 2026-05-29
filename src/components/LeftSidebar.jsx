@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, GraduationCap, Shield } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import InstructorToolbox from './InstructorToolbox';
 import UnifiedToolbox from './UnifiedToolbox';
@@ -10,6 +10,7 @@ export default function LeftSidebar() {
     setIsSidebarOpen,
     activeGuestId,
     activeToolbox,
+    setActiveToolbox,
     participants,
     guestButtons,
     handleToggleGuestButton,
@@ -45,6 +46,18 @@ export default function LeftSidebar() {
     );
   }
 
+  const isInstructorClient = sessionStorage.getItem('stagetrack_role') !== 'student';
+
+  const handleSTO = () => {
+    if (activeGuestId !== null) {
+      setActiveToolbox('student');
+    }
+  };
+
+  const handleITO = () => {
+    setActiveToolbox('instructor');
+  };
+
   // Determine flex values based on expansion states
   const showSto = activeGuestId !== null && activeGuest && activeToolbox === 'student';
   const showIto = activeGuestId === null || activeToolbox === 'instructor';
@@ -65,6 +78,32 @@ export default function LeftSidebar() {
         width: '380px'
       }}
     >
+      {/* 0. Tab switcher bar (Tools Grid) */}
+      {isInstructorClient && (
+        <div className="tools-grid">
+          {/* Standard STO Button */}
+          <button
+            onClick={handleSTO}
+            disabled={activeGuestId === null}
+            className={`tool-btn ${activeToolbox === 'student' && activeGuestId !== null ? 'active' : ''}`}
+            title={activeGuestId === null ? "Select a student to access Student Tools" : "Switch to Student Tools"}
+          >
+            <GraduationCap size={20} style={{ marginBottom: '4px' }} />
+            <span>STO</span>
+          </button>
+
+          {/* Exclusive ITO Button */}
+          <button
+            onClick={handleITO}
+            className={`tool-btn variant-admin ${activeToolbox === 'instructor' || activeGuestId === null ? 'active' : ''}`}
+            title="Switch to Instructor Tools"
+          >
+            <Shield size={20} style={{ marginBottom: '4px' }} />
+            <span>ITO</span>
+          </button>
+        </div>
+      )}
+
       {/* 1. Instructor Tools (ITO) Section */}
       {showIto && (
         <div 
