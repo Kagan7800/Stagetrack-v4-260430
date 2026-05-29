@@ -101,10 +101,28 @@ function App() {
         <div className="top-banner" style={{ backgroundImage: "url('/banner.png')", backgroundSize: '100% 100%', backgroundRepeat: 'no-repeat', backgroundPosition: 'center', position: 'relative' }}>
           {/* Left Side Logo */}
           <div style={{ position: 'absolute', left: '70px', height: '100%', display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
-            <img src="/greenStagetrack_studio.png" alt="Stagetrack Studio" style={{ height: '70%', maxWidth: '100%', objectFit: 'contain' }} />
+            <img 
+              src="/greenStagetrack_studio.png" 
+              alt="Stagetrack Studio" 
+              style={{ 
+                height: '70%', 
+                maxWidth: '100%', 
+                objectFit: 'contain',
+                filter: 'drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.25))'
+              }} 
+            />
           </div>
 
-          <img src="/assets/logo_modern.png" alt="Music Fun Logo" style={{ height: '100%', width: 'auto', objectFit: 'contain' }} />
+          <img 
+            src="/assets/logo_modern.png" 
+            alt="Music Fun Logo" 
+            style={{ 
+              height: '100%', 
+              width: 'auto', 
+              objectFit: 'contain',
+              filter: 'drop-shadow(0px 3px 6px rgba(0, 0, 0, 0.3))'
+            }} 
+          />
         </div>
       ) : (
           <div className="top-banner" style={{ backgroundImage: "linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), url('/assets/SOR/1ui_sor top banner-052826 3.png')", backgroundSize: '100% 100%', backgroundRepeat: 'no-repeat', backgroundPosition: 'center', position: 'relative' }}>
@@ -115,7 +133,7 @@ function App() {
                 height: '80%', 
                 width: 'auto', 
                 objectFit: 'contain',
-                filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.6))'
+                filter: 'drop-shadow(0px 3px 6px rgba(0, 0, 0, 0.4))'
               }} 
             />
             <div className="gradient-divider-bar" style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '6px' }}></div>
