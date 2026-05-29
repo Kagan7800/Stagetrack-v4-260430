@@ -100,6 +100,7 @@ export default function LeftSidebar() {
             onClick={() => setIsSidebarOpen(false)}
             style={{ 
               padding: '14px 16px', 
+              background: 'rgba(0, 0, 0, 0.6)',
               cursor: 'pointer', 
               display: 'flex', 
               justifyContent: 'center', 
@@ -135,6 +136,7 @@ export default function LeftSidebar() {
             onClick={() => setIsStoExpanded(!isStoExpanded)}
             style={{ 
               padding: '14px 16px', 
+              background: 'rgba(0, 0, 0, 0.6)',
               cursor: 'pointer', 
               display: 'flex', 
               justifyContent: 'center', 
