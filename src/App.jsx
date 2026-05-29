@@ -142,15 +142,13 @@ function App() {
                    isActive={activeGuestId === p.id}
                    onClick={() => {
                      if (!isInstructorClient) return;
-                     const isMuted = guestButtons[p.id]?.mute;
-                     if (globalPause || isMuted || p.isBlank) return;
+                     if (p.isBlank) return;
                       setActiveGuestId(p.id);
                       setActiveToolbox("student");
                    }}
                    onDoubleClick={() => {
                      if (!isInstructorClient) return;
-                     const isMuted = guestButtons[p.id]?.mute;
-                     if (globalPause || isMuted || p.isBlank) return;
+                     if (p.isBlank) return;
                       setActiveGuestId(p.id);
                       setActiveToolbox("instructor");
                    }}
@@ -190,15 +188,13 @@ function App() {
                    isActive={activeGuestId === p.id}
                    onClick={() => {
                      if (!isInstructorClient) return;
-                     const isMuted = guestButtons[p.id]?.mute;
-                     if (globalPause || isMuted || p.isBlank) return;
+                     if (p.isBlank) return;
                       setActiveGuestId(p.id);
                       setActiveToolbox("student");
                    }}
                    onDoubleClick={() => {
                      if (!isInstructorClient) return;
-                     const isMuted = guestButtons[p.id]?.mute;
-                     if (globalPause || isMuted || p.isBlank) return;
+                     if (p.isBlank) return;
                       setActiveGuestId(p.id);
                       setActiveToolbox("instructor");
                    }}
