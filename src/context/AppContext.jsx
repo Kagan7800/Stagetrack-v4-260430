@@ -241,18 +241,17 @@ export function AppProvider({ children }) {
     }
   }, [globalPause]);
 
-  // Enforce active guest validity (cannot be blank, muted, or active during global pause)
+  // Enforce active guest validity (cannot be blank)
   useEffect(() => {
     if (activeGuestId !== null) {
       const activeGuest = participants.find(p => p.id === activeGuestId);
-      const isMuted = guestButtons[activeGuestId]?.mute;
-      if (!activeGuest || activeGuest.isBlank || isMuted || globalPause) {
+      if (!activeGuest || activeGuest.isBlank) {
         setTimeout(() => {
           setActiveGuestId(null);
         }, 0);
       }
     }
-  }, [activeGuestId, participants, guestButtons, globalPause]);
+  }, [activeGuestId, participants]);
 
   // MUTUAL EXCLUSIVITY: Doodling vs Upload
   const setIsDoodling = useCallback((val) => {
