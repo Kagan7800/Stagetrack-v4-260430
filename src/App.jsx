@@ -249,6 +249,20 @@ function App() {
             <div className="gradient-divider-bar" style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '6px' }}></div>
           </div>
         )
+      ) : activeTheme === 'sor' ? (
+        <div className="top-banner" style={{ backgroundImage: "linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)), url('/assets/SOR/1ui_sor top banner-052826 3.png')", backgroundSize: '100% 100%', backgroundRepeat: 'no-repeat', backgroundPosition: 'center', position: 'relative' }}>
+          <img 
+            src="/assets/SOR/1logo_sor.png" 
+            alt="School of Rock Logo" 
+            style={{ 
+              height: '80%', 
+              width: 'auto', 
+              objectFit: 'contain',
+              filter: 'drop-shadow(0px 3px 6px rgba(0, 0, 0, 0.4))'
+            }} 
+          />
+          <div className="gradient-divider-bar" style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '6px' }}></div>
+        </div>
       ) : (
         <div className="top-banner" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'relative' }}>
           <div style={{ 
