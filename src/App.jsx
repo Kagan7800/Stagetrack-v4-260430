@@ -243,7 +243,7 @@ function App() {
                 className="sor-logo-text"
               />
               <img 
-                src="/assets/SOR/1logo_sor.png" 
+                src="/assets/SOR/1logo_sor_original_backup.png" 
                 alt="School of Rock Icon" 
                 className="sor-logo-icon"
               />
@@ -260,7 +260,7 @@ function App() {
               className="sor-logo-text"
             />
             <img 
-              src="/assets/SOR/1logo_sor.png" 
+              src="/assets/SOR/1logo_sor_original_backup.png" 
               alt="School of Rock Icon" 
               className="sor-logo-icon"
             />
