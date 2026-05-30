@@ -290,12 +290,14 @@ export default function InstructorToolbox() {
               >
                 undo last
               </button>
+              <span className="undo-spacer" style={{ whiteSpace: 'pre' }}>   </span>
               <button 
                 className="gb-btn"
                 onClick={() => handleAddSticker('instructor', 'UNDO_ALL_IC', true)}
               >
                 all
               </button>
+              <span className="undo-spacer" style={{ whiteSpace: 'pre' }}>   </span>
               <button 
                 className="gb-btn"
                 onDoubleClick={() => handleAddSticker('instructor', 'UNDO_ALL_PEO', true)}
