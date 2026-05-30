@@ -112,7 +112,9 @@ export default function LeftSidebar() {
       };
 
   const panelGridBorderStyle = { 
-    borderTop: '2px solid #ffffff' 
+    borderTop: mode === 'ITO' 
+      ? '2.5px solid rgba(245, 158, 11, 0.7)' 
+      : (isSor ? '2.5px solid #ef4444' : '2.5px solid #3b82f6')
   };
 
 

@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { Palette, Image as ImageIcon, X, Mic, MicOff, Pause, Play, ChevronLeft, ChevronRight, UploadCloud, HardDrive, RotateCw } from 'lucide-react';
+import { Palette, Image as ImageIcon, X, Mic, MicOff, Pause, Play, ChevronLeft, ChevronRight, UploadCloud, HardDrive, RotateCcw } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import heartPng from '../assets/RealHeart.png';
 import crownPng from '../assets/RealCrown.png';
@@ -79,11 +79,11 @@ export default function InstructorToolbox() {
   return (
     <div className="glass-panel sidebar instructor-toolbox" style={{ height: '100%', borderRight: 'none', position: 'relative' }}>
       <div className="toolbox-header" style={{ minHeight: '52px', borderBottom: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '12px 16px', position: 'relative' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px', textAlign: 'center' }}>
-          <span style={{ color: '#ffffff', textShadow: themeTextShadow, fontSize: '1.08rem', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px', textAlign: 'center', maxWidth: '160px', width: '100%' }}>
+          <span style={{ color: '#ffffff', textShadow: themeTextShadow, fontSize: '0.92rem', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block', width: '100%' }} title="Instructor Tools">
             Instructor Tools
           </span>
-          <span style={{ fontSize: '12px', color: '#ffffff', textTransform: 'lowercase', letterSpacing: '-0.02em', fontWeight: 500 }}>
+          <span style={{ fontSize: '12px', color: '#ffffff', textTransform: 'lowercase', letterSpacing: '-0.02em', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block', width: '100%' }}>
             double-click for STO
           </span>
         </div>
@@ -285,20 +285,20 @@ export default function InstructorToolbox() {
                 className="gb-btn"
                 onClick={() => handleAddSticker('instructor', 'UNDO_IC', true)}
               >
-                Undo Last
+                <RotateCcw size={13} /> undo last
               </button>
               <button 
                 className="gb-btn"
                 onClick={() => handleAddSticker('instructor', 'UNDO_ALL_IC', true)}
               >
-                Undo All
+                <RotateCcw size={13} /> all
               </button>
               <button 
                 className="gb-btn undo-peo-btn"
                 onDoubleClick={() => handleAddSticker('instructor', 'UNDO_ALL_PEO', true)}
                 title="Double click to clear all PEO stickers"
               >
-                Undo All PEO
+                <RotateCcw size={13} /> all peo
               </button>
             </div>
           </div>

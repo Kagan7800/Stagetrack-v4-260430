@@ -485,7 +485,7 @@ body {
 
 /* Guest Container (gc) */
 .video-cell {
-  background: #000000;
+  background: rgba(11, 25, 46, 0.7) !important;
   border-radius: 12px;
   border: 1px solid var(--glass-border);
   position: relative;
@@ -952,7 +952,7 @@ body {
   bottom: 4px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(0,0,0,0.6);
+  background: rgba(11, 25, 46, 0.7) !important;
   padding: 2px 6px;
   border-radius: 4px;
   font-size: 1.34rem;
@@ -1278,7 +1278,22 @@ body {
 .instructor-toolbox .ito-buttons-container .upload-row {
   grid-column: span 2;
 }
-.instructor-toolbox .ito-undo-grid,
+.instructor-toolbox .ito-undo-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  width: 100%;
+  margin-top: 8px;
+}
+.instructor-toolbox .ito-undo-grid .gb-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 6px 2px !important;
+  font-size: 0.72rem !important;
+  text-transform: lowercase; /* Make text lowercase to match request */
+}
 .instructor-toolbox .ito-theme-grid,
 .instructor-toolbox .ito-utility-grid {
   display: grid;
@@ -1286,9 +1301,6 @@ body {
   gap: 6px;
   width: 100%;
   margin-top: 8px;
-}
-.instructor-toolbox .ito-undo-grid .undo-peo-btn {
-  grid-column: span 2;
 }
 .instructor-toolbox .gb-btn {
   padding: 6px 4px !important;
