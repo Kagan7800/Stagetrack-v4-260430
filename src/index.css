@@ -1314,7 +1314,7 @@ body {
   font-weight: bold;
   flex-shrink: 0;
   padding-left: 2px;
-  margin-right: 6px;
+  margin-right: 20px;
 }
 .instructor-toolbox .ito-undo-row .gb-btn {
   flex: none !important;
@@ -1323,7 +1323,7 @@ body {
   padding: 0 !important;
   box-shadow: none !important;
   color: #cbd5e1 !important;
-  font-size: 1.02rem !important;
+  font-size: 0.98rem !important;
   font-weight: bold !important;
   text-transform: lowercase;
   white-space: nowrap;
