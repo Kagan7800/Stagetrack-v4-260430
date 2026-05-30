@@ -2654,6 +2654,7 @@ body {
   height: 94%;
   object-fit: cover;
   border-radius: calc(18px * var(--lobby-scale));
+  transform: scaleX(-1);
 }
 
 .lobby-camera-blocked-fallback {
@@ -2979,6 +2980,7 @@ body {
   border-radius: 11px;
   z-index: 1;
   pointer-events: none;
+  transform: scaleX(-1);
 }
 
 .gc-joined-icon-badge {
@@ -3821,6 +3823,7 @@ body {
     width: 100% !important;
     height: 100% !important;
     border-radius: 14px !important;
+    transform: scaleX(-1) !important;
   }
 
   /* Reposition Card 1: Stickers */
