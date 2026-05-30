@@ -17,7 +17,8 @@ export default function InstructorToolbox() {
     metronomeBpm, setMetronomeBpm,
     isMetronomePlaying, setIsMetronomePlaying,
     activeTheme, setActiveTheme,
-    resetStudentState
+    resetStudentState,
+    setPendingRequest
   } = useAppContext();
 
   const isSor = activeTheme === 'sor';
@@ -63,15 +64,27 @@ export default function InstructorToolbox() {
     }
   };
 
+  const handleSimulateRequest = () => {
+    const reqData = {
+      myName: "Jessica",
+      myLittleOne: "Danny",
+      color: "hsl(140, 70%, 60%)",
+      selectedIcon: "Balloons.svg",
+      selectedBorder: "#00FCFC"
+    };
+    localStorage.setItem('stagetrack_lobby_request', JSON.stringify(reqData));
+    setPendingRequest(reqData);
+  };
+
   return (
     <div className="glass-panel sidebar instructor-toolbox" style={{ height: '100%', borderRight: 'none', position: 'relative' }}>
       <div className="toolbox-header" style={{ minHeight: '52px', borderBottom: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '12px 16px', position: 'relative' }}>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px', textAlign: 'center' }}>
-          <span style={{ color: themeTextColor, textShadow: themeTextShadow, fontSize: '1.08rem', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          <span style={{ color: '#ffffff', textShadow: themeTextShadow, fontSize: '1.08rem', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
             Instructor Tools
           </span>
-          <span style={{ fontSize: '12px', color: themeSubtextColor, textTransform: 'lowercase', letterSpacing: '-0.02em', fontWeight: 500 }}>
-            double-click your box to select STO
+          <span style={{ fontSize: '12px', color: '#ffffff', textTransform: 'lowercase', letterSpacing: '-0.02em', fontWeight: 500 }}>
+            double-click for STO
           </span>
         </div>
         <button onClick={() => setIsSidebarOpen(false)} className="close-btn" style={{ position: 'absolute', right: '16px', top: '50%', transform: 'translateY(-50%)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -205,7 +218,7 @@ export default function InstructorToolbox() {
               {globalPause ? <Play size={18} /> : <Pause size={18} />} Pause PEO
             </button>
 
-            <div style={{ display: 'flex', gap: '8px', width: '100%' }}>
+            <div className="upload-row" style={{ display: 'flex', gap: '8px', width: '100%' }}>
               <div className="upload-wrapper" style={{ position: 'relative', flex: 1 }}>
                 <button 
                   className="gb-btn" 
@@ -267,57 +280,64 @@ export default function InstructorToolbox() {
               ))}
             </div>
             
-            <div style={{ display: 'flex', gap: '6px', marginTop: '8px', width: '100%' }}>
+            <div className="ito-undo-grid">
               <button 
                 className="gb-btn"
                 onClick={() => handleAddSticker('instructor', 'UNDO_IC', true)}
-                style={{ flex: 1, padding: '8px 4px', fontSize: '0.85rem', whiteSpace: 'normal', height: 'auto', minWidth: 0, display: 'flex', justifyContent: 'center', alignItems: 'center', textAlign: 'center', lineHeight: '1.2' }}
               >
-                Undo Last Sticker
+                Undo Last
               </button>
               <button 
                 className="gb-btn"
                 onClick={() => handleAddSticker('instructor', 'UNDO_ALL_IC', true)}
-                style={{ flex: 1, padding: '8px 4px', fontSize: '0.85rem', whiteSpace: 'normal', height: 'auto', minWidth: 0, display: 'flex', justifyContent: 'center', alignItems: 'center', textAlign: 'center', lineHeight: '1.2' }}
               >
-                Undo all Stickers
+                Undo All
               </button>
               <button 
-                className="gb-btn"
+                className="gb-btn undo-peo-btn"
                 onDoubleClick={() => handleAddSticker('instructor', 'UNDO_ALL_PEO', true)}
-                style={{ flex: 1, padding: '8px 4px', fontSize: '0.85rem', whiteSpace: 'normal', height: 'auto', minWidth: 0, display: 'flex', justifyContent: 'center', alignItems: 'center', textAlign: 'center', lineHeight: '1.2' }}
                 title="Double click to clear all PEO stickers"
               >
-                Undo all peo
+                Undo All PEO
               </button>
             </div>
           </div>
 
+          <div style={{ width: '85%', height: '1px', background: 'var(--glass-border)', margin: '12px auto' }} />
+
           {/* --- STUDIO THEME SELECTOR --- */}
-          <div className="ito-theme-selector-container" style={{ display: 'flex', gap: '6px', alignItems: 'center', width: '100%', marginTop: '0px', paddingTop: '1px' }}>
-            <div style={{ display: 'flex', gap: '4px', flex: 1 }}>
-              <button 
-                className={`gb-btn ${activeTheme === 'music-fun' ? 'active active-music' : ''}`}
-                onClick={() => setActiveTheme('music-fun')}
-                style={{ flex: 1, padding: '6px 4px', fontSize: '0.78rem', whiteSpace: 'nowrap', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '2px', border: 'none' }}
-              >
-                Music
-              </button>
-              <button 
-                className={`gb-btn ${activeTheme === 'sor' ? 'active active-sor' : ''}`}
-                onClick={() => setActiveTheme('sor')}
-                style={{ flex: 1, padding: '6px 4px', fontSize: '0.78rem', whiteSpace: 'nowrap', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '2px', border: 'none' }}
-              >
-                SOR
-              </button>
-            </div>
+          <div className="ito-theme-grid">
+            <button 
+              className={`gb-btn ${activeTheme === 'music-fun' ? 'active active-music' : ''}`}
+              onClick={() => setActiveTheme('music-fun')}
+            >
+              Music Theme
+            </button>
+            <button 
+              className={`gb-btn ${activeTheme === 'sor' ? 'active active-sor' : ''}`}
+              onClick={() => setActiveTheme('sor')}
+            >
+              SOR Theme
+            </button>
+          </div>
+
+          <div style={{ width: '85%', height: '1px', background: 'var(--glass-border)', margin: '12px auto' }} />
+
+          <div className="ito-utility-grid">
             <button 
               className="gb-btn"
               onClick={resetStudentState}
-              style={{ width: 'auto', padding: '6px 10px', display: 'flex', justifyContent: 'center', alignItems: 'center', borderRadius: '4px', border: 'none' }}
               title="Reset Room / Refresh Session"
             >
-              <RotateCw size={16} />
+              Reset Room
+            </button>
+
+            <button 
+              className="gb-btn simulate-btn"
+              onClick={handleSimulateRequest}
+              style={{ backgroundColor: '#fbbf24', color: '#000000', fontWeight: 'bold' }}
+            >
+              Simulate PEO
             </button>
           </div>
 

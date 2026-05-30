@@ -39,7 +39,7 @@ export function AppProvider({ children }) {
         }
       }
     } catch { /* ignore */ }
-    return 1;
+    return 5;
   }, []);
 
   const totalSlots = MOCK_USER_COUNT === 1
@@ -53,18 +53,43 @@ export function AppProvider({ children }) {
     try {
       const params = new URLSearchParams(window.location.search);
       const hasUserParam = params.get('users') || params.get('user') || params.get('count') || params.get('peo') || params.get('peos');
-      if (hasUserParam) return true;
+      if (hasUserParam) {
+        sessionStorage.setItem('stagetrack_role', 'instructor');
+        return true;
+      }
+
+      const role = sessionStorage.getItem('stagetrack_role');
+      if (role === 'instructor') {
+        return true;
+      }
 
       const res = localStorage.getItem('stagetrack_lobby_response');
       if (res && JSON.parse(res).status === 'accepted') {
         return true;
       }
     } catch { /* ignore */ }
-    return true;
+    return false;
   });
 
-  const [lobbyStatus, setLobbyStatus] = useState('initial'); // 'initial' | 'waiting' | 'denied'
-  const [pendingRequest, setPendingRequest] = useState(null);
+  const [lobbyStatus, setLobbyStatus] = useState(() => {
+    try {
+      const saved = localStorage.getItem('stagetrack_lobby_response');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.status === 'pending') return 'waiting';
+        if (parsed.status === 'denied') return 'denied';
+      }
+    } catch {}
+    return 'initial';
+  });
+  const [pendingRequest, setPendingRequest] = useState(() => {
+    try {
+      const saved = localStorage.getItem('stagetrack_lobby_request');
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
 
   const generateDefaultParticipants = useCallback((includeRestored = true) => {
     // Helper function to map 1-based display slot number to grid index
@@ -83,10 +108,30 @@ export function AppProvider({ children }) {
     };
 
     const list = new Array(totalSlots);
-    let blankCounter = 0;
+
+    // Force PEO 1 (index 0) to be Instructor Client
+    list[0] = { 
+      id: 'instructor-ic', 
+      name: 'Instructor', 
+      color: '#3b82f6', 
+      initial: 'I', 
+      isInstructor: true 
+    };
+
+    // Force PEO 2 (index 1) to be a blank slot (guest join destination)
+    list[1] = { 
+      id: 'blank-1', 
+      isBlank: true, 
+      blankIndex: 1 
+    };
+
+    let blankCounter = 1;
 
     for (let slotNum = 1; slotNum <= totalSlots; slotNum++) {
       const idx = getArrayIndex(slotNum);
+      if (idx === 0 || idx === 1) {
+        continue;
+      }
       
       // Determine if this slot is a designated blank slot
       let isDesignatedBlank = false;
@@ -704,6 +749,7 @@ export function AppProvider({ children }) {
     sessionStorage.setItem('stagetrack_role', 'student');
     setLobbyStatus('waiting');
     const reqData = { myName, myLittleOne, color, selectedIcon, selectedBorder };
+    console.log("Requesting access with data in student tab:", reqData);
     localStorage.setItem('stagetrack_lobby_request', JSON.stringify(reqData));
     localStorage.setItem('stagetrack_lobby_response', JSON.stringify({ status: 'pending' }));
   }, [resetStudentState]);
@@ -768,8 +814,10 @@ export function AppProvider({ children }) {
   // Listen to cross-tab storage actions
   useEffect(() => {
     const handleStorage = (e) => {
+      console.log("Storage event fired:", e.key, "New value:", e.newValue);
       // For instructor: listen for new requests
       if (e.key === 'stagetrack_lobby_request') {
+        console.log("Received lobby request event:", e.newValue);
         if (e.newValue) {
           setPendingRequest(JSON.parse(e.newValue));
         } else {
@@ -853,10 +901,14 @@ export function AppProvider({ children }) {
     window.addEventListener('storage', handleStorage);
     window.addEventListener('beforeunload', handleBeforeUnload);
     
-    // Initial check on load: close any join requests when refresh
+    // Initial check on load: do not aggressively clear active requests to maintain tab status on reload
     try {
-      localStorage.removeItem('stagetrack_lobby_request');
-      localStorage.removeItem('stagetrack_lobby_response');
+      // Clean up response if it was accepted in a previous session
+      const savedResponse = localStorage.getItem('stagetrack_lobby_response');
+      if (savedResponse && JSON.parse(savedResponse).status === 'accepted') {
+        localStorage.removeItem('stagetrack_lobby_request');
+        localStorage.removeItem('stagetrack_lobby_response');
+      }
     } catch { /* ignore */ }
 
     return () => {

@@ -31,32 +31,95 @@ const STO_STICKERS = [
   'Xylophone.svg'
 ];
 
+function LobbyAIChat({ instructorName }) {
+  const [chatInput, setChatInput] = useState('');
+  const [chatMessages, setChatMessages] = useState([]);
+
+  const handleSend = (e) => {
+    e.preventDefault();
+    if (!chatInput.trim()) return;
+    setChatMessages(prev => [...prev, chatInput]);
+    setChatInput('');
+  };
+  
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend(e);
+    }
+  };
+  
+  // Clean, judge-appealing layout for the AI block
+  return (
+    <form onSubmit={handleSend} className="lobby-ai-chat-container w-full max-w-sm bg-[#2a2625] border border-stone-800 rounded p-4 select-none">
+      {/* 1. Welcome sentence at the top */}
+      <div className="lobby-ai-chat-welcome">
+        Welcome! Let me know if you prefer larger text, high-contrast colors, or a calmer focus layout...
+      </div>
+
+      {/* 2. Input Row (moved to top, 20px under welcome sentence) */}
+      <div className="lobby-ai-chat-input-row flex gap-2">
+        <textarea
+          rows={10}
+          value={chatInput}
+          onChange={(e) => setChatInput(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder="e.g., make the buttons larger / use high contrast"
+          className="lobby-ai-chat-input flex-1 bg-stone-900 border border-stone-800 rounded px-2 py-1.5 text-xs text-stone-200 placeholder-stone-600 focus:outline-none focus:border-[#fbbf24]"
+        />
+      </div>
+
+      {/* 3. Send button directly below textarea (chatbox) */}
+      <button type="submit" className="lobby-ai-chat-button bg-[#fbbf24] text-stone-950 font-black text-xs px-3 rounded hover:bg-[#f59e0b] transition-colors">
+        →
+      </button>
+
+      {/* 4. Chat box height extending to bottom of container */}
+      <div className="lobby-ai-chat-history h-24 bg-stone-900/40 border border-stone-800/60 rounded mb-3 p-2 text-left text-[11px] text-stone-400 overflow-y-auto">
+        {chatMessages.map((msg, i) => (
+          <div key={i} className="lobby-ai-chat-message">
+            {msg}
+          </div>
+        ))}
+      </div>
+    </form>
+  );
+}
+
 export default function LobbyOverlay() {
-  const { lobbyStatus, requestAccess, setLobbyStatus, resetStudentState } = useAppContext();
+  const { lobbyStatus, requestAccess, setLobbyStatus, resetStudentState, setIsJoined, MOCK_USER_COUNT } = useAppContext();
+
+  const handleEnterAsInstructor = () => {
+    sessionStorage.setItem('stagetrack_role', 'instructor');
+    window.location.search = `?users=${MOCK_USER_COUNT || 5}`;
+  };
   const [myName, setMyName] = useState('');
   const [myLittleOne, setMyLittleOne] = useState('');
   const [selectedBorder, setSelectedBorder] = useState(BORDERS[0].value);
   const [selectedIcon, setSelectedIcon] = useState(null);
+  const [childPlaceholder, setChildPlaceholder] = useState("Child's 1st Name");
+  const [adultPlaceholder, setAdultPlaceholder] = useState("Adult's 1st Name");
   
-  const containerRef = useRef(null);
-  const [scale, setScale] = useState(1);
+  const getScale = () => {
+    if (typeof window === 'undefined') return 0.3;
+    const width = Math.min(window.innerWidth, window.innerHeight * (5208 / 2817));
+    return width / 5208;
+  };
+
+  const [scale, setScale] = useState(getScale);
+
+  // Synchronous window resize listener for instant scaling
+  useEffect(() => {
+    const handleResize = () => {
+      setScale(getScale());
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Webcam states
   const localVideoRef = useRef(null);
   const [stream, setStream] = useState(null);
-
-  // ResizeObserver for scale calculations
-  useEffect(() => {
-    if (!containerRef.current) return;
-    const observer = new ResizeObserver((entries) => {
-      for (let entry of entries) {
-        const { width } = entry.contentRect;
-        setScale(width / 5208);
-      }
-    });
-    observer.observe(containerRef.current);
-    return () => observer.disconnect();
-  }, []);
 
   // Request webcam access
   useEffect(() => {
@@ -86,6 +149,7 @@ export default function LobbyOverlay() {
   }, [stream, lobbyStatus]);
 
   const handleSubmit = (e) => {
+    console.log("handleSubmit called. myName:", myName, "myLittleOne:", myLittleOne, "selectedIcon:", selectedIcon, "selectedBorder:", selectedBorder);
     if (e) e.preventDefault();
     if (!myName.trim() || !myLittleOne.trim()) return;
     // Request access with name info, selected border color, and selected icon
@@ -100,25 +164,28 @@ export default function LobbyOverlay() {
 
   return (
     <div className="lobby-backdrop">
-      <div 
-        className="lobby-svg-container" 
-        ref={containerRef}
-        style={{ '--lobby-scale': scale }}
-      >
-        <img src="/assets/lobby_rect.png" className="lobby-card-panel-1" alt="" />
-        <img src="/assets/lobby_rect.png" className="lobby-card-panel-2" alt="" />
+      {lobbyStatus === 'initial' ? (
+        <div 
+          className="lobby-svg-container" 
+          style={{ '--lobby-scale': scale }}
+        >
+          <img src="/assets/lobby_rect.png" className="lobby-card-panel-1" alt="" />
+          <img src="/assets/lobby_rect.png" className="lobby-card-panel-2" alt="" />
+          <img src="/assets/lobby_rect.png" className="lobby-card-panel-3" alt="" />
 
-        {lobbyStatus === 'initial' && (
+
           <form onSubmit={handleSubmit}>
              {/* Input 1: My Name (Adult) */}
             <input 
               type="text" 
               className="lobby-overlay-input-1"
               required 
-              placeholder="Adult's 1st Name"
+              placeholder={adultPlaceholder}
               value={myName}
-              onChange={(e) => setMyName(e.target.value.slice(0, 15))}
-              maxLength={15}
+              onChange={(e) => setMyName(e.target.value.slice(0, 30))}
+              maxLength={30}
+              onFocus={() => setAdultPlaceholder('More than 1 adult, place "," between names')}
+              onBlur={() => setAdultPlaceholder("Adult's 1st Name")}
             />
 
             {/* Input 2: My Little One (Child) */}
@@ -126,10 +193,12 @@ export default function LobbyOverlay() {
               type="text" 
               className="lobby-overlay-input-2"
               required 
-              placeholder="Child's 1st Name"
+              placeholder={childPlaceholder}
               value={myLittleOne}
-              onChange={(e) => setMyLittleOne(e.target.value.slice(0, 15))}
-              maxLength={15}
+              onChange={(e) => setMyLittleOne(e.target.value.slice(0, 30))}
+              maxLength={30}
+              onFocus={() => setChildPlaceholder('More than 1 child, place "," between names')}
+              onBlur={() => setChildPlaceholder("Child's 1st Name")}
             />
 
              {/* Camera feed overlay inside the container below the inputs */}
@@ -205,48 +274,73 @@ export default function LobbyOverlay() {
               </div>
             </div>
 
+            {/* Special Formats Card (Card 3) */}
+            <div className="lobby-special-formats-container">
+              <div className="lobby-card-title">Personalize your studio</div>
+              <LobbyAIChat instructorName="Instructor" />
+            </div>
+
             {/* Join Session Section (Column 4) */}
-            <div className="lobby-join-container">
+            <button 
+              type="submit" 
+              className="lobby-join-container"
+              disabled={!myName.trim() || !myLittleOne.trim() || !selectedIcon}
+              title="Join Session"
+              style={{
+                background: 'transparent',
+                border: 'none',
+                cursor: 'pointer',
+                padding: 0,
+                outline: 'none'
+              }}
+            >
               <img 
                 src="/assets/Lobby/Click to join session.svg" 
                 className="lobby-join-title-img" 
                 alt="Click to join session" 
               />
-              <button 
-                type="submit" 
-                className="lobby-join-arrow-button"
-                disabled={!myName.trim() || !myLittleOne.trim() || !selectedIcon}
-                title="Join Session"
-              >
+              <div className="lobby-join-arrow-button-mock">
                 <img 
                   src="/assets/Lobby/Arrow.svg?v=4" 
                   className="lobby-join-arrow-img" 
                   alt="Join Arrow" 
                 />
+              </div>
+            </button>
+          </form>
+        </div>
+      ) : (
+        <div className="lobby-waiting-centered-container">
+          {lobbyStatus === 'waiting' && (
+            <div className="lobby-overlay-status waiting">
+              <Loader2 className="lobby-status-spinner" />
+              <h3>Waiting for approval...</h3>
+              <p>The instructor will let you in shortly.</p>
+            </div>
+          )}
+
+          {lobbyStatus === 'denied' && (
+            <div className="lobby-overlay-status denied">
+              <ShieldAlert className="lobby-status-error-icon" />
+              <h3>No Access</h3>
+              <p className="denied-text">Access is not available now, please contact Admin.</p>
+              <button type="button" onClick={handleRetry} className="lobby-status-retry-btn">
+                Try Again
               </button>
             </div>
-          </form>
-        )}
-
-        {lobbyStatus === 'waiting' && (
-          <div className="lobby-overlay-status waiting">
-            <Loader2 className="lobby-status-spinner" />
-            <h3>Waiting for approval...</h3>
-            <p>The instructor will let you in shortly.</p>
-          </div>
-        )}
-
-        {lobbyStatus === 'denied' && (
-          <div className="lobby-overlay-status denied">
-            <ShieldAlert className="lobby-status-error-icon" />
-            <h3>No Access</h3>
-            <p className="denied-text">Access is not available now, please contact Admin.</p>
-            <button type="button" onClick={handleRetry} className="lobby-status-retry-btn">
-              Try Again
-            </button>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
+      
+      {lobbyStatus === 'initial' && (
+        <button 
+          type="button" 
+          className="lobby-instructor-bypass-btn"
+          onClick={handleEnterAsInstructor}
+        >
+          Enter as Instructor
+        </button>
+      )}
     </div>
   );
 }

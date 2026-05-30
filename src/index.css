@@ -165,6 +165,11 @@ body {
   /* Reduced by ~50% from 350px/400px */
   display: flex;
   flex-direction: column;
+  flex-shrink: 0; /* Prevent squishing and layout cutoff */
+  height: calc(100% + 20px) !important;
+  margin-top: -10px;
+  margin-bottom: -10px;
+  margin-right: -10px; /* Sit flush with right screen edge */
 }
 
 /* Center Grid */
@@ -393,7 +398,7 @@ body {
 
 .gt-buttons-col {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 8px;
   margin-top: 16px;
   width: 100%;
@@ -829,7 +834,7 @@ body {
   color: white;
   font-family: 'Risque', serif;
   outline: none;
-  width: 100%;
+  min-width: 0;
 }
 
 .icon-btn {
@@ -1262,13 +1267,36 @@ body {
   border: none !important;
 }
 .instructor-toolbox .ito-buttons-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   flex: none;
   min-height: 0;
   margin-bottom: 12px;
+  gap: 8px;
+}
+.instructor-toolbox .ito-buttons-container .metronome-wrapper,
+.instructor-toolbox .ito-buttons-container .upload-row {
+  grid-column: span 2;
+}
+.instructor-toolbox .ito-undo-grid,
+.instructor-toolbox .ito-theme-grid,
+.instructor-toolbox .ito-utility-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 6px;
+  width: 100%;
+  margin-top: 8px;
+}
+.instructor-toolbox .ito-undo-grid .undo-peo-btn {
+  grid-column: span 2;
+}
+.instructor-toolbox .gb-btn {
+  padding: 6px 4px !important;
+  font-size: 0.85rem !important;
+  font-weight: bold !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 /* Tic-Tac-Toe Grid for Instructor Toolbox */
 .ttt-grid {
@@ -1373,7 +1401,7 @@ body {
 }
 .instructor-toolbox .ito-sticker-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(68px, 1fr));
+  grid-template-columns: repeat(4, 1fr);
   gap: 8px;
   width: 100%;
   margin: 0 0 12px 0;
@@ -1418,6 +1446,7 @@ body {
 }
 .chat-header h2 {
   font-size: 1.38rem !important;
+  font-family: 'Risque', serif !important;
 }
 
 /* Drawing Canvas Picker Dividers, Sliders, and Controls */
@@ -1971,7 +2000,7 @@ body {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: transparent;
+  background: #1745b9;
   z-index: 9999;
   display: flex;
   align-items: center;
@@ -1986,7 +2015,8 @@ body {
   max-width: calc(100vh * (5208 / 2817));
   max-height: 100vh;
   aspect-ratio: 5208 / 2817;
-  background: transparent;
+  background: url('/assets/Lobby.svg') no-repeat center;
+  background-size: contain;
 }
 
 .lobby-svg-img {
@@ -2045,7 +2075,7 @@ body {
 
 .lobby-card-panel-1 {
   position: absolute;
-  left: 32.392%;
+  left: 25.24%;
   top: 19.216%;
   width: 19.777%;
   height: 74.157%;
@@ -2056,7 +2086,18 @@ body {
 
 .lobby-card-panel-2 {
   position: absolute;
-  left: 53.802%;
+  left: 46.65%;
+  top: 19.216%;
+  width: 19.777%;
+  height: 74.157%;
+  object-fit: fill;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.lobby-card-panel-3 {
+  position: absolute;
+  left: 68.06%;
   top: 19.216%;
   width: 19.777%;
   height: 74.157%;
@@ -2067,17 +2108,18 @@ body {
 
 .lobby-overlay-input-1 {
   position: absolute;
-  left: 11.204%;
+  left: 4.377%;
   top: 41.977%;
   width: 18.683%;
   height: 6.141%;
   background: rgba(255, 255, 255, 0.08) !important;
-  border: calc(3px * var(--lobby-scale)) solid rgba(255, 255, 255, 0.2) !important;
+  border: calc(1.5px * var(--lobby-scale)) solid rgba(255, 255, 255, 0.2) !important;
   border-radius: calc(14px * var(--lobby-scale)) !important;
   outline: none;
   color: white;
-  font-size: calc(48px * var(--lobby-scale));
-  padding: calc(15px * var(--lobby-scale)) calc(35px * var(--lobby-scale)) 0 calc(35px * var(--lobby-scale));
+  font-size: calc(45.6px * var(--lobby-scale));
+  padding: calc(15px * var(--lobby-scale)) 0 0 0;
+  text-align: center;
   font-family: 'Risque', serif;
   box-sizing: border-box;
   transition: all 0.3s;
@@ -2086,23 +2128,24 @@ body {
 
 .lobby-overlay-input-1:focus {
   background: rgba(255, 255, 255, 0.15) !important;
-  border-color: rgba(255, 255, 255, 0.65) !important;
-  box-shadow: 0 0 calc(20px * var(--lobby-scale)) rgba(255, 255, 255, 0.15) !important;
+  border-color: #fbbf24 !important;
+  box-shadow: 0 0 calc(20px * var(--lobby-scale)) rgba(251, 191, 36, 0.25) !important;
 }
 
 .lobby-overlay-input-2 {
   position: absolute;
-  left: 11.204%;
+  left: 4.377%;
   top: 51.313%;
   width: 18.683%;
   height: 6.141%;
   background: rgba(255, 255, 255, 0.08) !important;
-  border: calc(3px * var(--lobby-scale)) solid rgba(255, 255, 255, 0.2) !important;
+  border: calc(1.5px * var(--lobby-scale)) solid rgba(255, 255, 255, 0.2) !important;
   border-radius: calc(14px * var(--lobby-scale)) !important;
   outline: none;
   color: white;
-  font-size: calc(48px * var(--lobby-scale));
-  padding: calc(15px * var(--lobby-scale)) calc(35px * var(--lobby-scale)) 0 calc(35px * var(--lobby-scale));
+  font-size: calc(45.6px * var(--lobby-scale));
+  padding: calc(15px * var(--lobby-scale)) 0 0 0;
+  text-align: center;
   font-family: 'Risque', serif;
   box-sizing: border-box;
   transition: all 0.3s;
@@ -2111,8 +2154,8 @@ body {
 
 .lobby-overlay-input-2:focus {
   background: rgba(255, 255, 255, 0.15) !important;
-  border-color: rgba(255, 255, 255, 0.65) !important;
-  box-shadow: 0 0 calc(20px * var(--lobby-scale)) rgba(255, 255, 255, 0.15) !important;
+  border-color: #fbbf24 !important;
+  box-shadow: 0 0 calc(20px * var(--lobby-scale)) rgba(251, 191, 36, 0.25) !important;
 }
 
 .lobby-overlay-input-1::placeholder,
@@ -2525,7 +2568,7 @@ body {
 
 .lobby-camera-preview-container {
   position: absolute;
-  left: 10.983%;
+  left: 3.83%;
   top: 62.383%;
   width: 19.777%;
   height: 30.99%;
@@ -2656,7 +2699,7 @@ body {
 /* Join Session Section styled with SVG assets */
 .lobby-join-container {
   position: absolute;
-  left: 75.211%;
+  left: calc(89.47% + 15px);
   top: 19.216%;
   width: 6.701%;
   height: 74.157%;
@@ -2673,14 +2716,15 @@ body {
   width: calc(349px * var(--lobby-scale));
   height: auto;
   pointer-events: none;
+  display: block;
+  margin: 0 auto;
 }
 
-.lobby-join-arrow-button {
+.lobby-join-arrow-button-mock {
   width: calc(328px * var(--lobby-scale));
   height: calc(259px * var(--lobby-scale));
   background: transparent !important;
   border: none !important;
-  cursor: pointer;
   outline: none;
   display: flex;
   align-items: center;
@@ -2689,12 +2733,13 @@ body {
   transition: transform 0.2s, filter 0.2s;
 }
 
-.lobby-join-arrow-button:hover:not(:disabled) {
+.lobby-join-container:hover:not(:disabled) .lobby-join-arrow-button-mock {
   transform: scale(1.08);
 }
 
-.lobby-join-arrow-button:disabled {
-  cursor: not-allowed;
+.lobby-join-container:disabled {
+  cursor: not-allowed !important;
+  opacity: 0.55;
 }
 
 .lobby-join-arrow-img {
@@ -2703,10 +2748,132 @@ body {
   object-fit: contain;
   pointer-events: none;
   transition: all 0.2s;
+  display: block;
+  margin: 0 auto;
 }
 
-.lobby-join-arrow-button:hover:not(:disabled) .lobby-join-arrow-img {
+.lobby-join-container:hover:not(:disabled) .lobby-join-arrow-img {
   filter: drop-shadow(0 0 calc(15px * var(--lobby-scale)) rgba(255, 255, 255, 0.6));
+}
+
+/* Special Formats Card (Card 3) styled for Lobby UI */
+.lobby-special-formats-container {
+  position: absolute;
+  left: 68.06%;
+  top: 19.216%;
+  width: 19.777%;
+  height: 74.157%;
+  padding: calc(140px * var(--lobby-scale)) calc(38px * var(--lobby-scale)) calc(30px * var(--lobby-scale)) calc(38px * var(--lobby-scale));
+  box-sizing: border-box;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.lobby-ai-chat-container {
+  width: 100%;
+  flex: 1;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: calc(35px * var(--lobby-scale)) 0 0 0 !important;
+  user-select: none;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.lobby-ai-chat-welcome {
+  font-size: calc(48px * var(--lobby-scale)) !important;
+  color: #cbd5e1 !important;
+  text-shadow: 0 calc(1.5px * var(--lobby-scale)) calc(3px * var(--lobby-scale)) rgba(0, 0, 0, 0.6) !important;
+  text-align: center !important;
+  width: 100% !important;
+  line-height: 1.35 !important;
+  margin-top: calc(90px * var(--lobby-scale)) !important;
+  margin-bottom: calc(20px * var(--lobby-scale)) !important;
+  box-sizing: border-box;
+}
+
+.lobby-ai-chat-input-row {
+  display: flex !important;
+  gap: calc(15px * var(--lobby-scale)) !important;
+  width: 100% !important;
+  box-sizing: border-box;
+  margin-bottom: calc(5px * var(--lobby-scale)) !important;
+}
+
+.lobby-ai-chat-input {
+  flex: 1 !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: calc(1.5px * var(--lobby-scale)) solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: calc(14px * var(--lobby-scale)) !important;
+  padding: calc(15px * var(--lobby-scale)) calc(20px * var(--lobby-scale)) !important;
+  font-size: calc(45.6px * var(--lobby-scale)) !important;
+  color: #e4e4e7 !important;
+  outline: none !important;
+  box-sizing: border-box;
+  transition: all 0.3s;
+  text-align: center !important;
+  resize: none !important;
+}
+
+.lobby-ai-chat-input:focus {
+  border-color: #fbbf24 !important;
+  box-shadow: 0 0 calc(15px * var(--lobby-scale)) rgba(251, 191, 36, 0.2) !important;
+}
+
+.lobby-ai-chat-input::placeholder {
+  color: #71717a !important;
+}
+
+.lobby-ai-chat-button {
+  background: transparent !important;
+  color: #fbbf24 !important;
+  font-weight: 900 !important;
+  font-size: calc(96px * var(--lobby-scale)) !important;
+  width: 100% !important;
+  height: calc(100px * var(--lobby-scale)) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: calc(14px * var(--lobby-scale)) !important;
+  border: calc(1.5px * var(--lobby-scale)) solid #fbbf24 !important;
+  cursor: pointer !important;
+  transition: all 0.2s !important;
+  box-sizing: border-box;
+  margin-bottom: calc(20px * var(--lobby-scale)) !important;
+}
+
+.lobby-ai-chat-button:hover {
+  background: rgba(251, 191, 36, 0.15) !important;
+}
+
+.lobby-ai-chat-history {
+  flex: 1 !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  margin-top: 0 !important;
+  margin-bottom: calc(68px * var(--lobby-scale)) !important;
+  padding: 0 !important;
+  text-align: center !important;
+  font-size: calc(48px * var(--lobby-scale)) !important;
+  color: #cbd5e1 !important;
+  overflow-y: auto !important;
+  box-sizing: border-box;
+  line-height: 1.35 !important;
+}
+
+.lobby-ai-chat-message {
+  font-size: calc(48px * var(--lobby-scale)) !important;
+  color: #cbd5e1 !important;
+  text-align: center !important;
+  margin-top: calc(10px * var(--lobby-scale)) !important;
+  line-height: 1.35 !important;
 }
 
 /* Sparkle filter animation for instructor pending PEO cell */
@@ -2767,7 +2934,7 @@ body {
 /* STO Stickers grid in lobby Card 1 (Left Side Box) */
 .lobby-stickers-grid {
   position: absolute;
-  left: 32.392%;
+  left: 25.24%;
   top: 19.216%;
   width: 19.777%;
   height: 74.157%;
@@ -2843,7 +3010,7 @@ body {
 /* Border Color Selection inside Card 2 (Right Side Box) */
 .lobby-colors-grid {
   position: absolute;
-  left: 53.802%;
+  left: 46.65%;
   top: 19.216%;
   width: 19.777%;
   height: 74.157%;
@@ -2954,7 +3121,7 @@ body {
 .instructor-toolbox .ito-theme-label,
 .instructor-toolbox .gb-btn:not([style*="color: white"]):not([style*="color:white"]),
 .instructor-toolbox .ito-theme-select,
-.instructor-toolbox span,
+  .instructor-toolbox .toolbox-content span,
 .unified-toolbox,
 .unified-toolbox h2,
 .unified-toolbox h3,
@@ -2976,6 +3143,10 @@ body {
 }
 .chat-sidebar {
   background: transparent !important;
+  border-radius: 0px !important;
+  border-right: none !important;
+  border-top: none !important;
+  border-bottom: none !important;
 }
 
 /* Edge-to-Edge Gradient Bar under SOR Logo */
@@ -3324,4 +3495,942 @@ body {
   100% {
     transform: translate3d(0, 250px, 0);
   }
+}
+
+.lobby-instructor-bypass-btn {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.7);
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  z-index: 100;
+  transition: all 0.2s ease-in-out;
+}
+
+.lobby-instructor-bypass-btn:hover {
+  background: rgba(255, 255, 255, 0.18);
+  color: white;
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.15);
+}
+
+.lobby-waiting-centered-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  z-index: 10;
+}
+
+.lobby-waiting-centered-container .lobby-overlay-status {
+  position: relative;
+  left: auto;
+  top: auto;
+  width: 450px;
+  height: 350px;
+  max-width: 90%;
+  max-height: 90%;
+  border-radius: 24px;
+  border: 5px solid rgba(255, 255, 255, 0.15);
+  background: rgba(23, 69, 185, 0.96);
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 30px;
+  text-align: center;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  animation: fadeInStatus 0.3s ease-out;
+}
+
+.lobby-waiting-centered-container .lobby-status-spinner {
+  width: 80px !important;
+  height: 80px !important;
+  animation: spin 1.5s linear infinite;
+  color: #4ade80;
+  filter: drop-shadow(0 0 16px rgba(34, 197, 94, 0.5));
+}
+
+.lobby-waiting-centered-container .lobby-overlay-status h3 {
+  font-size: 2.2rem;
+  font-family: 'Risque', serif;
+  color: #4ade80;
+  text-shadow: 0 0 16px rgba(34, 197, 94, 0.3);
+  margin: 0;
+}
+
+.lobby-waiting-centered-container .lobby-overlay-status p {
+  font-size: 1.2rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.lobby-waiting-centered-container .lobby-status-error-icon {
+  width: 90px !important;
+  height: 90px !important;
+  color: #ef4444;
+  filter: drop-shadow(0 0 24px rgba(239, 68, 68, 0.5));
+}
+
+.lobby-waiting-centered-container .denied-text {
+  font-size: 1.35rem !important;
+  color: #f87171 !important;
+  font-weight: bold;
+}
+
+.lobby-waiting-centered-container .lobby-status-retry-btn {
+  font-size: 1.1rem;
+  padding: 10px 24px;
+  border-radius: 30px;
+  border: 3px solid rgba(255, 255, 255, 0.2) !important;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Risque', serif;
+  font-weight: bold;
+  outline: none;
+}
+
+.lobby-waiting-centered-container .lobby-status-retry-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-4px);
+}
+
+.grayscale-video {
+  filter: grayscale(100%);
+}
+
+/* --- iPad & Tablet Layout Optimizations (widths <= 1024px) --- */
+@media (max-width: 1024px) {
+  /* Left Sidebar Squeezing Flow Mode */
+  .instructor-left-sidebar {
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    height: calc(100% + 20px) !important;
+    margin-top: -10px !important;
+    margin-bottom: -10px !important;
+    margin-left: -10px !important;
+    flex-shrink: 0 !important;
+    box-shadow: none !important;
+  }
+  
+  .instructor-left-sidebar.closed {
+    width: 40px !important;
+    box-shadow: none !important;
+    background: transparent !important;
+  }
+  
+  .instructor-left-sidebar.open {
+    width: 250px !important;
+  }
+
+  .instructor-left-sidebar .sidebar {
+    height: 100% !important;
+    margin-top: 0 !important;
+    background: rgba(18, 19, 24, 0.95) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
+    box-shadow: none !important;
+  }
+
+  /* Right Sidebar (Chat) Squeezing Flow Mode */
+  .right-sidebar {
+    position: relative !important;
+    right: auto !important;
+    top: auto !important;
+    height: calc(100% + 20px) !important;
+    width: 320px !important;
+    margin-top: -10px !important;
+    margin-bottom: -10px !important;
+    margin-right: -10px !important;
+    flex-shrink: 0 !important;
+    box-shadow: none !important;
+    background: rgba(18, 19, 24, 0.95) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border-left: 1px solid rgba(255, 255, 255, 0.1) !important;
+  }
+
+  /* Main Grid Expansion */
+  .center-grid-area {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding-left: 10px !important; /* Balanced layout margin */
+    padding-right: 10px !important;
+    transition: all 0.3s ease;
+  }
+
+  /* Optimize layout gaps inside the PEOs — single column only */
+  .side-peos {
+    row-gap: 10px !important;
+    flex-wrap: nowrap !important;
+  }
+
+  /* (Overridden by 1366px media query below for broader tablet support) */
+
+  /* --- Stacked and Centered Lobby Layout for Tablet/Mobile --- */
+  .lobby-svg-container {
+    background: none !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    aspect-ratio: auto !important;
+    overflow-y: auto !important;
+    padding: 30px 20px !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+  }
+
+  .lobby-svg-container form {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    width: 100% !important;
+    max-width: 480px !important;
+    margin: 0 auto !important;
+    gap: 20px !important;
+    position: relative !important;
+  }
+
+  /* Hide background frame panels */
+  .lobby-card-panel-1,
+  .lobby-card-panel-2,
+  .lobby-card-panel-3 {
+    display: none !important;
+  }
+
+  /* Reposition and size inputs */
+  .lobby-overlay-input-1,
+  .lobby-overlay-input-2 {
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    width: 100% !important;
+    height: 52px !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.2) !important;
+    border-radius: 12px !important;
+    font-size: 16px !important;
+    padding: 0 15px !important;
+    margin-bottom: 0 !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2) !important;
+    z-index: 5 !important;
+  }
+
+  /* Reposition camera preview card */
+  .lobby-camera-preview-container {
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    width: 100% !important;
+    height: 220px !important;
+    aspect-ratio: auto !important;
+    background: rgba(42, 38, 37, 0.9) !important;
+    border: 2px solid rgba(255, 255, 255, 0.15) !important;
+    border-radius: 16px !important;
+    margin-bottom: 0 !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5) !important;
+    z-index: 5 !important;
+  }
+
+  .lobby-camera-video-elem {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 14px !important;
+  }
+
+  /* Reposition Card 1: Stickers */
+  .lobby-stickers-grid {
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    width: 100% !important;
+    height: auto !important;
+    padding: 20px !important;
+    background: rgba(42, 38, 37, 0.9) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5) !important;
+    z-index: 5 !important;
+  }
+
+  .lobby-stickers-container {
+    grid-template-columns: repeat(2, 1fr) !important;
+    grid-template-rows: auto !important;
+    gap: 12px !important;
+    margin-top: 15px !important;
+  }
+
+  .lobby-sticker-swatch {
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 1/1 !important;
+    padding: 6px !important;
+  }
+
+  .lobby-sticker-swatch.selected {
+    border-radius: 12px !important;
+    padding: 6px !important;
+  }
+
+  /* Reposition Card 2: Colors selection */
+  .lobby-colors-grid {
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    width: 100% !important;
+    height: auto !important;
+    padding: 20px !important;
+    background: rgba(42, 38, 37, 0.9) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5) !important;
+    z-index: 5 !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .lobby-lines-stack {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 12px !important;
+    margin-top: 15px !important;
+  }
+
+  .lobby-line-button {
+    width: 100% !important;
+    height: 48px !important;
+    padding: 4px !important;
+    border-radius: 8px !important;
+  }
+
+  .lobby-line-img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+  }
+
+  /* Reposition Card 3: AI Chat formats */
+  .lobby-special-formats-container {
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    width: 100% !important;
+    height: auto !important;
+    padding: 20px !important;
+    background: rgba(42, 38, 37, 0.9) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5) !important;
+    z-index: 5 !important;
+  }
+
+  .lobby-ai-chat-welcome {
+    margin-top: 10px !important;
+    font-size: 13px !important;
+  }
+
+  .lobby-ai-chat-input {
+    font-size: 14px !important;
+    padding: 10px !important;
+    border-radius: 8px !important;
+  }
+
+  .lobby-ai-chat-button {
+    font-size: 16px !important;
+    height: 40px !important;
+    border-radius: 8px !important;
+  }
+
+  .lobby-ai-chat-history {
+    font-size: 11px !important;
+    margin-bottom: 10px !important;
+  }
+
+  /* Reposition Card 4: Join session button */
+  .lobby-join-container {
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    width: 100% !important;
+    height: auto !important;
+    padding: 20px !important;
+    background: rgba(34, 197, 94, 0.1) !important;
+    border: 2px solid #22c55e !important;
+    border-radius: 16px !important;
+    box-shadow: 0 10px 25px rgba(34, 197, 94, 0.1) !important;
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    gap: 15px !important;
+    z-index: 5 !important;
+    margin-bottom: 40px !important; /* Bottom margin for page scroll */
+  }
+
+  .lobby-join-title-img {
+    width: auto !important;
+    height: 32px !important;
+    margin: 0 !important;
+  }
+
+  .lobby-join-arrow-button-mock {
+    width: 60px !important;
+    height: 60px !important;
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .lobby-join-arrow-img {
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  .lobby-card-title {
+    font-size: 16px !important;
+  }
+
+  /* Keep bypass button float at top right */
+  .lobby-instructor-bypass-btn {
+    position: absolute !important;
+    top: 15px !important;
+    right: 15px !important;
+    bottom: auto !important;
+    left: auto !important;
+    padding: 8px 16px !important;
+    font-size: 12px !important;
+    border-radius: 8px !important;
+    background: rgba(255, 255, 255, 0.12) !important;
+    border: 1px solid rgba(255, 255, 255, 0.25) !important;
+    color: white !important;
+    z-index: 100 !important;
+  }
+}
+
+/* --- Lobby Scaling Readability Overrides --- */
+@media (max-width: 1200px) {
+  .lobby-card-title {
+    font-size: max(16px, calc(66px * var(--lobby-scale))) !important;
+  }
+
+  .lobby-overlay-input-1,
+  .lobby-overlay-input-2,
+  .lobby-ai-chat-input {
+    font-size: max(14px, calc(45.6px * var(--lobby-scale))) !important;
+    padding: max(6px, calc(15px * var(--lobby-scale))) 0 0 0 !important;
+  }
+
+  .lobby-ai-chat-welcome {
+    font-size: max(13px, calc(48px * var(--lobby-scale))) !important;
+    margin-top: max(20px, calc(90px * var(--lobby-scale))) !important;
+    margin-bottom: max(8px, calc(20px * var(--lobby-scale))) !important;
+  }
+
+  .lobby-ai-chat-history,
+  .lobby-ai-chat-message {
+    font-size: max(12px, calc(48px * var(--lobby-scale))) !important;
+    margin-bottom: max(15px, calc(68px * var(--lobby-scale))) !important;
+  }
+
+  .lobby-ai-chat-button {
+    font-size: max(16px, calc(96px * var(--lobby-scale))) !important;
+    height: max(32px, calc(100px * var(--lobby-scale))) !important;
+    margin-bottom: max(8px, calc(20px * var(--lobby-scale))) !important;
+  }
+
+  .lobby-status-retry-btn {
+    font-size: max(14px, calc(50px * var(--lobby-scale))) !important;
+    padding: max(8px, calc(25px * var(--lobby-scale))) max(16px, calc(60px * var(--lobby-scale))) !important;
+  }
+}
+
+
+
+
+@media (max-height: 480px) and (orientation: landscape) {
+  /* Enlarge the PC container to fit the remaining screen width and height */
+  .center-grid-area {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    height: 100% !important;
+    gap: 12px !important;
+    padding: 6px !important;
+  }
+
+  .center-wrapper {
+    flex: 1 !important;
+    width: auto !important;
+    height: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .pc-width-keeper {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+  }
+
+  .pc-gt-unified {
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  /* Bring back top banner on landscape view per request */
+  .top-banner {
+    display: flex !important;
+  }
+
+  /* Ensure main classroom grid content fits the remaining height below banner */
+  .main-content {
+    height: calc(100vh - 10.84vh) !important;
+  }
+
+  /* Keep the right PEO sidebar compact in mobile landscape */
+  .right-peos-sidebar {
+    width: 80px !important;
+    min-width: 80px !important;
+    max-width: 80px !important;
+    flex: 0 0 80px !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+}
+
+@media (min-height: 481px) {
+  .pc-width-keeper.pc-sidebar-open {
+    max-height: calc(56vh - 10px) !important;
+    max-width: calc((56vh - 10px) * 16 / 9) !important;
+  }
+}
+
+/* Hide left peos sidebar globally on desktop/tablet */
+.left-peos-sidebar {
+  display: none !important;
+}
+
+/* Style right peos sidebar globally as a stable, fixed-width vertical column */
+.right-peos-sidebar {
+  display: flex !important;
+  flex-direction: column !important;
+  flex-wrap: nowrap !important; /* Strict: no 2nd column ever */
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 15px !important;
+  flex: 0 0 130px !important;
+  min-width: 120px !important;
+  max-width: 150px !important;
+  width: 130px !important;
+  height: auto !important;
+  max-height: 400px !important; /* Adjusted to hide the 4th PEO completely */
+  overflow-y: auto !important;
+  overflow-x: hidden !important; /* Prevent any horizontal overflow / phantom 2nd column */
+  padding-right: 4px !important;
+  box-sizing: border-box !important;
+}
+
+/* Custom yellow scrollbar styling for the right PEO sidebar */
+.right-peos-sidebar::-webkit-scrollbar {
+  width: 6px !important;
+  height: 6px !important;
+}
+
+/* Expand width to 2x (12px) on touch/hover of sidebar or scrollbar thumb */
+.right-peos-sidebar:hover::-webkit-scrollbar,
+.right-peos-sidebar:active::-webkit-scrollbar,
+.right-peos-sidebar::-webkit-scrollbar:hover,
+.right-peos-sidebar::-webkit-scrollbar:active {
+  width: 12px !important;
+}
+
+.right-peos-sidebar::-webkit-scrollbar-thumb {
+  background: #facc15 !important;
+  border-radius: 10px !important;
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3), 0 0 8px rgba(250, 204, 21, 0.8) !important;
+}
+
+.right-peos-sidebar::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Force each PEO cell inside the right sidebar to fill the full width — never shrink to allow a neighbor */
+.right-peos-sidebar .video-cell {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  flex-shrink: 0 !important;
+  align-self: stretch !important;
+}
+
+@media (orientation: portrait) {
+  .main-content {
+    flex-direction: column !important;
+    position: relative !important;
+    height: calc(100vh - 10.84vh) !important;
+    min-height: calc(100vh - 10.84vh) !important;
+    justify-content: center !important;
+  }
+
+  /* Hide left sidebar in portrait to let classroom layout center vertically */
+  .instructor-left-sidebar {
+    display: none !important;
+  }
+
+  /* Absolute position for right sidebar chat overlay */
+  .right-sidebar {
+    position: absolute !important;
+    right: 10px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    height: 80% !important;
+    width: 320px !important;
+    z-index: 1000 !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5) !important;
+    background: rgba(18, 19, 24, 0.95) !important;
+    border-radius: 16px !important;
+  }
+
+  .center-grid-area {
+    flex-direction: column !important;
+    order: -1 !important; /* Keep classroom area on top of other sidebars */
+    width: 100% !important;
+    height: auto !important;
+    gap: 20px !important;
+    padding: 10px !important;
+    margin-top: auto !important; /* Center vertically now that sidebar blocks are cleared */
+    margin-bottom: auto !important;
+  }
+
+  .center-wrapper {
+    width: 100% !important;
+    height: auto !important;
+    flex: none !important;
+  }
+
+  .pc-width-keeper, 
+  .pc-width-keeper.pc-sidebar-open {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    aspect-ratio: 16 / 9 !important;
+  }
+
+  .right-peos-sidebar {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    justify-content: center !important;
+    align-content: center !important;
+    justify-items: center !important;
+    align-items: center !important;
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    flex: none !important;
+    height: auto !important;
+    max-height: 45vh !important; /* Made taller to show more cells */
+    overflow-y: auto !important;
+    gap: 12px !important;
+    padding: 8px 0 !important; /* Vertically pad to show top/bottom rounded corners */
+    padding-right: 0 !important;
+  }
+
+  .right-peos-sidebar .video-cell {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 1 / 1 !important;
+    align-self: auto !important;
+  }
+
+  /* Yellow scrollbar is now defined globally for all layouts */
+
+  /* Compact panel containers inside portrait bottom area */
+  .portrait-bottom-container {
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .portrait-active-panel-wrapper {
+    width: 100% !important;
+    max-width: 480px !important;
+    margin: 0 auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 15px !important;
+    box-sizing: border-box !important;
+  }
+
+  .portrait-chat-panel,
+  .portrait-ito-panel,
+  .portrait-sto-panel {
+    width: 100% !important;
+    background: rgba(18, 19, 24, 0.95) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: 16px !important;
+    padding: 15px !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4) !important;
+  }
+
+  .toolbox-header-custom {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    border-bottom: 1px solid var(--glass-border) !important;
+    padding-bottom: 8px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .toolbox-header-custom span {
+    font-size: 1rem !important;
+    font-weight: 900 !important;
+    color: white !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+  }
+
+  .close-panel-btn {
+    background: none !important;
+    border: none !important;
+    color: #94a3b8 !important;
+    font-size: 16px !important;
+    cursor: pointer !important;
+    padding: 4px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: color 0.2s ease !important;
+  }
+
+  .close-panel-btn:hover {
+    color: white !important;
+  }
+
+  /* Compact STO inside portrait bottom area */
+  .portrait-sto-panel .unified-toolbox {
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .portrait-sto-panel .toolbox-header {
+    display: none !important;
+  }
+
+  .portrait-sto-panel .toolbox-content {
+    padding: 0 !important;
+    overflow: visible !important;
+    height: auto !important;
+  }
+
+  .portrait-sto-panel .toolbox-section {
+    gap: 0 !important;
+    overflow: visible !important;
+    height: auto !important;
+  }
+
+  .portrait-sto-panel .gt-buttons-col {
+    margin-top: 0 !important;
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 10px !important;
+    width: 100% !important;
+  }
+
+  .portrait-sto-panel .gb-btn {
+    padding: 10px 6px !important;
+    font-size: 11px !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+    height: 70px !important;
+    justify-content: center !important;
+    align-items: center !important;
+    border-radius: 12px !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  }
+
+  .portrait-sto-panel .sticker-picker-popover {
+    bottom: 85px !important;
+    left: 10px !important;
+    right: 10px !important;
+    z-index: 10000 !important;
+  }
+
+  /* Compact ITO inside portrait bottom area */
+  .portrait-ito-panel .instructor-toolbox {
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .portrait-ito-panel .toolbox-header {
+    display: none !important;
+  }
+
+  .portrait-ito-panel .toolbox-content {
+    padding: 0 !important;
+    overflow: visible !important;
+    height: auto !important;
+  }
+
+  .portrait-ito-panel .ito-buttons-container {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 8px !important;
+    margin-bottom: 12px !important;
+    width: 100% !important;
+  }
+
+  .portrait-ito-panel .ito-buttons-container .metronome-wrapper,
+  .portrait-ito-panel .ito-buttons-container .upload-row {
+    grid-column: span 3 !important;
+  }
+
+  .portrait-ito-panel .ito-undo-grid,
+  .portrait-ito-panel .ito-theme-grid,
+  .portrait-ito-panel .ito-utility-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+    width: 100% !important;
+  }
+
+  .portrait-ito-panel .gb-btn {
+    padding: 8px 4px !important;
+    font-size: 11px !important;
+    flex-direction: column !important;
+    gap: 4px !important;
+    height: 60px !important;
+    justify-content: center !important;
+    align-items: center !important;
+    border-radius: 10px !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    width: 100% !important;
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+  }
+
+  .portrait-ito-panel .ito-sticker-grid {
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+
+  /* Compact Chat inside portrait bottom area */
+  .portrait-chat-panel .chat-sidebar {
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    height: auto !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    position: relative !important;
+    left: auto !important;
+    right: auto !important;
+    top: auto !important;
+    bottom: auto !important;
+    transform: none !important;
+  }
+
+  .portrait-chat-panel .chat-header {
+    display: none !important;
+  }
+
+  .portrait-chat-panel .chat-container {
+    height: 250px !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .portrait-buttons-row {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 15px !important;
+    justify-content: center !important;
+    align-items: center !important;
+    margin-top: 15px !important;
+    width: 100% !important;
+  }
+
+  .square-action-btn {
+    width: 55px !important;
+    height: 55px !important;
+    border-radius: 12px !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    background: rgba(0, 0, 0, 0.6) !important;
+    color: white !important;
+    font-size: 11px !important;
+    font-weight: bold !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3) !important;
+    text-transform: uppercase !important;
+  }
+
+  .square-action-btn:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+    transform: scale(1.05) !important;
+  }
+
+  .square-action-btn.active {
+    background: #eab308 !important; /* Yellow active theme */
+    color: black !important;
+    border-color: #facc15 !important;
+    box-shadow: 0 0 10px #facc15 !important;
+  }
+}
+
+/* Hide portrait buttons row globally in landscape mode */
+.portrait-buttons-row {
+  display: none !important;
 }

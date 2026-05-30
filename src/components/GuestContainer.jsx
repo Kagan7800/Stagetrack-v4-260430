@@ -1,4 +1,4 @@
-import { Pause } from 'lucide-react';
+import { Pause, Camera } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { useAppContext } from '../context/AppContext';
 import PeoBorder from './PeoBorder';
@@ -36,9 +36,35 @@ export default function GuestContainer({
   const [joinedStream, setJoinedStream] = useState(null);
   const joinedVideoRef = useRef(null);
 
+  const lastClickRef = useRef(0);
+
+  const handleCellClick = (e) => {
+    // Prevent click handling if target is within edit form or buttons
+    if (e.target.closest('.blank-peo-edit-form') || e.target.closest('.edit-blank-btn') || e.target.closest('button')) {
+      return;
+    }
+
+    const now = Date.now();
+    const isDoubleClick = now - lastClickRef.current < 300;
+    lastClickRef.current = now;
+
+    if (isDoubleClick) {
+      if (onDoubleClick) {
+        onDoubleClick(participant);
+      }
+    } else {
+      if (onClick) {
+        onClick(participant);
+      }
+    }
+  };
+
+  const isInstructorClient = sessionStorage.getItem('stagetrack_role') !== 'student';
   const isClosed = globalPause || (buttons && buttons.mute) || false;
-  const isPending = participant.isBlank && participant.blankIndex === 1 && pendingRequest !== null;
-  const isJoinedUser = !participant.isBlank && participant.id && String(participant.id).startsWith('active-joined');
+  const isPending = isInstructorClient && participant.isBlank && participant.blankIndex === 1 && pendingRequest !== null;
+  const isJoinedUser = !participant.isBlank && 
+    ((participant.isInstructor && isInstructorClient) || 
+     (participant.id && String(participant.id).startsWith('active-joined')));
 
   // Handle webcam stream for pending request slot (Instructor view)
   useEffect(() => {
@@ -102,28 +128,28 @@ export default function GuestContainer({
   const canEditBlank = Number(MOCK_USER_COUNT) === 1;
 
   if (participant.isBlank) {
-    const isPending = participant.blankIndex === 1 && pendingRequest !== null;
+    const isPending = isInstructorClient && participant.blankIndex === 1 && pendingRequest !== null;
 
     if (isPending) {
-      const glowColor = getGlowColor(pendingRequest.selectedBorder);
       return (
         <div 
           className="video-cell blank-peo-container pending-request-cell"
           style={{ 
             backgroundColor: pendingRequest.color, 
-            boxShadow: `0 0 15px ${glowColor}`,
+            boxShadow: '0 0 20px #fbbf24',
             cursor: 'default' 
           }}
         >
-          <PeoBorder color={pendingRequest.selectedBorder} />
-          {/* Live webcam feed background */}
+          <PeoBorder color="#fbbf24" />
+
+          {/* Live webcam feed background (same size as other PEOs, grayscale) */}
           {pendingStream && (
             <video 
               ref={pendingVideoRef} 
               autoPlay 
               playsInline 
               muted 
-              className="gc-video-element"
+              className="gc-video-element grayscale-video"
             />
           )}
 
@@ -343,8 +369,7 @@ export default function GuestContainer({
   return (
     <div 
       className={`video-cell ${showActiveGlow ? 'active-gc' : ''} ${showGrayscale ? 'grayscale-sharp' : ''} ${isNonInteractive ? 'non-interactive' : ''} ${isSpotlight ? 'spotlight-cell' : ''}`} 
-      onClick={() => onClick(participant)}
-      onDoubleClick={() => onDoubleClick && onDoubleClick(participant)}
+      onClick={handleCellClick}
       style={borderStyle}
     >
       {/* SVG-based PEO Border component */}

@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, GraduationCap, Shield } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { ChevronRight, GraduationCap, Shield } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import InstructorToolbox from './InstructorToolbox';
 import UnifiedToolbox from './UnifiedToolbox';
@@ -17,19 +17,38 @@ export default function LeftSidebar() {
     handleAddSticker,
     setActiveGuestId,
     globalMute,
-    setGlobalMute
+    setGlobalMute,
+    activeTheme
   } = useAppContext();
 
   const [isItoExpanded, setIsItoExpanded] = useState(true);
-  const [isStoExpanded, setIsStoExpanded] = useState(true);
 
   const activeGuest = participants.find(p => p.id === activeGuestId);
+
+  const inactivityTimerRef = useRef(null);
+
+  const resetInactivityTimer = () => {
+    if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current);
+    inactivityTimerRef.current = setTimeout(() => {
+      setIsSidebarOpen(false);
+    }, 20000); // 20 seconds
+  };
+
+  useEffect(() => {
+    if (isSidebarOpen) {
+      resetInactivityTimer();
+    } else {
+      if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current);
+    }
+    return () => {
+      if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current);
+    };
+  }, [isSidebarOpen]);
 
   // Automatically open the sidebar when a guest is selected
   useEffect(() => {
     if (activeGuestId !== null) {
       setIsSidebarOpen(true);
-      setIsStoExpanded(true); // Automatically expand the student toolbox when selected
     }
   }, [activeGuestId, setIsSidebarOpen]);
 
@@ -76,12 +95,33 @@ export default function LeftSidebar() {
   const showSto = activeGuestId !== null && activeGuest && activeToolbox === 'student';
   const showIto = activeGuestId === null || activeToolbox === 'instructor';
   
-  const transmissionGlowClass = mode === 'ITO' ? 'sidebar-glow-ito' : 'sidebar-glow-sto';
-  const panelGridBorder = mode === 'ITO' ? 'border-t-2-ito' : 'border-t-2-sto';
+  const isSor = activeTheme === 'sor';
+  const themeTextColor = isSor ? '#ef4444' : '#3b82f6';
+  const themeTextShadow = isSor ? '0 0 8px rgba(239, 68, 68, 0.18)' : '0 0 8px rgba(59, 130, 246, 0.18)';
+
+  // Dynamic border/glow styles
+  const transmissionGlowStyle = mode === 'ITO' 
+    ? { borderRight: '2px solid rgba(245, 158, 11, 0.7)', boxShadow: '0 0 15px rgba(245, 158, 11, 0.15)' }
+    : { 
+        borderRight: isSor 
+          ? '2px solid rgba(239, 68, 68, 0.7)' // Red in SOR
+          : '2px solid rgba(59, 130, 246, 0.7)', // Blue in Music
+        boxShadow: isSor 
+          ? '0 0 15px rgba(239, 68, 68, 0.15)' 
+          : '0 0 15px rgba(59, 130, 246, 0.15)'
+      };
+
+  const panelGridBorderStyle = { 
+    borderTop: '2px solid #ffffff' 
+  };
+
 
   return (
     <div 
-      className={`glass-panel sidebar ${transmissionGlowClass}`} 
+      className="glass-panel sidebar" 
+      onMouseMove={resetInactivityTimer}
+      onClick={resetInactivityTimer}
+      onKeyDown={resetInactivityTimer}
       style={{ 
         height: 'calc(100% + 10px)', 
         marginTop: '-10px',
@@ -91,21 +131,23 @@ export default function LeftSidebar() {
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
-        width: '380px'
+        width: '250px',
+        ...transmissionGlowStyle
       }}
     >
 
       {/* 1. Instructor Tools (ITO) Section */}
       {showIto && (
         <div 
-          className={panelGridBorder}
           style={{ 
             display: 'flex', 
             flexDirection: 'column', 
             borderBottom: showSto ? '1px solid var(--glass-border)' : 'none',
-            flex: isItoExpanded ? (showSto && isStoExpanded ? 1 : 1) : '0 0 auto',
+            flex: isItoExpanded ? 1 : '0 0 auto',
             minHeight: 0,
-            overflow: 'hidden'
+            overflow: 'hidden',
+            transition: 'border-color 0.2s ease',
+            ...panelGridBorderStyle
           }}
         >
           {isItoExpanded && (
@@ -119,45 +161,25 @@ export default function LeftSidebar() {
       {/* 2. Student Tools (STO) Section */}
       {showSto && (
         <div 
-          className={panelGridBorder}
           style={{ 
             display: 'flex', 
             flexDirection: 'column', 
-            flex: isStoExpanded ? (isItoExpanded ? 1 : 1) : '0 0 auto',
+            flex: 1,
             minHeight: 0,
-            overflow: 'hidden'
+            overflow: 'hidden',
+            transition: 'border-color 0.2s ease',
+            ...panelGridBorderStyle
           }}
         >
-          <div 
-            onClick={() => setIsStoExpanded(!isStoExpanded)}
-            style={{ 
-              padding: '14px 16px', 
-              background: 'rgba(0, 0, 0, 0.6)',
-              cursor: 'pointer', 
-              display: 'flex', 
-              justifyContent: 'center', 
-              alignItems: 'center',
-              userSelect: 'none',
-              borderBottom: '1px solid var(--glass-border)',
-              position: 'relative'
-            }}
-          >
-            <span className="text-emerald-400-class" style={{ fontSize: '0.85rem', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              🎓 {activeGuest ? activeGuest.name : "Richard"}'s Console
-            </span>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, background: 'rgba(0, 0, 0, 0.6)', overflow: 'hidden' }}>
+            <UnifiedToolbox 
+              activeGuest={activeGuest}
+              guestButtons={guestButtons}
+              toggleGuestButton={handleToggleGuestButton}
+              onAddSticker={handleAddSticker}
+              onClose={() => setActiveGuestId(null)}
+            />
           </div>
-          
-          {isStoExpanded && (
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, background: 'rgba(0, 0, 0, 0.6)', overflow: 'hidden' }}>
-              <UnifiedToolbox 
-                activeGuest={activeGuest}
-                guestButtons={guestButtons}
-                toggleGuestButton={handleToggleGuestButton}
-                onAddSticker={handleAddSticker}
-                onClose={() => setActiveGuestId(null)}
-              />
-            </div>
-          )}
         </div>
       )}
     </div>
