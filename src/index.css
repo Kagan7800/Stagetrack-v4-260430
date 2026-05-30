@@ -4509,3 +4509,42 @@ body {
 .portrait-buttons-row {
   display: none !important;
 }
+
+/* School of Rock Layered Logo Container */
+.sor-logo-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 95px;
+  max-width: 100%;
+  transform: scale(1.05);
+  transform-origin: center;
+  z-index: 1000;
+}
+
+.sor-logo-text {
+  height: 100%;
+  max-height: 100%;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0px -1px 0px #fcf6ba) drop-shadow(0px 1px 0px #aa771c) drop-shadow(-1px 0px 0px #bf953f) drop-shadow(1px 0px 0px #bf953f) drop-shadow(0 0 4px #b38728) drop-shadow(2px 2px 3px rgba(0,0,0,0.85));
+}
+
+.sor-logo-icon {
+  position: absolute;
+  height: 44.2%;
+  width: auto;
+  object-fit: contain;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 23.1%;
+}
+
+/* Responsive adjustments for mobile viewports */
+@media (max-width: 768px) {
+  .sor-logo-container {
+    height: 60px;
+    transform: scale(1.0);
+  }
+}
