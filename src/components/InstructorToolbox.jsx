@@ -79,7 +79,7 @@ export default function InstructorToolbox() {
   return (
     <div className="glass-panel sidebar instructor-toolbox" style={{ height: '100%', borderRight: 'none', position: 'relative' }}>
       <div className="toolbox-header" style={{ minHeight: '52px', borderBottom: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '12px 16px', position: 'relative' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px', textAlign: 'center', maxWidth: '160px', width: '100%' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px', textAlign: 'center', maxWidth: '160px', width: '100%', position: 'relative', left: '-20px' }}>
           <span style={{ color: '#ffffff', textShadow: themeTextShadow, fontSize: '0.92rem', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block', width: '100%' }} title="Instructor Tools">
             Instructor Tools
           </span>
@@ -280,25 +280,28 @@ export default function InstructorToolbox() {
               ))}
             </div>
             
-            <div className="ito-undo-grid">
+            <div className="ito-undo-row">
+              <span className="undo-symbol-bold">
+                <RotateCcw size={15} strokeWidth={3} />
+              </span>
               <button 
                 className="gb-btn"
                 onClick={() => handleAddSticker('instructor', 'UNDO_IC', true)}
               >
-                <RotateCcw size={13} /> undo last
+                undo last
               </button>
               <button 
                 className="gb-btn"
                 onClick={() => handleAddSticker('instructor', 'UNDO_ALL_IC', true)}
               >
-                <RotateCcw size={13} /> all
+                all
               </button>
               <button 
-                className="gb-btn undo-peo-btn"
+                className="gb-btn"
                 onDoubleClick={() => handleAddSticker('instructor', 'UNDO_ALL_PEO', true)}
                 title="Double click to clear all PEO stickers"
               >
-                <RotateCcw size={13} /> all peo
+                all peo
               </button>
             </div>
           </div>

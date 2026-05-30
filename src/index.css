@@ -1278,21 +1278,31 @@ body {
 .instructor-toolbox .ito-buttons-container .upload-row {
   grid-column: span 2;
 }
-.instructor-toolbox .ito-undo-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 4px;
+.instructor-toolbox .ito-undo-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
   width: 100%;
   margin-top: 8px;
 }
-.instructor-toolbox .ito-undo-grid .gb-btn {
+.instructor-toolbox .ito-undo-row .undo-symbol-bold {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  font-weight: bold;
+  flex-shrink: 0;
+  padding-left: 2px;
+}
+.instructor-toolbox .ito-undo-row .gb-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 6px 2px !important;
-  font-size: 0.72rem !important;
-  text-transform: lowercase; /* Make text lowercase to match request */
+  font-size: 0.9rem !important;
+  text-transform: lowercase;
+  white-space: nowrap;
 }
 .instructor-toolbox .ito-theme-grid,
 .instructor-toolbox .ito-utility-grid {
@@ -4342,13 +4352,17 @@ body {
     grid-column: span 3 !important;
   }
 
-  .portrait-ito-panel .ito-undo-grid,
+  .portrait-ito-panel .ito-undo-row,
   .portrait-ito-panel .ito-theme-grid,
   .portrait-ito-panel .ito-utility-grid {
     display: flex !important;
     flex-direction: column !important;
     gap: 6px !important;
     width: 100% !important;
+  }
+
+  .portrait-ito-panel .ito-undo-row .undo-symbol-bold {
+    display: none !important;
   }
 
   .portrait-ito-panel .gb-btn {

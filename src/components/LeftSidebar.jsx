@@ -134,6 +134,7 @@ export default function LeftSidebar() {
         flexDirection: 'column',
         overflow: 'hidden',
         width: '250px',
+        background: 'rgba(11, 25, 46, 0.7)',
         ...transmissionGlowStyle
       }}
     >
@@ -153,7 +154,7 @@ export default function LeftSidebar() {
           }}
         >
           {isItoExpanded && (
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, background: 'rgba(0, 0, 0, 0.6)', overflow: 'hidden' }}>
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, background: 'rgba(11, 25, 46, 0.7)', overflow: 'hidden' }}>
               <InstructorToolbox />
             </div>
           )}
@@ -173,7 +174,7 @@ export default function LeftSidebar() {
             ...panelGridBorderStyle
           }}
         >
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, background: 'rgba(0, 0, 0, 0.6)', overflow: 'hidden' }}>
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, background: 'rgba(11, 25, 46, 0.7)', overflow: 'hidden' }}>
             <UnifiedToolbox 
               activeGuest={activeGuest}
               guestButtons={guestButtons}
