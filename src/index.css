@@ -4516,10 +4516,9 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 95px;
+  height: 80%;
+  max-height: 80px;
   max-width: 100%;
-  transform: scale(1.05);
-  transform-origin: center;
   z-index: 1000;
 }
 
@@ -4539,12 +4538,4 @@ body {
   left: 50%;
   transform: translateX(-50%);
   top: 10%;
-}
-
-/* Responsive adjustments for mobile viewports */
-@media (max-width: 768px) {
-  .sor-logo-container {
-    height: 60px;
-    transform: scale(1.0);
-  }
 }
