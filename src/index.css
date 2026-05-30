@@ -416,8 +416,8 @@ body {
   font-size: 0.86rem;
   font-weight: 600;
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.05) !important;
-  border: none !important;
+  background: rgba(11, 25, 46, 0.7) !important;
+  border: 1px solid var(--glass-border) !important;
   min-width: 0;
   color: white;
   transition: all 0.2s;
@@ -425,7 +425,7 @@ body {
 }
 
 .unified-toolbox .gb-btn:hover {
-  background: rgba(255, 255, 255, 0.12) !important;
+  background: rgba(11, 25, 46, 0.9) !important;
   transform: translateY(-1px);
 }
 
@@ -434,8 +434,17 @@ body {
 }
 
 .unified-toolbox .gb-btn.active {
-  background: var(--accent-color) !important;
   border: none !important;
+}
+
+.unified-toolbox.theme-sor .gb-btn.active {
+  background: #ef4444 !important;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.4) !important;
+}
+
+.unified-toolbox.theme-music .gb-btn.active {
+  background: #3b82f6 !important;
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.4) !important;
 }
 
 
@@ -1264,7 +1273,19 @@ body {
   padding: 6px 8px;
   font-size: 1.14rem;
   width: 100%;
+  border: 1px solid var(--glass-border) !important;
+  background: rgba(11, 25, 46, 0.7) !important;
+  color: #cbd5e1 !important;
+}
+.instructor-toolbox .gb-btn:hover {
+  background: rgba(11, 25, 46, 0.9) !important;
+  border-color: rgba(255, 255, 255, 0.25) !important;
+}
+.instructor-toolbox .gb-btn.active {
+  background: rgba(245, 158, 11, 0.85) !important; /* Orange/Yellow */
   border: none !important;
+  color: white !important;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.4) !important;
 }
 .instructor-toolbox .ito-buttons-container {
   display: grid;
@@ -3305,18 +3326,22 @@ body {
 }
 
 /* Active Theme Buttons: Red & Squared Edges */
+.ito-theme-grid .gb-btn,
 .ito-theme-selector-container .gb-btn {
   border-radius: 4px !important;
 }
+.ito-theme-grid .gb-btn.active,
 .ito-theme-selector-container .gb-btn.active {
   box-shadow: 0 0 0 2px #fbbf24, 0 0 8px rgba(251, 191, 36, 0.4) !important;
   font-weight: 700 !important;
   opacity: 1 !important;
 }
+.ito-theme-grid .gb-btn.active.active-music,
 .ito-theme-selector-container .gb-btn.active.active-music {
   background: #3b82f6 !important;
   color: #ffffff !important;
 }
+.ito-theme-grid .gb-btn.active.active-sor,
 .ito-theme-selector-container .gb-btn.active.active-sor {
   background: #ef4444 !important;
   color: #ffffff !important;
