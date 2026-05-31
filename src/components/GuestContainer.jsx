@@ -125,9 +125,7 @@ export default function GuestContainer({
     }
   }, [isEditing, participant.id, participant.isBlank, blankCovers]);
 
-  const canEditBlank = Number(MOCK_USER_COUNT) === 1;
-  const isSpecialBottomRightBlank = Number(MOCK_USER_COUNT) === 5 && participant.id === 'blank-7';
-  const canEditThisBlank = (isSpecialBottomRightBlank && isInstructorClient) || (!isSpecialBottomRightBlank && canEditBlank);
+  const canEditThisBlank = isInstructorClient;
 
   if (participant.isBlank) {
     const isPending = isInstructorClient && participant.blankIndex === 1 && pendingRequest !== null;
@@ -256,22 +254,20 @@ export default function GuestContainer({
           }
         }}
       >
-        {isSpecialBottomRightBlank && (
-          <img 
-            src="/assets/lights.png" 
-            alt="Lights" 
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-              zIndex: 2,
-              borderRadius: '12px'
-            }}
-          />
-        )}
+        <img 
+          src="/assets/lights.png" 
+          alt="Lights" 
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            zIndex: 2,
+            borderRadius: '12px'
+          }}
+        />
         {hasCover && (
           <div 
             className="peo-background-cover"
@@ -289,15 +285,9 @@ export default function GuestContainer({
             }}
           />
         )}
-        {/* Label for 1st or 2nd blank PEO container */}
-        {canEditThisBlank && !isSpecialBottomRightBlank && !hasCover && (
-          <div className="blank-peo-label">
-            {participant.blankIndex === 1 ? "Upload 1" : "Upload 2"}
-          </div>
-        )}
 
         {/* Special "Attach Link" label for students */}
-        {isSpecialBottomRightBlank && !isInstructorClient && (
+        {!isInstructorClient && (
           <div className="gc-name-badge" style={{ zIndex: 12 }}>
             Attach Link
           </div>
