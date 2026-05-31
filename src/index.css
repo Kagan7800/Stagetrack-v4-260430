@@ -4509,33 +4509,4 @@ body {
 .portrait-buttons-row {
   display: none !important;
 }
-
-/* School of Rock Layered Logo Container */
-.sor-logo-container {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 80%;
-  max-height: 95px;
-  max-width: 100%;
-  z-index: 1000;
-}
-
-.sor-logo-text {
-  height: 100%;
-  max-height: 100%;
-  width: auto;
-  object-fit: contain;
-  filter: drop-shadow(2px 2px 3px rgba(0,0,0,0.85));
-}
-
-.sor-logo-icon {
-  position: absolute;
-  height: 20%;
-  width: auto;
-  object-fit: contain;
-  left: 50%;
-  transform: translateX(-50%);
-  top: 26%;
-}
+

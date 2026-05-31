@@ -236,35 +236,31 @@ function App() {
           </div>
         ) : (
           <div className="top-banner" style={{ backgroundImage: "radial-gradient(ellipse at top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0) 70%), linear-gradient(to bottom, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.1) 100%), url('/assets/SOR/1ui_sor top banner-052826 3.png')", backgroundSize: '100% 100%', backgroundRepeat: 'no-repeat', backgroundPosition: 'center', position: 'relative' }}>
-            <div className="sor-logo-container">
-              <img 
-                src="/assets/SOR/1ui_sor logo-052826.png" 
-                alt="School of Rock Alpharetta" 
-                className="sor-logo-text"
-              />
-              <img 
-                src="/assets/SOR/1logo_sor_original_backup.png" 
-                alt="School of Rock Icon" 
-                className="sor-logo-icon"
-              />
-            </div>
+            <img 
+              src="/assets/SOR/2logo-sor-053126.png" 
+              alt="School of Rock Logo" 
+              style={{ 
+                height: '100%', 
+                width: 'auto', 
+                objectFit: 'contain',
+                zIndex: 1000
+              }} 
+            />
             <div className="gradient-divider-bar" style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '6px' }}></div>
           </div>
         )
       ) : activeTheme === 'sor' ? (
         <div className="top-banner" style={{ backgroundImage: "radial-gradient(ellipse at top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0) 70%), linear-gradient(to bottom, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.1) 100%), url('/assets/SOR/1ui_sor top banner-052826 3.png')", backgroundSize: '100% 100%', backgroundRepeat: 'no-repeat', backgroundPosition: 'center', position: 'relative' }}>
-          <div className="sor-logo-container">
-            <img 
-              src="/assets/SOR/1ui_sor logo-052826.png" 
-              alt="School of Rock Alpharetta" 
-              className="sor-logo-text"
-            />
-            <img 
-              src="/assets/SOR/1logo_sor_original_backup.png" 
-              alt="School of Rock Icon" 
-              className="sor-logo-icon"
-            />
-          </div>
+          <img 
+            src="/assets/SOR/2logo-sor-053126.png" 
+            alt="School of Rock Logo" 
+            style={{ 
+              height: '100%', 
+              width: 'auto', 
+              objectFit: 'contain',
+              zIndex: 1000
+            }} 
+          />
           <div className="gradient-divider-bar" style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '6px' }}></div>
         </div>
       ) : (
