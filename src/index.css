@@ -1818,7 +1818,7 @@ body {
 
 .edit-blank-btn {
   position: absolute;
-  bottom: 25%;
+  bottom: 12px;
   left: 50%;
   transform: translateX(-50%);
   background: rgba(34, 197, 94, 0.1);
@@ -1831,9 +1831,10 @@ body {
   transition: all 0.2s ease-in-out;
   display: flex;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
+  white-space: nowrap;
   box-shadow: 0 0 10px rgba(34, 197, 94, 0.15);
-  z-index: 5;
+  z-index: 15;
 }
 
 .edit-blank-btn:hover {
@@ -1841,42 +1842,6 @@ body {
   border-color: #4ade80;
   box-shadow: 0 0 15px rgba(34, 197, 94, 0.35);
   transform: translateX(-50%) scale(1.05);
-}
-
-/* Small gear icon button that floats on top of the cover image and appears on hover */
-.edit-blank-btn.has-cover-btn {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  bottom: auto;
-  left: auto;
-  transform: none;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: rgba(15, 23, 42, 0.75);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  color: white;
-  font-size: 1rem;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  opacity: 0;
-  transition: opacity 0.2s ease, transform 0.2s ease, background-color 0.2s ease;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-  z-index: 10;
-}
-
-.blank-peo-container:hover .edit-blank-btn.has-cover-btn {
-  opacity: 1;
-}
-
-.edit-blank-btn.has-cover-btn:hover {
-  background: #22c55e;
-  border-color: #4ade80;
-  transform: scale(1.1) rotate(45deg);
 }
 
 /* Glassmorphism Edit Form Overlay */

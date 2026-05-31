@@ -265,10 +265,10 @@ export default function GuestContainer({
               top: 0,
               left: 0,
               width: '100%',
-              height: '50%',
+              height: '100%',
               objectFit: 'cover',
               zIndex: 2,
-              borderRadius: '12px 12px 0 0'
+              borderRadius: '12px'
             }}
           />
         )}
@@ -306,14 +306,14 @@ export default function GuestContainer({
         {/* Upload Cover Trigger */}
         {canEditThisBlank && !isEditing && (
           <button 
-            className={`edit-blank-btn ${hasCover ? 'has-cover-btn' : ''}`}
-            style={{ zIndex: 2 }}
+            className="edit-blank-btn"
+            style={{ zIndex: 12 }}
             onClick={(e) => {
               e.stopPropagation();
               setIsEditing(true);
             }}
           >
-            {hasCover ? "⚙️" : "⚙️ Upload Cover"}
+            Upload Cover
           </button>
         )}
 
