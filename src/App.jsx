@@ -240,7 +240,7 @@ function App() {
               src="/assets/SOR/2logo-sor-053126.png" 
               alt="School of Rock Logo" 
               style={{ 
-                height: '100%', 
+                height: '80%', 
                 width: 'auto', 
                 objectFit: 'contain',
                 zIndex: 1000
@@ -255,7 +255,7 @@ function App() {
             src="/assets/SOR/2logo-sor-053126.png" 
             alt="School of Rock Logo" 
             style={{ 
-              height: '100%', 
+              height: '80%', 
               width: 'auto', 
               objectFit: 'contain',
               zIndex: 1000
