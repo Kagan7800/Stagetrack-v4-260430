@@ -4760,4 +4760,220 @@ body {
 .peo-reaction-bar .reaction-btn.undo-btn:hover {
   color: #ffffff;
 }
+
+/* Central Control Deck (Under Presentation Container) */
+.control-deck-outer {
+  width: 100%;
+}
+
+.control-deck {
+  background: rgba(11, 25, 46, 0.75) !important;
+  border: 1px solid var(--glass-border) !important;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.deck-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.deck-divider {
+  width: 1px;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.deck-sub-divider {
+  width: 1px;
+  height: 16px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 0 4px;
+}
+
+.deck-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #cbd5e1;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.deck-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.25);
+  color: white;
+  transform: translateY(-1px);
+}
+
+.deck-btn.active {
+  background: rgba(245, 158, 11, 0.25);
+  border-color: rgba(245, 158, 11, 0.8);
+  color: #fbbf24;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.2);
+}
+
+/* Sticker Deck Buttons */
+.deck-sticker-btn {
+  background: transparent;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+}
+
+.deck-sticker-btn:hover {
+  transform: scale(1.2) translateY(-2px);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.deck-sticker-btn img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+/* Filter Deck Buttons */
+.deck-filter-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: var(--filter-color);
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-sizing: border-box;
+  opacity: 0.65;
+}
+
+.deck-filter-btn:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.deck-filter-btn.active {
+  opacity: 1;
+  border-color: white;
+  box-shadow: 0 0 8px var(--filter-color);
+}
+
+/* Active student indicator text */
+.active-student-indicator {
+  font-size: 0.75rem;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.active-student-name {
+  color: #10b981; /* Emerald/Green targeting text */
+  text-shadow: 0 0 8px rgba(16, 185, 129, 0.15);
+}
+
+.active-student-hint {
+  color: #64748b;
+  font-style: italic;
+}
+
+/* Group Labels */
+.deck-group .group-label {
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.4);
+  letter-spacing: 0.05em;
+  margin-right: 4px;
+  white-space: nowrap;
+}
+
+/* Metronome Popover */
+.metronome-popover {
+  position: absolute;
+  bottom: 42px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 180px;
+  background: rgba(9, 13, 22, 0.9) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: 8px;
+  padding: 8px 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 1000;
+}
+
+.metronome-popover .popover-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.72rem;
+  font-weight: bold;
+  color: #94a3b8;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 4px;
+}
+
+.metronome-popover .close-pop-btn {
+  background: transparent;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.metronome-popover .close-pop-btn:hover {
+  color: white;
+}
+
+.metronome-popover .tempo-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.metronome-popover .bpm-label {
+  font-size: 0.75rem;
+  color: white;
+  font-weight: bold;
+}
+
+.metronome-popover .metro-play-btn {
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: #22c55e;
+  border: none;
+  color: white;
+  font-size: 0.68rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.metronome-popover .metro-play-btn.playing {
+  background: #ef4444;
+}
+
+.metronome-popover .bpm-slider {
+  width: 100%;
+  accent-color: #f59e0b;
+  cursor: pointer;
+}
 

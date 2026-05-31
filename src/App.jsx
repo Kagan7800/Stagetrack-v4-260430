@@ -8,6 +8,7 @@ import LeftSidebar from './components/LeftSidebar';
 import LobbyOverlay from './components/LobbyOverlay';
 import { useAppContext } from './context/AppContext';
 import UnifiedToolbox from './components/UnifiedToolbox';
+import ControlDeck from './components/ControlDeck';
 
 function App() {
   const {
@@ -495,6 +496,7 @@ function App() {
                        onClearMedia={clearMedia}
                      />
                  </div>
+                 <ControlDeck />
                </div>
              </div>
              
