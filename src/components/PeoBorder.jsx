@@ -58,7 +58,7 @@ export default function PeoBorder({ color }) {
         <rect 
           x="2" 
           y="2" 
-          width="96" 
+          width="76.8" 
           height="96" 
           rx="6" 
           ry="6" 
