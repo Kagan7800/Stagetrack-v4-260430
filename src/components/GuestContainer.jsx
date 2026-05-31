@@ -1,4 +1,4 @@
-import { Pause, Camera } from 'lucide-react';
+import { Pause, Camera, RotateCcw } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { useAppContext } from '../context/AppContext';
 import PeoBorder from './PeoBorder';
@@ -22,7 +22,7 @@ export default function GuestContainer({
   nudges = {},
   globalPause
 }) {
-  const { blankCovers, setBlankCovers, MOCK_USER_COUNT, pendingRequest, approveRequest, denyRequest, activeTheme } = useAppContext();
+  const { blankCovers, setBlankCovers, MOCK_USER_COUNT, pendingRequest, approveRequest, denyRequest, activeTheme, handleAddSticker } = useAppContext();
   const [isEditing, setIsEditing] = useState(false);
   
   // Local state for forms
@@ -526,6 +526,30 @@ export default function GuestContainer({
           />
         );
       })}
+
+      {isInstructorClient && (
+        <div className="peo-reaction-bar" onClick={(e) => e.stopPropagation()}>
+          <button className="reaction-btn" onClick={() => handleAddSticker(participant.id, 'Heart.png', true)} title="Give Heart">
+            <img src="/assets/svg_stickers/Heart.png" alt="Heart" />
+          </button>
+          <button className="reaction-btn" onClick={() => handleAddSticker(participant.id, 'RealCrown.png', true)} title="Give Crown">
+            <img src="/assets/svg_stickers/RealCrown.png" alt="Crown" />
+          </button>
+          <button className="reaction-btn" onClick={() => handleAddSticker(participant.id, 'Happy_Birthday.png', true)} title="Give Birthday Star">
+            <img src="/assets/svg_stickers/Happy_Birthday.png" alt="Birthday" />
+          </button>
+          <button className="reaction-btn" onClick={() => handleAddSticker(participant.id, 'Star.png', true)} title="Give Star">
+            <img src="/assets/svg_stickers/Star.png" alt="Star" />
+          </button>
+          <button className="reaction-btn" onClick={() => handleAddSticker(participant.id, 'ic_gold_star.png', true)} title="Give Gold Star">
+            <img src="/assets/svg_stickers/ic_gold_star.png" alt="Gold Star" />
+          </button>
+          <div className="reaction-divider"></div>
+          <button className="reaction-btn undo-btn" onClick={() => handleAddSticker(participant.id, 'UNDO_IC', true)} title="Undo Last Reward">
+            <RotateCcw size={13} />
+          </button>
+        </div>
+      )}
     </div>
   );
 }

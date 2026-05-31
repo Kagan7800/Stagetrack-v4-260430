@@ -1,10 +1,6 @@
 import { useRef, useState } from 'react';
 import { Palette, Image as ImageIcon, X, Mic, MicOff, Pause, Play, ChevronLeft, ChevronRight, UploadCloud, HardDrive, RotateCcw } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
-import heartPng from '../assets/RealHeart.png';
-import crownPng from '../assets/RealCrown.png';
-import birthdayPng from '../assets/Happy_Birthday.png';
-import starPng from '../assets/Star.png';
 
 export default function InstructorToolbox() {
   const {
@@ -28,17 +24,6 @@ export default function InstructorToolbox() {
 
   const fileInputRef = useRef(null);
   const [showUploadMenu, setShowUploadMenu] = useState(false);
-
-  const availableStickers = [
-    { id: 'Heart.png', src: heartPng, isSmall: true },
-    { id: 'RealCrown.png', src: crownPng }, 
-    { id: 'Happy_Birthday.png', src: birthdayPng }, 
-    { id: 'Star.png', src: starPng },
-    { id: 'Piano.svg', src: '/assets/svg_stickers/Piano.svg' },
-    { id: 'ic star1.png', src: '/assets/svg_stickers/ic star1.png' },
-    { id: 'ic star1_red.png', src: '/assets/svg_stickers/ic star1_red.png' },
-    { id: 'ic_gold_star.png', src: '/assets/svg_stickers/ic_gold_star.png' }
-  ];
 
   const handleFileUpload = (e) => {
     const file = e.target.files?.[0];
@@ -280,63 +265,9 @@ export default function InstructorToolbox() {
             onChange={handleFileUpload}
           />
 
-          {/* ZONE 3: REWARDS / STICKERS */}
-          <div className="ito-section-label">Reward Center</div>
-          <div className="ito-stickers-section">
-            <div className="ito-sticker-grid">
-              {availableStickers.map((sticker) => (
-                <div 
-                  key={sticker.id} 
-                  className="sticker-item" 
-                  onClick={() => handleAddSticker('instructor', sticker.id, true)}
-                  role="button"
-                  aria-label={`Add ${sticker.id}`}
-                >
-                  <img 
-                    src={sticker.src} 
-                    alt={sticker.id} 
-                    style={{ 
-                      width: '100%', 
-                      height: '100%', 
-                      objectFit: 'contain',
-                      ...(sticker.isSmall ? { transform: 'scale(0.75)' } : {})
-                    }} 
-                  />
-                </div>
-              ))}
-            </div>
-            
-            <div className="ito-undo-row">
-              <span className="undo-symbol-bold">
-                <RotateCcw size={14} strokeWidth={3} />
-              </span>
-              <button 
-                className="gb-btn"
-                onClick={() => handleAddSticker('instructor', 'UNDO_IC', true)}
-              >
-                undo last
-              </button>
-              <span className="undo-spacer" style={{ whiteSpace: 'pre' }}>   </span>
-              <button 
-                className="gb-btn"
-                onClick={() => handleAddSticker('instructor', 'UNDO_ALL_IC', true)}
-              >
-                all
-              </button>
-              <span className="undo-spacer" style={{ whiteSpace: 'pre' }}>   </span>
-              <button 
-                className="gb-btn"
-                onClick={() => handleAddSticker('instructor', 'UNDO_ALL_PEO', true)}
-                title="Click to clear all PEO stickers"
-              >
-                all peo
-              </button>
-            </div>
-          </div>
-
           <div style={{ width: '90%', height: '1px', background: 'var(--glass-border)', margin: '14px auto 10px auto' }} />
 
-          {/* ZONE 4: MUTED SETTINGS & ADMIN */}
+          {/* ZONE 3: MUTED SETTINGS & ADMIN */}
           <div className="ito-admin-section">
             <div className="ito-theme-grid">
               <button 
@@ -353,13 +284,21 @@ export default function InstructorToolbox() {
               </button>
             </div>
 
-            <div className="ito-utility-grid">
+            <div className="ito-utility-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
               <button 
                 className="ito-admin-btn"
                 onClick={resetStudentState}
                 title="Reset Room / Refresh Session"
               >
                 Reset Room
+              </button>
+
+              <button 
+                className="ito-admin-btn"
+                onClick={() => handleAddSticker('instructor', 'UNDO_ALL_PEO', true)}
+                title="Clear all stickers from all PEOs"
+              >
+                Clear Stickers
               </button>
 
               <button 

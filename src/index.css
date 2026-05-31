@@ -4693,4 +4693,71 @@ body {
 .portrait-buttons-row {
   display: none !important;
 }
+
+/* Participant Hover Reaction Bar (Instructor View Only) */
+.video-cell .peo-reaction-bar {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translate(-50%, -4px);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(9, 13, 22, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 4px 6px;
+  border-radius: 20px;
+  z-index: 200;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+}
+
+.video-cell:hover .peo-reaction-bar {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(-50%, 0);
+}
+
+.peo-reaction-bar .reaction-btn {
+  background: transparent;
+  border: none;
+  padding: 2px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s ease;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+}
+
+.peo-reaction-bar .reaction-btn:hover {
+  transform: scale(1.25);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.peo-reaction-bar .reaction-btn img {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
+
+.peo-reaction-bar .reaction-divider {
+  width: 1px;
+  height: 14px;
+  background: rgba(255, 255, 255, 0.2);
+  margin: 0 2px;
+}
+
+.peo-reaction-bar .reaction-btn.undo-btn {
+  color: #a8a29e;
+}
+
+.peo-reaction-bar .reaction-btn.undo-btn:hover {
+  color: #ffffff;
+}
 
