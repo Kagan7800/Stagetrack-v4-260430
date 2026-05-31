@@ -135,9 +135,9 @@ export function AppProvider({ children }) {
       
       return [
         rightColBottomRight,
-        leftColBottomRight,
+        leftColBottomLeft,
         rightColBottomLeft,
-        leftColBottomLeft
+        leftColBottomRight
       ];
     };
 
