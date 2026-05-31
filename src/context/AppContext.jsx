@@ -92,6 +92,55 @@ export function AppProvider({ children }) {
   });
 
   const generateDefaultParticipants = useCallback((includeRestored = true) => {
+    if (MOCK_USER_COUNT === 5 || MOCK_USER_COUNT === 6) {
+      const list = new Array(8);
+      const displayOrder = [0, 1, 4, 5, 2, 3, 6, 7];
+      
+      list[0] = { 
+        id: 'instructor-ic', 
+        name: 'Instructor', 
+        color: '#3b82f6', 
+        initial: 'I', 
+        isInstructor: true 
+      };
+      
+      list[1] = { 
+        id: 'blank-1', 
+        isBlank: true, 
+        blankIndex: 1 
+      };
+      
+      let blankCounter = 1;
+      let userNumber = 2; // guest at idx 1 is Student 1, so mock starts at 2
+      
+      displayOrder.forEach(idx => {
+        if (idx === 0 || idx === 1) return;
+        
+        let isBlank = false;
+        if (MOCK_USER_COUNT === 5) {
+          if (idx === 3 || idx === 7) isBlank = true;
+        } else if (MOCK_USER_COUNT === 6) {
+          if (idx === 3) isBlank = true;
+        }
+        
+        if (isBlank) {
+          blankCounter++;
+          list[idx] = { id: `blank-${idx}`, isBlank: true, blankIndex: blankCounter };
+        } else {
+          const nameVal = String(userNumber);
+          const mappedSlotNum = idx === 4 ? 3 : (idx === 5 ? 4 : (idx === 2 ? 5 : (idx === 3 ? 6 : (idx === 6 ? 7 : 8))));
+          list[idx] = {
+            id: mappedSlotNum,
+            name: nameVal,
+            color: `hsl(${(userNumber * 137.5) % 360}, 70%, 60%)`,
+            initial: nameVal
+          };
+          userNumber++;
+        }
+      });
+      return list;
+    }
+
     // Helper function to map 1-based display slot number to grid index
     const getArrayIndex = (slotNum) => {
       if (totalSlots < 8) {
