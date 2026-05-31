@@ -4516,8 +4516,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 40%;
-  max-height: 48px;
+  height: 80%;
+  max-height: 95px;
   max-width: 100%;
   z-index: 1000;
 }
@@ -4532,10 +4532,10 @@ body {
 
 .sor-logo-icon {
   position: absolute;
-  height: 33%;
+  height: 16.5%;
   width: auto;
   object-fit: contain;
   left: 50%;
   transform: translateX(-50%);
-  top: 18%;
+  top: 28%;
 }
