@@ -4516,8 +4516,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 80%;
-  max-height: 95px;
+  height: 40%;
+  max-height: 48px;
   max-width: 100%;
   z-index: 1000;
 }
