@@ -126,6 +126,8 @@ export default function GuestContainer({
   }, [isEditing, participant.id, participant.isBlank, blankCovers]);
 
   const canEditBlank = Number(MOCK_USER_COUNT) === 1;
+  const isSpecialBottomRightBlank = Number(MOCK_USER_COUNT) === 5 && participant.id === 'blank-7';
+  const canEditThisBlank = (isSpecialBottomRightBlank && isInstructorClient) || (!isSpecialBottomRightBlank && canEditBlank);
 
   if (participant.isBlank) {
     const isPending = isInstructorClient && participant.blankIndex === 1 && pendingRequest !== null;
@@ -242,17 +244,34 @@ export default function GuestContainer({
     };
 
     const isLocalFile = tempCoverUrl.startsWith('data:image/');
+    const hasHyperlink = !!coverData.hyperlink;
 
     return (
       <div 
         className={`video-cell spotlight-cell blank-peo-container ${hasCover ? 'has-cover' : ''}`}
-        style={hasCover && coverData.hyperlink ? { cursor: 'pointer' } : {}}
+        style={hasHyperlink ? { cursor: 'pointer' } : {}}
         onClick={(e) => {
-          if (hasCover && coverData.hyperlink && !e.target.closest('.blank-peo-edit-form') && !e.target.closest('.edit-blank-btn')) {
+          if (hasHyperlink && !e.target.closest('.blank-peo-edit-form') && !e.target.closest('.edit-blank-btn')) {
             window.open(coverData.hyperlink, '_blank');
           }
         }}
       >
+        {isSpecialBottomRightBlank && (
+          <img 
+            src="/assets/lights.png" 
+            alt="Lights" 
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '50%',
+              objectFit: 'cover',
+              zIndex: 2,
+              borderRadius: '12px 12px 0 0'
+            }}
+          />
+        )}
         {hasCover && (
           <div 
             className="peo-background-cover"
@@ -271,14 +290,21 @@ export default function GuestContainer({
           />
         )}
         {/* Label for 1st or 2nd blank PEO container */}
-        {canEditBlank && !hasCover && (
+        {canEditThisBlank && !isSpecialBottomRightBlank && !hasCover && (
           <div className="blank-peo-label">
             {participant.blankIndex === 1 ? "Upload 1" : "Upload 2"}
           </div>
         )}
 
+        {/* Special "Attach Link" label for students */}
+        {isSpecialBottomRightBlank && !isInstructorClient && (
+          <div className="gc-name-badge" style={{ zIndex: 12 }}>
+            Attach Link
+          </div>
+        )}
+
         {/* Upload Cover Trigger */}
-        {canEditBlank && !isEditing && (
+        {canEditThisBlank && !isEditing && (
           <button 
             className={`edit-blank-btn ${hasCover ? 'has-cover-btn' : ''}`}
             style={{ zIndex: 2 }}
