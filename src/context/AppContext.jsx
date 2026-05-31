@@ -130,13 +130,13 @@ export function AppProvider({ children }) {
       
       const leftColBottomLeft = (numRows - 1) * 2;
       const leftColBottomRight = (numRows - 1) * 2 + 1;
-      const rightColBottomLeft = halfLength + (numRows - 1) * 2;
+      const rightColTopLeft = halfLength;
       const rightColBottomRight = halfLength + (numRows - 1) * 2 + 1;
       
       return [
         rightColBottomRight,
         leftColBottomLeft,
-        rightColBottomLeft,
+        rightColTopLeft,
         leftColBottomRight
       ];
     };
