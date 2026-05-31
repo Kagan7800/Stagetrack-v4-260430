@@ -4532,10 +4532,10 @@ body {
 
 .sor-logo-icon {
   position: absolute;
-  height: 16.5%;
+  height: 20%;
   width: auto;
   object-fit: contain;
   left: 50%;
   transform: translateX(-50%);
-  top: 28%;
+  top: 26%;
 }
