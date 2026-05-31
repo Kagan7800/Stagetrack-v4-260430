@@ -300,8 +300,8 @@ export default function InstructorToolbox() {
               <span className="undo-spacer" style={{ whiteSpace: 'pre' }}>   </span>
               <button 
                 className="gb-btn"
-                onDoubleClick={() => handleAddSticker('instructor', 'UNDO_ALL_PEO', true)}
-                title="Double click to clear all PEO stickers"
+                onClick={() => handleAddSticker('instructor', 'UNDO_ALL_PEO', true)}
+                title="Click to clear all PEO stickers"
               >
                 all peo
               </button>

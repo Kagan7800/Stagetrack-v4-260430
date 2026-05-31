@@ -44,10 +44,17 @@ export function AppProvider({ children }) {
 
   const totalSlots = MOCK_USER_COUNT === 1
     ? 3
-    : (MOCK_USER_COUNT >= 4 
-        ? (MOCK_USER_COUNT <= 4 ? 4 : (MOCK_USER_COUNT <= 8 ? 8 : (MOCK_USER_COUNT <= 12 ? 12 : 16)))
-        : (MOCK_USER_COUNT % 2 !== 0 ? MOCK_USER_COUNT + 1 : MOCK_USER_COUNT)
-      );
+    : (MOCK_USER_COUNT === 2 
+        ? 2 
+        : (MOCK_USER_COUNT === 3 
+            ? 4 
+            : (MOCK_USER_COUNT === 4 
+                ? 4 
+                : (MOCK_USER_COUNT <= 6 
+                    ? 6 
+                    : (MOCK_USER_COUNT <= 8 
+                        ? 8 
+                        : (MOCK_USER_COUNT <= 12 ? 12 : 16))))));
 
   const [isJoined, setIsJoined] = useState(() => {
     try {
@@ -92,73 +99,51 @@ export function AppProvider({ children }) {
   });
 
   const generateDefaultParticipants = useCallback((includeRestored = true) => {
-    if (MOCK_USER_COUNT === 5 || MOCK_USER_COUNT === 6) {
-      const list = new Array(8);
-      const displayOrder = [0, 1, 4, 5, 2, 3, 6, 7];
-      
-      list[0] = { 
-        id: 'instructor-ic', 
-        name: 'Instructor', 
-        color: '#3b82f6', 
-        initial: 'I', 
-        isInstructor: true 
-      };
-      
-      list[1] = { 
-        id: 'blank-1', 
-        isBlank: true, 
-        blankIndex: 1 
-      };
-      
-      let blankCounter = 1;
-      let userNumber = 2; // guest at idx 1 is Student 1, so mock starts at 2
-      
-      displayOrder.forEach(idx => {
-        if (idx === 0 || idx === 1) return;
-        
-        let isBlank = false;
-        if (MOCK_USER_COUNT === 5) {
-          if (idx === 3 || idx === 7) isBlank = true;
-        } else if (MOCK_USER_COUNT === 6) {
-          if (idx === 3) isBlank = true;
-        }
-        
-        if (isBlank) {
-          blankCounter++;
-          list[idx] = { id: `blank-${idx}`, isBlank: true, blankIndex: blankCounter };
-        } else {
-          const nameVal = String(userNumber);
-          const mappedSlotNum = idx === 4 ? 3 : (idx === 5 ? 4 : (idx === 2 ? 5 : (idx === 3 ? 6 : (idx === 6 ? 7 : 8))));
-          list[idx] = {
-            id: mappedSlotNum,
-            name: nameVal,
-            color: `hsl(${(userNumber * 137.5) % 360}, 70%, 60%)`,
-            initial: nameVal
-          };
-          userNumber++;
-        }
-      });
-      return list;
-    }
+    const getDisplayOrder = (slots) => {
+      if (slots === 2) return [0, 1];
+      if (slots === 3) return [0, 2, 1];
+      if (slots === 4) return [0, 2, 1, 3];
+      if (slots === 6) return [0, 3, 1, 4, 2, 5];
+      if (slots < 8) {
+        return Array.from({ length: slots }, (_, i) => i);
+      }
+      const halfLength = slots / 2;
+      const numRows = slots / 4;
+      const order = [];
+      for (let r = 0; r < numRows; r++) {
+        order.push(r * 2);
+        order.push(r * 2 + 1);
+        order.push(halfLength + r * 2);
+        order.push(halfLength + r * 2 + 1);
+      }
+      return order;
+    };
 
-    // Helper function to map 1-based display slot number to grid index
-    const getArrayIndex = (slotNum) => {
-      if (totalSlots < 8) {
-        return slotNum - 1;
-      }
-      const halfLength = totalSlots / 2;
-      const row = Math.floor((slotNum - 1) / 4);
-      const col = (slotNum - 1) % 4;
-      if (col < 2) {
-        return row * 2 + col;
-      } else {
-        return halfLength + row * 2 + (col - 2);
-      }
+    const getBlankPriorityList = (slots) => {
+      if (slots === 2) return [];
+      if (slots === 3) return [2, 1];
+      if (slots === 4) return [3, 1];
+      if (slots === 6) return [5, 2];
+      
+      const halfLength = slots / 2;
+      const numRows = slots / 4;
+      
+      const leftColBottomLeft = (numRows - 1) * 2;
+      const leftColBottomRight = (numRows - 1) * 2 + 1;
+      const rightColBottomLeft = halfLength + (numRows - 1) * 2;
+      const rightColBottomRight = halfLength + (numRows - 1) * 2 + 1;
+      
+      return [
+        rightColBottomRight,
+        leftColBottomRight,
+        rightColBottomLeft,
+        leftColBottomLeft
+      ];
     };
 
     const list = new Array(totalSlots);
 
-    // Force PEO 1 (index 0) to be Instructor Client
+    // Initialize list with Instructor
     list[0] = { 
       id: 'instructor-ic', 
       name: 'Instructor', 
@@ -167,85 +152,70 @@ export function AppProvider({ children }) {
       isInstructor: true 
     };
 
-    // Force PEO 2 (index 1) to be a blank slot (guest join destination)
-    list[1] = { 
-      id: 'blank-1', 
-      isBlank: true, 
-      blankIndex: 1 
-    };
+    const numBlanks = totalSlots - MOCK_USER_COUNT;
+    const blankPriority = getBlankPriorityList(totalSlots);
+    let blankIndices = blankPriority.slice(0, numBlanks);
 
-    let blankCounter = 1;
+    if (MOCK_USER_COUNT === 9) {
+      blankIndices = [11, 6, 4];
+    }
 
-    for (let slotNum = 1; slotNum <= totalSlots; slotNum++) {
-      const idx = getArrayIndex(slotNum);
-      if (idx === 0 || idx === 1) {
-        continue;
-      }
-      
-      // Determine if this slot is a designated blank slot
-      let isDesignatedBlank = false;
-      if (MOCK_USER_COUNT === 3) {
-        if (slotNum === 2) {
-          isDesignatedBlank = true;
-        }
-      } else if (MOCK_USER_COUNT === 5) {
-        if (slotNum === 6 || slotNum === 7 || slotNum === 8) {
-          isDesignatedBlank = true;
-        }
-      } else if (MOCK_USER_COUNT === 6) {
-        if (slotNum === 5 || slotNum === 8) {
-          isDesignatedBlank = true;
-        }
-      } else if (MOCK_USER_COUNT === 7) {
-        if (slotNum === 8) {
-          isDesignatedBlank = true;
-        }
-      } else if (MOCK_USER_COUNT === 9) {
-        if (slotNum === 10 || slotNum === 11 || slotNum === 12) {
-          isDesignatedBlank = true;
-        }
-      } else if (MOCK_USER_COUNT === 10) {
-        if (slotNum === 9 || slotNum === 12) {
-          isDesignatedBlank = true;
-        }
-      } else if (MOCK_USER_COUNT === 11) {
-        if (slotNum === 12) {
-          isDesignatedBlank = true;
-        }
-      } else if (MOCK_USER_COUNT === 13) {
-        if (slotNum === 6 || slotNum === 15 || slotNum === 16) {
-          isDesignatedBlank = true;
-        }
-      } else if (MOCK_USER_COUNT === 14) {
-        if (slotNum === 13 || slotNum === 16) {
-          isDesignatedBlank = true;
-        }
-      } else if (MOCK_USER_COUNT === 15) {
-        if (slotNum === 16) {
-          isDesignatedBlank = true;
-        }
-      }
+    const blankIndexMap = {};
+    blankIndices.forEach((idx, i) => {
+      blankIndexMap[idx] = i + 1;
+    });
 
-      const customRulesMatch = [3, 6, 7, 9, 10, 11, 13, 14, 15].includes(MOCK_USER_COUNT);
-      const isBlank = isDesignatedBlank || (!customRulesMatch && slotNum > MOCK_USER_COUNT);
-
-      if (isBlank) {
-        blankCounter++;
-        list[idx] = { id: `blank-${idx}`, isBlank: true, blankIndex: blankCounter };
+    for (let idx = 1; idx < totalSlots; idx++) {
+      if (blankIndices.includes(idx)) {
+        list[idx] = { 
+          id: `blank-${idx}`, 
+          isBlank: true, 
+          blankIndex: blankIndexMap[idx] 
+        };
       } else {
-        let nameVal = `${slotNum}`;
-        if (MOCK_USER_COUNT === 3) {
-          if (slotNum === 3) nameVal = "2";
-          if (slotNum === 4) nameVal = "3";
-        }
         list[idx] = {
-          id: slotNum,
-          name: nameVal,
-          color: `hsl(${(slotNum * 137.5) % 360}, 70%, 60%)`,
-          initial: nameVal
+          id: idx + 1, // temporary placeholder, will be mapped below
+          name: '',
+          color: '',
+          initial: ''
         };
       }
     }
+
+    // Post-processing to assign names and IDs sequentially in display order
+    const displayOrder = getDisplayOrder(totalSlots);
+    let studentCounter = 0;
+    displayOrder.forEach(idx => {
+      if (idx >= list.length || !list[idx]) return;
+      if (list[idx].isInstructor || list[idx].isBlank) return;
+      
+      studentCounter++;
+      const nameVal = String(studentCounter);
+      
+      let mappedSlotNum = idx + 1;
+      if (totalSlots >= 8) {
+        const halfLength = totalSlots / 2;
+        if (idx < halfLength) {
+          const row = Math.floor(idx / 2);
+          const col = idx % 2;
+          mappedSlotNum = row * 4 + col + 1;
+        } else {
+          const rightIdx = idx - halfLength;
+          const row = Math.floor(rightIdx / 2);
+          const col = rightIdx % 2;
+          mappedSlotNum = row * 4 + col + 3;
+        }
+      } else if (totalSlots === 4) {
+        mappedSlotNum = idx === 0 ? 1 : 
+                        idx === 1 ? 2 : 
+                        idx === 2 ? 3 : 4;
+      }
+
+      list[idx].id = mappedSlotNum;
+      list[idx].name = nameVal;
+      list[idx].initial = nameVal;
+      list[idx].color = `hsl(${(studentCounter * 137.5) % 360}, 70%, 60%)`;
+    });
 
     return list;
   }, [totalSlots, MOCK_USER_COUNT]);
@@ -510,6 +480,11 @@ export function AppProvider({ children }) {
         return;
       }
 
+      if (stickerName === 'UNDO_ALL_PEO') {
+        setGuestStickers({});
+        return;
+      }
+
       if (activeGuestId === null) return;
       targetId = activeGuestId;
     }
@@ -538,20 +513,16 @@ export function AppProvider({ children }) {
 
       if (isInstructor) {
         if (stickerName === 'UNDO_IC') {
-          const icUndoSlots = ['tc', 'tl-c', 'tr-c', 'lc', 'birthday', 'crown'];
+          const icUndoSlots = ['tc', 'tl-c', 'tr-c', 'lc', 'rc-1', 'rc-2', 'birthday', 'crown'];
           const lastIcIndex = current.findLastIndex(s => icUndoSlots.includes(s.position));
           if (lastIcIndex !== -1) current.splice(lastIcIndex, 1);
           return { ...prev, [targetId]: current };
         }
 
         if (stickerName === 'UNDO_ALL_IC') {
-          const icUndoSlots = ['tc', 'tl-c', 'tr-c', 'lc', 'birthday', 'crown'];
+          const icUndoSlots = ['tc', 'tl-c', 'tr-c', 'lc', 'rc-1', 'rc-2', 'birthday', 'crown'];
           current = current.filter(s => !icUndoSlots.includes(s.position));
           return { ...prev, [targetId]: current };
-        }
-
-        if (stickerName === 'UNDO_ALL_PEO') {
-          return { ...prev, [targetId]: [] };
         }
 
         if (stickerName === 'Happy_Birthday.png') {

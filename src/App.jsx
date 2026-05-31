@@ -451,8 +451,8 @@ function App() {
           </div>
         ) : (
           /* Center Grid (Landscape/Desktop) */
-          <div className="center-grid-area" data-columns={halfLength <= 2 ? "1" : "2"}>
-             <div className="side-peos" data-columns={halfLength <= 2 ? "1" : "2"}>
+          <div className="center-grid-area" data-columns={halfLength <= 3 ? "1" : "2"}>
+             <div className="side-peos" data-columns={halfLength <= 3 ? "1" : "2"}>
                {leftParticipants.map(p => {
                  return (
                    <GuestContainer 
@@ -498,7 +498,7 @@ function App() {
                </div>
              </div>
              
-             <div className="side-peos" data-columns={halfLength <= 2 ? "1" : "2"}>
+             <div className="side-peos" data-columns={halfLength <= 3 ? "1" : "2"}>
                {rightParticipantsLandscape.map(p => {
                  return (
                    <GuestContainer 
