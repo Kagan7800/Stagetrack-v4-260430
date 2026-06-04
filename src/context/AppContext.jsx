@@ -1,9 +1,14 @@
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useContext, useState, useMemo, useCallback, useEffect } from 'react';
+import { createContext, useContext, useState, useMemo, useCallback, useEffect, useRef } from 'react';
+import { doc, onSnapshot, setDoc, updateDoc } from 'firebase/firestore';
+import { db, ensureAuthenticated } from '../firebase';
 
 const AppContext = createContext();
 
 export function AppProvider({ children }) {
+  const [sessionId, setSessionId] = useState(null);
+  const isRemoteUpdate = useRef(false);
+  const role = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('stagetrack_role') : null;
   // Detect if this is a fresh session (tab opened/restored or system restarted)
   if (typeof window !== 'undefined') {
     try {
@@ -221,6 +226,11 @@ export function AppProvider({ children }) {
   }, [totalSlots, MOCK_USER_COUNT]);
 
   const [participants, setParticipants] = useState(() => generateDefaultParticipants(true));
+  useEffect(() => {
+    if (sessionId && !isRemoteUpdate.current) {
+      updateDoc(doc(db, "sessions", sessionId), { participants }).catch(e=>console.error(e));
+    }
+  }, [participants, sessionId]);
 
   const [activeGuestId, setActiveGuestId] = useState(null);
   const [activeToolbox, setActiveToolbox] = useState('instructor');
@@ -269,8 +279,11 @@ export function AppProvider({ children }) {
   useEffect(() => {
     try {
       localStorage.setItem('stagetrack_active_theme', activeTheme);
+      if (sessionId && !isRemoteUpdate.current) {
+        updateDoc(doc(db, "sessions", sessionId), { activeTheme }).catch(e=>console.error(e));
+      }
     } catch { /* ignore */ }
-  }, [activeTheme]);
+  }, [activeTheme, sessionId]);
 
   // Keep-alive heartbeat interval to identify active sessions across tabs
   useEffect(() => {
@@ -293,26 +306,38 @@ export function AppProvider({ children }) {
   useEffect(() => {
     try {
       localStorage.setItem('stagetrack_guest_buttons', JSON.stringify(guestButtons));
+      if (sessionId && !isRemoteUpdate.current) {
+        updateDoc(doc(db, "sessions", sessionId), { guestButtons }).catch(e=>console.error(e));
+      }
     } catch { /* ignore */ }
-  }, [guestButtons]);
+  }, [guestButtons, sessionId]);
 
   useEffect(() => {
     try {
       localStorage.setItem('stagetrack_guest_stickers', JSON.stringify(guestStickers));
+      if (sessionId && !isRemoteUpdate.current) {
+        updateDoc(doc(db, "sessions", sessionId), { guestStickers }).catch(e=>console.error(e));
+      }
     } catch { /* ignore */ }
-  }, [guestStickers]);
+  }, [guestStickers, sessionId]);
 
   useEffect(() => {
     try {
       localStorage.setItem('stagetrack_global_mute', String(globalMute));
+      if (sessionId && !isRemoteUpdate.current) {
+        updateDoc(doc(db, "sessions", sessionId), { globalMute }).catch(e=>console.error(e));
+      }
     } catch { /* ignore */ }
-  }, [globalMute]);
+  }, [globalMute, sessionId]);
 
   useEffect(() => {
     try {
       localStorage.setItem('stagetrack_global_pause', String(globalPause));
+      if (sessionId && !isRemoteUpdate.current) {
+        updateDoc(doc(db, "sessions", sessionId), { globalPause }).catch(e=>console.error(e));
+      }
     } catch { /* ignore */ }
-  }, [globalPause]);
+  }, [globalPause, sessionId]);
 
   // Chat Moderation State
   const [messages, setMessages] = useState([
@@ -320,6 +345,11 @@ export function AppProvider({ children }) {
     { id: 'initial-2', text: "Hello there! This is a guest message in green.", sender: "other", senderName: "2", status: "public" },
     { id: 'initial-3', text: "I have a private question/pending issue in red.", sender: "other", senderName: "3", status: "pending" }
   ]);
+  useEffect(() => {
+    if (sessionId && !isRemoteUpdate.current) {
+      updateDoc(doc(db, "sessions", sessionId), { messages }).catch(e=>console.error(e));
+    }
+  }, [messages, sessionId]);
 
   // Metronome State
   const [metronomeBpm, setMetronomeBpm] = useState(120);
@@ -768,6 +798,12 @@ export function AppProvider({ children }) {
     console.log("Requesting access with data in student tab:", reqData);
     localStorage.setItem('stagetrack_lobby_request', JSON.stringify(reqData));
     localStorage.setItem('stagetrack_lobby_response', JSON.stringify({ status: 'pending' }));
+    if (sessionId) {
+      updateDoc(doc(db, "sessions", sessionId), { 
+        lobbyRequest: reqData,
+        lobbyResponse: { status: 'pending' }
+      }).catch(e=>console.error(e));
+    }
   }, [resetStudentState]);
 
   const approveRequest = useCallback(() => {
@@ -817,95 +853,60 @@ export function AppProvider({ children }) {
         selectedBorder: pendingRequest.selectedBorder
       }
     }));
-    localStorage.removeItem('stagetrack_lobby_request');
+    updateDoc(doc(db, "sessions", sessionId), { 
+      lobbyResponse: { status: 'accepted', joinedUser: { ...pendingRequest, id: activeId } },
+      lobbyRequest: null
+    }).catch(e=>console.error(e));
+
     setPendingRequest(null);
-  }, [pendingRequest]);
+  }, [pendingRequest, sessionId]);
 
   const denyRequest = useCallback(() => {
-    localStorage.setItem('stagetrack_lobby_response', JSON.stringify({ status: 'denied' }));
-    localStorage.removeItem('stagetrack_lobby_request');
+    if (!sessionId) return;
+    updateDoc(doc(db, "sessions", sessionId), { 
+        lobbyResponse: { status: 'denied' },
+        lobbyRequest: null
+    }).catch(e=>console.error(e));
     setPendingRequest(null);
-  }, []);
+  }, [sessionId]);
 
-  // Listen to cross-tab storage actions
   useEffect(() => {
-    const handleStorage = (e) => {
-      console.log("Storage event fired:", e.key, "New value:", e.newValue);
-      // For instructor: listen for new requests
-      if (e.key === 'stagetrack_lobby_request') {
-        console.log("Received lobby request event:", e.newValue);
-        if (e.newValue) {
-          setPendingRequest(JSON.parse(e.newValue));
-        } else {
-          setPendingRequest(null);
-        }
-      }
-      // For student: listen for response
-      if (e.key === 'stagetrack_lobby_response') {
-        if (e.newValue) {
-          const res = JSON.parse(e.newValue);
-          if (res.status === 'accepted') {
-            setLobbyStatus('initial');
-            setIsJoined(true);
-            const activeId = res.joinedUser.id || `active-joined-local`;
-            setParticipants(prev => {
-              const next = [...prev];
-              const blankIdx = next.findIndex(p => p.isBlank);
-              if (blankIdx !== -1) {
-                next[blankIdx] = {
-                  id: activeId,
-                  name: `${res.joinedUser.myName} & ${res.joinedUser.myLittleOne}`,
-                  color: res.joinedUser.color,
-                  selectedIcon: null,
-                  selectedBorder: res.joinedUser.selectedBorder,
-                  initial: res.joinedUser.myName[0] || '?'
-                };
-              }
-              return next;
+    const initFirebaseSession = async () => {
+      await ensureAuthenticated();
+      const params = new URLSearchParams(window.location.search);
+      let sid = params.get('session');
+      
+      if (!sid) {
+        sid = 'session-' + Math.random().toString(36).substr(2, 9);
+        const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?session=' + sid + window.location.hash;
+        window.history.replaceState({path:newUrl}, '', newUrl);
+        sessionStorage.setItem('stagetrack_role', 'instructor');
+        setIsJoined(true);
+        
+        setTimeout(async () => {
+          try {
+            await setDoc(doc(db, "sessions", sid), {
+              createdAt: Date.now(),
+              participants: generateDefaultParticipants(false),
+              guestStickers: {},
+              guestButtons: {},
+              messages: [
+                { id: 'initial-1', text: "Hello! Here is a self message in darker purple.", sender: "self", status: "public" },
+                { id: 'initial-2', text: "Hello there! This is a guest message in green.", sender: "other", senderName: "2", status: "public" },
+                { id: 'initial-3', text: "I have a private question/pending issue in red.", sender: "other", senderName: "3", status: "pending" }
+              ],
+              lobbyRequest: null,
+              lobbyResponse: null,
+              globalMute: true,
+              globalPause: false,
+              activeTheme: 'music-fun'
             });
-
-            if (res.joinedUser.selectedIcon) {
-              setGuestStickers(prev => ({
-                ...prev,
-                [activeId]: [
-                  {
-                    id: crypto.randomUUID(),
-                    name: res.joinedUser.selectedIcon,
-                    position: 1
-                  }
-                ]
-              }));
-            }
-          } else if (res.status === 'denied') {
-            setLobbyStatus('denied');
-            setIsJoined(false);
-          }
-        } else {
-          // If lobby response was removed/deleted, kick student back to lobby
-          setLobbyStatus('initial');
-          setIsJoined(false);
-        }
+          } catch(e) { console.error(e); }
+        }, 500);
       }
-      if (e.key === 'stagetrack_guest_stickers') {
-        try {
-          setGuestStickers(e.newValue ? JSON.parse(e.newValue) : {});
-        } catch { /* ignore */ }
-      }
-      if (e.key === 'stagetrack_guest_buttons') {
-        try {
-          setGuestButtons(e.newValue ? JSON.parse(e.newValue) : {});
-        } catch { /* ignore */ }
-      }
-      if (e.key === 'stagetrack_active_theme') {
-        setActiveTheme(e.newValue === 'sor' ? 'sor' : 'music-fun');
-      }
-      if (e.key === 'stagetrack_global_mute') {
-        setGlobalMute(e.newValue === 'true');
-      }
-      if (e.key === 'stagetrack_global_pause') {
-        setGlobalPause(e.newValue === 'true');
-      }
+      setSessionId(sid);
     };
+    initFirebaseSession();
 
     const handleBeforeUnload = () => {
       try {
@@ -913,25 +914,78 @@ export function AppProvider({ children }) {
         localStorage.removeItem('stagetrack_lobby_response');
       } catch { /* ignore */ }
     };
-
-    window.addEventListener('storage', handleStorage);
     window.addEventListener('beforeunload', handleBeforeUnload);
-    
-    // Initial check on load: do not aggressively clear active requests to maintain tab status on reload
-    try {
-      // Clean up response if it was accepted in a previous session
-      const savedResponse = localStorage.getItem('stagetrack_lobby_response');
-      if (savedResponse && JSON.parse(savedResponse).status === 'accepted') {
-        localStorage.removeItem('stagetrack_lobby_request');
-        localStorage.removeItem('stagetrack_lobby_response');
-      }
-    } catch { /* ignore */ }
 
     return () => {
-      window.removeEventListener('storage', handleStorage);
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
   }, []);
+
+  useEffect(() => {
+    if (!sessionId) return;
+    const unsubscribe = onSnapshot(doc(db, "sessions", sessionId), (snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.data();
+        isRemoteUpdate.current = true;
+
+        if (data.participants) setParticipants(data.participants);
+        if (data.guestStickers) setGuestStickers(data.guestStickers);
+        if (data.guestButtons) setGuestButtons(data.guestButtons);
+        if (data.messages) setMessages(data.messages);
+        if (data.globalMute !== undefined) setGlobalMute(data.globalMute);
+        if (data.globalPause !== undefined) setGlobalPause(data.globalPause);
+        if (data.activeTheme) setActiveTheme(data.activeTheme);
+        
+        const currentRole = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('stagetrack_role') : null;
+
+        if (currentRole === 'instructor') {
+            setPendingRequest(data.lobbyRequest || null);
+        }
+        
+        if (currentRole === 'student') {
+            if (data.lobbyResponse) {
+                if (data.lobbyResponse.status === 'accepted') {
+                    setIsJoined(true);
+                    setLobbyStatus('accepted');
+                    const { joinedUser } = data.lobbyResponse;
+                    setParticipants(prev => {
+                      const next = [...prev];
+                      const blankIdx = next.findIndex(p => p.isBlank);
+                      if (blankIdx !== -1) {
+                        next[blankIdx] = {
+                          id: joinedUser.id,
+                          name: `${joinedUser.myName} & ${joinedUser.myLittleOne}`,
+                          color: joinedUser.color,
+                          selectedIcon: null,
+                          selectedBorder: joinedUser.selectedBorder,
+                          initial: joinedUser.myName[0] || '?'
+                        };
+                      }
+                      return next;
+                    });
+                } else if (data.lobbyResponse.status === 'denied') {
+                    setIsJoined(false);
+                    setLobbyStatus('denied');
+                }
+            } else {
+                if (lobbyStatus !== 'accepted') {
+                    setIsJoined(false);
+                    setLobbyStatus('initial');
+                }
+            }
+        }
+        
+        setTimeout(() => { isRemoteUpdate.current = false; }, 50);
+      }
+    });
+    return () => unsubscribe();
+  }, [sessionId, lobbyStatus]);
+
+  useEffect(() => {
+    if (sessionId && !isRemoteUpdate.current) {
+        updateDoc(doc(db, "sessions", sessionId), { participants }).catch(e => console.error(e));
+    }
+  }, [participants, sessionId]);
 
   const value = {
     MOCK_USER_COUNT,
