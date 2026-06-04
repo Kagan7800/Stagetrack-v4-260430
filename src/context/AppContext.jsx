@@ -232,20 +232,16 @@ export function AppProvider({ children }) {
       return {};
     }
   });
-  const [guestStickers, setGuestStickers] = useState(() => {
-    try {
-      const saved = localStorage.getItem('stagetrack_guest_stickers');
-      return saved ? JSON.parse(saved) : {};
-    } catch {
-      return {};
-    }
-  });
+  const [guestStickers, setGuestStickers] = useState({});
   const [equippedSticker, setEquippedSticker] = useState(null);
   const [isDoodling, setIsDoodlingInternal] = useState(false);
   const [mediaUrl, setMediaUrlInternal] = useState(null);
   const [mediaType, setMediaTypeInternal] = useState(null);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [showInstructorStickers, setShowInstructorStickers] = useState(false);
+  const [showStudentStickers, setShowStudentStickers] = useState(false);
+  const [showStudentFilters, setShowStudentFilters] = useState(false);
   const [globalMute, setGlobalMute] = useState(() => {
     try {
       const saved = localStorage.getItem('stagetrack_global_mute');
@@ -949,6 +945,9 @@ export function AppProvider({ children }) {
     mediaUrl, mediaType, setMediaUpload, clearMedia,
     isChatOpen, setIsChatOpen,
     isSidebarOpen, setIsSidebarOpen,
+    showInstructorStickers, setShowInstructorStickers,
+    showStudentStickers, setShowStudentStickers,
+    showStudentFilters, setShowStudentFilters,
     globalMute, setGlobalMute,
     globalPause, setGlobalPause,
     messages, setMessages,

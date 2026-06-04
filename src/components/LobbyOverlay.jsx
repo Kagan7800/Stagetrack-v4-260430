@@ -65,7 +65,7 @@ function LobbyAIChat({ instructorName }) {
           onChange={(e) => setChatInput(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="e.g., make the buttons larger / use high contrast"
-          className="lobby-ai-chat-input flex-1 bg-stone-900 border border-stone-800 rounded px-2 py-1.5 text-xs text-stone-200 placeholder-stone-600 focus:outline-none focus:border-[#fbbf24]"
+          className="lobby-ai-chat-input flex-1 bg-stone-900 border border-stone-800 rounded px-2 py-1.5 text-xs text-white placeholder-white focus:outline-none focus:border-[#fbbf24]"
         />
       </div>
 
@@ -87,7 +87,7 @@ function LobbyAIChat({ instructorName }) {
 }
 
 export default function LobbyOverlay() {
-  const { lobbyStatus, requestAccess, setLobbyStatus, resetStudentState, setIsJoined, MOCK_USER_COUNT } = useAppContext();
+  const { lobbyStatus, requestAccess, setLobbyStatus, resetStudentState, setIsJoined, MOCK_USER_COUNT, activeTheme } = useAppContext();
 
   const handleEnterAsInstructor = () => {
     sessionStorage.setItem('stagetrack_role', 'instructor');
@@ -163,11 +163,14 @@ export default function LobbyOverlay() {
   const selectedIconFile = selectedIcon;
 
   return (
-    <div className="lobby-backdrop">
+    <div 
+      className="lobby-backdrop"
+      style={activeTheme === 'sor' ? { background: "url('/assets/SOR/sor_bottom_bg.png') center/cover no-repeat" } : {}}
+    >
       {lobbyStatus === 'initial' ? (
         <div 
           className="lobby-svg-container" 
-          style={{ '--lobby-scale': scale }}
+          style={{ '--lobby-scale': scale, color: 'white' }}
         >
           <img src="/assets/lobby_rect.png" className="lobby-card-panel-1" alt="" />
           <img src="/assets/lobby_rect.png" className="lobby-card-panel-2" alt="" />

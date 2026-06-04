@@ -8,6 +8,7 @@ import LeftSidebar from './components/LeftSidebar';
 import LobbyOverlay from './components/LobbyOverlay';
 import { useAppContext } from './context/AppContext';
 import UnifiedToolbox from './components/UnifiedToolbox';
+import InstructorToolbox from './components/InstructorToolbox';
 import ControlDeck from './components/ControlDeck';
 
 function App() {
@@ -167,18 +168,20 @@ function App() {
       {!isJoined && <LobbyOverlay />}
 
       {/* LAYER 0: BASE MUSIC FUN BACKGROUND */}
-      <div 
-        style={{
-          position: 'absolute',
-          inset: 0,
-          zIndex: 0,
-          backgroundImage: "url('/assets/background_modern.png')",
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          pointerEvents: 'none',
-          opacity: 0.7
-        }}
-      />
+      {activeTheme !== 'sor' && (
+        <div 
+          style={{
+            position: 'absolute',
+            inset: 0,
+            zIndex: 0,
+            backgroundImage: "url('/assets/background_modern (2).png')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            pointerEvents: 'none',
+            opacity: 0.7
+          }}
+        />
+      )}
 
       {/* LAYER 1: SOR BACKGROUND BASE */}
       <div 
@@ -191,7 +194,6 @@ function App() {
           backgroundRepeat: 'no-repeat',
           zIndex: 1, 
           pointerEvents: 'none',
-          transition: 'opacity 0.5s ease-in-out',
           opacity: activeTheme === 'sor' ? 1 : 0
         }}
       />
@@ -352,7 +354,7 @@ function App() {
                             }
                             return;
                           }
-                          if (!isInstructorClient) return;
+                          if (!isInstructorClient && p.id !== loggedInGc?.id) return;
                           if (p.isBlank) return;
                           setActiveGuestId(p.id);
                           setActiveToolbox("student");
@@ -452,7 +454,7 @@ function App() {
           </div>
         ) : (
           /* Center Grid (Landscape/Desktop) */
-          <div className="center-grid-area" data-columns={halfLength <= 3 ? "1" : "2"}>
+          <div className={`center-grid-area ${isSidebarOpen || isChatOpen ? 'sidebars-open' : ''}`} data-columns={halfLength <= 3 ? "1" : "2"}>
              <div className="side-peos" data-columns={halfLength <= 3 ? "1" : "2"}>
                {leftParticipants.map(p => {
                  return (
@@ -461,10 +463,15 @@ function App() {
                      participant={p}
                      isActive={activeGuestId === p.id}
                      onClick={() => {
-                       if (!isInstructorClient) return;
+                       if (!isInstructorClient && p.id !== loggedInGc?.id) return;
                        if (p.isBlank) return;
-                        setActiveGuestId(p.id);
-                        setActiveToolbox("student");
+                        if (activeGuestId === p.id && activeToolbox === "student" && isSidebarOpen) {
+                          setIsSidebarOpen(false);
+                        } else {
+                          setActiveGuestId(p.id);
+                          setActiveToolbox("student");
+                          setIsSidebarOpen(true);
+                        }
                      }}
                      onDoubleClick={() => {
                        if (!isInstructorClient) return;
@@ -496,8 +503,8 @@ function App() {
                        onClearMedia={clearMedia}
                      />
                  </div>
-                 <ControlDeck />
                </div>
+               <ControlDeck />
              </div>
              
              <div className="side-peos" data-columns={halfLength <= 3 ? "1" : "2"}>
@@ -508,10 +515,15 @@ function App() {
                      participant={p}
                      isActive={activeGuestId === p.id}
                      onClick={() => {
-                       if (!isInstructorClient) return;
+                       if (!isInstructorClient && p.id !== loggedInGc?.id) return;
                        if (p.isBlank) return;
-                        setActiveGuestId(p.id);
-                        setActiveToolbox("student");
+                        if (activeGuestId === p.id && activeToolbox === "student" && isSidebarOpen) {
+                          setIsSidebarOpen(false);
+                        } else {
+                          setActiveGuestId(p.id);
+                          setActiveToolbox("student");
+                          setIsSidebarOpen(true);
+                        }
                      }}
                      onDoubleClick={() => {
                        if (!isInstructorClient) return;

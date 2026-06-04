@@ -10,15 +10,19 @@ export default function UnifiedToolbox({
   onAddSticker,
   onClose
 }) {
-  const { setIsChatOpen, setIsSidebarOpen, activeTheme } = useAppContext();
+  const { 
+    setIsChatOpen, 
+    setIsSidebarOpen, 
+    activeTheme,
+    showStudentStickers, setShowStudentStickers,
+    showStudentFilters, setShowStudentFilters
+  } = useAppContext();
   const isInstructorClient = sessionStorage.getItem('stagetrack_role') !== 'student';
 
   const isSor = activeTheme === 'sor';
   const themeTextColor = isSor ? '#ef4444' : '#3b82f6';
   const themeSubtextColor = isSor ? 'rgba(239, 68, 68, 0.7)' : 'rgba(59, 130, 246, 0.7)';
   const themeTextShadow = isSor ? '0 0 8px rgba(239, 68, 68, 0.18)' : '0 0 8px rgba(59, 130, 246, 0.18)';
-  const [showStickerPicker, setShowStickerPicker] = useState(false);
-  const [showFilterPicker, setShowFilterPicker] = useState(false);
   const timerRef = useRef(null);
   const filterTimerRef = useRef(null);
 
@@ -37,7 +41,7 @@ export default function UnifiedToolbox({
   }, []);
 
   useEffect(() => {
-    if (showStickerPicker) {
+    if (showStudentStickers) {
       resetInactivityTimer();
     } else {
       if (timerRef.current) clearTimeout(timerRef.current);
@@ -45,10 +49,10 @@ export default function UnifiedToolbox({
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
     };
-  }, [showStickerPicker, resetInactivityTimer]);
+  }, [showStudentStickers, resetInactivityTimer]);
 
   useEffect(() => {
-    if (showFilterPicker) {
+    if (showStudentFilters) {
       resetFilterInactivityTimer();
     } else {
       if (filterTimerRef.current) clearTimeout(filterTimerRef.current);
@@ -56,7 +60,7 @@ export default function UnifiedToolbox({
     return () => {
       if (filterTimerRef.current) clearTimeout(filterTimerRef.current);
     };
-  }, [showFilterPicker, resetFilterInactivityTimer]);
+  }, [showStudentFilters, resetFilterInactivityTimer]);
 
   const handleScreenshot = () => {
     const target = document.querySelector('.app-container');
@@ -91,7 +95,16 @@ export default function UnifiedToolbox({
         setIsChatOpen(false); // Closes chat
         setIsSidebarOpen(false); // Closes ITO
 
-        const image = canvas.toDataURL('image/png');
+        // Create a mirrored canvas
+        const mirrorCanvas = document.createElement('canvas');
+        mirrorCanvas.width = canvas.width;
+        mirrorCanvas.height = canvas.height;
+        const ctx = mirrorCanvas.getContext('2d');
+        ctx.translate(canvas.width, 0);
+        ctx.scale(-1, 1);
+        ctx.drawImage(canvas, 0, 0);
+
+        const image = mirrorCanvas.toDataURL('image/png');
         const link = document.createElement('a');
         link.download = `screenshot-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.png`;
         link.href = image;
@@ -106,27 +119,7 @@ export default function UnifiedToolbox({
     }, 50);
   };
 
-  const guestStickers = [
-    "Balloons.svg",
-    "Boat.svg",
-    "Dancer.svg",
-    "Dog.svg",
-    "Fish.svg",
-    "Flowers 6.svg",
-    "Kitten.svg",
-    "Piano.svg",
-    "Sun with sunglasses.svg",
-    "Truck.svg",
-    "Xylophone.svg",
-    "Confetti.svg"
-  ];
 
-  const specialStickers = [
-    "Drums.svg",
-    "Guitar.svg",
-    "Microphone.svg",
-    "Trumpet.svg"
-  ];
 
   if (!activeGuest) return null;
 
@@ -135,7 +128,7 @@ export default function UnifiedToolbox({
   return (
     <div className={`unified-toolbox glass-panel ${activeTheme === 'sor' ? 'theme-sor' : 'theme-music'}`} style={{ height: '100%', width: '100%' }}>
       <div className="toolbox-header" style={{ minHeight: '52px', borderBottom: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '12px 16px', position: 'relative' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px', textAlign: 'center', maxWidth: '160px', width: '100%', position: 'relative', left: '-20px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px', textAlign: 'center', maxWidth: '160px', width: '100%' }}>
           <span style={{ color: '#ffffff', textShadow: themeTextShadow, fontSize: '0.92rem', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block', width: '100%' }} title={activeGuest && !activeGuest.isInstructor ? `${activeGuest.name}'s Tools` : "Student Tools"}>
             {activeGuest && !activeGuest.isInstructor ? `${activeGuest.name}'s Tools` : "Student Tools"}
           </span>
@@ -145,7 +138,10 @@ export default function UnifiedToolbox({
             </span>
           )}
         </div>
-        <button onClick={onClose} className="close-btn" style={{ position: 'absolute', right: '16px', top: '50%', transform: 'translateY(-50%)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      </div>
+
+      <div style={{ display: 'flex', justifyContent: 'center', padding: '16px 0 2px 0' }}>
+        <button onClick={onClose} className="close-btn" style={{ position: 'static', transform: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'transparent', border: 'none', cursor: 'pointer' }}>
           <svg 
             width="32" 
             height="32" 
@@ -167,7 +163,7 @@ export default function UnifiedToolbox({
         </button>
       </div>
 
-      <div className="toolbox-content">
+      <div className="toolbox-content" style={{ marginTop: '-15px' }}>
         {/* Guest Tools Section */}
         <div className="toolbox-section">
           <div className="gt-buttons-col">
@@ -193,20 +189,24 @@ export default function UnifiedToolbox({
               <span>Chat</span>
             </button>
             <button 
-              className={`gb-btn ${showStickerPicker ? 'active' : ''}`}
+              className={`gb-btn ${showStudentStickers ? 'active' : ''}`}
               onClick={() => {
-                setShowStickerPicker(!showStickerPicker);
-                setShowFilterPicker(false);
+                const nextState = !showStudentStickers;
+                setShowStudentStickers(nextState);
+                setShowStudentFilters(false);
+                if (nextState) setIsSidebarOpen(false);
               }}
             >
               <Smile size={18} />
               <span>Stickers</span>
             </button>
             <button 
-              className={`gb-btn ${(showFilterPicker || buttons.greenFilter || buttons.blueFilter || buttons.purpleFilter || buttons.orangeFilter) ? 'active' : ''}`}
+              className={`gb-btn ${(showStudentFilters || buttons.greenFilter || buttons.blueFilter || buttons.purpleFilter || buttons.orangeFilter) ? 'active' : ''}`}
               onClick={() => {
-                setShowFilterPicker(!showFilterPicker);
-                setShowStickerPicker(false);
+                const nextState = !showStudentFilters;
+                setShowStudentFilters(nextState);
+                setShowStudentStickers(false);
+                if (nextState) setIsSidebarOpen(false);
               }}
             >
               <Sparkles size={18} />
@@ -220,153 +220,6 @@ export default function UnifiedToolbox({
               <span>Take a Picture</span>
             </button>
           </div>
-
-          {showStickerPicker && (
-            <div 
-              className="sticker-picker-popover" 
-              onClick={resetInactivityTimer}
-            >
-              <div className="sticker-picker-header">
-                <h4>Select a Sticker</h4>
-                <button 
-                  className="sticker-picker-close" 
-                  onClick={() => setShowStickerPicker(false)}
-                >
-                  <X size={16} />
-                </button>
-              </div>
-              
-              <div className="sticker-picker-content">
-                {/* Unique Box for Special Rewards & Instruments */}
-                <div style={{
-                  background: 'rgba(255, 255, 255, 0.03)',
-                  border: '1px solid rgba(255, 255, 255, 0.1)',
-                  borderRadius: '10px',
-                  padding: '10px',
-                  boxShadow: 'inset 0 0 10px rgba(255, 255, 255, 0.02)'
-                }}>
-                  <div style={{ fontSize: '0.78rem', fontWeight: 'bold', color: '#ffd700', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    ✨ Instruments
-                  </div>
-                  <div className="peo-sticker-grid">
-                    {specialStickers.map((sticker) => (
-                      <div 
-                        key={sticker} 
-                        className="sticker-item" 
-                        onClick={() => {
-                          onAddSticker(activeGuest.id, sticker, false);
-                          resetInactivityTimer();
-                        }}
-                      >
-                        <img 
-                          src={`/assets/svg_stickers/${sticker}`} 
-                          alt={sticker} 
-                          style={
-                            sticker.includes('Guitar') || sticker.includes('Drums') || sticker.includes('Trumpet') || sticker.includes('Microphone') 
-                              ? { transform: 'scale(1.25)' } 
-                              : {}
-                          }
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Standard Stickers Grid */}
-                <div>
-                  <div style={{ fontSize: '0.78rem', fontWeight: 'bold', color: 'rgba(255, 255, 255, 0.6)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                    Stickers
-                  </div>
-                  <div className="peo-sticker-grid">
-                    {guestStickers.map((sticker) => (
-                      <div 
-                        key={sticker} 
-                        className="sticker-item" 
-                        onClick={() => {
-                          onAddSticker(activeGuest.id, sticker, false);
-                          resetInactivityTimer();
-                        }}
-                      >
-                        <img 
-                          src={`/assets/svg_stickers/${sticker}`} 
-                          alt={sticker} 
-                          style={sticker.includes('Guitar') ? { transform: 'scale(1.25)' } : {}}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {showFilterPicker && (
-            <div 
-              className="sticker-picker-popover" 
-              onClick={resetFilterInactivityTimer}
-              style={{ bottom: '120px' }} // Adjusted height to stay nicely visible above buttons
-            >
-              <div className="sticker-picker-header">
-                <h4>Select a Filter</h4>
-                <button 
-                  className="sticker-picker-close" 
-                  onClick={() => setShowFilterPicker(false)}
-                >
-                  <X size={16} />
-                </button>
-              </div>
-              <div className="peo-sticker-grid">
-                {[
-                  { id: 'greenFilter', name: 'Green Filter', color: '#39ff14', glow: 'rgba(57, 255, 20, 0.5)' },
-                  { id: 'blueFilter', name: 'Blue Filter', color: '#00bfff', glow: 'rgba(0, 191, 255, 0.5)' },
-                  { id: 'purpleFilter', name: 'Purple Filter', color: '#ba55d3', glow: 'rgba(186, 85, 211, 0.5)' },
-                  { id: 'orangeFilter', name: 'Orange Filter', color: '#ff8c00', glow: 'rgba(255, 140, 0, 0.5)' }
-                ].map((filter) => {
-                  const isActive = buttons[filter.id] || false;
-                  return (
-                    <div 
-                      key={filter.id} 
-                      className="sticker-item" 
-                      onClick={() => {
-                        toggleGuestButton(activeGuest.id, filter.id);
-                        resetFilterInactivityTimer();
-                      }}
-                      style={{
-                        background: filter.color,
-                        boxShadow: isActive ? `0 0 12px ${filter.color}` : 'none',
-                        border: isActive ? '3px solid #ffffff' : '1px solid var(--glass-border)',
-                        borderRadius: '8px',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        aspectRatio: '1',
-                        transition: 'all 0.2s ease',
-                        boxSizing: 'border-box'
-                      }}
-                      title={filter.name}
-                    >
-                      <Sparkles size={18} color="#ffffff" style={{ filter: 'drop-shadow(0px 1px 2px rgba(0,0,0,0.5))' }} />
-                    </div>
-                  );
-                })}
-              </div>
-              <button
-                className="clear-filters-btn"
-                onClick={() => {
-                  ['greenFilter', 'blueFilter', 'purpleFilter', 'orangeFilter'].forEach(fId => {
-                    if (buttons[fId]) {
-                      toggleGuestButton(activeGuest.id, fId);
-                    }
-                  });
-                  resetFilterInactivityTimer();
-                }}
-              >
-                <Trash2 size={14} />
-                <span>Remove Filter</span>
-              </button>
-            </div>
-          )}
         </div>
       </div>
     </div>

@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { Palette, Image as ImageIcon, X, Mic, MicOff, Pause, Play, ChevronLeft, ChevronRight, UploadCloud, HardDrive, RotateCcw } from 'lucide-react';
+import { Palette, Image as ImageIcon, X, Mic, MicOff, Pause, Play, ChevronLeft, ChevronRight, UploadCloud, HardDrive, RotateCcw, Smile, Trash2 } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 
 export default function InstructorToolbox() {
@@ -9,9 +9,10 @@ export default function InstructorToolbox() {
     globalPause, setGlobalPause,
     isSidebarOpen, setIsSidebarOpen,
     setMediaUpload, clearMedia, mediaType, mediaUrl,
-    handleAddSticker,
+    handleAddSticker, activeGuestId,
     metronomeBpm, setMetronomeBpm,
     isMetronomePlaying, setIsMetronomePlaying,
+    showInstructorStickers, setShowInstructorStickers,
     activeTheme, setActiveTheme,
     resetStudentState,
     setPendingRequest
@@ -181,6 +182,51 @@ export default function InstructorToolbox() {
                 </div>
               )}
             </div>
+            
+          </div>
+
+          {/* ZONE 3: STICKERS */}
+          <div className="ito-section-label" style={{ marginTop: '20px' }}>Stickers</div>
+          <div className="ito-grid-3">
+            <button 
+              className={`ito-icon-btn ${showInstructorStickers ? 'active' : ''}`}
+              onClick={() => {
+                const nextState = !showInstructorStickers;
+                setShowInstructorStickers(nextState);
+                if (nextState) setIsSidebarOpen(false);
+              }}
+              title="Toggle Sticker Deck"
+            >
+              <div className="icon-wrapper">
+                <Smile size={20} />
+              </div>
+              <span className="btn-label">stickers</span>
+            </button>
+
+            <button 
+              className="ito-icon-btn"
+              onClick={() => {
+                if (activeGuestId) handleAddSticker(activeGuestId, 'UNDO_IC', true);
+                else alert("Please select a student in the grid first!");
+              }}
+              title="Remove Stickers"
+            >
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', textAlign: 'center', lineHeight: '1.2' }}>
+                <span className="btn-label">remove</span>
+                <span className="btn-label">stickers</span>
+              </div>
+            </button>
+
+            <button 
+              className="ito-icon-btn"
+              onClick={() => handleAddSticker('instructor', 'UNDO_ALL_PEO', true)}
+              title="Remove all peo Stickers"
+            >
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', textAlign: 'center', lineHeight: '1.2' }}>
+                <span className="btn-label">remove</span>
+                <span className="btn-label">all peo</span>
+              </div>
+            </button>
           </div>
 
           {/* Collapsible Metronome Drawer */}

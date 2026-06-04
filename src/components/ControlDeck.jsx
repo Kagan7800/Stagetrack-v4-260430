@@ -1,7 +1,8 @@
 import React, { useState, useRef } from 'react';
-import { Palette, Image as ImageIcon, X, Mic, MicOff, Pause, Play, UploadCloud, HardDrive, RotateCcw, Hand, MessageSquare, Camera, Sparkles, Smile } from 'lucide-react';
+import { Palette, Image as ImageIcon, X, Mic, MicOff, Pause, Play, UploadCloud, HardDrive, RotateCcw, Hand, MessageSquare, Camera, Sparkles, Smile, Trash2 } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import { useAppContext } from '../context/AppContext';
+import { instructorStickers, studentStickers } from '../constants/stickers';
 
 export default function ControlDeck() {
   const {
@@ -9,20 +10,24 @@ export default function ControlDeck() {
     globalMute, setGlobalMute,
     globalPause, setGlobalPause,
     setMediaUpload, clearMedia, mediaType, mediaUrl,
-    handleAddSticker,
+    handleAddSticker, guestStickers,
     metronomeBpm, setMetronomeBpm,
     isMetronomePlaying, setIsMetronomePlaying,
     activeTheme, setActiveTheme,
     resetStudentState,
     participants, activeGuestId, setActiveGuestId,
     guestButtons, handleToggleGuestButton,
-    setIsChatOpen, setIsSidebarOpen
+    setIsChatOpen, setIsSidebarOpen,
+    showInstructorStickers,
+    showStudentStickers,
+    showStudentFilters
   } = useAppContext();
 
   const isInstructorClient = sessionStorage.getItem('stagetrack_role') !== 'student';
   const fileInputRef = useRef(null);
   const [showUploadMenu, setShowUploadMenu] = useState(false);
   const [showMetronomePopover, setShowMetronomePopover] = useState(false);
+  const [isPeoStickersOpen, setIsPeoStickersOpen] = useState(false);
 
   // Find targeted guest for instructor rewards
   const activeGuest = participants.find(p => p.id === activeGuestId);
@@ -31,23 +36,6 @@ export default function ControlDeck() {
   const mySelf = participants.find(p => p.id && String(p.id).startsWith('active-joined')) || 
                  participants.find(p => !p.isInstructor && !p.isBlank) || 
                  participants[1]; // fallback
-
-  const instructorStickers = [
-    { id: 'Heart.png', name: 'Heart' },
-    { id: 'RealCrown.png', name: 'Crown' },
-    { id: 'Happy_Birthday.png', name: 'Birthday' },
-    { id: 'Star.png', name: 'Star' },
-    { id: 'ic_gold_star.png', name: 'Gold Star' }
-  ];
-
-  const studentStickers = [
-    { id: 'Balloons.svg', name: 'Balloons' },
-    { id: 'Boat.svg', name: 'Boat' },
-    { id: 'Dog.svg', name: 'Dog' },
-    { id: 'Fish.svg', name: 'Fish' },
-    { id: 'Kitten.svg', name: 'Kitten' },
-    { id: 'Piano.svg', name: 'Piano' }
-  ];
 
   const studentFilters = [
     { id: 'greenFilter', name: 'Green', color: '#39ff14' },
@@ -102,7 +90,16 @@ export default function ControlDeck() {
         if (deck) deck.style.display = '';
         sidebars.forEach(s => s.style.display = '');
 
-        const image = canvas.toDataURL('image/png');
+        // Create a mirrored canvas
+        const mirrorCanvas = document.createElement('canvas');
+        mirrorCanvas.width = canvas.width;
+        mirrorCanvas.height = canvas.height;
+        const ctx = mirrorCanvas.getContext('2d');
+        ctx.translate(canvas.width, 0);
+        ctx.scale(-1, 1);
+        ctx.drawImage(canvas, 0, 0);
+
+        const image = mirrorCanvas.toDataURL('image/png');
         const link = document.createElement('a');
         link.download = `screenshot-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.png`;
         link.href = image;
@@ -127,258 +124,182 @@ export default function ControlDeck() {
 
   const selfButtons = mySelf ? (guestButtons[mySelf.id] || { raiseHand: false, mute: false, chat: false }) : { raiseHand: false, mute: false, chat: false };
 
+  const shouldShowStudentStickers = showStudentStickers;
+  const shouldShowStudentFilters = showStudentFilters;
+  const shouldShowInstructorDeck = isInstructorClient && showInstructorStickers && !shouldShowStudentStickers && !shouldShowStudentFilters && !isPeoStickersOpen;
+
+  if (!shouldShowInstructorDeck && !shouldShowStudentStickers && !shouldShowStudentFilters && !isPeoStickersOpen) {
+    return null;
+  }
+
+  const targetId = isInstructorClient ? activeGuest?.id : mySelf?.id;
+  const stickerCount = targetId && guestStickers[targetId] ? guestStickers[targetId].length : 0;
+  const targetBtns = targetId ? (guestButtons[targetId] || { raiseHand: false, mute: false, chat: false }) : { raiseHand: false, mute: false, chat: false };
+
+  const handleStickerClick = (stickerId) => {
+    if (!targetId) {
+      if (isInstructorClient) alert("Please select a student in the grid first to apply rewards!");
+      return;
+    }
+    handleAddSticker(targetId, stickerId, false);
+  };
+
+  const handleUndoSticker = () => {
+    if (targetId) handleAddSticker(targetId, 'UNDO_LAST_PEO', false);
+  };
+
+  const handleFilterClick = (filterId) => {
+    if (targetId) handleToggleGuestButton(targetId, filterId);
+  };
+
+  const handleClearFilters = () => {
+    if (targetId) {
+      ['greenFilter', 'blueFilter', 'purpleFilter', 'orangeFilter'].forEach(fId => {
+        if (targetBtns[fId]) handleToggleGuestButton(targetId, fId);
+      });
+    }
+  };
+
   return (
     <div className="control-deck-outer" style={{ width: '100%', marginTop: '12px', zIndex: 50, position: 'relative' }}>
-      <div className="control-deck glass-panel" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 16px', borderRadius: '12px', boxSizing: 'border-box', gap: '16px' }}>
+      <div className="control-deck" style={{ display: 'flex', flexDirection: 'column', gap: '12px', padding: '12px 16px', borderRadius: '12px', boxSizing: 'border-box', background: 'transparent', border: 'none', boxShadow: 'none' }}>
         
-        {isInstructorClient ? (
-          /* INSTRUCTOR CONTROL DECK */
-          <>
-            {/* Group 1: Classroom Controls */}
-            <div className="deck-group">
-              <button 
-                className={`deck-btn ${!globalMute ? 'active' : ''}`}
-                onClick={() => setGlobalMute(!globalMute)}
-                title={globalMute ? 'Unmute Classroom' : 'Mute Classroom'}
-              >
-                {globalMute ? <MicOff size={16} /> : <Mic size={16} />}
-              </button>
-              
-              <button 
-                className={`deck-btn ${globalPause ? 'active' : ''}`}
-                onClick={() => setGlobalPause(!globalPause)}
-                title={globalPause ? 'Resume PEOs' : 'Pause PEOs'}
-              >
-                {globalPause ? <Play size={16} /> : <Pause size={16} />}
-              </button>
-
-              <button 
-                className="deck-btn celebrate-btn"
-                onClick={() => handleAddSticker('instructor', 'Confetti.svg', true)}
-                title="Trigger Confetti 🎉"
-              >
-                <span>🎉</span>
-              </button>
-            </div>
-
-            <div className="deck-divider" />
-
-            {/* Group 2: Teaching Tools */}
-            <div className="deck-group">
-              <button 
-                className={`deck-btn ${isDoodling ? 'active' : ''}`}
-                onClick={() => setIsDoodling(!isDoodling)}
-                title="Toggle Drawing Canvas"
-              >
-                <Palette size={16} />
-              </button>
-
-              <div style={{ position: 'relative' }}>
-                <button 
-                  className={`deck-btn ${mediaType === 'metronome' ? 'active' : ''}`}
-                  onClick={handleMetronomeToggle}
-                  title="Toggle Metronome"
-                >
-                  <span>⏱️</span>
-                </button>
-                {mediaType === 'metronome' && showMetronomePopover && (
-                  <div className="metronome-popover glass-panel">
-                    <div className="popover-header">
-                      <span>Metronome Settings</span>
-                      <button onClick={() => setShowMetronomePopover(false)} className="close-pop-btn"><X size={12} /></button>
-                    </div>
-                    <div className="popover-body">
-                      <div className="tempo-row">
-                        <span className="bpm-label">BPM: {metronomeBpm}</span>
-                        <button 
-                          onClick={() => setIsMetronomePlaying(!isMetronomePlaying)}
-                          className={`metro-play-btn ${isMetronomePlaying ? 'playing' : ''}`}
-                        >
-                          {isMetronomePlaying ? 'Stop' : 'Start'}
-                        </button>
-                      </div>
-                      <input 
-                        type="range"
-                        min="40"
-                        max="240"
-                        value={metronomeBpm}
-                        onChange={(e) => setMetronomeBpm(parseInt(e.target.value, 10))}
-                        className="bpm-slider"
-                      />
-                    </div>
-                  </div>
-                )}
+        {/* ROW 1: INSTRUCTOR STICKERS */}
+        {shouldShowInstructorDeck && (
+          <div className="deck-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+            <div className="deck-group rewards-group" style={{ flex: 1, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
+              <div style={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
+                <span className="group-label" style={{ textAlign: 'center' }}>Instructor Stickers {activeGuest ? `- ${activeGuest.name} of peo` : ''}</span>
               </div>
-
-              <div style={{ position: 'relative' }}>
-                <button 
-                  className={`deck-btn ${mediaUrl && mediaType !== 'metronome' ? 'active' : ''}`}
-                  onClick={() => setShowUploadMenu(!showUploadMenu)}
-                  title="Upload Media (Image/Video)"
-                >
-                  <ImageIcon size={16} />
-                </button>
-                {showUploadMenu && (
-                  <div className="upload-dropdown glass-panel" style={{ bottom: '40px', top: 'auto', left: '0', zIndex: 110 }}>
-                    <button onClick={() => fileInputRef.current?.click()}><HardDrive size={14}/> Local Computer</button>
-                    <button onClick={handleDriveUpload}><UploadCloud size={14}/> Google Drive</button>
-                  </div>
-                )}
+              <div style={{ display: 'flex', justifyContent: 'center', gap: '8px' }}>
+                {instructorStickers.map((sticker) => (
+                  <button 
+                    key={sticker.id}
+                    className="deck-sticker-btn"
+                    onClick={() => {
+                      if (!activeGuest) {
+                        alert("Please select a student in the grid first to apply rewards!");
+                        return;
+                      }
+                      handleAddSticker(activeGuest.id, sticker.id, true);
+                    }}
+                    title={activeGuest ? `Reward ${activeGuest.name} with ${sticker.name}` : `Select student to reward with ${sticker.name}`}
+                    style={{ opacity: 1 }}
+                  >
+                    <img src={`/assets/svg_stickers/${sticker.id}`} alt={sticker.name} />
+                  </button>
+                ))}
               </div>
-
-              {mediaUrl && (
-                <button className="deck-btn clear-media-btn" onClick={clearMedia} title="Clear Media">
-                  <X size={16} />
-                </button>
-              )}
-            </div>
-
-            <div className="deck-divider" />
-
-            {/* Group 3: Reward Stickers (Requires active guest selected) */}
-            <div className="deck-group rewards-group" style={{ flex: 1, justifyContent: 'flex-start' }}>
-              <span className="group-label">Sticker Deck:</span>
-              {instructorStickers.map((sticker) => (
-                <button 
-                  key={sticker.id}
-                  className="deck-sticker-btn"
-                  onClick={() => {
-                    if (!activeGuest) {
-                      alert("Please select a student in the grid first to apply rewards!");
-                      return;
-                    }
-                    handleAddSticker(activeGuest.id, sticker.id, true);
-                  }}
-                  title={activeGuest ? `Reward ${activeGuest.name} with ${sticker.name}` : `Select student to reward with ${sticker.name}`}
-                  style={{ opacity: activeGuest ? 1 : 0.4 }}
-                >
-                  <img src={`/assets/svg_stickers/${sticker.id}`} alt={sticker.name} />
-                </button>
-              ))}
-              {activeGuest && (
-                <>
-                  <div className="deck-sub-divider" />
-                  <button 
-                    className="deck-btn undo-btn"
-                    onClick={() => handleAddSticker(activeGuest.id, 'UNDO_IC', true)}
-                    title="Undo Last Reward on Selected Student"
-                  >
-                    <RotateCcw size={14} />
-                  </button>
-                </>
-              )}
-            </div>
-
-            {/* Target name indicator */}
-            <div className="active-student-indicator">
-              {activeGuest ? (
-                <span className="active-student-name">targeting: {activeGuest.name}</span>
-              ) : (
-                <span className="active-student-hint">select student to reward</span>
-              )}
-            </div>
-          </>
-        ) : (
-          /* STUDENT CONTROL DECK */
-          <>
-            {/* Group 1: Student Quick Controls */}
-            <div className="deck-group">
-              <button 
-                className={`deck-btn ${selfButtons.raiseHand ? 'active' : ''}`}
-                onClick={() => mySelf && handleToggleGuestButton(mySelf.id, 'raiseHand')}
-                title="Raise Hand"
+              <button
+                onClick={() => setIsPeoStickersOpen(!isPeoStickersOpen)}
+                style={{
+                  background: 'transparent',
+                  color: 'white',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontSize: '13px',
+                  whiteSpace: 'nowrap',
+                  padding: '4px 12px',
+                  opacity: 0.8,
+                  fontWeight: 500
+                }}
               >
-                <Hand size={16} />
-              </button>
-
-              <button 
-                className={`deck-btn ${selfButtons.mute ? 'active' : ''}`}
-                onClick={() => mySelf && handleToggleGuestButton(mySelf.id, 'mute')}
-                title="Mute/Unmute Webcam"
-              >
-                {selfButtons.mute ? <MicOff size={16} /> : <Mic size={16} />}
-              </button>
-
-              <button 
-                className={`deck-btn ${selfButtons.chat ? 'active' : ''}`}
-                onClick={() => setIsChatOpen(!selfButtons.chat)}
-                title="Open Chat"
-              >
-                <MessageSquare size={16} />
-              </button>
-
-              <button 
-                className="deck-btn screenshot-btn"
-                onClick={handleScreenshot}
-                title="Take a Picture"
-              >
-                <Camera size={16} />
+                Open PEO Stickers
               </button>
             </div>
+          </div>
+        )}
 
-            <div className="deck-divider" />
+        {shouldShowInstructorDeck && isPeoStickersOpen && (
+          <div className="deck-divider-horizontal" style={{ width: '100%', height: '1px', background: 'var(--glass-border)' }} />
+        )}
 
-            {/* Group 2: My Reactions (Stickers) */}
-            <div className="deck-group reactions-group" style={{ flex: 1, justifyContent: 'flex-start' }}>
-              <span className="group-label">Reactions:</span>
-              {studentStickers.map((sticker) => (
-                <button 
-                  key={sticker.id}
-                  className="deck-sticker-btn"
-                  onClick={() => handleStudentStickerAdd(sticker.id)}
-                  title={`Place ${sticker.name} sticker`}
-                >
-                  <img src={`/assets/svg_stickers/${sticker.id}`} alt={sticker.name} />
-                </button>
-              ))}
-              {mySelf && (
-                <>
-                  <div className="deck-sub-divider" />
-                  <button 
-                    className="deck-btn undo-btn"
-                    onClick={() => handleAddSticker(mySelf.id, 'UNDO_LAST_PEO', false)}
-                    title="Undo My Last Reaction"
-                  >
-                    <RotateCcw size={14} />
-                  </button>
-                </>
-              )}
-            </div>
+        {/* ROW 2: STUDENT STICKERS & FILTERS */}
+        {(isPeoStickersOpen || shouldShowStudentStickers || shouldShowStudentFilters) && (
+          <div className="deck-row" style={{ display: 'flex', alignItems: 'center', gap: '16px', width: '100%' }}>
+            
+            {(isPeoStickersOpen || shouldShowStudentStickers) && (
+              <div className="deck-group reactions-group" style={{ flex: 1, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', gap: '8px' }}>
+                  <span className="group-label" style={{ textAlign: 'center' }}>
+                    Stickers - {targetId ? (activeGuest?.name || participants.find(p => p.id === targetId)?.name || targetId) : 'identifying name or #'}
+                  </span>
+                  {isPeoStickersOpen && (
+                    <button
+                      onClick={() => setIsPeoStickersOpen(false)}
+                      style={{
+                        background: 'transparent',
+                        color: 'white',
+                        border: 'none',
+                        cursor: 'pointer',
+                        fontSize: '13px',
+                        whiteSpace: 'nowrap',
+                        padding: '4px 12px',
+                        opacity: 0.8,
+                        fontWeight: 500
+                      }}
+                    >
+                      Close PEO Stickers
+                    </button>
+                  )}
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, auto)', gap: '8px', justifyContent: 'center' }}>
+                  {studentStickers.map((sticker) => (
+                    <button 
+                      key={sticker.id}
+                      className="deck-sticker-btn"
+                      onClick={() => handleStickerClick(sticker.id)}
+                      title={`Place ${sticker.name} sticker`}
+                      style={{ width: '61px', height: '61px' }}
+                    >
+                      <img src={`/assets/svg_stickers/${sticker.id}`} alt={sticker.name} style={{ width: '46px', height: '46px' }} />
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
-            <div className="deck-divider" />
+            {(isPeoStickersOpen || shouldShowStudentStickers) && shouldShowStudentFilters && (
+              <div className="deck-divider" />
+            )}
 
-            {/* Group 3: My Filters */}
-            <div className="deck-group filters-group">
-              <span className="group-label">Filters:</span>
-              {studentFilters.map((filter) => {
-                const isActive = selfButtons[filter.id] || false;
-                return (
-                  <button 
-                    key={filter.id}
-                    className={`deck-filter-btn ${isActive ? 'active' : ''}`}
-                    onClick={() => handleStudentFilterToggle(filter.id)}
-                    style={{ '--filter-color': filter.color }}
-                    title={`Toggle ${filter.name} Filter`}
-                  >
-                    <Sparkles size={12} color="#ffffff" />
-                  </button>
-                );
-              })}
-              {mySelf && (buttons.greenFilter || buttons.blueFilter || buttons.purpleFilter || buttons.orangeFilter) && (
-                <button 
-                  className="deck-btn clear-filters-btn"
-                  onClick={() => {
-                    ['greenFilter', 'blueFilter', 'purpleFilter', 'orangeFilter'].forEach(fId => {
-                      if (selfButtons[fId]) handleStudentFilterToggle(fId);
-                    });
-                  }}
-                  title="Remove Filters"
-                >
-                  <X size={14} />
-                </button>
-              )}
-            </div>
-          </>
+            {shouldShowStudentFilters && (
+              <div className="deck-group filters-group" style={{ flex: 1, flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', gap: '8px', marginBottom: isPeoStickersOpen ? '32px' : '0' }}>
+                  <span className="group-label" style={{ textAlign: 'center' }}>
+                    Filters - {targetId ? (activeGuest?.name || participants.find(p => p.id === targetId)?.name || targetId) : 'identifying name or #'}
+                  </span>
+                </div>
+                <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', alignItems: 'center', marginTop: '10px' }}>
+                  {studentFilters.map((filter) => {
+                    const isActive = targetBtns[filter.id] || false;
+                    return (
+                      <button 
+                        key={filter.id}
+                        className={`deck-filter-btn ${isActive ? 'active' : ''}`}
+                        onClick={() => handleFilterClick(filter.id)}
+                        style={{ '--filter-color': filter.color, width: '31px', height: '31px' }}
+                        title={`Toggle ${filter.name} Filter`}
+                      >
+                        <Sparkles size={16} color="#ffffff" />
+                      </button>
+                    );
+                  })}
+                  {targetId && (targetBtns.greenFilter || targetBtns.blueFilter || targetBtns.purpleFilter || targetBtns.orangeFilter) && (
+                    <button 
+                      className="deck-btn clear-filters-btn"
+                      onClick={handleClearFilters}
+                      title="Remove Filters"
+                      style={{ width: '31px', height: '31px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}
+                    >
+                      <X size={18} />
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
+            
+          </div>
         )}
 
         <input 
