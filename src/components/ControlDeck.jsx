@@ -18,9 +18,9 @@ export default function ControlDeck() {
     participants, activeGuestId, setActiveGuestId,
     guestButtons, handleToggleGuestButton,
     setIsChatOpen, setIsSidebarOpen,
-    showInstructorStickers,
-    showStudentStickers,
-    showStudentFilters
+    showInstructorStickers, setShowInstructorStickers,
+    showStudentStickers, setShowStudentStickers,
+    showStudentFilters, setShowStudentFilters
   } = useAppContext();
 
   const isInstructorClient = sessionStorage.getItem('stagetrack_role') !== 'student';
@@ -226,7 +226,12 @@ export default function ControlDeck() {
                   </span>
                   {isPeoStickersOpen && (
                     <button
-                      onClick={() => setIsPeoStickersOpen(false)}
+                      onClick={() => {
+                        setIsPeoStickersOpen(false);
+                        setShowInstructorStickers(false);
+                        setShowStudentStickers(false);
+                        setShowStudentFilters(false);
+                      }}
                       style={{
                         background: 'transparent',
                         color: 'white',

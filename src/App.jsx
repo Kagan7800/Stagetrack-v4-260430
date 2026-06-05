@@ -1,5 +1,5 @@
 // file:///c:/0-Music%20Fun/Backups/backup%20for%20firestore/src/App.jsx
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { MessageSquare } from 'lucide-react';
 import PresentationContainer from './components/PresentationContainer';
 import Chat from './components/Chat';
@@ -17,8 +17,8 @@ function App() {
     participants,
     activeGuestId, setActiveGuestId,
     activeToolbox, setActiveToolbox,
-    guestButtons, handleToggleGuestButton,
-    guestStickers, handleAddSticker, stickerNudges,
+    guestButtons, setGuestButtons, handleToggleGuestButton,
+    guestStickers, setGuestStickers, handleAddSticker, stickerNudges,
     isDoodling, setIsDoodling,
     mediaUrl, mediaType, setMediaUpload, clearMedia,
     isChatOpen, setIsChatOpen,
@@ -156,6 +156,34 @@ function App() {
           setActiveGuestId(firstGuest.id);
         }
       }
+    }
+  };
+
+  const stateRef = useRef({ activeGuestId, isSidebarOpen, activeToolbox });
+  useEffect(() => {
+    stateRef.current = { activeGuestId, isSidebarOpen, activeToolbox };
+  }, [activeGuestId, isSidebarOpen, activeToolbox]);
+
+  const handleDoubleClick = (p) => {
+    const { activeGuestId: currentGuestId, isSidebarOpen: currentSidebarOpen, activeToolbox: currentToolbox } = stateRef.current;
+    
+    if (!isInstructorClient) return;
+    if (p.isBlank) return;
+
+    if (currentGuestId === p.id && currentSidebarOpen) {
+      if (currentToolbox === "instructor") {
+        setActiveToolbox("student");
+      } else if (currentToolbox === "student") {
+        setIsSidebarOpen(false);
+        setGuestStickers(prev => ({ ...prev, [p.id]: [] }));
+        setGuestButtons(prev => ({ ...prev, [p.id]: {} }));
+      } else {
+        setActiveToolbox("instructor");
+      }
+    } else {
+      setActiveGuestId(p.id);
+      setActiveToolbox("instructor");
+      setIsSidebarOpen(true);
     }
   };
 
@@ -360,13 +388,7 @@ function App() {
                           setActiveToolbox("student");
                           setIsSidebarOpen(true);
                         }}
-                        onDoubleClick={() => {
-                          if (!isInstructorClient) return;
-                          if (p.isBlank) return;
-                          setActiveGuestId(p.id);
-                          setActiveToolbox("instructor");
-                          setIsSidebarOpen(true);
-                        }}
+                        onDoubleClick={() => handleDoubleClick(p)}
                         stickers={guestStickers[p.id] || []}
                         buttons={guestButtons[p.id] || {}}
                         nudges={stickerNudges[p.id] || {}}
@@ -454,7 +476,7 @@ function App() {
           </div>
         ) : (
           /* Center Grid (Landscape/Desktop) */
-          <div className={`center-grid-area ${isSidebarOpen || isChatOpen ? 'sidebars-open' : ''}`} data-columns={halfLength <= 3 ? "1" : "2"}>
+          <div className={`center-grid-area ${isSidebarOpen || isChatOpen ? 'sidebars-open' : ''}`} data-columns={halfLength <= 3 ? "1" : "2"} data-left-open={isSidebarOpen} data-right-open={isChatOpen}>
              <div className="side-peos" data-columns={halfLength <= 3 ? "1" : "2"}>
                {leftParticipants.map(p => {
                  return (
@@ -473,12 +495,7 @@ function App() {
                           setIsSidebarOpen(true);
                         }
                      }}
-                     onDoubleClick={() => {
-                       if (!isInstructorClient) return;
-                       if (p.isBlank) return;
-                        setActiveGuestId(p.id);
-                        setActiveToolbox("instructor");
-                     }}
+                     onDoubleClick={() => handleDoubleClick(p)}
                      stickers={guestStickers[p.id] || []}
                      buttons={guestButtons[p.id] || {}}
                      nudges={stickerNudges[p.id] || {}}
@@ -525,12 +542,7 @@ function App() {
                           setIsSidebarOpen(true);
                         }
                      }}
-                     onDoubleClick={() => {
-                       if (!isInstructorClient) return;
-                       if (p.isBlank) return;
-                        setActiveGuestId(p.id);
-                        setActiveToolbox("instructor");
-                     }}
+                     onDoubleClick={() => handleDoubleClick(p)}
                      stickers={guestStickers[p.id] || []}
                      buttons={guestButtons[p.id] || {}}
                      nudges={stickerNudges[p.id] || {}}

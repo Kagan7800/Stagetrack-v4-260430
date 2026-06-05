@@ -36,7 +36,7 @@ export default function GuestContainer({
   const [joinedStream, setJoinedStream] = useState(null);
   const joinedVideoRef = useRef(null);
 
-  const lastClickRef = useRef(0);
+  const clickTimeoutRef = useRef(null);
 
   const handleCellClick = (e) => {
     // Prevent click handling if target is within edit form or buttons
@@ -44,18 +44,19 @@ export default function GuestContainer({
       return;
     }
 
-    const now = Date.now();
-    const isDoubleClick = now - lastClickRef.current < 300;
-    lastClickRef.current = now;
-
-    if (isDoubleClick) {
+    if (clickTimeoutRef.current) {
+      clearTimeout(clickTimeoutRef.current);
+      clickTimeoutRef.current = null;
       if (onDoubleClick) {
         onDoubleClick(participant);
       }
     } else {
-      if (onClick) {
-        onClick(participant);
-      }
+      clickTimeoutRef.current = setTimeout(() => {
+        clickTimeoutRef.current = null;
+        if (onClick) {
+          onClick(participant);
+        }
+      }, 250);
     }
   };
 
