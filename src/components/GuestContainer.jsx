@@ -1,4 +1,4 @@
-import { Pause, Camera, RotateCcw } from 'lucide-react';
+import { Pause } from 'lucide-react';
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useAppContext } from '../context/AppContext';
 import PeoBorder from './PeoBorder';
@@ -22,7 +22,7 @@ export default function GuestContainer({
   nudges = {},
   globalPause
 }) {
-  const { participants, blankCovers, setBlankCovers, MOCK_USER_COUNT, pendingRequest, approveRequest, denyRequest, activeTheme, handleAddSticker } = useAppContext();
+  const { participants, blankCovers, setBlankCovers, pendingRequest, approveRequest, denyRequest, activeTheme } = useAppContext();
   const [isEditing, setIsEditing] = useState(false);
   
   // Local state for forms
@@ -36,13 +36,21 @@ export default function GuestContainer({
     if (buttons?.whisper && buttons?.whisperTime) {
       const timeSince = Date.now() - buttons.whisperTime;
       if (timeSince < 10000) {
-        setShowWhisper(true);
+        const delayTimer = setTimeout(() => {
+          setShowWhisper(true);
+        }, 0);
         const timer = setTimeout(() => {
           setShowWhisper(false);
         }, 10000 - timeSince);
-        return () => clearTimeout(timer);
+        return () => {
+          clearTimeout(delayTimer);
+          clearTimeout(timer);
+        };
       } else {
-        setShowWhisper(false);
+        const delayTimer = setTimeout(() => {
+          setShowWhisper(false);
+        }, 0);
+        return () => clearTimeout(delayTimer);
       }
     }
   }, [buttons?.whisper, buttons?.whisperTime]);
@@ -124,7 +132,10 @@ export default function GuestContainer({
           console.log("Webcam access blocked in instructor pending view:", err);
         });
     } else {
-      setPendingStream(null);
+      const timer = setTimeout(() => {
+        setPendingStream(prev => prev === null ? prev : null);
+      }, 0);
+      return () => clearTimeout(timer);
     }
     return () => {
       if (activeStream) {
@@ -153,7 +164,10 @@ export default function GuestContainer({
         console.warn("navigator.mediaDevices is not available. Ensure you are on HTTPS or localhost.");
       }
     } else {
-      setJoinedStream(null);
+      const timer = setTimeout(() => {
+        setJoinedStream(prev => prev === null ? prev : null);
+      }, 0);
+      return () => clearTimeout(timer);
     }
     return () => {
       if (activeStream) {
@@ -166,8 +180,13 @@ export default function GuestContainer({
   useEffect(() => {
     if (participant.isBlank) {
       const coverData = blankCovers[participant.id] || {};
-      setTempCoverUrl(coverData.coverUrl || '');
-      setTempLink(coverData.hyperlink || '');
+      const targetCoverUrl = coverData.coverUrl || '';
+      const targetHyperlink = coverData.hyperlink || '';
+      const timer = setTimeout(() => {
+        setTempCoverUrl(prev => prev === targetCoverUrl ? prev : targetCoverUrl);
+        setTempLink(prev => prev === targetHyperlink ? prev : targetHyperlink);
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, [isEditing, participant.id, participant.isBlank, blankCovers]);
 

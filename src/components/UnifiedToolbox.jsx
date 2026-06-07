@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Hand, MicOff, MessageSquare, X, Camera, Sparkles, Smile, Trash2, Star, ArrowLeftRight } from 'lucide-react';
+import { useEffect, useRef, useCallback } from 'react';
+import { Hand, MicOff, MessageSquare, Camera, Smile, ArrowLeftRight } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import { useAppContext } from '../context/AppContext';
 
@@ -7,7 +7,6 @@ export default function UnifiedToolbox({
   activeGuest, 
   guestButtons, 
   toggleGuestButton, 
-  onAddSticker,
   onClose
 }) {
   const { 
@@ -17,18 +16,13 @@ export default function UnifiedToolbox({
     showStudentStickers, setShowStudentStickers,
     showStudentFilters, setShowStudentFilters,
     showStudentWhisper, setShowStudentWhisper,
-    activeItoSection, setActiveItoSection,
-    sendWhisper,
-    spotlightGuestId, setSpotlightGuestId,
+    setActiveItoSection,
     setActiveToolbox,
     isPeoStickersOpen, setIsPeoStickersOpen
   } = useAppContext();
   const isInstructorClient = sessionStorage.getItem('stagetrack_role') !== 'student';
-  const [whisperText, setWhisperText] = useState('');
 
   const isSor = activeTheme === 'sor';
-  const themeTextColor = isSor ? '#ef4444' : '#3b82f6';
-  const themeSubtextColor = isSor ? 'rgba(239, 68, 68, 0.7)' : 'rgba(59, 130, 246, 0.7)';
   const themeTextShadow = isSor ? '0 0 8px rgba(239, 68, 68, 0.18)' : '0 0 8px rgba(59, 130, 246, 0.18)';
   const timerRef = useRef(null);
   const filterTimerRef = useRef(null);
@@ -38,14 +32,14 @@ export default function UnifiedToolbox({
     timerRef.current = setTimeout(() => {
       setShowStudentStickers(false);
     }, 20000);
-  }, []);
+  }, [setShowStudentStickers]);
 
   const resetFilterInactivityTimer = useCallback(() => {
     if (filterTimerRef.current) clearTimeout(filterTimerRef.current);
     filterTimerRef.current = setTimeout(() => {
       setShowStudentFilters(false);
     }, 20000);
-  }, []);
+  }, [setShowStudentFilters]);
 
   useEffect(() => {
     if (showStudentStickers) {

@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
-import { ChevronRight, GraduationCap, Shield } from 'lucide-react';
+import { useEffect, useRef, useCallback } from 'react';
+import { ChevronRight } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import InstructorToolbox from './InstructorToolbox';
 import UnifiedToolbox from './UnifiedToolbox';
@@ -10,29 +10,25 @@ export default function LeftSidebar() {
     setIsSidebarOpen,
     activeGuestId,
     activeToolbox,
-    setActiveToolbox,
     participants,
     guestButtons,
     handleToggleGuestButton,
     handleAddSticker,
     setActiveGuestId,
-    globalMute,
     setGlobalMute,
     activeTheme
   } = useAppContext();
-
-  const [isItoExpanded, setIsItoExpanded] = useState(true);
 
   const activeGuest = participants.find(p => p.id === activeGuestId);
 
   const inactivityTimerRef = useRef(null);
 
-  const resetInactivityTimer = () => {
+  const resetInactivityTimer = useCallback(() => {
     if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current);
     inactivityTimerRef.current = setTimeout(() => {
       setIsSidebarOpen(false);
     }, 20000); // 20 seconds
-  };
+  }, [setIsSidebarOpen]);
 
   useEffect(() => {
     if (isSidebarOpen) {
@@ -43,7 +39,7 @@ export default function LeftSidebar() {
     return () => {
       if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current);
     };
-  }, [isSidebarOpen]);
+  }, [isSidebarOpen, resetInactivityTimer]);
 
   // Automatically open the sidebar when a guest is selected
   useEffect(() => {
@@ -52,7 +48,6 @@ export default function LeftSidebar() {
     }
   }, [activeGuestId, setIsSidebarOpen]);
 
-  const isInstructorClient = sessionStorage.getItem('stagetrack_role') !== 'student';
   const mode = (activeGuestId === null || activeToolbox === 'instructor') ? 'ITO' : 'STO';
 
   // Auto-Muting / Routing Side Effects on Mode Shift
@@ -65,16 +60,6 @@ export default function LeftSidebar() {
       console.log("Switching to Stage Channel: Open broadcast restored.");
     }
   }, [mode, setGlobalMute]);
-
-  const handleSTO = () => {
-    if (activeGuestId !== null) {
-      setActiveToolbox('student');
-    }
-  };
-
-  const handleITO = () => {
-    setActiveToolbox('instructor');
-  };
 
   if (!isSidebarOpen) {
     return (
@@ -96,8 +81,6 @@ export default function LeftSidebar() {
   const showIto = activeGuestId === null || activeToolbox === 'instructor';
   
   const isSor = activeTheme === 'sor';
-  const themeTextColor = isSor ? '#ef4444' : '#3b82f6';
-  const themeTextShadow = isSor ? '0 0 8px rgba(239, 68, 68, 0.18)' : '0 0 8px rgba(59, 130, 246, 0.18)';
 
   // Dynamic border/glow styles
   const transmissionGlowStyle = mode === 'ITO' 
@@ -147,18 +130,16 @@ export default function LeftSidebar() {
             display: 'flex', 
             flexDirection: 'column', 
             borderBottom: showSto ? '1px solid var(--glass-border)' : 'none',
-            flex: isItoExpanded ? 1 : '0 0 auto',
+            flex: 1,
             minHeight: 0,
             overflow: 'hidden',
             transition: 'border-color 0.2s ease',
             ...panelGridBorderStyle
           }}
         >
-          {isItoExpanded && (
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, background: 'rgba(11, 25, 46, 0.7)', overflow: 'hidden' }}>
-              <InstructorToolbox />
-            </div>
-          )}
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, background: 'rgba(11, 25, 46, 0.7)', overflow: 'hidden' }}>
+            <InstructorToolbox />
+          </div>
         </div>
       )}
 

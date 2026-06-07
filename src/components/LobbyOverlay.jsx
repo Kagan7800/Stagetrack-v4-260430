@@ -31,7 +31,7 @@ const STO_STICKERS = [
   'Xylophone.svg'
 ];
 
-function LobbyAIChat({ instructorName }) {
+function LobbyAIChat() {
   const [chatInput, setChatInput] = useState('');
   const [chatMessages, setChatMessages] = useState([]);
 
@@ -87,7 +87,7 @@ function LobbyAIChat({ instructorName }) {
 }
 
 export default function LobbyOverlay() {
-  const { lobbyStatus, requestAccess, setLobbyStatus, resetStudentState, setIsJoined, MOCK_USER_COUNT, activeTheme } = useAppContext();
+  const { lobbyStatus, requestAccess, resetStudentState, MOCK_USER_COUNT, activeTheme } = useAppContext();
 
   const handleEnterAsInstructor = () => {
     sessionStorage.setItem('stagetrack_role', 'instructor');
@@ -163,8 +163,6 @@ export default function LobbyOverlay() {
   const handleRetry = () => {
     resetStudentState();
   };
-
-  const selectedIconFile = selectedIcon;
 
   return (
     <div 

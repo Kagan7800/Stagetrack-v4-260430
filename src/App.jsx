@@ -1,6 +1,5 @@
 // file:///c:/0-Music%20Fun/Backups/backup%20for%20firestore/src/App.jsx
 import { useState, useEffect, useRef } from 'react';
-import { MessageSquare } from 'lucide-react';
 import PresentationContainer from './components/PresentationContainer';
 import Chat from './components/Chat';
 import GuestContainer from './components/GuestContainer';
@@ -12,30 +11,35 @@ import InstructorToolbox from './components/InstructorToolbox';
 import ControlDeck from './components/ControlDeck';
 
 function StageTimerDisplay({ stageTimer, setStageTimer, isInstructorClient }) {
-  const [timeLeft, setTimeLeft] = useState(0);
+  const [timeLeft, setTimeLeft] = useState(() => {
+    if (!stageTimer) return 0;
+    if (!stageTimer.isRunning) return stageTimer.duration || 0;
+    return Math.max(0, Math.round((stageTimer.endTime - Date.now()) / 1000));
+  });
 
   useEffect(() => {
-    if (!stageTimer || !stageTimer.endTime) return;
+    if (!stageTimer) return;
     if (!stageTimer.isRunning) {
-      setTimeLeft(stageTimer.duration);
-      return;
+      const duration = stageTimer.duration || 0;
+      const timer = setTimeout(() => {
+        setTimeLeft(prev => prev === duration ? prev : duration);
+      }, 0);
+      return () => clearTimeout(timer);
     }
 
     const updateTimer = () => {
       const remaining = Math.max(0, Math.round((stageTimer.endTime - Date.now()) / 1000));
       setTimeLeft(remaining);
       
-      if (remaining <= 0) {
-        if (isInstructorClient) {
-          setStageTimer({ endTime: null, duration: 0, isRunning: false });
-        }
+      if (remaining <= 0 && isInstructorClient) {
+        setStageTimer({ endTime: null, duration: 0, isRunning: false });
       }
     };
 
     updateTimer();
     const interval = setInterval(updateTimer, 1000);
     return () => clearInterval(interval);
-  }, [stageTimer?.endTime, stageTimer?.isRunning, stageTimer?.duration, isInstructorClient, setStageTimer]);
+  }, [stageTimer, isInstructorClient, setStageTimer]);
 
   const minutes = Math.floor(timeLeft / 60);
   const seconds = timeLeft % 60;
@@ -77,26 +81,20 @@ function App() {
     activeToolbox, setActiveToolbox,
     guestButtons, setGuestButtons, handleToggleGuestButton,
     guestStickers, setGuestStickers, handleAddSticker, stickerNudges,
-    isDoodling, setIsDoodling,
-    mediaUrl, mediaType, setMediaUpload, clearMedia,
+    isDoodling,
+    mediaUrl, mediaType, clearMedia,
     isChatOpen, setIsChatOpen,
     isSidebarOpen, setIsSidebarOpen,
-    globalMute, setGlobalMute,
-    globalPause, setGlobalPause,
+    globalMute,
+    globalPause,
     messages, handleModerateMessage, handleSendChatMessage,
     isJoined,
-    pendingRequest,
-    approveRequest,
-    denyRequest,
     activeTheme,
     activeItoSection,
-    setActiveItoSection,
     showInstructorStickers,
-    showStudentStickers, setShowStudentStickers,
-    showStudentFilters, setShowStudentFilters,
-    setShowStudentWhisper,
+    showStudentStickers,
+    showStudentFilters,
     isPeoStickersOpen,
-    spotlightGuestId,
     stageTimer, setStageTimer
   } = useAppContext();
 
@@ -140,30 +138,6 @@ function App() {
     };
   }, [participants, isSidebarOpen, isChatOpen, activeItoSection]);
 
-  const [showSelectPeoWarning, setShowSelectPeoWarning] = useState(false);
-  useEffect(() => {
-    if (activeGuestId) {
-      setShowSelectPeoWarning(false);
-    }
-  }, [activeGuestId]);
-
-  const copyInviteLink = async () => {
-    const params = new URLSearchParams(window.location.search);
-    const sid = params.get('session');
-    if (!sid) {
-      alert("No active session to invite to.");
-      return;
-    }
-    const inviteUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?session=' + sid;
-    try {
-      await navigator.clipboard.writeText(inviteUrl);
-      alert("Invite link copied to clipboard!");
-    } catch (err) {
-      console.error("Failed to copy:", err);
-      prompt("Copy this link:", inviteUrl);
-    }
-  };
-
   const isInstructorClient = sessionStorage.getItem('stagetrack_role') !== 'student';
   const isInstructorSidebarVisible = true;
   const activeGuest = participants.find(p => p.id === activeGuestId);
@@ -177,24 +151,6 @@ function App() {
     !p.isInstructor && 
     p.id !== (loggedInGc ? loggedInGc.id : null)
   );
-
-  const rotationCandidates = otherGcs;
-
-  const [rotationIndex, setRotationIndex] = useState(0);
-
-  useEffect(() => {
-    if (rotationCandidates.length <= 1) return;
-    const timer = setInterval(() => {
-      setRotationIndex(prev => (prev + 1) % rotationCandidates.length);
-    }, 10000);
-    return () => clearInterval(timer);
-  }, [rotationCandidates.length]);
-
-  const currentRotatedGc = rotationCandidates.length > 0 
-    ? rotationCandidates[rotationIndex % rotationCandidates.length] 
-    : null;
-
-  const blankSlots = participants.filter(p => p.isBlank);
 
   const isStoOpen = isSidebarOpen && activeToolbox === 'student';
   const isItoOpen = isSidebarOpen && activeToolbox === 'instructor';

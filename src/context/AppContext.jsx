@@ -8,9 +8,9 @@ const AppContext = createContext();
 export function AppProvider({ children }) {
   const [sessionId, setSessionId] = useState(null);
   const isRemoteUpdate = useRef(false);
-  const role = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('stagetrack_role') : null;
+
   // Detect if this is a fresh session (tab opened/restored or system restarted)
-  if (typeof window !== 'undefined') {
+  useEffect(() => {
     try {
       const sessionActive = sessionStorage.getItem('stagetrack_session_active');
       if (!sessionActive) {
@@ -30,7 +30,7 @@ export function AppProvider({ children }) {
     } catch (e) {
       console.error('Session initialization error:', e);
     }
-  }
+  }, []);
 
   const MOCK_USER_COUNT = useMemo(() => {
     if (typeof window === 'undefined') return 12;
@@ -91,7 +91,9 @@ export function AppProvider({ children }) {
         if (parsed.status === 'pending') return 'waiting';
         if (parsed.status === 'denied') return 'denied';
       }
-    } catch {}
+    } catch {
+      // Ignore parsing errors
+    }
     return 'initial';
   });
   const [pendingRequest, setPendingRequest] = useState(() => {
@@ -103,7 +105,7 @@ export function AppProvider({ children }) {
     }
   });
 
-  const generateDefaultParticipants = useCallback((includeRestored = true) => {
+  const generateDefaultParticipants = useCallback(() => {
     const getDisplayOrder = (slots) => {
       if (slots === 2) return [0, 1];
       if (slots === 3) return [0, 2, 1];
@@ -225,7 +227,7 @@ export function AppProvider({ children }) {
     return list;
   }, [totalSlots, MOCK_USER_COUNT]);
 
-  const [participants, setParticipants] = useState(() => generateDefaultParticipants(true));
+  const [participants, setParticipants] = useState(() => generateDefaultParticipants());
   useEffect(() => {
     if (sessionId && !isRemoteUpdate.current) {
       updateDoc(doc(db, "sessions", sessionId), { participants }).catch(e=>console.error(e));
@@ -823,7 +825,10 @@ export function AppProvider({ children }) {
   // If not joined and we are in 'initial' lobby state, ensure student state is reset
   useEffect(() => {
     if (!isJoined && lobbyStatus === 'initial') {
-      resetStudentState();
+      const timer = setTimeout(() => {
+        resetStudentState();
+      }, 0);
+      return () => clearTimeout(timer);
     }
   }, [isJoined, lobbyStatus, resetStudentState]);
 
@@ -961,7 +966,7 @@ export function AppProvider({ children }) {
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
-  }, []);
+  }, [generateDefaultParticipants]);
 
   useEffect(() => {
     if (!sessionId) return;

@@ -1,18 +1,17 @@
 import { useAppContext } from '../context/AppContext';
-import { ArrowLeftRight, X } from 'lucide-react';
+import { X } from 'lucide-react';
 
 export default function InstructorToolbox() {
   const {
-    isSidebarOpen, setIsSidebarOpen,
+    setIsSidebarOpen,
     activeItoSection, setActiveItoSection,
     showInstructorStickers, setShowInstructorStickers,
-    showStudentStickers, setShowStudentStickers,
-    showStudentFilters, setShowStudentFilters,
+    setShowStudentStickers,
+    setShowStudentFilters,
     activeTheme, setActiveTheme,
     resetStudentState,
     setActiveToolbox,
     activeGuestId,
-    participants,
     spotlightGuestId, setSpotlightGuestId,
     isPeoStickersOpen, setIsPeoStickersOpen,
     stageTimer, setStageTimer
@@ -21,7 +20,6 @@ export default function InstructorToolbox() {
   const isInstructorClient = sessionStorage.getItem('stagetrack_role') !== 'student';
 
   const isSor = activeTheme === 'sor';
-  const themeTextColor = isSor ? '#ef4444' : '#3b82f6';
   const themeTextShadow = isSor ? '0 0 8px rgba(239, 68, 68, 0.18)' : '0 0 8px rgba(59, 130, 246, 0.18)';
 
   const handleSectionClick = (section) => {
@@ -115,7 +113,7 @@ export default function InstructorToolbox() {
                   try {
                     await navigator.clipboard.writeText(inviteUrl);
                     alert("Invite link copied to clipboard!");
-                  } catch (err) {
+                  } catch {
                     prompt("Copy this link:", inviteUrl);
                   }
                 }}

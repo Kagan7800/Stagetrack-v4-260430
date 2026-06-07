@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Send } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 
@@ -8,19 +8,19 @@ export default function Chat({ messages = [], onSendMessage, onModerate, onClose
   const [input, setInput] = useState("");
   const timerRef = useRef(null);
 
-  const resetInactivityTimer = () => {
+  const resetInactivityTimer = useCallback(() => {
     if (timerRef.current) clearTimeout(timerRef.current);
     timerRef.current = setTimeout(() => {
       onClose();
     }, 20000); // 20 seconds
-  };
+  }, [onClose]);
 
   useEffect(() => {
     resetInactivityTimer();
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
     };
-  }, []);
+  }, [resetInactivityTimer]);
 
   const handleSend = (e) => {
     e.preventDefault();

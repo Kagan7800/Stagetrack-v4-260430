@@ -1,23 +1,17 @@
-import React, { useState, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { X, Sparkles } from 'lucide-react';
-import html2canvas from 'html2canvas';
 import { useAppContext } from '../context/AppContext';
 import { instructorStickers, studentStickers } from '../constants/stickers';
 
 export default function ControlDeck() {
   const {
     isDoodling, setIsDoodling,
-    globalMute, setGlobalMute,
-    globalPause, setGlobalPause,
     setMediaUpload, clearMedia, mediaType, mediaUrl,
-    handleAddSticker, guestStickers,
+    handleAddSticker,
     metronomeBpm, setMetronomeBpm,
     isMetronomePlaying, setIsMetronomePlaying,
-    activeTheme, setActiveTheme,
-    resetStudentState,
-    participants, activeGuestId, setActiveGuestId,
+    participants, activeGuestId,
     guestButtons, handleToggleGuestButton,
-    setIsChatOpen, setIsSidebarOpen,
     showInstructorStickers, setShowInstructorStickers,
     showStudentStickers, setShowStudentStickers,
     showStudentFilters, setShowStudentFilters,
@@ -28,7 +22,6 @@ export default function ControlDeck() {
   const isInstructorClient = sessionStorage.getItem('stagetrack_role') !== 'student';
   const fileInputRef = useRef(null);
   const [showUploadMenu, setShowUploadMenu] = useState(false);
-  const [showMetronomePopover, setShowMetronomePopover] = useState(false);
 
   // Find targeted guest for instructor rewards
   const activeGuest = participants.find(p => p.id === activeGuestId);
@@ -64,66 +57,10 @@ export default function ControlDeck() {
     if (mediaType === 'metronome') {
       clearMedia();
       setIsMetronomePlaying(false);
-      setShowMetronomePopover(false);
     } else {
       setMediaUpload('metronome', 'metronome');
-      setShowMetronomePopover(true);
     }
   };
-
-  const handleScreenshot = () => {
-    const target = document.querySelector('.app-container');
-    if (!target) return;
-
-    const deck = document.querySelector('.control-deck-outer');
-    const sidebars = document.querySelectorAll('.sidebar, .right-sidebar');
-    
-    if (deck) deck.style.display = 'none';
-    sidebars.forEach(s => s.style.display = 'none');
-
-    setTimeout(() => {
-      html2canvas(target, {
-        useCORS: true,
-        allowTaint: true,
-        backgroundColor: '#090d16',
-        scale: 2
-      }).then((canvas) => {
-        if (deck) deck.style.display = '';
-        sidebars.forEach(s => s.style.display = '');
-
-        // Create a mirrored canvas
-        const mirrorCanvas = document.createElement('canvas');
-        mirrorCanvas.width = canvas.width;
-        mirrorCanvas.height = canvas.height;
-        const ctx = mirrorCanvas.getContext('2d');
-        ctx.translate(canvas.width, 0);
-        ctx.scale(-1, 1);
-        ctx.drawImage(canvas, 0, 0);
-
-        const image = mirrorCanvas.toDataURL('image/png');
-        const link = document.createElement('a');
-        link.download = `screenshot-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.png`;
-        link.href = image;
-        link.click();
-      }).catch((err) => {
-        console.error("Screenshot failed:", err);
-        if (deck) deck.style.display = '';
-        sidebars.forEach(s => s.style.display = '');
-      });
-    }, 50);
-  };
-
-  const handleStudentFilterToggle = (filterId) => {
-    if (!mySelf) return;
-    handleToggleGuestButton(mySelf.id, filterId);
-  };
-
-  const handleStudentStickerAdd = (stickerId) => {
-    if (!mySelf) return;
-    handleAddSticker(mySelf.id, stickerId, false);
-  };
-
-  const selfButtons = mySelf ? (guestButtons[mySelf.id] || { raiseHand: false, mute: false, chat: false }) : { raiseHand: false, mute: false, chat: false };
 
   const shouldShowStudentStickers = showStudentStickers;
   const shouldShowStudentFilters = showStudentFilters;
@@ -136,7 +73,6 @@ export default function ControlDeck() {
   }
 
   const targetId = isInstructorClient ? activeGuest?.id : mySelf?.id;
-  const stickerCount = targetId && guestStickers[targetId] ? guestStickers[targetId].length : 0;
   const targetBtns = targetId ? (guestButtons[targetId] || { raiseHand: false, mute: false, chat: false }) : { raiseHand: false, mute: false, chat: false };
 
   const handleStickerClick = (stickerId) => {
@@ -145,10 +81,6 @@ export default function ControlDeck() {
       return;
     }
     handleAddSticker(targetId, stickerId, false);
-  };
-
-  const handleUndoSticker = () => {
-    if (targetId) handleAddSticker(targetId, 'UNDO_LAST_PEO', false);
   };
 
   const handleFilterClick = (filterId) => {

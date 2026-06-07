@@ -1,13 +1,12 @@
 import { useRef, useState, useEffect, useCallback } from 'react';
-import { X, Eraser, Undo2, Redo2, Trash2 } from 'lucide-react';
+import { Eraser, Undo2, Redo2, Trash2 } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import Metronome from './Metronome';
 
 export default function PresentationContainer({ 
   isDoodling, 
   mediaUrl, 
-  mediaType: propMediaType,
-  onClearMedia
+  mediaType: propMediaType
 }) {
   const { drawingPaths, setDrawingPaths, mediaType: globalMediaType } = useAppContext();
   const mediaType = propMediaType || globalMediaType;

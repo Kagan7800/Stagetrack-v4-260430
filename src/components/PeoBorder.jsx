@@ -1,5 +1,3 @@
-import React from 'react';
-
 // Helper function to resolve the color/gradient value
 const resolveStrokeColor = (color) => {
   if (!color) return '#22c55e';
