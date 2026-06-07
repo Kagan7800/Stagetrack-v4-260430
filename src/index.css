@@ -183,7 +183,7 @@ body {
 .center-grid-area {
   display: flex;
   flex-direction: row;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   padding: 0;
   gap: 10px;
@@ -204,7 +204,7 @@ body {
 }
 
 .center-grid-area[data-left-open="true"] {
-  padding-left: 380px;
+  padding-left: 0px;
 }
 
 .center-grid-area[data-right-open="true"] {
@@ -216,11 +216,11 @@ body {
 }
 
 .center-grid-area[data-columns="1"] .pc-width-keeper {
-  height: calc(60% - 12px); /* Increased size by 20% from calc(50% - 10px) */
+  /* Height automatically governed by var(--peo-height) calculation */
 }
 
 .center-grid-area[data-columns="1"] .toolbox-panel {
-  top: calc(60% + 12px); /* Positioned to match the bottom of the enlarged PC */
+  top: calc(var(--peo-height, 25vh) * 2 + 20px);
 }
 
 /* Side Peos Mini-Grid */
@@ -275,7 +275,8 @@ body {
 
 /* Unified PC Container Wrapper to hold exact width */
 .pc-width-keeper {
-  height: calc(50% - 10px);
+  height: calc(55% - 11px); /* Fallback */
+  height: calc(var(--peo-height, 25vh) * 2 + 20px);
   aspect-ratio: 16 / 9;
   display: flex;
   flex-direction: column;
@@ -589,26 +590,26 @@ body {
 
 .gc-sticker {
   position: absolute;
-  width: 72px;
-  height: 72px;
+  width: 112px;
+  height: 112px;
   z-index: 10;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 .gc-sticker.ic-placed {
-  width: 46px;
-  height: 46px;
+  width: 88px !important;
+  height: 88px !important;
   z-index: 10000 !important;
 }
 
 .gc-sticker.large-sticker {
-  width: 86px !important;
-  height: 86px !important;
+  width: 135px !important;
+  height: 135px !important;
 }
 
 .gc-sticker.large-sticker.ic-placed {
-  width: 58px !important;
-  height: 58px !important;
+  width: 110px !important;
+  height: 110px !important;
 }
 
 .gc-sticker.ic-star-special {
@@ -616,13 +617,13 @@ body {
 }
 
 .gc-sticker.ic-star-special.ic-placed {
-  width: 55px !important;
-  height: 55px !important;
+  width: 104px !important;
+  height: 104px !important;
 }
 
 .gc-sticker.ic-star-special:not(.ic-placed) {
-  width: 86px !important;
-  height: 86px !important;
+  width: 135px !important;
+  height: 135px !important;
 }
 
 /* Antigravity Spatial Map & Priority Stack */
@@ -638,17 +639,17 @@ body {
 .gc-sticker.pos-crown {
   top: 0;
   left: 50%;
-  width: 85px;
-  height: 85px;
-  transform: translate(-50%, calc(-50% - 3px));
+  width: 106px;
+  height: 106px;
+  transform: perspective(250px) translate(-50%, calc(-50% + 20px)) rotateX(-35deg);
   z-index: 10000 !important; /* Always wins/overlaps STO */
 }
 
 .gc-sticker.pos-star {
   top: 0;
   left: 53px; /* Safe distance from the top-left sticker */
-  width: 30px;
-  height: 30px;
+  width: 38px;
+  height: 38px;
   transform: translate(-50%, -50%);
   z-index: 40;
 }
@@ -656,8 +657,8 @@ body {
 .gc-sticker.pos-star2 {
   top: 0;
   right: 62px; /* Moved left another 3px */
-  width: 26px;
-  height: 26px;
+  width: 33px;
+  height: 33px;
   transform: translate(50%, 0); /* Show full image */
   z-index: 40;
 }
@@ -714,16 +715,16 @@ body {
 }
 
 .gc-sticker.pos-3 {
-  bottom: 0px;
+  bottom: 1px;
   left: 0px;
-  transform: translate(-65%, 65%);
+  transform: translate(-65%, 0%);
   z-index: 9999 !important;
 }
 
 .gc-sticker.pos-4 {
-  bottom: 0px;
+  bottom: 1px;
   right: 0px;
-  transform: translate(65%, 65%);
+  transform: translate(65%, 0%);
   z-index: 9999 !important;
 }
 
@@ -769,42 +770,35 @@ body {
 /* GC Sticker Positions for Instructor-Added Slots */
 .gc-sticker.pos-tc {
   top: 0;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  left: 40%;
 }
 
 .gc-sticker.pos-rc-1 {
-  top: calc(50% - 18px);
-  right: 0;
-  width: 36px !important;
-  height: 36px !important;
+  top: 0;
+  right: auto;
+  left: 80%;
 }
 
 .gc-sticker.pos-rc-2 {
-  top: calc(50% + 18px);
-  right: 0;
-  width: 36px !important;
-  height: 36px !important;
+  top: 0;
+  right: auto;
+  left: 100%;
 }
 
 .gc-sticker.pos-tl-c {
   top: 0;
-  left: 25%;
-  transform: translate(-50%, -50%);
+  left: 0%;
 }
 
 .gc-sticker.pos-tr-c {
-  top: 3px;
-  right: 25%;
-  transform: translate(50%, -50%);
-  width: 36px !important;
-  height: 36px !important;
+  top: 0;
+  right: auto;
+  left: 60%;
 }
 
 .gc-sticker.pos-lc {
-  top: 50%;
-  left: 0;
-  transform: translate(-50%, -50%);
+  top: 0;
+  left: 20%;
 }
 
 /* right center */
@@ -1309,7 +1303,7 @@ body {
   width: 100%;
   border: 1px solid var(--glass-border) !important;
   background: rgba(11, 25, 46, 0.7) !important;
-  color: #cbd5e1 !important;
+  color: #ffffff !important;
 }
 .instructor-toolbox .gb-btn:hover {
   background: rgba(11, 25, 46, 0.9) !important;
@@ -1349,7 +1343,7 @@ body {
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.03) !important;
   border: 1px solid var(--glass-border) !important;
-  color: #cbd5e1 !important;
+  color: #ffffff !important;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
   width: 100%;
@@ -1379,7 +1373,7 @@ body {
   font-size: 0.68rem;
   font-weight: 600;
   text-transform: lowercase;
-  color: #94a3b8;
+  color: #ffffff;
   white-space: nowrap;
 }
 
@@ -3324,7 +3318,7 @@ body {
 
 .lobby-line-button {
   width: 100%;
-  height: calc(13px * var(--lobby-scale));
+  flex: 1;
   background: transparent !important;
   border: none !important;
   cursor: pointer;
@@ -3418,7 +3412,7 @@ body {
 .chat-sidebar h2,
 .chat-sidebar span,
 .chat-sidebar .close-btn {
-  color: #cbd5e1 !important;
+  color: #ffffff !important;
 }
 
 /* Background override for Instructor Toolbox (ITO) and Student Toolbox (STO) */
@@ -4317,8 +4311,8 @@ body {
 
 @media (min-height: 481px) {
   .pc-width-keeper.pc-sidebar-open {
-    max-height: calc(56vh - 10px) !important;
-    max-width: calc((56vh - 10px) * 16 / 9) !important;
+    max-height: calc(var(--peo-height, 25vh) * 2 + 20px) !important;
+    max-width: calc((var(--peo-height, 25vh) * 2 + 20px) * 16 / 9) !important;
   }
 }
 
@@ -4801,9 +4795,16 @@ body {
   color: #ffffff;
 }
 
-/* Central Control Deck (Under Presentation Container) */
 .control-deck-outer {
-  width: 100%;
+  width: calc((var(--peo-height, 25vh) * 2 + 20px) * 16 / 9) !important;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-height: 480px) and (orientation: landscape) {
+  .control-deck-outer {
+    width: 100% !important;
+  }
 }
 
 .control-deck {
@@ -4870,8 +4871,8 @@ body {
   align-items: center;
   justify-content: center;
   transition: all 0.15s ease;
-  width: 46px;
-  height: 46px;
+  width: 77px;
+  height: 77px;
   border-radius: 8px;
 }
 
@@ -4881,8 +4882,8 @@ body {
 }
 
 .deck-sticker-btn img {
-  width: 35px;
-  height: 35px;
+  width: 59px;
+  height: 59px;
   object-fit: contain;
 }
 
@@ -4965,7 +4966,7 @@ body {
   align-items: center;
   font-size: 0.72rem;
   font-weight: bold;
-  color: #94a3b8;
+  color: #ffffff;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   padding-bottom: 4px;
 }
@@ -5027,5 +5028,49 @@ body {
 .lobby-backdrop textarea::placeholder {
   color: rgba(255, 255, 255, 1) !important;
   opacity: 1 !important;
+}
+
+.whisper-input::placeholder {
+  color: white !important;
+  opacity: 1 !important;
+}
+
+/* User request: all buttons under PC transparent with custom text style */
+.control-deck-outer button:not(.deck-filter-btn):not(.deck-sticker-btn):not(.cd-close-btn) {
+  background: transparent !important;
+  color: #ffffff !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  text-shadow: 0px 1px 3px rgba(0, 0, 0, 0.5) !important;
+  letter-spacing: 0.05em !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  font-size: 0.875rem !important;
+  opacity: 0.9 !important;
+}
+
+.control-deck-outer button:not(.deck-filter-btn):not(.deck-sticker-btn):not(.cd-close-btn) * {
+  color: #ffffff !important;
+  text-shadow: 0px 1px 3px rgba(0, 0, 0, 0.5) !important;
+}
+
+.control-deck-outer .group-label {
+  color: #ffffff !important;
+  text-shadow: 0px 1px 3px rgba(0, 0, 0, 0.5) !important;
+  letter-spacing: 0.18em !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  font-size: 0.875rem !important;
+  opacity: 0.9 !important;
+}
+
+.control-deck-outer span {
+  color: #ffffff !important;
+  text-shadow: 0px 1px 3px rgba(0, 0, 0, 0.5) !important;
+  letter-spacing: 0.05em !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  font-size: 0.875rem !important;
+  opacity: 0.9 !important;
 }
 

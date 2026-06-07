@@ -1,5 +1,5 @@
 import { Pause, Camera, RotateCcw } from 'lucide-react';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useAppContext } from '../context/AppContext';
 import PeoBorder from './PeoBorder';
 
@@ -22,12 +22,30 @@ export default function GuestContainer({
   nudges = {},
   globalPause
 }) {
-  const { blankCovers, setBlankCovers, MOCK_USER_COUNT, pendingRequest, approveRequest, denyRequest, activeTheme, handleAddSticker } = useAppContext();
+  const { participants, blankCovers, setBlankCovers, MOCK_USER_COUNT, pendingRequest, approveRequest, denyRequest, activeTheme, handleAddSticker } = useAppContext();
   const [isEditing, setIsEditing] = useState(false);
   
   // Local state for forms
   const [tempCoverUrl, setTempCoverUrl] = useState('');
   const [tempLink, setTempLink] = useState('');
+
+  // Whisper State
+  const [showWhisper, setShowWhisper] = useState(false);
+
+  useEffect(() => {
+    if (buttons?.whisper && buttons?.whisperTime) {
+      const timeSince = Date.now() - buttons.whisperTime;
+      if (timeSince < 10000) {
+        setShowWhisper(true);
+        const timer = setTimeout(() => {
+          setShowWhisper(false);
+        }, 10000 - timeSince);
+        return () => clearTimeout(timer);
+      } else {
+        setShowWhisper(false);
+      }
+    }
+  }, [buttons?.whisper, buttons?.whisperTime]);
 
   // Webcams state
   const [pendingStream, setPendingStream] = useState(null);
@@ -37,6 +55,7 @@ export default function GuestContainer({
   const joinedVideoRef = useRef(null);
 
   const clickTimeoutRef = useRef(null);
+  const lastClickTimeRef = useRef(0);
 
   const handleCellClick = (e) => {
     // Prevent click handling if target is within edit form or buttons
@@ -44,25 +63,47 @@ export default function GuestContainer({
       return;
     }
 
-    if (clickTimeoutRef.current) {
-      clearTimeout(clickTimeoutRef.current);
-      clickTimeoutRef.current = null;
+    const now = Date.now();
+    const timeSinceLastClick = now - lastClickTimeRef.current;
+
+    if (e.detail === 2 || (timeSinceLastClick > 0 && timeSinceLastClick < 450)) {
+      lastClickTimeRef.current = 0; // Reset
+      if (clickTimeoutRef.current) {
+        clearTimeout(clickTimeoutRef.current);
+        clickTimeoutRef.current = null;
+      }
       if (onDoubleClick) {
         onDoubleClick(participant);
       }
-    } else {
-      clickTimeoutRef.current = setTimeout(() => {
-        clickTimeoutRef.current = null;
-        if (onClick) {
-          onClick(participant);
-        }
-      }, 250);
+      return;
     }
+
+    lastClickTimeRef.current = now;
+
+    if (clickTimeoutRef.current) {
+      clearTimeout(clickTimeoutRef.current);
+    }
+
+    clickTimeoutRef.current = setTimeout(() => {
+      clickTimeoutRef.current = null;
+      if (onClick) {
+        onClick(participant);
+      }
+    }, 450);
   };
 
   const isInstructorClient = sessionStorage.getItem('stagetrack_role') !== 'student';
   const isClosed = globalPause || (buttons && buttons.mute) || false;
-  const isPending = isInstructorClient && participant.isBlank && participant.blankIndex === 1 && pendingRequest !== null;
+
+  // Find the very first available blank cell dynamically, robust against MOCK_USER_COUNT changes or manual edits
+  const firstBlankId = useMemo(() => {
+    if (!participants) return null;
+    const blank = participants.find(p => p.isBlank);
+    return blank ? blank.id : null;
+  }, [participants]);
+
+  const isPending = isInstructorClient && participant.isBlank && participant.id === firstBlankId && pendingRequest !== null;
+
   const isJoinedUser = !participant.isBlank && 
     ((participant.isInstructor && isInstructorClient) || 
      (participant.id && String(participant.id).startsWith('active-joined')));
@@ -96,17 +137,21 @@ export default function GuestContainer({
   useEffect(() => {
     let activeStream = null;
     if (isJoinedUser && !isClosed) {
-      navigator.mediaDevices.getUserMedia({ video: true, audio: false })
-        .then((s) => {
-          activeStream = s;
-          setJoinedStream(s);
-          if (joinedVideoRef.current) {
-            joinedVideoRef.current.srcObject = s;
-          }
-        })
-        .catch((err) => {
-          console.log("Webcam access blocked in joined student view:", err);
-        });
+      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+          .then((s) => {
+            activeStream = s;
+            setJoinedStream(s);
+            if (joinedVideoRef.current) {
+              joinedVideoRef.current.srcObject = s;
+            }
+          })
+          .catch((err) => {
+            console.log("Webcam access blocked in joined student view:", err);
+          });
+      } else {
+        console.warn("navigator.mediaDevices is not available. Ensure you are on HTTPS or localhost.");
+      }
     } else {
       setJoinedStream(null);
     }
@@ -129,8 +174,6 @@ export default function GuestContainer({
   const canEditThisBlank = isInstructorClient;
 
   if (participant.isBlank) {
-    const isPending = isInstructorClient && participant.blankIndex === 1 && pendingRequest !== null;
-
     if (isPending) {
       return (
         <div 
@@ -444,6 +487,14 @@ export default function GuestContainer({
         </div>
       )}
 
+      {/* Whisper Overlay */}
+      {showWhisper && buttons.whisper && (
+        <div className="peo-whisper-overlay" style={{ zIndex: 25 }}>
+          <div className="whisper-bubble">
+            {buttons.whisper}
+          </div>
+        </div>
+      )}
 
       {/* Stickers */}
       {stickers.filter(s => !(activeTheme === 'sor' && (s.position === 'confetti' || s.name === 'Confetti.svg'))).map((s) => {
@@ -467,16 +518,18 @@ export default function GuestContainer({
         const isIcSticker = typeof s.position === 'string' && s.position !== 'confetti' && s.position !== 'sun' && s.position !== 'birthday' && s.position !== 'crown';
 
         if (isIcSticker) {
-          const xTrans = (s.position.includes('tr-c') || s.position.startsWith('rc-')) ? '50%' : '-50%';
+          let xTrans = '-50%';
+          if (s.position === 'tl-c') xTrans = '0%';
+          if (s.position === 'rc-2') xTrans = '-100%';
           const yTrans = '-50%';
-          const rot = s.rotation || 0;
-          const sc = s.scale || 1;
-          style.transform = `translate(${xTrans}, ${yTrans}) rotate(${rot}deg) scale(${sc})`;
+          style.transform = `translate(${xTrans}, ${yTrans})`;
+          style.width = '70px';
+          style.height = '70px';
         }
 
         if (s.name === 'Drums.svg') {
-          style.width = isIcSticker ? '48px' : '74px';
-          style.height = isIcSticker ? '48px' : '74px';
+          style.width = isIcSticker ? '72px' : '93px';
+          style.height = isIcSticker ? '72px' : '93px';
         }
 
         if (s.name === 'Trumpet.svg') {
@@ -486,8 +539,8 @@ export default function GuestContainer({
 
           if (s.position === 1) { xT = -65; yT = -65; hasCustomTransform = true; }
           else if (s.position === 2) { xT = 65; yT = -65; hasCustomTransform = true; }
-          else if (s.position === 3) { xT = -65; yT = 65; hasCustomTransform = true; }
-          else if (s.position === 4) { xT = 65; yT = 65; hasCustomTransform = true; }
+          else if (s.position === 3) { xT = -65; yT = 0; hasCustomTransform = true; }
+          else if (s.position === 4) { xT = 65; yT = 0; hasCustomTransform = true; }
           else if (s.position === 5) { xT = 50; yT = -50; hasCustomTransform = true; }
           else if (s.position === 'crown') {
             style.top = '13px';

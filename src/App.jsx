@@ -11,6 +11,64 @@ import UnifiedToolbox from './components/UnifiedToolbox';
 import InstructorToolbox from './components/InstructorToolbox';
 import ControlDeck from './components/ControlDeck';
 
+function StageTimerDisplay({ stageTimer, setStageTimer, isInstructorClient }) {
+  const [timeLeft, setTimeLeft] = useState(0);
+
+  useEffect(() => {
+    if (!stageTimer || !stageTimer.endTime) return;
+    if (!stageTimer.isRunning) {
+      setTimeLeft(stageTimer.duration);
+      return;
+    }
+
+    const updateTimer = () => {
+      const remaining = Math.max(0, Math.round((stageTimer.endTime - Date.now()) / 1000));
+      setTimeLeft(remaining);
+      
+      if (remaining <= 0) {
+        if (isInstructorClient) {
+          setStageTimer({ endTime: null, duration: 0, isRunning: false });
+        }
+      }
+    };
+
+    updateTimer();
+    const interval = setInterval(updateTimer, 1000);
+    return () => clearInterval(interval);
+  }, [stageTimer?.endTime, stageTimer?.isRunning, stageTimer?.duration, isInstructorClient, setStageTimer]);
+
+  const minutes = Math.floor(timeLeft / 60);
+  const seconds = timeLeft % 60;
+  const timeStr = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+
+  return (
+    <div 
+      className="stage-timer-display"
+      style={{
+        position: 'absolute',
+        right: '20px',
+        top: '50%',
+        transform: 'translateY(-50%)',
+        background: 'transparent',
+        border: 'none',
+        borderRadius: '20px',
+        padding: '6px 16px',
+        color: timeLeft <= 10 ? '#ef4444' : '#22c55e',
+        fontFamily: 'monospace',
+        fontSize: '2.4rem',
+        fontWeight: 'bold',
+        zIndex: 100,
+        display: 'flex',
+        alignItems: 'center',
+        gap: '12px',
+        boxShadow: 'none'
+      }}
+    >
+      {timeStr}
+    </div>
+  );
+}
+
 function App() {
   const {
     MOCK_USER_COUNT,
@@ -27,7 +85,19 @@ function App() {
     globalPause, setGlobalPause,
     messages, handleModerateMessage, handleSendChatMessage,
     isJoined,
-    activeTheme
+    pendingRequest,
+    approveRequest,
+    denyRequest,
+    activeTheme,
+    activeItoSection,
+    setActiveItoSection,
+    showInstructorStickers,
+    showStudentStickers, setShowStudentStickers,
+    showStudentFilters, setShowStudentFilters,
+    setShowStudentWhisper,
+    isPeoStickersOpen,
+    spotlightGuestId,
+    stageTimer, setStageTimer
   } = useAppContext();
 
   const [isPortrait, setIsPortrait] = useState(
@@ -41,6 +111,58 @@ function App() {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  useEffect(() => {
+    const updatePeoHeight = () => {
+      const peoElement = document.querySelector('.right-peos-sidebar .video-cell') || document.querySelector('.side-peos .video-cell');
+      if (peoElement) {
+        const height = peoElement.getBoundingClientRect().height;
+        if (height > 0) {
+          document.documentElement.style.setProperty('--peo-height', `${height}px`);
+        }
+      }
+    };
+
+    const handleUpdate = () => {
+      requestAnimationFrame(updatePeoHeight);
+    };
+
+    handleUpdate();
+
+    window.addEventListener('resize', handleUpdate);
+    const timer1 = setTimeout(handleUpdate, 150);
+    const timer2 = setTimeout(handleUpdate, 350);
+
+    return () => {
+      window.removeEventListener('resize', handleUpdate);
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+    };
+  }, [participants, isSidebarOpen, isChatOpen, activeItoSection]);
+
+  const [showSelectPeoWarning, setShowSelectPeoWarning] = useState(false);
+  useEffect(() => {
+    if (activeGuestId) {
+      setShowSelectPeoWarning(false);
+    }
+  }, [activeGuestId]);
+
+  const copyInviteLink = async () => {
+    const params = new URLSearchParams(window.location.search);
+    const sid = params.get('session');
+    if (!sid) {
+      alert("No active session to invite to.");
+      return;
+    }
+    const inviteUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?session=' + sid;
+    try {
+      await navigator.clipboard.writeText(inviteUrl);
+      alert("Invite link copied to clipboard!");
+    } catch (err) {
+      console.error("Failed to copy:", err);
+      prompt("Copy this link:", inviteUrl);
+    }
+  };
 
   const isInstructorClient = sessionStorage.getItem('stagetrack_role') !== 'student';
   const isInstructorSidebarVisible = true;
@@ -264,6 +386,10 @@ function App() {
                 filter: 'drop-shadow(0px 3px 6px rgba(0, 0, 0, 0.3))'
               }} 
             />
+
+            {stageTimer && (stageTimer.isRunning || stageTimer.duration > 0) && (
+              <StageTimerDisplay stageTimer={stageTimer} setStageTimer={setStageTimer} isInstructorClient={isInstructorClient} />
+            )}
           </div>
         ) : (
           <div className="top-banner" style={{ backgroundImage: "radial-gradient(ellipse at top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0) 70%), linear-gradient(to bottom, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.1) 100%), url('/assets/SOR/1ui_sor top banner-052826 3.png')", backgroundSize: '100% 100%', backgroundRepeat: 'no-repeat', backgroundPosition: 'center', position: 'relative' }}>
@@ -278,6 +404,10 @@ function App() {
               }} 
             />
             <div className="gradient-divider-bar" style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '6px' }}></div>
+
+            {stageTimer && (stageTimer.isRunning || stageTimer.duration > 0) && (
+              <StageTimerDisplay stageTimer={stageTimer} setStageTimer={setStageTimer} isInstructorClient={isInstructorClient} />
+            )}
           </div>
         )
       ) : activeTheme === 'sor' ? (
@@ -293,6 +423,10 @@ function App() {
             }} 
           />
           <div className="gradient-divider-bar" style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '6px' }}></div>
+
+          {stageTimer && (stageTimer.isRunning || stageTimer.duration > 0) && (
+            <StageTimerDisplay stageTimer={stageTimer} setStageTimer={setStageTimer} isInstructorClient={isInstructorClient} />
+          )}
         </div>
       ) : (
         <div className="top-banner" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'relative' }}>
@@ -318,6 +452,10 @@ function App() {
               }} 
             />
           </div>
+
+          {stageTimer && (stageTimer.isRunning || stageTimer.duration > 0) && (
+            <StageTimerDisplay stageTimer={stageTimer} setStageTimer={setStageTimer} isInstructorClient={isInstructorClient} />
+          )}
         </div>
       )}
 
@@ -507,21 +645,30 @@ function App() {
                })}
              </div>
 
-             <div className="center-wrapper" style={{ justifyContent: 'center' }}>
-               <div className={`pc-width-keeper ${isSidebarOpen || isChatOpen ? 'pc-sidebar-open' : ''}`}>
-                  <div 
-                    className={`pc-gt-unified ${mediaType === 'iframe' || mediaType === 'metronome' ? 'metronome-active' : ''}`}
-                    style={{ border: activeTheme === 'sor' ? '2px solid #dc2626' : 'none' }}
-                  >
-                     <PresentationContainer 
-                       isDoodling={isDoodling}
-                       mediaUrl={mediaUrl}
-                       mediaType={mediaType}
-                       onClearMedia={clearMedia}
-                     />
+              <div className="center-wrapper" style={{ position: 'relative', alignSelf: 'flex-start' }}>
+                <div style={{ 
+                  display: 'flex', 
+                  flexDirection: 'column', 
+                  width: 'fit-content', 
+                  alignItems: 'center', 
+                  height: '100%', 
+                  justifyContent: ((isInstructorClient && showInstructorStickers) || showStudentStickers || showStudentFilters || isPeoStickersOpen || (isInstructorClient && activeItoSection === 'studio')) ? 'space-between' : 'center' 
+                }}>
+                 <div className={`pc-width-keeper ${isSidebarOpen || isChatOpen ? 'pc-sidebar-open' : ''}`}>
+                    <div 
+                      className={`pc-gt-unified ${mediaType === 'iframe' || mediaType === 'metronome' ? 'metronome-active' : ''}`}
+                      style={{ border: activeTheme === 'sor' ? '2px solid #dc2626' : 'none' }}
+                    >
+                       <PresentationContainer 
+                         isDoodling={isDoodling}
+                         mediaUrl={mediaUrl}
+                         mediaType={mediaType}
+                         onClearMedia={clearMedia}
+                       />
+                   </div>
                  </div>
+                 <ControlDeck />
                </div>
-               <ControlDeck />
              </div>
              
              <div className="side-peos" data-columns={halfLength <= 3 ? "1" : "2"}>

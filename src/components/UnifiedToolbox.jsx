@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Hand, MicOff, MessageSquare, X, Camera, Sparkles, Smile, Trash2 } from 'lucide-react';
+import { Hand, MicOff, MessageSquare, X, Camera, Sparkles, Smile, Trash2, Star, ArrowLeftRight } from 'lucide-react';
 import html2canvas from 'html2canvas';
 import { useAppContext } from '../context/AppContext';
 
@@ -15,9 +15,16 @@ export default function UnifiedToolbox({
     setIsSidebarOpen, 
     activeTheme,
     showStudentStickers, setShowStudentStickers,
-    showStudentFilters, setShowStudentFilters
+    showStudentFilters, setShowStudentFilters,
+    showStudentWhisper, setShowStudentWhisper,
+    activeItoSection, setActiveItoSection,
+    sendWhisper,
+    spotlightGuestId, setSpotlightGuestId,
+    setActiveToolbox,
+    isPeoStickersOpen, setIsPeoStickersOpen
   } = useAppContext();
   const isInstructorClient = sessionStorage.getItem('stagetrack_role') !== 'student';
+  const [whisperText, setWhisperText] = useState('');
 
   const isSor = activeTheme === 'sor';
   const themeTextColor = isSor ? '#ef4444' : '#3b82f6';
@@ -29,14 +36,14 @@ export default function UnifiedToolbox({
   const resetInactivityTimer = useCallback(() => {
     if (timerRef.current) clearTimeout(timerRef.current);
     timerRef.current = setTimeout(() => {
-      setShowStickerPicker(false);
+      setShowStudentStickers(false);
     }, 20000);
   }, []);
 
   const resetFilterInactivityTimer = useCallback(() => {
     if (filterTimerRef.current) clearTimeout(filterTimerRef.current);
     filterTimerRef.current = setTimeout(() => {
-      setShowFilterPicker(false);
+      setShowStudentFilters(false);
     }, 20000);
   }, []);
 
@@ -95,16 +102,7 @@ export default function UnifiedToolbox({
         setIsChatOpen(false); // Closes chat
         setIsSidebarOpen(false); // Closes ITO
 
-        // Create a mirrored canvas
-        const mirrorCanvas = document.createElement('canvas');
-        mirrorCanvas.width = canvas.width;
-        mirrorCanvas.height = canvas.height;
-        const ctx = mirrorCanvas.getContext('2d');
-        ctx.translate(canvas.width, 0);
-        ctx.scale(-1, 1);
-        ctx.drawImage(canvas, 0, 0);
-
-        const image = mirrorCanvas.toDataURL('image/png');
+        const image = canvas.toDataURL('image/png');
         const link = document.createElement('a');
         link.download = `screenshot-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.png`;
         link.href = image;
@@ -127,46 +125,40 @@ export default function UnifiedToolbox({
 
   return (
     <div className={`unified-toolbox glass-panel ${activeTheme === 'sor' ? 'theme-sor' : 'theme-music'}`} style={{ height: '100%', width: '100%' }}>
-      <div className="toolbox-header" style={{ minHeight: '52px', borderBottom: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '12px 16px', position: 'relative' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px', textAlign: 'center', maxWidth: '160px', width: '100%' }}>
-          <span style={{ color: '#ffffff', textShadow: themeTextShadow, fontSize: '0.92rem', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block', width: '100%' }} title={activeGuest && !activeGuest.isInstructor ? `${activeGuest.name}'s Tools` : "Student Tools"}>
-            {activeGuest && !activeGuest.isInstructor ? `${activeGuest.name}'s Tools` : "Student Tools"}
+      <div className="toolbox-header" style={{ minHeight: '52px', borderBottom: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '12px 16px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px', textAlign: 'center', width: '100%' }}>
+          <span style={{ color: '#ffffff', textShadow: themeTextShadow, fontSize: '0.8rem', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'normal', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block', width: '100%', lineHeight: '1.2', textAlign: 'center' }} title={activeGuest && !activeGuest.isInstructor ? `${activeGuest.name}'s Tools` : "Student Tools"}>
+            {activeGuest && !activeGuest.isInstructor ? (
+              <>{activeGuest.name}'s<br/>Tools</>
+            ) : (
+              <>Student<br/>Tools</>
+            )}
           </span>
-          {isInstructorClient && (
-            <span style={{ fontSize: '12px', color: '#ffffff', textTransform: 'lowercase', letterSpacing: '-0.02em', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block', width: '100%' }}>
-              double-click for ITO
-            </span>
-          )}
+
         </div>
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'center', padding: '16px 0 2px 0' }}>
-        <button onClick={onClose} className="close-btn" style={{ position: 'static', transform: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'transparent', border: 'none', cursor: 'pointer' }}>
-          <svg 
-            width="32" 
-            height="32" 
-            viewBox="0 0 328 259" 
-            style={{ 
-              transform: 'rotate(180deg)',
-              objectFit: 'contain'
-            }}
-          >
-            <path 
-              d="M 154.88 17.14 L 163.26 21.57 L 301.25 123.09 L 311.60 133.94 L 309.63 138.86 L 162.28 241.86 L 158.83 240.88 L 157.35 235.95 L 152.91 234.96 L 150.94 231.51 L 162.28 174.35 L 31.18 188.15 L 24.78 187.65 L 22.81 182.72 L 18.86 181.74 L 16.40 178.29 L 16.89 77.26 L 23.79 75.29 L 163.75 90.07 L 150.94 22.56 L 151.93 18.62 L 154.39 17.63 Z" 
-              fill={themeTextColor} 
-              stroke="#fbbf24" 
-              strokeWidth="20" 
-              strokeLinejoin="round" 
-              strokeLinecap="round" 
-            />
-          </svg>
-        </button>
-      </div>
-
-      <div className="toolbox-content" style={{ marginTop: '-15px' }}>
+      <div className="toolbox-content" style={{ marginTop: '0px' }}>
         {/* Guest Tools Section */}
         <div className="toolbox-section">
           <div className="gt-buttons-col">
+            {/* Switch to Instructor Tools Button */}
+            {isInstructorClient && (
+              <button 
+                className="gb-btn"
+                onClick={() => {
+                  setActiveToolbox("instructor");
+                  setShowStudentStickers(false);
+                  setShowStudentFilters(false);
+                  setShowStudentWhisper(false);
+                }}
+                style={{ color: '#fbbf24', borderColor: '#fbbf24' }}
+              >
+                <ArrowLeftRight size={18} />
+                <span>Change to<br />ITO</span>
+              </button>
+            )}
+
             <button 
               className={`gb-btn ${buttons.raiseHand ? 'active' : ''}`}
               onClick={() => toggleGuestButton(activeGuest.id, 'raiseHand')}
@@ -189,29 +181,23 @@ export default function UnifiedToolbox({
               <span>Chat</span>
             </button>
             <button 
-              className={`gb-btn ${showStudentStickers ? 'active' : ''}`}
+              className={`gb-btn ${(showStudentStickers || isPeoStickersOpen) ? 'active' : ''}`}
               onClick={() => {
-                const nextState = !showStudentStickers;
-                setShowStudentStickers(nextState);
+                const isAlreadyOpen = showStudentStickers || isPeoStickersOpen;
+                if (isAlreadyOpen) {
+                  setShowStudentStickers(false);
+                  setIsPeoStickersOpen(false);
+                } else {
+                  setShowStudentStickers(true);
+                }
                 setShowStudentFilters(false);
-                if (nextState) setIsSidebarOpen(false);
+                setActiveItoSection(null);
               }}
             >
               <Smile size={18} />
               <span>Stickers</span>
             </button>
-            <button 
-              className={`gb-btn ${(showStudentFilters || buttons.greenFilter || buttons.blueFilter || buttons.purpleFilter || buttons.orangeFilter) ? 'active' : ''}`}
-              onClick={() => {
-                const nextState = !showStudentFilters;
-                setShowStudentFilters(nextState);
-                setShowStudentStickers(false);
-                if (nextState) setIsSidebarOpen(false);
-              }}
-            >
-              <Sparkles size={18} />
-              <span>Filters</span>
-            </button>
+
             <button 
               className="gb-btn screenshot-btn"
               onClick={handleScreenshot}
@@ -219,7 +205,27 @@ export default function UnifiedToolbox({
               <Camera size={18} />
               <span>Take a Picture</span>
             </button>
+
           </div>
+          
+          {/* Whisper Section for Instructors */}
+          {isInstructorClient && (
+            <button 
+              className={`gb-btn ${showStudentWhisper ? 'active' : ''}`}
+              onClick={() => {
+                const nextState = !showStudentWhisper;
+                setShowStudentWhisper(nextState);
+                setShowStudentStickers(false);
+                setShowStudentFilters(false);
+                setActiveItoSection(null);
+                if (nextState) setIsSidebarOpen(false);
+              }}
+              style={{ marginTop: '16px' }}
+            >
+              <MessageSquare size={18} />
+              <span>Private Whisper</span>
+            </button>
+          )}
         </div>
       </div>
     </div>

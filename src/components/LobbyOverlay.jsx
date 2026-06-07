@@ -124,15 +124,19 @@ export default function LobbyOverlay() {
   // Request webcam access
   useEffect(() => {
     let activeStream = null;
-    navigator.mediaDevices.getUserMedia({ video: true, audio: false })
-      .then((mediaStream) => {
-        activeStream = mediaStream;
-        setStream(mediaStream);
-        if (localVideoRef.current) localVideoRef.current.srcObject = mediaStream;
-      })
-      .catch((err) => {
-        console.log("Webcam access blocked:", err);
-      });
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+        .then((mediaStream) => {
+          activeStream = mediaStream;
+          setStream(mediaStream);
+          if (localVideoRef.current) localVideoRef.current.srcObject = mediaStream;
+        })
+        .catch((err) => {
+          console.log("Webcam access blocked or denied:", err);
+        });
+    } else {
+      console.warn("navigator.mediaDevices is not available. Ensure you are on HTTPS or localhost.");
+    }
 
     return () => {
       if (activeStream) {

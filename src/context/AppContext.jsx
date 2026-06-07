@@ -248,10 +248,18 @@ export function AppProvider({ children }) {
   const [mediaUrl, setMediaUrlInternal] = useState(null);
   const [mediaType, setMediaTypeInternal] = useState(null);
   const [isChatOpen, setIsChatOpen] = useState(false);
+
+  // Clear all stickers and buttons globally
+  const clearAllStage = useCallback(() => {
+    setGuestStickers({});
+    setGuestButtons({});
+  }, []);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [showInstructorStickers, setShowInstructorStickers] = useState(false);
   const [showStudentStickers, setShowStudentStickers] = useState(false);
   const [showStudentFilters, setShowStudentFilters] = useState(false);
+  const [showStudentWhisper, setShowStudentWhisper] = useState(false);
+  const [isPeoStickersOpen, setIsPeoStickersOpen] = useState(false);
   const [globalMute, setGlobalMute] = useState(() => {
     try {
       const saved = localStorage.getItem('stagetrack_global_mute');
@@ -276,6 +284,13 @@ export function AppProvider({ children }) {
     }
   });
 
+  const [spotlightGuestId, setSpotlightGuestId] = useState(null);
+  const [stageTimer, setStageTimer] = useState({ endTime: null, duration: 0, isRunning: false });
+
+  // ITO Section State
+  const [activeItoSection, setActiveItoSection] = useState(null);
+
+  // Sync timers to local storage to persist across refresh
   useEffect(() => {
     try {
       localStorage.setItem('stagetrack_active_theme', activeTheme);
@@ -441,6 +456,14 @@ export function AppProvider({ children }) {
       const nextVal = !current[btnName];
       const updated = { ...current, [btnName]: nextVal };
       
+      if (btnName === 'raiseHand') {
+        if (nextVal) {
+          updated.raiseHandTime = Date.now();
+        } else {
+          updated.raiseHandTime = null;
+        }
+      }
+      
       const filterKeys = ['greenFilter', 'blueFilter', 'purpleFilter', 'orangeFilter'];
       if (filterKeys.includes(btnName) && nextVal) {
         filterKeys.forEach(k => {
@@ -471,6 +494,20 @@ export function AppProvider({ children }) {
       setIsChatOpen(newState);
     }
   }, [guestButtons, toggleGuestButton, setActiveGuestId]);
+
+  const sendWhisper = useCallback((guestId, message) => {
+    setGuestButtons(prev => {
+      const current = prev[guestId] || { raiseHand: false, mute: false, chat: false };
+      return {
+        ...prev,
+        [guestId]: {
+          ...current,
+          whisper: message,
+          whisperTime: Date.now()
+        }
+      };
+    });
+  }, [setGuestButtons]);
 
   const handleAddSticker = useCallback((targetId, stickerName, isInstructor) => {
     // If it's the instructor adding a sticker to the instructor container
@@ -802,9 +839,14 @@ export function AppProvider({ children }) {
       updateDoc(doc(db, "sessions", sessionId), { 
         lobbyRequest: reqData,
         lobbyResponse: { status: 'pending' }
-      }).catch(e=>console.error(e));
+      }).catch(e => {
+        console.error("Firestore update failed:", e);
+        alert("Connection Error: " + e.message + "\nPlease try refreshing.");
+      });
+    } else {
+      alert("Error: No Session ID found. Please ask the instructor for a new link.");
     }
-  }, [resetStudentState]);
+  }, [resetStudentState, sessionId]);
 
   const approveRequest = useCallback(() => {
     if (!pendingRequest) return;
@@ -935,10 +977,13 @@ export function AppProvider({ children }) {
         if (data.globalMute !== undefined) setGlobalMute(data.globalMute);
         if (data.globalPause !== undefined) setGlobalPause(data.globalPause);
         if (data.activeTheme) setActiveTheme(data.activeTheme);
+        if (data.spotlightGuestId !== undefined) setSpotlightGuestId(data.spotlightGuestId);
+        if (data.stageTimer !== undefined) setStageTimer(data.stageTimer);
         
         const currentRole = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('stagetrack_role') : null;
+        const isInstructorClient = currentRole !== 'student';
 
-        if (currentRole === 'instructor') {
+        if (isInstructorClient) {
             setPendingRequest(data.lobbyRequest || null);
         }
         
@@ -987,21 +1032,32 @@ export function AppProvider({ children }) {
     }
   }, [participants, sessionId]);
 
+  useEffect(() => {
+    if (sessionId && !isRemoteUpdate.current) {
+      updateDoc(doc(db, "sessions", sessionId), { spotlightGuestId, stageTimer }).catch(e => console.error(e));
+    }
+  }, [spotlightGuestId, stageTimer, sessionId]);
+
   const value = {
     MOCK_USER_COUNT,
     participants,
     activeGuestId, setActiveGuestId,
     activeToolbox, setActiveToolbox,
-    guestButtons, setGuestButtons, handleToggleGuestButton,
+    guestButtons, setGuestButtons, handleToggleGuestButton, sendWhisper,
     guestStickers, setGuestStickers, handleAddSticker,
     stickerNudges,
     isDoodling, setIsDoodling,
     mediaUrl, mediaType, setMediaUpload, clearMedia,
     isChatOpen, setIsChatOpen,
     isSidebarOpen, setIsSidebarOpen,
+    activeItoSection, setActiveItoSection,
+    sessionId, // Added to expose session code
     showInstructorStickers, setShowInstructorStickers,
     showStudentStickers, setShowStudentStickers,
     showStudentFilters, setShowStudentFilters,
+    showStudentWhisper, setShowStudentWhisper,
+    isPeoStickersOpen, setIsPeoStickersOpen,
+    clearAllStage,
     globalMute, setGlobalMute,
     globalPause, setGlobalPause,
     messages, setMessages,
@@ -1018,7 +1074,9 @@ export function AppProvider({ children }) {
     pendingRequest, setPendingRequest,
     requestAccess, approveRequest, denyRequest,
     resetStudentState,
-    activeTheme, setActiveTheme
+    activeTheme, setActiveTheme,
+    spotlightGuestId, setSpotlightGuestId,
+    stageTimer, setStageTimer
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

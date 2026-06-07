@@ -133,7 +133,7 @@ export default function LeftSidebar() {
         display: 'flex',
         flexDirection: 'column',
         overflow: 'hidden',
-        width: mode === 'STO' ? '150px' : '250px',
+        width: '150px',
         transition: 'width 0.3s ease',
         background: 'rgba(11, 25, 46, 0.7)',
         ...transmissionGlowStyle
