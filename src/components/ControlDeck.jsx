@@ -59,9 +59,9 @@ export default function ControlDeck() {
 
   const shouldShowStudentStickers = showStudentStickers;
   const shouldShowStudentFilters = showStudentFilters;
-  const shouldShowStudioControls = isInstructorClient && activeItoSection === 'studio';
+  const shouldShowStudioControls = isInstructorClient && (activeItoSection === 'studio' || showInstructorStickers || showStudentStickers || isPeoStickersOpen || showStudentFilters);
   // Always show instructor deck if no other specific deck is requested
-  const shouldShowInstructorDeck = isInstructorClient && showInstructorStickers && !shouldShowStudentStickers && !shouldShowStudentFilters && !isPeoStickersOpen;
+  const shouldShowInstructorDeck = !isInstructorClient && showInstructorStickers && !shouldShowStudentStickers && !shouldShowStudentFilters && !isPeoStickersOpen;
 
   if (!shouldShowInstructorDeck && !shouldShowStudentStickers && !shouldShowStudentFilters && !isPeoStickersOpen && !shouldShowStudioControls) {
     return null;
@@ -218,6 +218,10 @@ export default function ControlDeck() {
               onClick={() => {
                 setActiveItoSection(null);
                 setActiveCdTab(null);
+                setShowInstructorStickers(false);
+                setShowStudentStickers(false);
+                setShowStudentFilters(false);
+                setIsPeoStickersOpen(false);
               }}
               className="cd-close-btn"
               style={{
@@ -253,13 +257,17 @@ export default function ControlDeck() {
               X
             </button>
 
-            {activeCdTab !== null && (
+            {(activeCdTab !== null || showInstructorStickers || showStudentStickers || isPeoStickersOpen || showStudentFilters) && (
               <button
                 onClick={() => {
                   if (activeCdTab === 'activities') {
                     setActiveCdTab('upload');
                   } else {
                     setActiveCdTab(null);
+                    setShowInstructorStickers(false);
+                    setShowStudentStickers(false);
+                    setShowStudentFilters(false);
+                    setIsPeoStickersOpen(false);
                   }
                 }}
                 className="cd-back-btn"
@@ -298,10 +306,24 @@ export default function ControlDeck() {
             )}
 
             <h2>
-              {activeCdTab === 'timer' ? 'STAGE TIMER' : activeCdTab === 'system' ? 'SYSTEM' : activeCdTab === 'upload' ? 'UPLOAD MEDIA' : activeCdTab === 'activities' ? 'ACTIVITIES' : 'STUDIO CONTROLS'}
+              {activeCdTab === 'timer' 
+                ? 'STAGE TIMER' 
+                : activeCdTab === 'system' 
+                ? 'SYSTEM' 
+                : activeCdTab === 'upload' 
+                ? 'UPLOAD MEDIA' 
+                : activeCdTab === 'activities' 
+                ? 'ACTIVITIES' 
+                : showInstructorStickers 
+                ? 'INSTRUCTOR REWARDS' 
+                : (showStudentStickers || isPeoStickersOpen)
+                ? 'REACTION STICKERS'
+                : showStudentFilters
+                ? 'STUDENT FILTERS'
+                : 'STUDIO CONTROLS'}
             </h2>
 
-            {activeCdTab === null ? (
+            {activeCdTab === null && !showInstructorStickers && !showStudentStickers && !isPeoStickersOpen && !showStudentFilters ? (
               <>
                 <div className="controls-row top-row">
                   {/* INVITE */}
@@ -409,7 +431,7 @@ export default function ControlDeck() {
                 </div>
               </>
             ) : activeCdTab === 'upload' ? (
-              <div className="controls-row middle-row" style={{ width: '100%', margin: '1rem 0' }}>
+              <div className="controls-row middle-row" style={{ width: '100%', margin: '0.5rem 0' }}>
                 <button 
                   onClick={() => {
                     fileInputRef.current?.click();
@@ -446,7 +468,7 @@ export default function ControlDeck() {
                 )}
               </div>
             ) : activeCdTab === 'activities' ? (
-              <div className="controls-row middle-row" style={{ width: '100%', margin: '1rem 0' }}>
+              <div className="controls-row middle-row" style={{ width: '100%', margin: '0.5rem 0' }}>
                 {activities.map((act) => (
                   <button 
                     key={act.filename}
@@ -460,7 +482,7 @@ export default function ControlDeck() {
                 ))}
               </div>
             ) : activeCdTab === 'timer' ? (
-              <div className="controls-row middle-row" style={{ width: '100%', margin: '1rem 0', gap: '8px' }}>
+              <div className="controls-row middle-row" style={{ width: '100%', margin: '0.5rem 0', gap: '8px' }}>
                 {[60, 120, 300].map((sec) => (
                   <button
                     key={sec}
@@ -548,7 +570,7 @@ export default function ControlDeck() {
                 )}
               </div>
             ) : activeCdTab === 'system' ? (
-              <div className="controls-row middle-row" style={{ width: '100%', margin: '1rem 0' }}>
+              <div className="controls-row middle-row" style={{ width: '100%', margin: '0.5rem 0' }}>
                 <button 
                   className={activeTheme === 'music-fun' ? 'active' : ''}
                   onClick={() => setActiveTheme('music-fun')}
@@ -570,6 +592,81 @@ export default function ControlDeck() {
                   SOR
                 </button>
               </div>
+            ) : showInstructorStickers ? (
+              <div className="controls-row middle-row" style={{ width: '100%', margin: '0.5rem 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '8px' }}>
+                  {instructorStickers.map((sticker) => (
+                    <button 
+                      key={sticker.id}
+                      className="deck-sticker-btn"
+                      onClick={() => {
+                        if (!activeGuest) {
+                          alert("Please select a student in the grid first to apply rewards!");
+                          return;
+                        }
+                        handleAddSticker(activeGuest.id, sticker.id, true);
+                      }}
+                      title={activeGuest ? `Reward ${activeGuest.name} with ${sticker.name}` : `Select student to reward with ${sticker.name}`}
+                      style={{ width: 'calc(var(--peo-height) * 0.45)', height: 'calc(var(--peo-height) * 0.45)', maxWidth: '61px', maxHeight: '61px', minWidth: '36px', minHeight: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2px', border: 'none', background: 'transparent' }}
+                    >
+                      <img src={`/assets/svg_stickers/${sticker.id}`} alt={sticker.name} style={{ width: '80%', height: '80%', objectFit: 'contain' }} />
+                    </button>
+                  ))}
+                </div>
+                {activeGuest && (
+                  <span style={{ fontSize: '0.8rem', color: '#10b981', fontWeight: 'bold' }}>
+                    Target: {activeGuest.name}
+                  </span>
+                )}
+              </div>
+            ) : (showStudentStickers || isPeoStickersOpen) ? (
+              <div className="controls-row middle-row" style={{ width: '100%', margin: '0.5rem 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, auto)', gap: '8px', justifyContent: 'center' }}>
+                  {studentStickers.map((sticker) => (
+                    <button 
+                      key={sticker.id}
+                      className="deck-sticker-btn"
+                      onClick={() => handleStickerClick(sticker.id)}
+                      title={`Place ${sticker.name} sticker`}
+                      style={{ width: 'calc(var(--peo-height) * 0.45)', height: 'calc(var(--peo-height) * 0.45)', maxWidth: '61px', maxHeight: '61px', minWidth: '36px', minHeight: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2px', border: 'none', background: 'transparent' }}
+                    >
+                      <img src={`/assets/svg_stickers/${sticker.id}`} alt={sticker.name} style={{ width: '80%', height: '80%', objectFit: 'contain' }} />
+                    </button>
+                  ))}
+                </div>
+                {activeGuest && (
+                  <span style={{ fontSize: '0.8rem', color: '#10b981', fontWeight: 'bold' }}>
+                    Target: {activeGuest.name}
+                  </span>
+                )}
+              </div>
+            ) : showStudentFilters ? (
+              <div className="controls-row middle-row" style={{ width: '100%', margin: '0.5rem 0', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '12px' }}>
+                {studentFilters.map((filter) => {
+                  const isActive = targetBtns[filter.id] || false;
+                  return (
+                    <button 
+                      key={filter.id}
+                      className={`deck-filter-btn ${isActive ? 'active' : ''}`}
+                      onClick={() => handleFilterClick(filter.id)}
+                      style={{ '--filter-color': filter.color, width: '31px', height: '31px', padding: 0 }}
+                      title={`Toggle ${filter.name} Filter`}
+                    >
+                      <Sparkles size={16} color="#ffffff" />
+                    </button>
+                  );
+                })}
+                {targetId && (targetBtns.greenFilter || targetBtns.blueFilter || targetBtns.purpleFilter || targetBtns.orangeFilter) && (
+                  <button 
+                    className="deck-btn clear-filters-btn"
+                    onClick={handleClearFilters}
+                    title="Remove Filters"
+                    style={{ width: '31px', height: '31px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}
+                  >
+                    <X size={18} />
+                  </button>
+                )}
+              </div>
             ) : null}
           </section>
         )}
@@ -579,7 +676,7 @@ export default function ControlDeck() {
         )}
 
         {/* ROW 2: STUDENT STICKERS & FILTERS */}
-        {(isPeoStickersOpen || shouldShowStudentStickers || shouldShowStudentFilters) && (
+        {!isInstructorClient && (isPeoStickersOpen || shouldShowStudentStickers || shouldShowStudentFilters) && (
           <div className="deck-row glass-panel" style={{ display: 'flex', alignItems: 'center', gap: '16px', width: '100%', position: 'relative', background: 'rgba(30, 41, 59, 0.35)', padding: '10px 50px 8px 16px', borderRadius: '12px', height: 'var(--peo-height)', boxSizing: 'border-box' }}>
             
             <div style={{ display: 'flex', flex: 1, height: '100%', alignItems: 'center', gap: '16px', position: 'relative' }}>
