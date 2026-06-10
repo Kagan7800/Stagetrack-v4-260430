@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Luckiest+Guy&family=Risque&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Risque&display=swap');
 
 :root {
   --bg-gradient-start: #090a0f;
@@ -5185,14 +5185,9 @@ body {
   align-items: center;
   background: linear-gradient(135deg, #3a2dbb, #7a4fd9) !important;
   color: white;
-  font-family: 'Luckiest Guy', cursive !important;
   padding: 2rem;
   border-radius: 12px;
   width: 100%;
-}
-
-.studio-controls * {
-  font-family: 'Luckiest Guy', cursive !important;
 }
 
 .studio-controls h2 {

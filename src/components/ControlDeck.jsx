@@ -234,7 +234,7 @@ export default function ControlDeck() {
                 color: 'white',
                 transition: 'all 0.2s ease',
                 zIndex: 10,
-                fontFamily: '"Luckiest Guy", cursive',
+                fontFamily: '"Inter", sans-serif',
                 fontSize: '36px',
                 lineHeight: '1',
                 padding: '4px'
