@@ -266,47 +266,34 @@ export default function ControlDeck() {
                 style={{
                   position: 'absolute',
                   left: '12px',
-                  top: '12px',
+                  top: '4px',
+                  transform: 'rotate(-15deg)',
                   background: 'transparent',
                   border: 'none',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   cursor: 'pointer',
+                  color: 'white',
                   transition: 'all 0.2s ease',
                   zIndex: 10,
-                  width: '36px',
-                  height: '36px',
-                  padding: '0'
+                  fontFamily: '"Risque", serif',
+                  fontSize: '36px',
+                  lineHeight: '1',
+                  padding: '4px'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'scale(1.1)';
-                  const img = e.currentTarget.querySelector('img');
-                  if (img) {
-                    img.style.filter = 'invert(24%) sepia(87%) saturate(6444%) hue-rotate(352deg) brightness(96%) contrast(97%) drop-shadow(0 0 8px rgba(239, 68, 68, 0.5))';
-                  }
+                  e.currentTarget.style.color = '#ef4444';
+                  e.currentTarget.style.transform = 'rotate(-15deg) scale(1.1)';
+                  e.currentTarget.style.textShadow = '0 0 10px rgba(239, 68, 68, 0.5)';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'scale(1)';
-                  const img = e.currentTarget.querySelector('img');
-                  if (img) {
-                    img.style.filter = 'none';
-                  }
+                  e.currentTarget.style.color = 'white';
+                  e.currentTarget.style.transform = 'rotate(-15deg) scale(1)';
+                  e.currentTarget.style.textShadow = 'none';
                 }}
               >
-                <img 
-                  src="/assets/Lobby/Arrow.svg?v=4" 
-                  alt="Back" 
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    objectFit: 'contain',
-                    transform: 'scaleX(-1)', // Flip pointing left
-                    transition: 'filter 0.2s ease',
-                    pointerEvents: 'none',
-                    display: 'block'
-                  }}
-                />
+                &lt;
               </button>
             )}
 
