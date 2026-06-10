@@ -212,7 +212,7 @@ export default function ControlDeck() {
 
         {/* ROW 1B: STUDIO CONTROLS */}
         {shouldShowStudioControls && (
-          <div className="deck-row glass-panel" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', position: 'relative', background: 'rgba(30, 41, 59, 0.35)', padding: '12px 50px 12px 16px', borderRadius: '12px', height: 'auto', minHeight: 'var(--peo-height)', boxSizing: 'border-box' }}>
+          <section className="studio-controls" style={{ position: 'relative', width: '100%', boxSizing: 'border-box' }}>
             
             <button
               onClick={() => {
@@ -234,7 +234,7 @@ export default function ControlDeck() {
                 color: 'white',
                 transition: 'all 0.2s ease',
                 zIndex: 10,
-                fontFamily: '"Risque", serif',
+                fontFamily: '"Luckiest Guy", cursive',
                 fontSize: '36px',
                 lineHeight: '1',
                 padding: '4px'
@@ -266,398 +266,325 @@ export default function ControlDeck() {
                 style={{
                   position: 'absolute',
                   left: '12px',
-                  top: '4px',
-                  transform: 'rotate(-15deg)',
+                  top: '12px',
                   background: 'transparent',
                   border: 'none',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   cursor: 'pointer',
-                  color: 'white',
                   transition: 'all 0.2s ease',
                   zIndex: 10,
-                  fontFamily: '"Risque", serif',
-                  fontSize: '36px',
-                  lineHeight: '1',
-                  padding: '4px'
+                  width: '36px',
+                  height: '36px',
+                  padding: '0'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.color = '#ef4444';
-                  e.currentTarget.style.transform = 'rotate(-15deg) scale(1.1)';
-                  e.currentTarget.style.textShadow = '0 0 10px rgba(239, 68, 68, 0.5)';
+                  e.currentTarget.style.transform = 'scale(1.1)';
+                  const img = e.currentTarget.querySelector('img');
+                  if (img) {
+                    img.style.filter = 'invert(24%) sepia(87%) saturate(6444%) hue-rotate(352deg) brightness(96%) contrast(97%) drop-shadow(0 0 8px rgba(239, 68, 68, 0.5))';
+                  }
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.color = 'white';
-                  e.currentTarget.style.transform = 'rotate(-15deg) scale(1)';
-                  e.currentTarget.style.textShadow = 'none';
+                  e.currentTarget.style.transform = 'scale(1)';
+                  const img = e.currentTarget.querySelector('img');
+                  if (img) {
+                    img.style.filter = 'none';
+                  }
                 }}
               >
-                &lt;
+                <img 
+                  src="/assets/Lobby/Arrow.svg?v=4" 
+                  alt="Back" 
+                  style={{
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'contain',
+                    transform: 'scaleX(-1)', // Flip pointing left
+                    transition: 'filter 0.2s ease',
+                    pointerEvents: 'none',
+                    display: 'block'
+                  }}
+                />
               </button>
             )}
 
-            <div className="deck-group studio-group" style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: '8px', height: '100%', position: 'relative' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', gap: '8px', marginBottom: '5px' }}>
-                <span 
-                  className="group-label" 
-                  style={{ textAlign: 'center', visibility: 'hidden', pointerEvents: 'none' }}
-                >
-                  Studio Controls
-                </span>
-                <span 
-                  className="group-label" 
-                  style={{ 
-                    position: 'absolute', 
-                    top: '10px', 
-                    left: '50%', 
-                    transform: 'translateX(-50%)', 
-                    textAlign: 'center', 
-                    cursor: 'pointer',
-                    whiteSpace: 'nowrap',
-                    zIndex: 5,
-                    visibility: 'visible'
-                  }}
-                  onClick={() => {
-                    setActiveItoSection(null);
-                    setActiveCdTab(null);
-                  }}
-                  title={activeCdTab === 'timer' ? "Close Stage Timer" : activeCdTab === 'system' ? "Close System Controls" : activeCdTab === 'upload' ? "Close Upload Menu" : activeCdTab === 'activities' ? "Close Activities Menu" : "Close Studio Controls"}
-                >
-                  {activeCdTab === 'timer' ? 'Stage Timer' : activeCdTab === 'system' ? 'System' : activeCdTab === 'upload' ? 'Upload Media' : activeCdTab === 'activities' ? 'Activities' : 'Studio Controls'}
-                </span>
-              </div>
-              
-              {activeCdTab === null ? (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', width: '100%', alignItems: 'center' }}>
-                  {/* Row 1 */}
-                  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '16px', width: '100%', flexWrap: 'wrap' }}>
-                    {/* Invite */}
-                    <button 
-                      className="gb-btn"
-                      onClick={async () => {
-                        const params = new URLSearchParams(window.location.search);
-                        const sid = params.get('session');
-                        if (!sid) {
-                          alert("No active session to invite to.");
-                          return;
-                        }
-                        const inviteUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?session=' + sid;
-                        try {
-                          await navigator.clipboard.writeText(inviteUrl);
-                          alert("Invite link copied to clipboard!");
-                        } catch {
-                          prompt("Copy this link:", inviteUrl);
-                        }
-                      }}
-                      style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', fontSize: '0.9rem', borderRadius: '8px', cursor: 'pointer', border: '1px solid var(--glass-border)', background: 'transparent', color: 'white' }}
-                    >
-                      Invite
-                    </button>
+            <h2>
+              {activeCdTab === 'timer' ? 'STAGE TIMER' : activeCdTab === 'system' ? 'SYSTEM' : activeCdTab === 'upload' ? 'UPLOAD MEDIA' : activeCdTab === 'activities' ? 'ACTIVITIES' : 'STUDIO CONTROLS'}
+            </h2>
 
-                    <div style={{ width: '1px', height: '24px', background: 'var(--glass-border)' }} />
-
-                    {/* Spotlight */}
-                    <button 
-                      className={`gb-btn ${spotlightGuestId === activeGuestId && activeGuestId ? 'active' : ''}`}
-                      onClick={() => {
-                        if (activeGuestId) {
-                          setSpotlightGuestId(spotlightGuestId === activeGuestId ? null : activeGuestId);
-                        }
-                      }}
-                      disabled={!activeGuestId}
-                      style={{ 
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        gap: '6px', 
-                        padding: '8px 16px', 
-                        fontSize: '0.9rem', 
-                        borderRadius: '8px', 
-                        cursor: activeGuestId ? 'pointer' : 'not-allowed', 
-                        border: '1px solid var(--glass-border)', 
-                        background: (spotlightGuestId === activeGuestId && activeGuestId) ? 'rgba(250,204,21,0.2)' : 'transparent', 
-                        color: (spotlightGuestId === activeGuestId && activeGuestId) ? '#facc15' : 'white',
-                        opacity: activeGuestId ? 1 : 0.5 
-                      }}
-                      title={activeGuestId ? "Spotlight the selected student" : "Select a student to spotlight"}
-                    >
-                      Spotlight
-                    </button>
-
-                    <div style={{ width: '1px', height: '24px', background: 'var(--glass-border)' }} />
-
-                    {/* Doodling */}
-                    <button 
-                      className={`gb-btn ${isDoodling ? 'active' : ''}`}
-                      onClick={() => setIsDoodling(!isDoodling)}
-                      style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', fontSize: '0.9rem', borderRadius: '8px', cursor: 'pointer', border: '1px solid var(--glass-border)', background: isDoodling ? 'rgba(255,255,255,0.2)' : 'transparent', color: 'white' }}
-                    >
-                      Doodling
-                    </button>
-
-                    <div style={{ width: '1px', height: '24px', background: 'var(--glass-border)' }} />
-
-                    {/* Confetti */}
-                    <button 
-                      className="gb-btn"
-                      onClick={() => handleAddSticker('instructor', 'Confetti.svg', true)}
-                      style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', fontSize: '0.9rem', borderRadius: '8px', cursor: 'pointer', border: '1px solid var(--glass-border)', background: 'transparent', color: 'white' }}
-                    >
-                      Confetti
-                    </button>
-
-                    <div style={{ width: '1px', height: '24px', background: 'var(--glass-border)' }} />
-
-                    {/* Upload Media */}
-                    <button 
-                      className="gb-btn"
-                      onClick={() => setActiveCdTab('upload')}
-                      style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', fontSize: '0.9rem', borderRadius: '8px', cursor: 'pointer', border: '1px solid var(--glass-border)', background: 'transparent', color: 'white' }}
-                    >
-                      Upload Media
-                    </button>
-
-                    <div style={{ width: '1px', height: '24px', background: 'var(--glass-border)' }} />
-
-                    {/* Stage Timer Toggle */}
-                    <button 
-                      className="gb-btn"
-                      onClick={() => setActiveCdTab('timer')}
-                      style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', fontSize: '0.9rem', borderRadius: '8px', cursor: 'pointer', border: '1px solid var(--glass-border)', background: 'transparent', color: 'white' }}
-                    >
-                      Stage Timer
-                    </button>
-
-                    <div style={{ width: '1px', height: '24px', background: 'var(--glass-border)' }} />
-
-                    {/* System Toggle */}
-                    <button 
-                      className="gb-btn"
-                      onClick={() => setActiveCdTab('system')}
-                      style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', fontSize: '0.9rem', borderRadius: '8px', cursor: 'pointer', border: '1px solid var(--glass-border)', background: 'transparent', color: 'white' }}
-                    >
-                      System
-                    </button>
-                  </div>
-
-                  {/* Row 2 */}
-                  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '16px', width: '100%', marginTop: '4px' }}>
-                    {/* Stickers (Student Stickers) Toggle Button */}
-                    <button 
-                      className={`gb-btn ${showStudentStickers ? 'active' : ''}`}
-                      onClick={() => {
-                        const nextState = !showStudentStickers;
-                        setShowStudentStickers(nextState);
-                        if (nextState) {
-                          setShowInstructorStickers(false);
-                          setIsPeoStickersOpen(false);
-                        }
-                      }}
-                      style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', fontSize: '0.9rem', borderRadius: '8px', cursor: 'pointer', border: '1px solid var(--glass-border)', background: showStudentStickers ? 'rgba(255,255,255,0.2)' : 'transparent', color: 'white' }}
-                    >
-                      Stickers
-                    </button>
-
-                    <div style={{ width: '1px', height: '24px', background: 'var(--glass-border)' }} />
-
-                    {/* IC Stickers Toggle Button */}
-                    <button 
-                      className={`gb-btn ${showInstructorStickers ? 'active' : ''}`}
-                      onClick={() => {
-                        const nextState = !showInstructorStickers;
-                        setShowInstructorStickers(nextState);
-                        if (nextState) {
-                          setShowStudentStickers(false);
-                          setIsPeoStickersOpen(false);
-                        }
-                      }}
-                      style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '8px 16px', fontSize: '0.9rem', borderRadius: '8px', cursor: 'pointer', border: '1px solid var(--glass-border)', background: showInstructorStickers ? 'rgba(255,255,255,0.2)' : 'transparent', color: 'white' }}
-                    >
-                      IC Stickers
-                    </button>
-                  </div>
-                </div>
-              ) : activeCdTab === 'upload' ? (
-                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '12px', width: '100%', background: 'transparent', border: '1px solid transparent', height: '38px', boxSizing: 'border-box' }}>
+            {activeCdTab === null ? (
+              <>
+                <div className="controls-row top-row">
+                  {/* INVITE */}
                   <button 
-                    onClick={() => {
-                      fileInputRef.current?.click();
-                      setActiveCdTab(null);
-                    }}
-                    style={{ padding: '6px 12px', background: 'rgba(255,255,255,0.1)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'white', cursor: 'pointer', fontSize: '0.85rem' }}
-                  >
-                    Local Computer
-                  </button>
-                  <button 
-                    onClick={() => {
-                      setActiveCdTab('activities');
-                    }}
-                    style={{ padding: '6px 12px', background: 'rgba(255,255,255,0.1)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'white', cursor: 'pointer', fontSize: '0.85rem' }}
-                  >
-                    Activities
-                  </button>
-                  <button 
-                    onClick={() => {
-                      handleDriveUpload();
-                      setActiveCdTab(null);
-                    }}
-                    style={{ padding: '6px 12px', background: 'rgba(255,255,255,0.1)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'white', cursor: 'pointer', fontSize: '0.85rem' }}
-                  >
-                    Google Drive
-                  </button>
-                  {mediaUrl && mediaType !== 'metronome' && (
-                    <button 
-                      onClick={() => {
-                        clearMedia();
-                        setActiveCdTab(null);
-                      }}
-                      style={{ padding: '6px 12px', background: 'rgba(239, 68, 68, 0.2)', border: '1px solid rgba(239, 68, 68, 0.4)', borderRadius: '6px', color: 'white', cursor: 'pointer', fontSize: '0.85rem' }}
-                    >
-                      Clear Media
-                    </button>
-                  )}
-                </div>
-              ) : activeCdTab === 'activities' ? (
-                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '12px', width: '100%', background: 'transparent', border: '1px solid transparent', height: '38px', boxSizing: 'border-box' }}>
-                  {activities.map((act) => (
-                    <button 
-                      key={act.filename}
-                      onClick={() => {
-                        setMediaUpload(`/assets/Activities/${act.filename}`, 'iframe');
-                        setActiveCdTab(null);
-                      }}
-                      style={{ padding: '6px 12px', background: 'rgba(255,255,255,0.1)', border: '1px solid var(--glass-border)', borderRadius: '6px', color: 'white', cursor: 'pointer', fontSize: '0.85rem' }}
-                    >
-                      {act.name}
-                    </button>
-                  ))}
-                </div>
-              ) : activeCdTab === 'timer' ? (
-                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', width: '100%', background: 'transparent', border: '1px solid transparent', height: '38px', boxSizing: 'border-box' }}>
-                  {[60, 120, 300].map((sec) => (
-                    <button
-                      key={sec}
-                      onClick={() => {
-                        const endTime = Date.now() + sec * 1000;
-                        setStageTimer({ endTime, duration: sec, isRunning: true });
-                      }}
-                      style={{
-                        padding: '4px 8px',
-                        background: 'rgba(255, 255, 255, 0.1)',
-                        color: 'white',
-                        border: '1px solid rgba(255,255,255,0.2)',
-                        borderRadius: '4px',
-                        fontSize: '0.75rem',
-                        fontWeight: 'bold',
-                        cursor: 'pointer'
-                      }}
-                    >
-                      {sec / 60}m
-                    </button>
-                  ))}
-                  
-                  <div style={{ width: '1px', height: '18px', background: 'var(--glass-border)' }} />
-
-                  <input
-                    type="number"
-                    placeholder="Min"
-                    min="0"
-                    id="cd-timer-min"
-                    style={{ width: '35px', padding: '2px', borderRadius: '4px', border: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.4)', color: 'white', fontSize: '0.75rem', textAlign: 'center' }}
-                  />
-                  <span style={{ color: 'white', fontSize: '0.75rem' }}>:</span>
-                  <input
-                    type="number"
-                    placeholder="Sec"
-                    min="0"
-                    max="59"
-                    id="cd-timer-sec"
-                    style={{ width: '35px', padding: '2px', borderRadius: '4px', border: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.4)', color: 'white', fontSize: '0.75rem', textAlign: 'center' }}
-                  />
-                  <button
-                    onClick={() => {
-                      const minVal = parseInt(document.getElementById('cd-timer-min')?.value || '0', 10);
-                      const secVal = parseInt(document.getElementById('cd-timer-sec')?.value || '0', 10);
-                      const totalSec = minVal * 60 + secVal;
-                      if (totalSec > 0) {
-                        const endTime = Date.now() + totalSec * 1000;
-                        setStageTimer({ endTime, duration: totalSec, isRunning: true });
+                    onClick={async () => {
+                      const params = new URLSearchParams(window.location.search);
+                      const sid = params.get('session');
+                      if (!sid) {
+                        alert("No active session to invite to.");
+                        return;
+                      }
+                      const inviteUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?session=' + sid;
+                      try {
+                        await navigator.clipboard.writeText(inviteUrl);
+                        alert("Invite link copied to clipboard!");
+                      } catch {
+                        prompt("Copy this link:", inviteUrl);
                       }
                     }}
-                    style={{ padding: '4px 6px', background: 'var(--primary-color)', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '0.75rem', fontWeight: 'bold' }}
                   >
-                    Set
+                    INVITE
                   </button>
 
-                  <div style={{ width: '1px', height: '18px', background: 'var(--glass-border)' }} />
-
-                  <span style={{ fontSize: '0.75rem', color: stageTimer.isRunning ? '#22c55e' : stageTimer.duration > 0 ? '#fbbf24' : '#94a3b8', fontWeight: 'bold', whiteSpace: 'nowrap' }}>
-                    {stageTimer.isRunning ? 'Running' : stageTimer.duration > 0 ? 'Paused' : 'Off'}
-                  </span>
-
-                  {stageTimer.isRunning ? (
-                    <button
-                      onClick={() => {
-                        const remaining = Math.max(0, Math.round((stageTimer.endTime - Date.now()) / 1000));
-                        setStageTimer({ ...stageTimer, duration: remaining, isRunning: false });
-                      }}
-                      style={{ padding: '4px 6px', background: '#fbbf24', color: '#000000', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.75rem' }}
-                    >
-                      Pause
-                    </button>
-                  ) : (
-                    stageTimer.duration > 0 && (
-                      <button
-                        onClick={() => {
-                          const endTime = Date.now() + stageTimer.duration * 1000;
-                          setStageTimer({ ...stageTimer, endTime, isRunning: true });
-                        }}
-                        style={{ padding: '4px 6px', background: '#22c55e', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.75rem' }}
-                      >
-                        Resume
-                      </button>
-                    )
-                  )}
-
-                  {(stageTimer.isRunning || stageTimer.duration > 0) && (
-                    <button
-                      onClick={() => {
-                        setStageTimer({ endTime: null, duration: 0, isRunning: false });
-                      }}
-                      style={{ padding: '4px 6px', background: '#ef4444', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.75rem' }}
-                    >
-                      Reset
-                    </button>
-                  )}
-                </div>
-              ) : activeCdTab === 'system' ? (
-                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', width: '100%', background: 'transparent', border: '1px solid transparent', height: '38px', boxSizing: 'border-box' }}>
+                  {/* SPOTLIGHT */}
                   <button 
-                    className={`gb-btn ${activeTheme === 'music-fun' ? 'active' : ''}`}
-                    onClick={() => setActiveTheme('music-fun')}
-                    style={{ padding: '4px 8px', fontSize: '0.75rem', cursor: 'pointer', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '4px', background: activeTheme === 'music-fun' ? 'rgba(255,255,255,0.2)' : 'transparent', color: 'white' }}
+                    onClick={() => {
+                      if (activeGuestId) {
+                        setSpotlightGuestId(spotlightGuestId === activeGuestId ? null : activeGuestId);
+                      }
+                    }}
+                    disabled={!activeGuestId}
+                    className={spotlightGuestId === activeGuestId && activeGuestId ? 'active' : ''}
+                    title={activeGuestId ? "Spotlight the selected student" : "Select a student to spotlight"}
+                    style={{
+                      opacity: activeGuestId ? 1 : 0.5,
+                      cursor: activeGuestId ? 'pointer' : 'not-allowed'
+                    }}
                   >
-                    Music
+                    SPOTLIGHT
                   </button>
-                  <div style={{ width: '1px', height: '18px', background: 'var(--glass-border)' }} />
+
+                  {/* DOODLING */}
                   <button 
-                    onClick={resetStudentState}
-                    style={{ padding: '4px 8px', fontSize: '0.75rem', cursor: 'pointer', background: 'rgba(239, 68, 68, 0.2)', border: '1px solid rgba(239, 68, 68, 0.4)', borderRadius: '4px', color: 'white', fontWeight: 'bold' }}
+                    onClick={() => setIsDoodling(!isDoodling)}
+                    className={isDoodling ? 'active' : ''}
                   >
-                    Reset Room
+                    DOODLING
                   </button>
-                  <div style={{ width: '1px', height: '18px', background: 'var(--glass-border)' }} />
+
+                  {/* CONFETTI */}
                   <button 
-                    className={`gb-btn ${activeTheme === 'sor' ? 'active' : ''}`}
-                    onClick={() => setActiveTheme('sor')}
-                    style={{ padding: '4px 8px', fontSize: '0.75rem', cursor: 'pointer', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '4px', background: activeTheme === 'sor' ? 'rgba(255,255,255,0.2)' : 'transparent', color: 'white' }}
+                    onClick={() => handleAddSticker('instructor', 'Confetti.svg', true)}
                   >
-                    SOR
+                    CONFETTI
                   </button>
                 </div>
-              ) : null}
-            </div>
-          </div>
+
+                <div className="controls-row middle-row">
+                  {/* UPLOAD MEDIA */}
+                  <button onClick={() => setActiveCdTab('upload')}>
+                    UPLOAD MEDIA
+                  </button>
+
+                  {/* STAGE TIMER */}
+                  <button onClick={() => setActiveCdTab('timer')}>
+                    STAGE TIMER
+                  </button>
+
+                  {/* SYSTEM */}
+                  <button onClick={() => setActiveCdTab('system')}>
+                    SYSTEM
+                  </button>
+                </div>
+
+                <div className="controls-row bottom-row">
+                  {/* STICKERS */}
+                  <button 
+                    onClick={() => {
+                      const nextState = !showStudentStickers;
+                      setShowStudentStickers(nextState);
+                      if (nextState) {
+                        setShowInstructorStickers(false);
+                        setIsPeoStickersOpen(false);
+                      }
+                    }}
+                    className={showStudentStickers ? 'active' : ''}
+                  >
+                    STICKERS
+                  </button>
+
+                  {/* IC STICKERS */}
+                  <button 
+                    onClick={() => {
+                      const nextState = !showInstructorStickers;
+                      setShowInstructorStickers(nextState);
+                      if (nextState) {
+                        setShowStudentStickers(false);
+                        setIsPeoStickersOpen(false);
+                      }
+                    }}
+                    className={showInstructorStickers ? 'active' : ''}
+                  >
+                    IC STICKERS
+                  </button>
+                </div>
+              </>
+            ) : activeCdTab === 'upload' ? (
+              <div className="controls-row middle-row" style={{ width: '100%', margin: '1rem 0' }}>
+                <button 
+                  onClick={() => {
+                    fileInputRef.current?.click();
+                    setActiveCdTab(null);
+                  }}
+                >
+                  Local Computer
+                </button>
+                <button 
+                  onClick={() => {
+                    setActiveCdTab('activities');
+                  }}
+                >
+                  Activities
+                </button>
+                <button 
+                  onClick={() => {
+                    handleDriveUpload();
+                    setActiveCdTab(null);
+                  }}
+                >
+                  Google Drive
+                </button>
+                {mediaUrl && mediaType !== 'metronome' && (
+                  <button 
+                    onClick={() => {
+                      clearMedia();
+                      setActiveCdTab(null);
+                    }}
+                    style={{ background: 'rgba(239, 68, 68, 0.2)', border: '1px solid rgba(239, 68, 68, 0.4)', color: 'white' }}
+                  >
+                    Clear Media
+                  </button>
+                )}
+              </div>
+            ) : activeCdTab === 'activities' ? (
+              <div className="controls-row middle-row" style={{ width: '100%', margin: '1rem 0' }}>
+                {activities.map((act) => (
+                  <button 
+                    key={act.filename}
+                    onClick={() => {
+                      setMediaUpload(`/assets/Activities/${act.filename}`, 'iframe');
+                      setActiveCdTab(null);
+                    }}
+                  >
+                    {act.name}
+                  </button>
+                ))}
+              </div>
+            ) : activeCdTab === 'timer' ? (
+              <div className="controls-row middle-row" style={{ width: '100%', margin: '1rem 0', gap: '8px' }}>
+                {[60, 120, 300].map((sec) => (
+                  <button
+                    key={sec}
+                    onClick={() => {
+                      const endTime = Date.now() + sec * 1000;
+                      setStageTimer({ endTime, duration: sec, isRunning: true });
+                    }}
+                  >
+                    {sec / 60}m
+                  </button>
+                ))}
+                
+                <div style={{ width: '1px', height: '18px', background: 'var(--glass-border)' }} />
+
+                <input
+                  type="number"
+                  placeholder="Min"
+                  min="0"
+                  id="cd-timer-min"
+                  style={{ width: '55px', padding: '6px', borderRadius: '4px', border: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.4)', color: 'white', fontSize: '0.85rem', textAlign: 'center', fontFamily: 'inherit' }}
+                />
+                <span style={{ color: 'white', fontSize: '0.85rem' }}>:</span>
+                <input
+                  type="number"
+                  placeholder="Sec"
+                  min="0"
+                  max="59"
+                  id="cd-timer-sec"
+                  style={{ width: '55px', padding: '6px', borderRadius: '4px', border: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.4)', color: 'white', fontSize: '0.85rem', textAlign: 'center', fontFamily: 'inherit' }}
+                />
+                <button
+                  onClick={() => {
+                    const minVal = parseInt(document.getElementById('cd-timer-min')?.value || '0', 10);
+                    const secVal = parseInt(document.getElementById('cd-timer-sec')?.value || '0', 10);
+                    const totalSec = minVal * 60 + secVal;
+                    if (totalSec > 0) {
+                      const endTime = Date.now() + totalSec * 1000;
+                      setStageTimer({ endTime, duration: totalSec, isRunning: true });
+                    }
+                  }}
+                  style={{ background: 'var(--primary-color)', color: 'white' }}
+                >
+                  Set
+                </button>
+
+                <div style={{ width: '1px', height: '18px', background: 'var(--glass-border)' }} />
+
+                <span style={{ fontSize: '0.85rem', color: stageTimer.isRunning ? '#22c55e' : stageTimer.duration > 0 ? '#fbbf24' : '#94a3b8', fontWeight: 'bold', whiteSpace: 'nowrap' }}>
+                  {stageTimer.isRunning ? 'Running' : stageTimer.duration > 0 ? 'Paused' : 'Off'}
+                </span>
+
+                {stageTimer.isRunning ? (
+                  <button
+                    onClick={() => {
+                      const remaining = Math.max(0, Math.round((stageTimer.endTime - Date.now()) / 1000));
+                      setStageTimer({ ...stageTimer, duration: remaining, isRunning: false });
+                    }}
+                    style={{ background: '#fbbf24', color: '#000000' }}
+                  >
+                    Pause
+                  </button>
+                ) : (
+                  stageTimer.duration > 0 && (
+                    <button
+                      onClick={() => {
+                        const endTime = Date.now() + stageTimer.duration * 1000;
+                        setStageTimer({ ...stageTimer, endTime, isRunning: true });
+                      }}
+                      style={{ background: '#22c55e', color: 'white' }}
+                    >
+                      Resume
+                    </button>
+                  )
+                )}
+
+                {(stageTimer.isRunning || stageTimer.duration > 0) && (
+                  <button
+                    onClick={() => {
+                      setStageTimer({ endTime: null, duration: 0, isRunning: false });
+                    }}
+                    style={{ background: '#ef4444', color: 'white' }}
+                  >
+                    Reset
+                  </button>
+                )}
+              </div>
+            ) : activeCdTab === 'system' ? (
+              <div className="controls-row middle-row" style={{ width: '100%', margin: '1rem 0' }}>
+                <button 
+                  className={activeTheme === 'music-fun' ? 'active' : ''}
+                  onClick={() => setActiveTheme('music-fun')}
+                >
+                  Music
+                </button>
+                <div style={{ width: '1px', height: '18px', background: 'var(--glass-border)' }} />
+                <button 
+                  onClick={resetStudentState}
+                  style={{ background: 'rgba(239, 68, 68, 0.2)', border: '1px solid rgba(239, 68, 68, 0.4)', color: 'white' }}
+                >
+                  Reset Room
+                </button>
+                <div style={{ width: '1px', height: '18px', background: 'var(--glass-border)' }} />
+                <button 
+                  className={activeTheme === 'sor' ? 'active' : ''}
+                  onClick={() => setActiveTheme('sor')}
+                >
+                  SOR
+                </button>
+              </div>
+            ) : null}
+          </section>
         )}
 
         {shouldShowInstructorDeck && isPeoStickersOpen && (
