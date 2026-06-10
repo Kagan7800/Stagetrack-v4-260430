@@ -275,33 +275,38 @@ export default function ControlDeck() {
                   position: 'absolute',
                   left: '12px',
                   top: '4px',
-                  transform: 'rotate(-15deg)',
                   background: 'transparent',
                   border: 'none',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   cursor: 'pointer',
-                  color: 'white',
                   transition: 'all 0.2s ease',
                   zIndex: 10,
-                  fontFamily: '"Risque", serif',
-                  fontSize: '36px',
-                  lineHeight: '1',
                   padding: '4px'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.color = '#ef4444';
-                  e.currentTarget.style.transform = 'rotate(-15deg) scale(1.1)';
-                  e.currentTarget.style.textShadow = '0 0 10px rgba(239, 68, 68, 0.5)';
+                  const img = e.currentTarget.querySelector('img');
+                  if (img) img.style.filter = 'drop-shadow(0 0 5px rgba(239, 68, 68, 0.6)) sepia(100%) saturate(8000%) hue-rotate(345deg)';
+                  e.currentTarget.style.transform = 'scale(1.1)';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.color = 'white';
-                  e.currentTarget.style.transform = 'rotate(-15deg) scale(1)';
-                  e.currentTarget.style.textShadow = 'none';
+                  const img = e.currentTarget.querySelector('img');
+                  if (img) img.style.filter = 'none';
+                  e.currentTarget.style.transform = 'scale(1)';
                 }}
               >
-                &lt;
+                <img 
+                  src="/assets/Lobby/Arrow.svg" 
+                  alt="Back" 
+                  style={{ 
+                    width: '32px', 
+                    height: '25px', 
+                    transform: 'scaleX(-1)', 
+                    transition: 'filter 0.2s ease',
+                    objectFit: 'contain'
+                  }} 
+                />
               </button>
             )}
 
