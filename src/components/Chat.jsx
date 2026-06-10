@@ -76,7 +76,7 @@ export default function Chat({ messages = [], onSendMessage, onModerate, onClose
             />
           </svg>
         </button>
-        <h2 style={{ margin: '0 auto', fontFamily: "'Risque', serif", color: '#ffffff', fontSize: '1.25rem', fontWeight: 600, textAlign: 'center', width: '100%' }}>
+        <h2 style={{ margin: '0 auto', fontFamily: "'Risque', serif", color: '#ffffff', fontSize: '1rem', fontWeight: 600, textAlign: 'center', width: '100%' }}>
           Chat
         </h2>
       </div>

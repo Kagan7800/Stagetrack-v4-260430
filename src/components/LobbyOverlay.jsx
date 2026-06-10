@@ -51,7 +51,7 @@ function LobbyAIChat() {
   
   // Clean, judge-appealing layout for the AI block
   return (
-    <form onSubmit={handleSend} className="lobby-ai-chat-container w-full max-w-sm bg-[#2a2625] border border-stone-800 rounded p-4 select-none">
+    <div className="lobby-ai-chat-container w-full max-w-sm bg-[#2a2625] border border-stone-800 rounded p-4 select-none">
       {/* 1. Welcome sentence at the top */}
       <div className="lobby-ai-chat-welcome">
         Welcome! Let me know if you prefer larger text, high-contrast colors, or a calmer focus layout...
@@ -70,7 +70,7 @@ function LobbyAIChat() {
       </div>
 
       {/* 3. Send button directly below textarea (chatbox) */}
-      <button type="submit" className="lobby-ai-chat-button bg-[#fbbf24] text-stone-950 font-black text-xs px-3 rounded hover:bg-[#f59e0b] transition-colors">
+      <button type="button" onClick={handleSend} className="lobby-ai-chat-button bg-[#fbbf24] text-stone-950 font-black text-xs px-3 rounded hover:bg-[#f59e0b] transition-colors">
         →
       </button>
 
@@ -82,7 +82,7 @@ function LobbyAIChat() {
           </div>
         ))}
       </div>
-    </form>
+    </div>
   );
 }
 

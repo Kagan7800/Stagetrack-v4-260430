@@ -105,11 +105,11 @@ export default function Metronome() {
     >
       <iframe 
         src="https://www.figma.com/proto/jiqvv9jZCykXIhtfocAbBO/Metronome?node-id=2-42&embed-host=share&hide-ui=1&hide-controls=1&hide-toolbar=1&scaling=scale-down-width&content-scaling=fixed&frame=0&margin=0"
-        allowTransparency="true"
+        allowtransparency="true"
         style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none', background: 'transparent', backgroundColor: 'transparent', pointerEvents: 'none' }} 
         allowFullScreen 
         loading="eager"
-        fetchpriority="high"
+        fetchPriority="high"
       />
     </div>
   );

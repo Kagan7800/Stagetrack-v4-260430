@@ -93,7 +93,7 @@ body {
 }
 
 .instructor-left-sidebar.open {
-  width: 380px;
+  width: 150px;
 }
 
 .instructor-left-sidebar.closed {
@@ -208,7 +208,7 @@ body {
 }
 
 .center-grid-area[data-right-open="true"] {
-  padding-right: 260px;
+  padding-right: 100px;
 }
 
 .center-grid-area.sidebars-open .side-peos {
@@ -872,6 +872,7 @@ body {
   font-family: 'Risque', serif;
   outline: none;
   min-width: 0;
+  font-size: 0.8rem;
 }
 
 .icon-btn {
@@ -999,6 +1000,28 @@ body {
   text-overflow: ellipsis;
 }
 
+.gc-name-badge.instructor-badge {
+  background: transparent !important;
+  box-shadow: none !important;
+  width: calc(100% - 24px);
+  left: 12px;
+  transform: none;
+  max-width: 100%;
+}
+
+.ic-toggle-btn {
+  position: relative;
+}
+.ic-toggle-btn::after {
+  content: '';
+  position: absolute;
+  top: -8px;
+  bottom: -8px;
+  left: -16px;
+  right: -16px;
+  cursor: pointer;
+}
+
 /* --- Added Refactored Classes for Chat --- */
 .chat-sidebar,
 .chat-sidebar * {
@@ -1021,7 +1044,7 @@ body {
 }
 
 .chat-header h2 {
-  font-size: 1.2rem;
+  font-size: 0.96rem;
   font-weight: 600;
   margin: 0;
 }
@@ -1037,7 +1060,7 @@ body {
   border-radius: 12px;
   max-width: 85%;
   word-wrap: break-word;
-  font-size: 0.9rem;
+  font-size: 0.72rem;
   line-height: 1.5;
   letter-spacing: 0.011em;
 }
@@ -1064,7 +1087,7 @@ body {
   border: 1px solid transparent;
   color: #94a3b8; /* Muted slate gray */
   font-style: italic;
-  font-size: 0.8rem;
+  font-size: 0.64rem;
 }
 
 .chat-message.private,
@@ -1075,7 +1098,7 @@ body {
 }
 
 .chat-sender-name {
-  font-size: 0.8rem !important;
+  font-size: 0.64rem !important;
   color: #cbd5e1;
   opacity: 0.9;
   display: block;
@@ -1084,7 +1107,7 @@ body {
 }
 
 .chat-private-note {
-  font-size: 0.7rem;
+  font-size: 0.56rem;
   display: block;
   color: #fcd34d;
   margin-top: 4px;
@@ -1738,22 +1761,22 @@ body {
 
 /* 15% Chat Font Size Increase */
 .chat-message {
-  font-size: 1.035rem !important;
+  font-size: 0.828rem !important;
 }
 .chat-message.system {
-  font-size: 0.92rem !important;
+  font-size: 0.736rem !important;
 }
 .chat-input {
-  font-size: 1.035rem !important;
+  font-size: 0.828rem !important;
 }
 .chat-sender-name {
-  font-size: 0.8rem !important;
+  font-size: 0.64rem !important;
 }
 .chat-private-note {
-  font-size: 0.8rem !important;
+  font-size: 0.64rem !important;
 }
 .chat-header h2 {
-  font-size: 1.38rem !important;
+  font-size: 1.104rem !important;
   font-family: 'Risque', serif !important;
 }
 
@@ -5073,4 +5096,84 @@ body {
   font-size: 0.875rem !important;
   opacity: 0.9 !important;
 }
-
+
+/* Banjo Mascot Container & Animation Styles */
+.banjo-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 32vmin;
+  height: 32vmin;
+  max-width: 250px;
+  max-height: 250px;
+  min-width: 160px;
+  min-height: 160px;
+  margin-right: 6vmin;
+  position: relative;
+  transition: transform 0.3s ease;
+}
+
+.banjo-character {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+/* Vector Mascot Animations & States */
+.ear, .arm {
+  transition: transform 0.15s cubic-bezier(0.25, 0.8, 0.25, 1.1);
+}
+
+/* Pose 1: Idle (Floppy ears down, arms resting at side) */
+.sprite-idle .left-ear { transform: rotate(0deg); transform-origin: 50px 70px; }
+.sprite-idle .right-ear { transform: rotate(0deg); transform-origin: 150px 70px; }
+.sprite-idle .left-arm { transform: rotate(0deg); transform-origin: 55px 140px; }
+.sprite-idle .right-arm { transform: rotate(0deg); transform-origin: 145px 140px; }
+
+/* Pose 2: Listening Ears (Ears perking upwards, arms listening) */
+.sprite-listening-ears .left-ear { transform: rotate(45deg); transform-origin: 50px 70px; }
+.sprite-listening-ears .right-ear { transform: rotate(-45deg); transform-origin: 150px 70px; }
+.sprite-listening-ears .left-arm { transform: rotate(-10deg); transform-origin: 55px 140px; }
+.sprite-listening-ears .right-arm { transform: rotate(10deg); transform-origin: 145px 140px; }
+
+/* Pose 3: Clapping Hands (Arms clap together in the center) */
+.sprite-clapping-hands .left-ear { transform: rotate(10deg); transform-origin: 50px 70px; }
+.sprite-clapping-hands .right-ear { transform: rotate(-10deg); transform-origin: 150px 70px; }
+.sprite-clapping-hands .left-arm { transform: translate(30px, -12px) rotate(-40deg); transform-origin: 55px 140px; }
+.sprite-clapping-hands .right-arm { transform: translate(-30px, -12px) rotate(40deg); transform-origin: 145px 140px; }
+
+/* Disney-style theatrical motion triggers */
+@keyframes anticipation {
+  0% { transform: scale(1); }
+  50% { transform: translateY(-6%) scale(1.05); }
+  100% { transform: scale(1); }
+}
+.animate-anticipation {
+  animation: anticipation 0.22s ease-out;
+}
+
+@keyframes strike-pop {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.1) translateY(-3%); }
+  100% { transform: scale(1); }
+}
+.animate-strike-pop {
+  animation: strike-pop 0.16s ease-out;
+}
+
+/* Starburst graphic popup for visual rhythm reinforcement */
+.visual-rhythm-burst {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 32px;
+  animation: burst-fade 0.35s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+  pointer-events: none;
+  z-index: 15;
+}
+@keyframes burst-fade {
+  0% { opacity: 0; transform: translateX(-50%) scale(0.3) rotate(-15deg); }
+  40% { opacity: 1; transform: translateX(-50%) scale(1.4) rotate(10deg); }
+  100% { opacity: 0; transform: translateX(-50%) scale(1) rotate(0deg); }
+}

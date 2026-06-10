@@ -930,26 +930,26 @@ export function AppProvider({ children }) {
         sessionStorage.setItem('stagetrack_role', 'instructor');
         setIsJoined(true);
         
-        setTimeout(async () => {
-          try {
-            await setDoc(doc(db, "sessions", sid), {
-              createdAt: Date.now(),
-              participants: generateDefaultParticipants(false),
-              guestStickers: {},
-              guestButtons: {},
-              messages: [
-                { id: 'initial-1', text: "Hello! Here is a self message in darker purple.", sender: "self", status: "public" },
-                { id: 'initial-2', text: "Hello there! This is a guest message in green.", sender: "other", senderName: "2", status: "public" },
-                { id: 'initial-3', text: "I have a private question/pending issue in red.", sender: "other", senderName: "3", status: "pending" }
-              ],
-              lobbyRequest: null,
-              lobbyResponse: null,
-              globalMute: true,
-              globalPause: false,
-              activeTheme: 'music-fun'
-            });
-          } catch(e) { console.error(e); }
-        }, 500);
+        try {
+          await setDoc(doc(db, "sessions", sid), {
+            createdAt: Date.now(),
+            participants: generateDefaultParticipants(false),
+            guestStickers: {},
+            guestButtons: {},
+            messages: [
+              { id: 'initial-1', text: "Hello! Here is a self message in darker purple.", sender: "self", status: "public" },
+              { id: 'initial-2', text: "Hello there! This is a guest message in green.", sender: "other", senderName: "2", status: "public" },
+              { id: 'initial-3', text: "I have a private question/pending issue in red.", sender: "other", senderName: "3", status: "pending" }
+            ],
+            lobbyRequest: null,
+            lobbyResponse: null,
+            globalMute: true,
+            globalPause: false,
+            activeTheme: 'music-fun'
+          });
+        } catch(e) {
+          console.error("Failed to set initial session doc:", e);
+        }
       }
       setSessionId(sid);
     };

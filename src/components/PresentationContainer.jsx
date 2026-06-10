@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect, useCallback } from 'react';
 import { Eraser, Undo2, Redo2, Trash2 } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
-import Metronome from './Metronome';
+
 
 export default function PresentationContainer({ 
   isDoodling, 
@@ -234,14 +234,14 @@ export default function PresentationContainer({
           ) : mediaType === 'iframe' ? (
             <iframe 
               src={mediaUrl} 
-              allowTransparency="true"
+              allowtransparency="true"
               style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none', background: 'transparent', backgroundColor: 'transparent' }} 
               allowFullScreen 
               loading="eager"
-              fetchpriority="high"
+              fetchPriority="high"
             />
           ) : mediaType === 'metronome' ? (
-            <Metronome />
+            null
           ) : (
             <img src={mediaUrl} alt="Uploaded Media" />
           )}

@@ -90,7 +90,7 @@ function App() {
     messages, handleModerateMessage, handleSendChatMessage,
     isJoined,
     activeTheme,
-    activeItoSection,
+    activeItoSection, setActiveItoSection,
     showInstructorStickers,
     showStudentStickers,
     showStudentFilters,
@@ -215,9 +215,12 @@ function App() {
     setIsChatOpen(false); // Close chat if toggling ITO
     if (isSidebarOpen && activeToolbox === 'instructor') {
       setIsSidebarOpen(false);
+      setActiveToolbox(null);
+      setActiveItoSection(null);
     } else {
       setIsSidebarOpen(true);
       setActiveToolbox('instructor');
+      setActiveGuestId(null);
     }
   };
 
@@ -225,6 +228,8 @@ function App() {
     setIsChatOpen(false); // Close chat if toggling STO
     if (isSidebarOpen && activeToolbox === 'student') {
       setIsSidebarOpen(false);
+      setActiveToolbox(null);
+      setActiveGuestId(null);
     } else {
       setIsSidebarOpen(true);
       setActiveToolbox('student');

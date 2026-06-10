@@ -128,7 +128,6 @@ export default function UnifiedToolbox({
               <>Student<br/>Tools</>
             )}
           </span>
-
         </div>
       </div>
 

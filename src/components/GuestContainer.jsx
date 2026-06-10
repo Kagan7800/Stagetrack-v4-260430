@@ -22,7 +22,23 @@ export default function GuestContainer({
   nudges = {},
   globalPause
 }) {
-  const { participants, blankCovers, setBlankCovers, pendingRequest, approveRequest, denyRequest, activeTheme } = useAppContext();
+  const { 
+    participants, 
+    blankCovers, 
+    setBlankCovers, 
+    pendingRequest, 
+    approveRequest, 
+    denyRequest, 
+    activeTheme,
+    isSidebarOpen,
+    setIsSidebarOpen,
+    activeGuestId,
+    setActiveGuestId,
+    activeToolbox,
+    setActiveToolbox,
+    activeItoSection,
+    setActiveItoSection
+  } = useAppContext();
   const [isEditing, setIsEditing] = useState(false);
   
   // Local state for forms
@@ -477,8 +493,125 @@ export default function GuestContainer({
 
       {/* Name Badge */}
       {participant.name && (
-        <div className="gc-name-badge" style={{ zIndex: 12 }}>
-          {participant.name}
+        <div 
+          className={`gc-name-badge ${participant.isInstructor && isInstructorClient ? 'instructor-badge' : ''}`}
+          style={{ 
+            zIndex: 12, 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: (participant.isInstructor && isInstructorClient) ? 'space-between' : 'center',
+            gap: '8px',
+            padding: (participant.isInstructor && isInstructorClient) ? '0px 10px' : '2px 6px',
+            overflow: 'visible'
+          }}
+        >
+          {participant.isInstructor && isInstructorClient ? (
+            <>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const isStudioOpen = activeItoSection === 'studio';
+                  if (isStudioOpen) {
+                    setActiveItoSection(null);
+                  } else {
+                    setActiveItoSection('studio');
+                    setIsSidebarOpen(false); // Close left panel
+                  }
+                }}
+                className="ic-toggle-btn"
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  color: (activeItoSection === 'studio') ? '#ef4444' : 'white',
+                  fontFamily: '"Risque", serif',
+                  fontSize: '29px',
+                  lineHeight: '1',
+                  padding: '0 4px',
+                  transform: 'rotate(-15deg)',
+                  transition: 'all 0.2s ease',
+                  textShadow: (activeItoSection === 'studio') ? '0 0 8px rgba(239, 68, 68, 0.5)' : 'none',
+                  position: 'relative',
+                  left: '-20px'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = '#ef4444';
+                  e.currentTarget.style.transform = 'rotate(-15deg) scale(1.2)';
+                  e.currentTarget.style.textShadow = '0 0 10px rgba(239, 68, 68, 0.5)';
+                }}
+                onMouseLeave={(e) => {
+                  const isStudioActive = activeItoSection === 'studio';
+                  e.currentTarget.style.color = isStudioActive ? '#ef4444' : 'white';
+                  e.currentTarget.style.transform = 'rotate(-15deg) scale(1)';
+                  e.currentTarget.style.textShadow = isStudioActive ? '0 0 8px rgba(239, 68, 68, 0.5)' : 'none';
+                }}
+                title="Toggle Instructor Tools"
+              >
+                I
+              </button>
+              
+              <span>{participant.name}</span>
+
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const isStoOpen = isSidebarOpen && activeToolbox === 'student';
+                  if (isStoOpen) {
+                    setIsSidebarOpen(false);
+                    setActiveToolbox(null);
+                    setActiveGuestId(null);
+                  } else {
+                    setActiveToolbox('student');
+                    if (!activeGuestId) {
+                      const firstGuest = participants.find(p => !p.isBlank && !p.isInstructor);
+                      if (firstGuest) {
+                        setActiveGuestId(firstGuest.id);
+                      }
+                    }
+                    setIsSidebarOpen(true);
+                  }
+                }}
+                className="ic-toggle-btn"
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  color: (isSidebarOpen && activeToolbox === 'student') ? '#ef4444' : 'white',
+                  fontFamily: '"Risque", serif',
+                  fontSize: '29px',
+                  lineHeight: '1',
+                  padding: '0 4px',
+                  transform: 'rotate(15deg)',
+                  transition: 'all 0.2s ease',
+                  textShadow: (isSidebarOpen && activeToolbox === 'student') ? '0 0 8px rgba(239, 68, 68, 0.5)' : 'none',
+                  position: 'relative',
+                  left: '20px'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = '#ef4444';
+                  e.currentTarget.style.transform = 'rotate(15deg) scale(1.2)';
+                  e.currentTarget.style.textShadow = '0 0 10px rgba(239, 68, 68, 0.5)';
+                }}
+                onMouseLeave={(e) => {
+                  const isStoActive = isSidebarOpen && activeToolbox === 'student';
+                  e.currentTarget.style.color = isStoActive ? '#ef4444' : 'white';
+                  e.currentTarget.style.transform = 'rotate(15deg) scale(1)';
+                  e.currentTarget.style.textShadow = isStoActive ? '0 0 8px rgba(239, 68, 68, 0.5)' : 'none';
+                }}
+                title="Toggle Student Tools"
+              >
+                S
+              </button>
+            </>
+          ) : (
+            participant.name
+          )}
         </div>
       )}
 
