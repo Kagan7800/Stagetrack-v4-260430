@@ -593,8 +593,8 @@ export default function ControlDeck() {
                 </button>
               </div>
             ) : showInstructorStickers ? (
-              <div className="controls-row middle-row" style={{ width: '100%', margin: '0.5rem 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
-                <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '20px' }}>
+              <div className="controls-row middle-row" style={{ width: '100%', margin: '0', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 0, flex: 1 }}>
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '10px', marginBottom: '5px' }}>
                   {instructorStickers.map((sticker) => (
                     <button 
                       key={sticker.id}
@@ -607,35 +607,35 @@ export default function ControlDeck() {
                         handleAddSticker(activeGuest.id, sticker.id, true);
                       }}
                       title={activeGuest ? `Reward ${activeGuest.name} with ${sticker.name}` : `Select student to reward with ${sticker.name}`}
-                      style={{ width: 'calc(var(--peo-height) * 0.45)', height: 'calc(var(--peo-height) * 0.45)', maxWidth: '61px', maxHeight: '61px', minWidth: '36px', minHeight: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2px', border: 'none', background: 'transparent' }}
+                      style={{ width: 'min(61px, calc(var(--peo-height) - 90px))', height: 'min(61px, calc(var(--peo-height) - 90px))', minWidth: '30px', minHeight: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2px', border: 'none', background: 'transparent' }}
                     >
                       <img src={`/assets/svg_stickers/${sticker.id}`} alt={sticker.name} style={{ width: '80%', height: '80%', objectFit: 'contain' }} />
                     </button>
                   ))}
                 </div>
                 {activeGuest && (
-                  <span style={{ fontSize: '0.8rem', color: '#10b981', fontWeight: 'bold' }}>
+                  <span style={{ fontSize: '0.8rem', color: '#10b981', fontWeight: 'bold', marginBottom: '5px' }}>
                     Target: {activeGuest.name}
                   </span>
                 )}
               </div>
             ) : (showStudentStickers || isPeoStickersOpen) ? (
-              <div className="controls-row middle-row" style={{ width: '100%', margin: '0.5rem 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, auto)', gap: '8px', justifyContent: 'center', marginTop: '20px' }}>
+              <div className="controls-row middle-row" style={{ width: '100%', margin: '0', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 0, flex: 1 }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, auto)', gap: '8px', justifyContent: 'center', marginTop: '10px', marginBottom: '5px' }}>
                   {studentStickers.map((sticker) => (
                     <button 
                       key={sticker.id}
                       className="deck-sticker-btn"
                       onClick={() => handleStickerClick(sticker.id)}
                       title={`Place ${sticker.name} sticker`}
-                      style={{ width: 'calc(var(--peo-height) * 0.45)', height: 'calc(var(--peo-height) * 0.45)', maxWidth: '61px', maxHeight: '61px', minWidth: '36px', minHeight: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2px', border: 'none', background: 'transparent' }}
+                      style={{ width: 'min(61px, calc(var(--peo-height) - 90px))', height: 'min(61px, calc(var(--peo-height) - 90px))', minWidth: '30px', minHeight: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2px', border: 'none', background: 'transparent' }}
                     >
                       <img src={`/assets/svg_stickers/${sticker.id}`} alt={sticker.name} style={{ width: '80%', height: '80%', objectFit: 'contain' }} />
                     </button>
                   ))}
                 </div>
                 {activeGuest && (
-                  <span style={{ fontSize: '0.8rem', color: '#10b981', fontWeight: 'bold' }}>
+                  <span style={{ fontSize: '0.8rem', color: '#10b981', fontWeight: 'bold', marginBottom: '5px' }}>
                     Target: {activeGuest.name}
                   </span>
                 )}
