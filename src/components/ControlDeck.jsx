@@ -300,8 +300,8 @@ export default function ControlDeck() {
                   src="/assets/Lobby/Arrow_no_stroke.svg" 
                   alt="Back" 
                   style={{ 
-                    width: '48px', 
-                    height: '38px', 
+                    width: '40px', 
+                    height: '32px', 
                     transform: 'scaleX(-1)', 
                     transition: 'filter 0.2s ease',
                     objectFit: 'contain'
