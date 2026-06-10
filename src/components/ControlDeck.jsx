@@ -297,7 +297,7 @@ export default function ControlDeck() {
                 }}
               >
                 <img 
-                  src="/assets/Lobby/Arrow.svg" 
+                  src="/assets/Lobby/Arrow_no_stroke.svg" 
                   alt="Back" 
                   style={{ 
                     width: '48px', 
