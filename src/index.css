@@ -5195,7 +5195,7 @@ body {
 }
 
 .studio-controls h2 {
-  margin-bottom: clamp(0.2rem, 0.4vw, 0.35rem);
+  margin-bottom: calc(clamp(0.2rem, 0.4vw, 0.35rem) + 10px);
   letter-spacing: 2px;
   margin-top: 0;
   font-size: clamp(1rem, 2.5vw, 1.25rem); /* slightly smaller to fit single row height */
