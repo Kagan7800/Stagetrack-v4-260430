@@ -5185,14 +5185,14 @@ body {
   align-items: center;
   background: linear-gradient(135deg, #3a2dbb, #7a4fd9) !important;
   color: white;
-  padding: clamp(1rem, 2.5vw, 2rem) !important;
+  padding: clamp(0.5rem, 1vw, 1rem) clamp(1rem, 2vw, 2rem) !important;
   border-radius: 12px;
   width: 100%;
   box-sizing: border-box;
 }
 
 .studio-controls h2 {
-  margin-bottom: clamp(1rem, 2vw, 1.5rem);
+  margin-bottom: clamp(0.4rem, 0.8vw, 0.6rem);
   letter-spacing: 2px;
   margin-top: 0;
   font-size: clamp(1.1rem, 2.8vw, 1.35rem); /* 25% smaller than original 1.8rem */
@@ -5202,8 +5202,8 @@ body {
 .controls-row {
   display: flex;
   justify-content: center;
-  gap: clamp(0.35rem, 1vw, 0.75rem);
-  margin: clamp(0.4rem, 1vw, 0.75rem) 0;
+  gap: clamp(0.3rem, 0.8vw, 0.6rem);
+  margin: clamp(0.2rem, 0.4vw, 0.35rem) 0;
   flex-wrap: wrap;
   width: 100%;
   box-sizing: border-box;
@@ -5213,9 +5213,9 @@ body {
   background: transparent;
   color: white;
   font-weight: bold;
-  border: 1px solid rgba(255, 255, 255, 0.35);
+  border: none;
   border-radius: 8px;
-  padding: clamp(0.5rem, 1vw, 0.75rem) clamp(0.6rem, 1.5vw, 1.25rem);
+  padding: clamp(0.4rem, 0.8vw, 0.6rem) clamp(0.5rem, 1.2vw, 1rem);
   cursor: pointer;
   transition: all 0.25s ease;
   font-size: clamp(0.7rem, 1.5vw, 0.9rem);
@@ -5226,19 +5226,19 @@ body {
 .top-row button.active {
   background: #00bfff !important;
   color: white !important;
-  border-color: #00bfff !important;
+  border: none !important;
 }
 
 .middle-row button:not(:disabled):hover,
 .middle-row button.active {
   background: #ffd700 !important;
   color: #1a1a1a !important;
-  border-color: #ffd700 !important;
+  border: none !important;
 }
 
 .bottom-row button:not(:disabled):hover,
 .bottom-row button.active {
   background: #ff69b4 !important;
   color: white !important;
-  border-color: #ff69b4 !important;
+  border: none !important;
 }
