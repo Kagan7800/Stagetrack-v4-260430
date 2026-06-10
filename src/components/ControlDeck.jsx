@@ -317,7 +317,7 @@ export default function ControlDeck() {
                 : showInstructorStickers 
                 ? 'INSTRUCTOR REWARDS' 
                 : (showStudentStickers || isPeoStickersOpen)
-                ? 'REACTION STICKERS'
+                ? 'STICKERS'
                 : showStudentFilters
                 ? 'STUDENT FILTERS'
                 : 'STUDIO CONTROLS'}
@@ -594,7 +594,7 @@ export default function ControlDeck() {
               </div>
             ) : showInstructorStickers ? (
               <div className="controls-row middle-row" style={{ width: '100%', margin: '0.5rem 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
-                <div style={{ display: 'flex', justifyContent: 'center', gap: '8px' }}>
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '20px' }}>
                   {instructorStickers.map((sticker) => (
                     <button 
                       key={sticker.id}
@@ -621,7 +621,7 @@ export default function ControlDeck() {
               </div>
             ) : (showStudentStickers || isPeoStickersOpen) ? (
               <div className="controls-row middle-row" style={{ width: '100%', margin: '0.5rem 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, auto)', gap: '8px', justifyContent: 'center' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, auto)', gap: '8px', justifyContent: 'center', marginTop: '20px' }}>
                   {studentStickers.map((sticker) => (
                     <button 
                       key={sticker.id}
