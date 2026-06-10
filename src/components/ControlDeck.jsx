@@ -478,7 +478,7 @@ export default function ControlDeck() {
                   <button 
                     key={act.filename}
                     onClick={() => {
-                      setMediaUpload(`/assets/Activities/${act.filename}`, 'iframe');
+                      setMediaUpload(`/assets/Activities/${act.filename}?v=${Date.now()}`, 'iframe');
                       setActiveCdTab(null);
                     }}
                   >

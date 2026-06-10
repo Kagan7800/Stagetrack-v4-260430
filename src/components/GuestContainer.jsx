@@ -717,7 +717,7 @@ export default function GuestContainer({
           }
         }
 
-        const isLargeSticker = s.name === 'Guitar.svg' || s.name === 'Dog.svg' || s.name === 'Trumpet.svg';
+        const isLargeSticker = s.name === 'Guitar.svg' || s.name === 'Giraffe.png' || s.name === 'Trumpet.svg';
         const isTrumpet = s.name === 'Trumpet.svg';
         const isSpecialStar = s.name === 'ic star1.png' || s.name === 'ic star1_red.png' || s.name === 'ic_gold_star.png';
         const isItoSticker = isIcSticker || s.position === 'crown' || s.position === 'birthday';
