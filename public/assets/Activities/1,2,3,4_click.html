@@ -250,6 +250,7 @@
 
     <script>
         let currentStep = 1;
+        let activeTimeout = null;
 
         const maskLayer = document.getElementById('maskLayer');
         const clap2 = document.getElementById('clap2');
@@ -257,6 +258,20 @@
         const clap4 = document.getElementById('clap4');
         const banjoCharacter = document.getElementById('banjoCharacter');
         const banjoContainer = document.getElementById('banjoContainer');
+
+        function notifyParent(step, isRunning) {
+            if (window.parent && window.parent !== window) {
+                window.parent.postMessage({
+                    type: 'RHYTHM_UPDATE',
+                    currentStep: step,
+                    isRunning: isRunning
+                }, '*');
+            }
+        }
+
+        window.addEventListener('load', function() {
+            notifyParent(currentStep, false);
+        });
 
         function updateClapVisuals(step) {
             // Instantly toggle the "Clap!" bubble popups based on beat numbers
@@ -297,11 +312,25 @@
             maskLayer.style.transform = `rotate(${(currentStep - 1) * 90}deg)`;
             updateClapVisuals(currentStep);
             updateMascotState(currentStep);
+
+            // Notify parent that we are running (beat just hit)
+            notifyParent(currentStep, true);
+
+            if (activeTimeout) clearTimeout(activeTimeout);
+            activeTimeout = setTimeout(() => {
+                notifyParent(currentStep, false);
+            }, 600);
         }
 
         window.addEventListener('keydown', function(e) {
             if (e.code === 'Space' || e.key === ' ' || e.keyCode === 32) {
                 e.preventDefault();
+                advanceStep();
+            }
+        });
+
+        window.addEventListener('message', function(event) {
+            if (event.data && event.data.type === 'ADVANCE_STEP') {
                 advanceStep();
             }
         });

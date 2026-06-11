@@ -34,35 +34,12 @@ export function BanjoMascotState({ currentBeat, isPlaying }) {
     <div className={`banjo-container ${animationClass}`}>
       {/* Structural placement left of the PC wheel card */}
       <div className={`banjo-character sprite-${pose}`}>
-        <svg viewBox="0 0 200 200" width="100%" height="100%">
-          {/* Left Floppy Ear */}
-          <path className="ear left-ear" d="M 50,70 C 10,70 10,130 45,110 Z" fill="#78350f" />
-          {/* Right Floppy Ear */}
-          <path className="ear right-ear" d="M 150,70 C 190,70 190,130 155,110 Z" fill="#78350f" />
-          {/* Body / Neck Collar */}
-          <path d="M 75,145 L 125,145 L 140,180 L 60,180 Z" fill="#b91c1c" />
-          {/* Main Dog Head Circle */}
-          <circle cx="100" cy="100" r="50" fill="#f59e0b" />
-          {/* Cheek Patches */}
-          <circle cx="65" cy="115" r="8" fill="#f43f5e" opacity="0.3" />
-          <circle cx="135" cy="115" r="8" fill="#f43f5e" opacity="0.3" />
-          {/* Snout Cream Oval */}
-          <ellipse cx="100" cy="118" rx="22" ry="16" fill="#fef08a" />
-          {/* Nose Triangle */}
-          <polygon points="94,112 106,112 100,121" fill="#1e293b" />
-          {/* Mouth Smile */}
-          <path d="M 90,123 Q 100,132 110,123" fill="none" stroke="#1e293b" strokeWidth="3" strokeLinecap="round" />
-          {/* Left Eye */}
-          <circle cx="82" cy="94" r="7" fill="#1e293b" />
-          <circle cx="80" cy="91" r="2.5" fill="#ffffff" />
-          {/* Right Eye */}
-          <circle cx="118" cy="94" r="7" fill="#1e293b" />
-          <circle cx="116" cy="91" r="2.5" fill="#ffffff" />
-          {/* Left Hand/Arm */}
-          <path className="arm left-arm" d="M 55,140 C 35,150 35,170 65,160 Z" fill="#d97706" />
-          {/* Right Hand/Arm */}
-          <path className="arm right-arm" d="M 145,140 C 165,150 165,170 135,160 Z" fill="#d97706" />
-        </svg>
+        <img 
+          src="/assets/svg_stickers/Giraffe.png" 
+          alt="Banjo" 
+          className="banjo-giraffe-img" 
+          style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+        />
         {effect && <span className="visual-rhythm-burst">{effect}</span>}
       </div>
     </div>

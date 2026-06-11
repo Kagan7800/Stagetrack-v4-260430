@@ -5119,6 +5119,24 @@ body {
   position: relative;
 }
 
+/* Custom styling for the Giraffe PNG mascot */
+.banjo-giraffe-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Listening state: lean forward slightly / scale */
+.sprite-listening-ears .banjo-giraffe-img {
+  transform: scale(1.05) translateY(-5px) rotate(-3deg);
+}
+
+/* Clapping state: bounce / scale pop */
+.sprite-clapping-hands .banjo-giraffe-img {
+  transform: scale(1.1) translateY(-10px) rotate(3deg);
+}
+
 /* Vector Mascot Animations & States */
 .ear, .arm {
   transition: transform 0.15s cubic-bezier(0.25, 0.8, 0.25, 1.1);

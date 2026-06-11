@@ -1,7 +1,40 @@
 import { useRef, useState, useEffect, useCallback } from 'react';
 import { Eraser, Undo2, Redo2, Trash2 } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
+import { BanjoMascotState } from './BanjoMascotState';
 
+const isRhythmWheelActivity = (url, type) => {
+  if (type !== 'iframe' || !url) return false;
+  return url.includes('1,2,3,4_wheel.html') || url.includes('1,2,3,4_click.html');
+};
+
+export function CentralStageDeck({ currentBeat, isPlaying, mediaUrl, onClick }) {
+  return (
+    <div 
+      className="w-full h-full flex items-center justify-center p-6 central-stage-deck" 
+      onClick={onClick}
+      style={{ cursor: 'pointer' }}
+    >
+      <div className="flex flex-row items-center justify-between w-full max-w-4xl gap-8">
+        {/* LEFT COLUMN: Banjo Mascot */}
+        <div className="w-1/2 flex justify-center items-center">
+          <BanjoMascotState currentBeat={currentBeat} isPlaying={isPlaying} />
+        </div>
+
+        {/* RIGHT COLUMN: The Pure Instrument Frame */}
+        <div className="w-1/2 flex justify-center items-center">
+          <iframe 
+            src={mediaUrl} 
+            title="Rhythm Wheel"
+            className="bg-transparent border-none"
+            style={{ width: '45vmin', height: '45vmin' }}
+            allowtransparency="true"
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function PresentationContainer({ 
   isDoodling, 
@@ -20,6 +53,47 @@ export default function PresentationContainer({
   const [selectedColor, setSelectedColor] = useState('#ec4899');
   const selectedColorRef = useRef('#ec4899');
   const currentPathRef = useRef(null);
+
+  const [currentStep, setCurrentStep] = useState(1);
+  const [isRunning, setIsRunning] = useState(false);
+
+  useEffect(() => {
+    const handleMessage = (event) => {
+      if (event.data && event.data.type === 'RHYTHM_UPDATE') {
+        setCurrentStep(event.data.currentStep);
+        setIsRunning(event.data.isRunning);
+      }
+    };
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.code === 'Space' || e.key === ' ' || e.keyCode === 32) {
+        if (['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName)) return;
+        
+        if (mediaUrl && mediaUrl.includes('1,2,3,4_click.html')) {
+          e.preventDefault();
+          const iframe = document.querySelector('.central-stage-deck iframe');
+          if (iframe && iframe.contentWindow) {
+            iframe.contentWindow.postMessage({ type: 'ADVANCE_STEP' }, '*');
+          }
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [mediaUrl]);
+
+  const handleDeckClick = () => {
+    if (mediaUrl && mediaUrl.includes('1,2,3,4_click.html')) {
+      const iframe = document.querySelector('.central-stage-deck iframe');
+      if (iframe && iframe.contentWindow) {
+        iframe.contentWindow.postMessage({ type: 'ADVANCE_STEP' }, '*');
+      }
+    }
+  };
 
   const popularColors = [
     { name: 'Pink', value: '#ec4899' },
@@ -202,7 +276,20 @@ export default function PresentationContainer({
       {(mediaUrl || mediaType === 'metronome') && (
         <div 
           className={`media-container ${mediaType === 'video' ? 'video-active' : ''}`}
-          style={mediaType === 'iframe' ? { 
+          style={isRhythmWheelActivity(mediaUrl, mediaType) ? {
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            width: '100%',
+            height: '100%',
+            maxWidth: '100%',
+            maxHeight: '100%',
+            borderRadius: 0,
+            zIndex: 20,
+            background: 'transparent'
+          } : mediaType === 'iframe' ? { 
             position: 'absolute',
             top: '50%',
             left: 0,
@@ -229,7 +316,14 @@ export default function PresentationContainer({
           } : {}}
         >
 
-          {mediaType === 'video' ? (
+          {isRhythmWheelActivity(mediaUrl, mediaType) ? (
+            <CentralStageDeck 
+              currentBeat={currentStep} 
+              isPlaying={isRunning} 
+              mediaUrl={mediaUrl} 
+              onClick={handleDeckClick}
+            />
+          ) : mediaType === 'video' ? (
             <video src={mediaUrl} controls autoPlay />
           ) : mediaType === 'iframe' ? (
             <iframe 

@@ -263,6 +263,18 @@
         const banjoCharacter = document.getElementById('banjoCharacter');
         const banjoContainer = document.getElementById('banjoContainer');
 
+        function notifyParent() {
+            if (window.parent && window.parent !== window) {
+                window.parent.postMessage({
+                    type: 'RHYTHM_UPDATE',
+                    currentStep: currentStep,
+                    isRunning: isRunning
+                }, '*');
+            }
+        }
+
+        window.addEventListener('load', notifyParent);
+
         function updateClapVisuals(step) {
             // Instantly toggle the "Clap!" bubble popups based on beat numbers
             clap2.style.display = (step === 2) ? 'block' : 'none';
@@ -313,6 +325,7 @@
                 updateClapVisuals(1);
                 updateMascotState(1, false);
                 tipText.innerText = "🎉 Sequence Complete! Click to play again.";
+                notifyParent();
                 return;
             }
 
@@ -322,6 +335,7 @@
             updateClapVisuals(currentStep);
             updateMascotState(currentStep, true);
             totalStepsExecuted++;
+            notifyParent();
 
             // High-precision self-correcting timer loop (adjusted to 60 BPM / 1000ms)
             const drift = Date.now() - expectedTime;
@@ -336,6 +350,7 @@
                 isRunning = false;
                 tipText.innerText = "⏸️ Paused. Click to resume.";
                 updateMascotState(currentStep, false);
+                notifyParent();
             } else {
                 // Click to Start / Resume
                 if (totalStepsExecuted === 0) {
@@ -345,10 +360,10 @@
                 }
                 isRunning = true;
                 tipText.innerText = "⚡ Playing Rhythm... Click to pause.";
-                
                 expectedTime = Date.now() + 1000;
                 timerInterval = setTimeout(runRhythmStep, 1000);
                 updateMascotState(currentStep, true);
+                notifyParent();
             }
         }
 
