@@ -18,7 +18,7 @@ export function CentralStageDeck({ currentBeat, isPlaying, mediaUrl, onClick }) 
       <div className="flex flex-row items-center justify-between w-full max-w-4xl gap-8">
         {/* LEFT COLUMN: Banjo Mascot */}
         <div className="w-1/2 flex justify-center items-center">
-          <BanjoMascotState currentBeat={currentBeat} isPlaying={isPlaying} />
+          <BanjoMascotState currentBeat={currentBeat} isPlaying={isPlaying} style={{ marginRight: 0 }} />
         </div>
 
         {/* RIGHT COLUMN: The Pure Instrument Frame */}

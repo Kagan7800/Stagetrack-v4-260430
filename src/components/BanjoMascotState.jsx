@@ -1,6 +1,6 @@
 
 
-export function BanjoMascotState({ currentBeat, isPlaying }) {
+export function BanjoMascotState({ currentBeat, isPlaying, style }) {
   // Map current beat directly to BP-compliant psychological & theatrical actions
   const getMascotPose = () => {
     if (!isPlaying) return { pose: 'idle', label: 'Banjo is waiting for the music!' };
@@ -31,7 +31,7 @@ export function BanjoMascotState({ currentBeat, isPlaying }) {
   const { pose, animationClass, effect } = getMascotPose();
 
   return (
-    <div className={`banjo-container ${animationClass}`}>
+    <div className={`banjo-container ${animationClass}`} style={style}>
       {/* Structural placement left of the PC wheel card */}
       <div className={`banjo-character sprite-${pose}`}>
         <img 

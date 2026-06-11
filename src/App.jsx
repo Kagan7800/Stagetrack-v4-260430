@@ -98,6 +98,8 @@ function App() {
     stageTimer, setStageTimer
   } = useAppContext();
 
+  const isRhythmWheel = mediaType === 'iframe' && mediaUrl && (mediaUrl.includes('1,2,3,4_wheel.html') || mediaUrl.includes('1,2,3,4_click.html'));
+
   const [isPortrait, setIsPortrait] = useState(
     typeof window !== 'undefined' ? window.innerHeight > window.innerWidth : false
   );
@@ -441,7 +443,7 @@ function App() {
             <div className="center-wrapper" style={{ justifyContent: 'center' }}>
               <div className={`pc-width-keeper ${isSidebarOpen || isChatOpen ? 'pc-sidebar-open' : ''}`}>
                  <div 
-                  className={`pc-gt-unified ${mediaType === 'iframe' || mediaType === 'metronome' ? 'metronome-active' : ''} presentation-container-parent`}
+                  className={`pc-gt-unified ${mediaType === 'iframe' || mediaType === 'metronome' ? 'metronome-active' : ''} ${isRhythmWheel ? 'rhythm-wheel-container' : 'presentation-container-parent'}`}
                  >
                     <PresentationContainer 
                       isDoodling={isDoodling}
@@ -616,7 +618,7 @@ function App() {
                 }}>
                  <div className={`pc-width-keeper ${isSidebarOpen || isChatOpen ? 'pc-sidebar-open' : ''}`}>
                     <div 
-                      className={`pc-gt-unified ${mediaType === 'iframe' || mediaType === 'metronome' ? 'metronome-active' : ''} presentation-container-parent`}
+                      className={`pc-gt-unified ${mediaType === 'iframe' || mediaType === 'metronome' ? 'metronome-active' : ''} ${isRhythmWheel ? 'rhythm-wheel-container' : 'presentation-container-parent'}`}
                     >
                        <PresentationContainer 
                          isDoodling={isDoodling}
