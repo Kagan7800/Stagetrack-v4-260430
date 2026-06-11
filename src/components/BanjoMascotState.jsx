@@ -34,11 +34,15 @@ export function BanjoMascotState({ currentBeat, isPlaying, style }) {
     <div className={`banjo-container ${animationClass}`} style={style}>
       {/* Structural placement left of the PC wheel card */}
       <div className={`banjo-character sprite-${pose}`}>
-        <img 
-          src="/assets/svg_stickers/Giraffe.png" 
+        <video 
+          src="/assets/MF_images/banjo.mp4" 
           alt="Banjo" 
           className="banjo-giraffe-img" 
-          style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+          style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '16px' }}
+          autoPlay
+          loop
+          muted
+          playsInline
         />
         {effect && <span className="visual-rhythm-burst">{effect}</span>}
       </div>
