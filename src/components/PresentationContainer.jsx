@@ -4,8 +4,7 @@ import { useAppContext } from '../context/AppContext';
 import { BanjoMascotState } from './BanjoMascotState';
 
 const isRhythmWheelActivity = (url, type) => {
-  if (type !== 'iframe' || !url) return false;
-  return url.includes('1,2,3,4_wheel.html') || url.includes('1,2,3,4_click.html');
+  return url && url.includes('1,2,3,4');
 };
 
 export function CentralStageDeck({ currentBeat, isPlaying, mediaUrl, onClick }) {

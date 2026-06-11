@@ -98,7 +98,7 @@ function App() {
     stageTimer, setStageTimer
   } = useAppContext();
 
-  const isRhythmWheel = mediaType === 'iframe' && mediaUrl && (mediaUrl.includes('1,2,3,4_wheel.html') || mediaUrl.includes('1,2,3,4_click.html'));
+  const isRhythmWheel = mediaUrl && mediaUrl.includes('1,2,3,4');
 
   const [isPortrait, setIsPortrait] = useState(
     typeof window !== 'undefined' ? window.innerHeight > window.innerWidth : false
