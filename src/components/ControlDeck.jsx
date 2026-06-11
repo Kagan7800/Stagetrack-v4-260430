@@ -26,7 +26,8 @@ export default function ControlDeck() {
   const [activeCdTab, setActiveCdTab] = useState(null); // 'timer', 'system', 'upload', or 'activities'
 
   const activities = [
-    { name: '1,2,3,4 Wheel', filename: '1,2,3,4_wheel.html' }
+    { name: '1,2,3,4 Wheel', filename: '1,2,3,4_wheel.html' },
+    { name: '1,2,3,4 Click', filename: '1,2,3,4_click.html' }
   ];
 
   // Find targeted guest for instructor rewards
