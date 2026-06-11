@@ -22,19 +22,18 @@
             user-select: none;
         }
 
-        /* Forces a strict responsive 16:9 widescreen canvas box */
         .canvas-16-9 {
             position: relative;
             width: 100vw;
             height: 56.25vw; 
             max-height: 100vh;
             max-width: 177.78vh;
-            background: rgba(15, 23, 42, 0.55); /* Disney/Bluey: Tinted dark slate/blue */
-            backdrop-filter: blur(12px); /* Psychologist: Heavy 12px blur to flatten background noise */
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.12); /* Engineer/XPRIZE: Crisp, subtle translucent border */
+            background: transparent;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+            border: none;
             border-radius: 24px;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            box-shadow: none;
             box-sizing: border-box;
             display: flex;
             justify-content: center;
