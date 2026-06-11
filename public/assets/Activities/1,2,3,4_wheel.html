@@ -351,6 +351,13 @@
                 updateMascotState(currentStep, true);
             }
         }
+
+        window.addEventListener('keydown', function(e) {
+            if (e.code === 'Space' || e.key === ' ' || e.keyCode === 32) {
+                e.preventDefault();
+                toggleSequence();
+            }
+        });
     </script>
 </body>
 </html>

@@ -298,6 +298,13 @@
             updateClapVisuals(currentStep);
             updateMascotState(currentStep);
         }
+
+        window.addEventListener('keydown', function(e) {
+            if (e.code === 'Space' || e.key === ' ' || e.keyCode === 32) {
+                e.preventDefault();
+                advanceStep();
+            }
+        });
     </script>
 </body>
 </html>
