@@ -26,8 +26,7 @@ export function CentralStageDeck({ currentBeat, isPlaying, mediaUrl, onClick }) 
           <iframe 
             src={mediaUrl} 
             title="Rhythm Wheel"
-            className="bg-transparent border-none"
-            style={{ width: '45vmin', height: '45vmin' }}
+            style={{ width: '45vmin', height: '45vmin', border: 'none', background: 'transparent' }}
             allowtransparency="true"
           />
         </div>
