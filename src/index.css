@@ -5324,7 +5324,7 @@ body {
   align-items: center;
   justify-content: space-between;
   width: 100%;
-  max-width: 896px; /* 4xl equivalent */
+  max-width: 720px; /* Reduced by 20% from 896px to bring columns closer */
   gap: 32px; /* gap-8 equivalent */
   box-sizing: border-box;
 }
