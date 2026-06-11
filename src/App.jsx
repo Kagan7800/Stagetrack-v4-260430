@@ -442,7 +442,6 @@ function App() {
               <div className={`pc-width-keeper ${isSidebarOpen || isChatOpen ? 'pc-sidebar-open' : ''}`}>
                  <div 
                   className={`pc-gt-unified ${mediaType === 'iframe' || mediaType === 'metronome' ? 'metronome-active' : ''}`}
-                  style={{ border: activeTheme === 'sor' ? '2px solid #dc2626' : 'none' }}
                  >
                     <PresentationContainer 
                       isDoodling={isDoodling}
@@ -618,7 +617,6 @@ function App() {
                  <div className={`pc-width-keeper ${isSidebarOpen || isChatOpen ? 'pc-sidebar-open' : ''}`}>
                     <div 
                       className={`pc-gt-unified ${mediaType === 'iframe' || mediaType === 'metronome' ? 'metronome-active' : ''}`}
-                      style={{ border: activeTheme === 'sor' ? '2px solid #dc2626' : 'none' }}
                     >
                        <PresentationContainer 
                          isDoodling={isDoodling}
