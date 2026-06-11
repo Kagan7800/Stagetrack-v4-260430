@@ -441,7 +441,7 @@ function App() {
             <div className="center-wrapper" style={{ justifyContent: 'center' }}>
               <div className={`pc-width-keeper ${isSidebarOpen || isChatOpen ? 'pc-sidebar-open' : ''}`}>
                  <div 
-                  className={`pc-gt-unified ${mediaType === 'iframe' || mediaType === 'metronome' ? 'metronome-active' : ''}`}
+                  className={`pc-gt-unified ${mediaType === 'iframe' || mediaType === 'metronome' ? 'metronome-active' : ''} presentation-container-parent`}
                  >
                     <PresentationContainer 
                       isDoodling={isDoodling}
@@ -616,7 +616,7 @@ function App() {
                 }}>
                  <div className={`pc-width-keeper ${isSidebarOpen || isChatOpen ? 'pc-sidebar-open' : ''}`}>
                     <div 
-                      className={`pc-gt-unified ${mediaType === 'iframe' || mediaType === 'metronome' ? 'metronome-active' : ''}`}
+                      className={`pc-gt-unified ${mediaType === 'iframe' || mediaType === 'metronome' ? 'metronome-active' : ''} presentation-container-parent`}
                     >
                        <PresentationContainer 
                          isDoodling={isDoodling}
