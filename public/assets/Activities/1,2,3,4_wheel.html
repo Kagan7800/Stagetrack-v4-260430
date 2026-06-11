@@ -24,10 +24,8 @@
 
         .canvas-16-9 {
             position: relative;
-            width: 100vw;
-            height: 56.25vw; 
-            max-height: 100vh;
-            max-width: 177.78vh;
+            width: 100%;
+            height: 100%;
             background: transparent;
             backdrop-filter: none;
             -webkit-backdrop-filter: none;
@@ -38,7 +36,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 24px; /* Creates the psychological breathing room for the child */
+            padding: 8px; /* Minimal padding for safety */
         }
 
         /* Banjo Mascot Container */
@@ -132,13 +130,12 @@
             container-type: size;
             
             /* XPRIZE/Engineering: Uses vmin to guarantee a perfect circle that scales responsively */
-            /* Psychologist/Disney: ~55% of the viewport/container height makes it a massive, clear target */
-            width: 77vmin;
-            height: 77vmin;
+            width: 80vmin;
+            height: 80vmin;
             
-            /* Max/Min safety constraints so it never breaks layout boundaries */
-            max-width: 588px;
-            max-height: 588px;
+            /* Max/Min safety constraints so it never breaks layout boundaries or cuts off */
+            max-width: 95%;
+            max-height: 95%;
             min-width: 150px;
             min-height: 150px;
             

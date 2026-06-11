@@ -16,16 +16,24 @@ export function CentralStageDeck({ currentBeat, isPlaying, mediaUrl, onClick }) 
     >
       <div className="central-stage-inner">
         {/* LEFT COLUMN: Banjo Mascot */}
-        <div className="central-stage-column">
+        <div className="central-stage-column left-col">
           <BanjoMascotState currentBeat={currentBeat} isPlaying={isPlaying} style={{ marginRight: 0 }} />
         </div>
 
         {/* RIGHT COLUMN: The Pure Instrument Frame */}
-        <div className="central-stage-column">
+        <div className="central-stage-column right-col">
           <iframe 
             src={mediaUrl} 
             title="Rhythm Wheel"
-            style={{ height: '90%', aspectRatio: '1 / 1', border: 'none', background: 'transparent' }}
+            style={{ 
+              height: '90%', 
+              aspectRatio: '1 / 1', 
+              maxWidth: '100%', 
+              maxHeight: '100%', 
+              border: 'none', 
+              background: 'transparent',
+              overflow: 'visible'
+            }}
             allowtransparency="true"
           />
         </div>
@@ -286,7 +294,8 @@ export default function PresentationContainer({
             maxHeight: '100%',
             borderRadius: 0,
             zIndex: 20,
-            background: 'transparent'
+            background: 'transparent',
+            overflow: 'visible'
           } : mediaType === 'iframe' ? { 
             position: 'absolute',
             top: '50%',
