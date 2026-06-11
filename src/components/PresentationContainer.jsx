@@ -10,18 +10,18 @@ const isRhythmWheelActivity = (url, type) => {
 export function CentralStageDeck({ currentBeat, isPlaying, mediaUrl, onClick }) {
   return (
     <div 
-      className="w-full h-full flex items-center justify-center p-6 central-stage-deck" 
+      className="central-stage-deck" 
       onClick={onClick}
       style={{ cursor: 'pointer' }}
     >
-      <div className="flex flex-row items-center justify-between w-full max-w-4xl gap-8">
+      <div className="central-stage-inner">
         {/* LEFT COLUMN: Banjo Mascot */}
-        <div className="w-1/2 flex justify-center items-center">
+        <div className="central-stage-column">
           <BanjoMascotState currentBeat={currentBeat} isPlaying={isPlaying} style={{ marginRight: 0 }} />
         </div>
 
         {/* RIGHT COLUMN: The Pure Instrument Frame */}
-        <div className="w-1/2 flex justify-center items-center">
+        <div className="central-stage-column">
           <iframe 
             src={mediaUrl} 
             title="Rhythm Wheel"

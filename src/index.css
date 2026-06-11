@@ -5297,3 +5297,33 @@ body {
   -webkit-backdrop-filter: none !important;
   padding: 24px;
 }
+
+/* Central Stage Deck side-by-side layout (replacing Tailwind classes) */
+.central-stage-deck {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+.central-stage-inner {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 896px; /* 4xl equivalent */
+  gap: 32px; /* gap-8 equivalent */
+  box-sizing: border-box;
+}
+
+.central-stage-column {
+  width: 50%; /* w-1/2 equivalent */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+}
