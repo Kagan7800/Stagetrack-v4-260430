@@ -7,6 +7,7 @@ const AppContext = createContext();
 
 export function AppProvider({ children }) {
   const [sessionId, setSessionId] = useState(null);
+  const [rhythmBeat, setRhythmBeat] = useState(1);
   const isRemoteUpdate = useRef(false);
 
   // Detect if this is a fresh session (tab opened/restored or system restarted)
@@ -984,6 +985,7 @@ export function AppProvider({ children }) {
         if (data.activeTheme) setActiveTheme(data.activeTheme);
         if (data.spotlightGuestId !== undefined) setSpotlightGuestId(data.spotlightGuestId);
         if (data.stageTimer !== undefined) setStageTimer(data.stageTimer);
+        if (data.currentBeat !== undefined) setRhythmBeat(data.currentBeat);
         
         const currentRole = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('stagetrack_role') : null;
         const isInstructorClient = currentRole !== 'student';
@@ -1057,6 +1059,7 @@ export function AppProvider({ children }) {
     isSidebarOpen, setIsSidebarOpen,
     activeItoSection, setActiveItoSection,
     sessionId, // Added to expose session code
+    rhythmBeat, // Sync beat across clients
     showInstructorStickers, setShowInstructorStickers,
     showStudentStickers, setShowStudentStickers,
     showStudentFilters, setShowStudentFilters,

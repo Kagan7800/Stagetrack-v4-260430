@@ -2,6 +2,7 @@ import { useRef, useState, useEffect, useCallback } from 'react';
 import { Eraser, Undo2, Redo2, Trash2 } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import { BanjoMascotState } from './BanjoMascotState';
+import { syncWheelBeatToFirebase } from '../firebase';
 
 const isRhythmWheelActivity = (url, type) => {
   return url && url.includes('1,2,3,4');
@@ -47,7 +48,7 @@ export default function PresentationContainer({
   mediaUrl, 
   mediaType: propMediaType
 }) {
-  const { drawingPaths, setDrawingPaths, mediaType: globalMediaType } = useAppContext();
+  const { drawingPaths, setDrawingPaths, mediaType: globalMediaType, sessionId, rhythmBeat } = useAppContext();
   const mediaType = propMediaType || globalMediaType;
 
   const canvasRef = useRef(null);
@@ -68,11 +69,29 @@ export default function PresentationContainer({
       if (event.data && event.data.type === 'RHYTHM_UPDATE') {
         setCurrentStep(event.data.currentStep);
         setIsRunning(event.data.isRunning);
+
+        // Sync to Firebase if we are the instructor client
+        const isInstructorClient = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('stagetrack_role') !== 'student' : true;
+        if (isInstructorClient && sessionId) {
+          syncWheelBeatToFirebase(event.data.currentStep, sessionId);
+        }
       }
     };
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
-  }, []);
+  }, [sessionId]);
+
+  // Student Sync: Snap client mascot and iframe step when Firestore updates
+  useEffect(() => {
+    const isStudent = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('stagetrack_role') === 'student' : false;
+    if (isStudent && rhythmBeat !== undefined) {
+      setCurrentStep(rhythmBeat);
+      const iframe = document.querySelector('.central-stage-deck iframe');
+      if (iframe && iframe.contentWindow) {
+        iframe.contentWindow.postMessage({ type: 'SET_STEP', step: rhythmBeat }, '*');
+      }
+    }
+  }, [rhythmBeat]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {

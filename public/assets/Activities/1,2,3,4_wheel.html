@@ -370,6 +370,18 @@
                 toggleSequence();
             }
         });
+
+        window.addEventListener('message', function(event) {
+            if (event.data && event.data.type === 'SET_STEP') {
+                const step = event.data.step;
+                if (step >= 1 && step <= 4) {
+                    currentStep = step;
+                    maskLayer.style.transform = `rotate(${(currentStep - 1) * 90}deg)`;
+                    updateClapVisuals(currentStep);
+                    updateMascotState(currentStep, true);
+                }
+            }
+        });
     </script>
 </body>
 </html>
