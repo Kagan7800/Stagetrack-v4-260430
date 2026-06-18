@@ -183,7 +183,7 @@ body {
 .center-grid-area {
   display: flex;
   flex-direction: row;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
   padding: 0;
   gap: 10px;
@@ -220,7 +220,7 @@ body {
 }
 
 .center-grid-area[data-columns="1"] .toolbox-panel {
-  top: calc(var(--peo-height, 25vh) * 2 + 20px);
+  top: calc(var(--peo-height, 31.25vh) * 2 + 20px);
 }
 
 /* Side Peos Mini-Grid */
@@ -238,7 +238,9 @@ body {
 
 .side-peos[data-columns="1"] {
   grid-template-columns: 1fr;
-  flex: 0.30; /* Increased by another 15% from 0.26 (0.26 * 1.15 ≈ 0.30) */
+  flex: 1;
+  max-width: 31.25vh;
+  min-width: 225px;
 }
 
 .side-peos[data-columns="1"]:has(> :only-child) {
@@ -275,8 +277,8 @@ body {
 
 /* Unified PC Container Wrapper to hold exact width */
 .pc-width-keeper {
-  height: calc(55% - 11px); /* Fallback */
-  height: calc(var(--peo-height, 25vh) * 2 + 20px);
+  height: calc((55% - 11px) * 0.7); /* Fallback */
+  height: calc((var(--peo-height, 31.25vh) * 2 + 20px) * 0.7);
   aspect-ratio: 16 / 9;
   display: flex;
   flex-direction: column;
@@ -297,7 +299,7 @@ body {
   height: 100%;
   align-self: center;
   border: none !important;
-  border-radius: 16px;
+  border-radius: 0 !important;
   display: flex;
   flex-direction: column;
   background: transparent !important;
@@ -612,6 +614,16 @@ body {
   height: 143px !important;
 }
 
+.gc-sticker.giraffe-special {
+  width: 105px !important;
+  height: 105px !important;
+}
+
+.gc-sticker.giraffe-special.ic-placed {
+  width: 86px !important;
+  height: 86px !important;
+}
+
 .gc-sticker.ic-star-special {
   z-index: 10000 !important;
 }
@@ -629,7 +641,7 @@ body {
 /* Antigravity Spatial Map & Priority Stack */
 .gc-sticker.pos-sun {
   top: 50%;
-  right: -9px;
+  right: -14px;
   margin-top: -36px; /* Vertically centers the 71px sticker without transform */
   transform: none !important; /* Never moves */
   transition: none !important; /* Never moves */
@@ -739,7 +751,7 @@ body {
   bottom: auto !important;
   top: 50% !important;
   left: auto !important;
-  right: -9px !important;
+  right: -14px !important;
   transform: translateY(-50%) !important;
 }
 
@@ -897,7 +909,7 @@ body {
 .media-container {
   max-width: 90%;
   max-height: 90%;
-  border-radius: 12px;
+  border-radius: 0 !important;
   overflow: hidden;
   position: absolute;
   z-index: 10;
@@ -906,7 +918,7 @@ body {
 .media-container img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .media-container video {
@@ -2412,7 +2424,7 @@ body {
   border-radius: calc(14px * var(--lobby-scale)) !important;
   outline: none;
   color: white;
-  font-size: calc(45.6px * var(--lobby-scale));
+  font-size: calc(54.72px * var(--lobby-scale));
   padding: calc(15px * var(--lobby-scale)) 0 0 0;
   text-align: center;
   font-family: 'Risque', serif;
@@ -2438,7 +2450,7 @@ body {
   border-radius: calc(14px * var(--lobby-scale)) !important;
   outline: none;
   color: white;
-  font-size: calc(45.6px * var(--lobby-scale));
+  font-size: calc(54.72px * var(--lobby-scale));
   padding: calc(15px * var(--lobby-scale)) 0 0 0;
   text-align: center;
   font-family: 'Risque', serif;
@@ -2455,7 +2467,7 @@ body {
 
 .lobby-overlay-input-1::placeholder,
 .lobby-overlay-input-2::placeholder {
-  color: rgba(255, 255, 255, 0.4) !important;
+  color: #ef4444 !important;
 }
 
 .lobby-overlay-colors {
@@ -3920,17 +3932,18 @@ body {
 
 /* --- iPad & Tablet Layout Optimizations (widths <= 1024px) --- */
 @media (max-width: 1024px) {
-  /* Left Sidebar Squeezing Flow Mode */
+  /* Left Sidebar Overlay Mode */
   .instructor-left-sidebar {
-    position: relative !important;
-    left: auto !important;
-    top: auto !important;
+    position: absolute !important;
+    left: 0 !important;
+    top: -10px !important;
     height: calc(100% + 20px) !important;
-    margin-top: -10px !important;
-    margin-bottom: -10px !important;
-    margin-left: -10px !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    margin-left: 0 !important;
     flex-shrink: 0 !important;
     box-shadow: none !important;
+    z-index: 100 !important;
   }
   
   .instructor-left-sidebar.closed {
@@ -4034,7 +4047,7 @@ body {
     background: rgba(255, 255, 255, 0.08) !important;
     border: 1.5px solid rgba(255, 255, 255, 0.2) !important;
     border-radius: 12px !important;
-    font-size: 16px !important;
+    font-size: 19px !important;
     padding: 0 15px !important;
     margin-bottom: 0 !important;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2) !important;
@@ -4246,7 +4259,7 @@ body {
   .lobby-overlay-input-1,
   .lobby-overlay-input-2,
   .lobby-ai-chat-input {
-    font-size: max(14px, calc(45.6px * var(--lobby-scale))) !important;
+    font-size: max(17px, calc(54.72px * var(--lobby-scale))) !important;
     padding: max(6px, calc(15px * var(--lobby-scale))) 0 0 0 !important;
   }
 
@@ -4334,8 +4347,8 @@ body {
 
 @media (min-height: 481px) {
   .pc-width-keeper.pc-sidebar-open {
-    max-height: calc(var(--peo-height, 25vh) * 2 + 20px) !important;
-    max-width: calc((var(--peo-height, 25vh) * 2 + 20px) * 16 / 9) !important;
+    max-height: calc((var(--peo-height, 31.25vh) * 2 + 20px) * 0.7) !important;
+    max-width: calc(((var(--peo-height, 31.25vh) * 2 + 20px) * 16 / 9) * 0.7) !important;
   }
 }
 
@@ -4819,7 +4832,7 @@ body {
 }
 
 .control-deck-outer {
-  width: calc((var(--peo-height, 25vh) * 2 + 20px) * 16 / 9) !important;
+  width: calc(((var(--peo-height, 31.25vh) * 2 + 20px) * 16 / 9) * 0.7) !important;
   max-width: 100%;
   box-sizing: border-box;
 }
@@ -5211,7 +5224,7 @@ body {
   padding: clamp(0.25rem, 0.8vw, 0.5rem) clamp(1rem, 2vw, 2rem) !important;
   border-radius: 12px;
   width: 100%;
-  height: var(--peo-height, 25vh) !important;
+  height: var(--peo-height, 31.25vh) !important;
   box-sizing: border-box;
   overflow: hidden;
 }
@@ -5281,7 +5294,7 @@ body {
   
   /* Crisp, high-end engineering boundary definition */
   border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  border-radius: 32px !important;
+  border-radius: 0 !important;
   
   /* Layout constraints to balance Banjo and the Wheel */
   padding: 24px;
@@ -5299,7 +5312,7 @@ body {
   
   /* Crisp, high-end engineering boundary definition - border none per request */
   border: none !important;
-  border-radius: 32px !important;
+  border-radius: 0 !important;
   
   /* Layout constraints to balance Banjo and the Wheel */
   padding: 24px;
@@ -5349,4 +5362,177 @@ body {
   width: 65%;
   height: 100%;
   justify-content: flex-start; /* Align wheel to the left of the column to bring it closer to the mascot */
+}
+
+/* Global Floating Access Request Modal (Instructor View) */
+.global-pending-approval-overlay {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 99999; /* Ensure it is above everything else, including sidebars */
+  animation: slideDownFade 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+
+@keyframes slideDownFade {
+  from {
+    transform: translate(-50%, -20px);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
+}
+
+.global-pending-approval-card {
+  pointer-events: auto;
+  background: rgba(30, 27, 26, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 2px solid #fbbf24;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(251, 191, 36, 0.25);
+  border-radius: 16px;
+  padding: 16px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  min-width: 300px;
+  max-width: 450px;
+  color: white;
+  text-align: center;
+}
+
+.global-pending-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.global-pending-pulse {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #fbbf24;
+  animation: pulseColor 1.5s infinite ease-in-out;
+}
+
+@keyframes pulseColor {
+  0%, 100% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+}
+
+.global-pending-header h4 {
+  margin: 0;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #fbbf24;
+  font-weight: 800;
+}
+
+.global-pending-names {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.global-pending-names .adult-name {
+  font-size: 1.25rem;
+  font-weight: bold;
+  font-family: 'Risque', serif;
+  color: #ffffff;
+}
+
+.global-pending-names .connector {
+  font-size: 0.9rem;
+  opacity: 0.7;
+  font-weight: bold;
+}
+
+.global-pending-names .child-name {
+  font-size: 1.4rem;
+  font-weight: bold;
+  font-family: 'Risque', serif;
+  color: #fef08a;
+  text-shadow: 0 0 8px rgba(254, 240, 138, 0.3);
+}
+
+.global-pending-actions {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  margin-top: 4px;
+}
+
+.global-pending-actions button {
+  flex: 1;
+  padding: 10px 16px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  font-family: 'Risque', serif;
+}
+
+.global-accept-btn {
+  background: #22c55e;
+  color: white;
+  box-shadow: 0 4px 10px rgba(34, 197, 94, 0.3);
+}
+
+.global-accept-btn:hover {
+  background: #15803d;
+  transform: translateY(-1px);
+}
+
+.global-deny-btn {
+  background: #ef4444;
+  color: white;
+  box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
+}
+
+.global-deny-btn:hover {
+  background: #b91c1c;
+  transform: translateY(-1px);
+}
+
+/* Ensure the parent Instructor View (PC Tile) stretches to fill its grid cell */
+.instructor-view-tile {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    aspect-ratio: 16 / 9 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    overflow: hidden !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    z-index: 20 !important;
+    border-radius: 0 !important;
+}
+
+/* Force the "Make Music" asset to scale perfectly to 100% of the tile boundaries */
+.instructor-view-tile img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: fill !important; /* Stretch image to fit flush to all 4 boundaries */
+    max-width: 100% !important;
+    max-height: 100% !important;
+    border-radius: 0 !important; /* 90 degree angles */
 }

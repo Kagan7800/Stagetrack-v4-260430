@@ -75,7 +75,6 @@ function StageTimerDisplay({ stageTimer, setStageTimer, isInstructorClient }) {
 
 function App() {
   const {
-    MOCK_USER_COUNT,
     participants,
     activeGuestId, setActiveGuestId,
     activeToolbox, setActiveToolbox,
@@ -95,7 +94,9 @@ function App() {
     showStudentStickers,
     showStudentFilters,
     isPeoStickersOpen,
-    stageTimer, setStageTimer
+    stageTimer, setStageTimer,
+    gcUsers,
+    pendingRequest
   } = useAppContext();
 
   const isRhythmWheel = mediaUrl && mediaUrl.includes('1,2,3,4');
@@ -202,16 +203,25 @@ function App() {
     }
   }
 
-  const halfLength = participants.length / 2;
-  const activeCount = participants.filter(p => !p.isBlank).length;
-  const isThreePeo = Number(MOCK_USER_COUNT) === 3 || (participants.length === 4 && activeCount === 3);
+  const joinedGuests = participants.filter(p => !p.isBlank && !p.isInstructor && (gcUsers || []).some(u => u.uid === p.id));
+  const instructorUser = participants.find(p => p.isInstructor) || { 
+    id: 'instructor-ic', 
+    name: 'Instructor', 
+    color: '#3b82f6', 
+    initial: 'I', 
+    isInstructor: true 
+  };
 
-  const leftParticipants = isThreePeo 
-    ? [participants[0], participants[1]] 
-    : participants.slice(0, halfLength);
-  const rightParticipantsLandscape = isThreePeo 
-    ? [participants[2], participants[3]] 
-    : participants.slice(halfLength);
+  const leftParticipants = [instructorUser];
+  
+  const rightParticipantsLandscape = joinedGuests.length === 0
+    ? [participants.find(p => p.isBlank) || { id: 'blank-1', isBlank: true, blankIndex: 1 }]
+    : ((joinedGuests.length === 1 || pendingRequest !== null)
+        ? [...joinedGuests, participants.find(p => p.isBlank) || { id: 'blank-1', isBlank: true, blankIndex: 1 }]
+        : joinedGuests
+      );
+
+  const halfLength = Math.max(leftParticipants.length, rightParticipantsLandscape.length);
 
   const toggleITO = () => {
     setIsChatOpen(false); // Close chat if toggling ITO
@@ -441,7 +451,7 @@ function App() {
             data-chat-open={isChatOpen ? "true" : "false"}
           >
             <div className="center-wrapper" style={{ justifyContent: 'center' }}>
-              <div className={`pc-width-keeper ${isSidebarOpen || isChatOpen ? 'pc-sidebar-open' : ''}`}>
+              <div className={`pc-width-keeper ${isChatOpen ? 'pc-sidebar-open' : ''}`}>
                  <div 
                   className={`pc-gt-unified ${mediaType === 'iframe' || mediaType === 'metronome' ? 'metronome-active' : ''} ${isRhythmWheel ? 'rhythm-wheel-container' : 'presentation-container-parent'}`}
                  >
@@ -520,7 +530,7 @@ function App() {
                   {isItoOpen && (
                     <div className="portrait-ito-panel">
                       <div className="toolbox-header-custom">
-                        <span>Instructor Tools</span>
+                        <span>Class Content</span>
                         <button className="close-panel-btn" onClick={() => setIsSidebarOpen(false)}>✕</button>
                       </div>
                       <InstructorToolbox />
@@ -576,7 +586,7 @@ function App() {
           </div>
         ) : (
           /* Center Grid (Landscape/Desktop) */
-          <div className={`center-grid-area ${isSidebarOpen || isChatOpen ? 'sidebars-open' : ''}`} data-columns={halfLength <= 3 ? "1" : "2"} data-left-open={isSidebarOpen} data-right-open={isChatOpen}>
+          <div className={`center-grid-area ${isChatOpen ? 'sidebars-open' : ''}`} data-columns={halfLength <= 3 ? "1" : "2"} data-left-open={false} data-right-open={isChatOpen}>
              <div className="side-peos" data-columns={halfLength <= 3 ? "1" : "2"}>
                {leftParticipants.map(p => {
                  return (
@@ -616,7 +626,7 @@ function App() {
                   height: '100%', 
                   justifyContent: ((isInstructorClient && showInstructorStickers) || showStudentStickers || showStudentFilters || isPeoStickersOpen || (isInstructorClient && activeItoSection === 'studio')) ? 'space-between' : 'center' 
                 }}>
-                 <div className={`pc-width-keeper ${isSidebarOpen || isChatOpen ? 'pc-sidebar-open' : ''}`}>
+                 <div className={`pc-width-keeper ${isChatOpen ? 'pc-sidebar-open' : ''}`}>
                     <div 
                       className={`pc-gt-unified ${mediaType === 'iframe' || mediaType === 'metronome' ? 'metronome-active' : ''} ${isRhythmWheel ? 'rhythm-wheel-container' : 'presentation-container-parent'}`}
                     >

@@ -15,7 +15,6 @@ export default function UnifiedToolbox({
     activeTheme,
     showStudentStickers, setShowStudentStickers,
     showStudentFilters, setShowStudentFilters,
-    showStudentWhisper, setShowStudentWhisper,
     setActiveItoSection,
     setActiveToolbox,
     isPeoStickersOpen, setIsPeoStickersOpen
@@ -78,6 +77,57 @@ export default function UnifiedToolbox({
     if (itoSidebar) itoSidebar.style.display = 'none';
     if (closeMedia) closeMedia.style.display = 'none';
 
+    // Temporary canvases list to cleanup after screenshot
+    const videoElements = target.querySelectorAll('video');
+    const tempCanvases = [];
+
+    videoElements.forEach((video) => {
+      // Check if video is playing/has data
+      if (video.readyState >= 2) {
+        try {
+          const rect = video.getBoundingClientRect();
+          const canvas = document.createElement('canvas');
+          canvas.width = video.videoWidth || rect.width || 300;
+          canvas.height = video.videoHeight || rect.height || 150;
+          
+          const ctx = canvas.getContext('2d');
+          
+          // Check if video is mirrored (i.e. has scaleX(-1) in styles or class)
+          const computedStyle = window.getComputedStyle(video);
+          const transform = computedStyle.transform;
+          const isMirrored = transform.includes('matrix(-1') || 
+                             video.classList.contains('gc-video-element') || 
+                             video.classList.contains('lobby-camera-video-elem');
+          
+          if (isMirrored) {
+            ctx.translate(canvas.width, 0);
+            ctx.scale(-1, 1);
+          }
+          
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          
+          // Copy styles to make it look identical to the video element
+          canvas.style.position = 'absolute';
+          canvas.style.top = video.style.top || '0';
+          canvas.style.left = video.style.left || '0';
+          canvas.style.width = '100%';
+          canvas.style.height = '100%';
+          canvas.style.objectFit = 'cover';
+          canvas.style.borderRadius = computedStyle.borderRadius || '11px';
+          canvas.style.zIndex = computedStyle.zIndex || '1';
+          
+          // Store mapping to restore later
+          tempCanvases.push({ video, canvas });
+          
+          // Insert canvas and hide video
+          video.parentNode.insertBefore(canvas, video);
+          video.style.opacity = '0';
+        } catch (e) {
+          console.error("Failed to copy video to canvas", e);
+        }
+      }
+    });
+
     setTimeout(() => {
       html2canvas(target, {
         useCORS: true,
@@ -85,6 +135,12 @@ export default function UnifiedToolbox({
         backgroundColor: '#090d16',
         scale: 2
       }).then((canvas) => {
+        // Restore videos and remove temp canvases
+        tempCanvases.forEach(({ video, canvas: tempCanvas }) => {
+          video.style.opacity = '';
+          tempCanvas.remove();
+        });
+
         // Restore DOM styles in case of re-render/cleanup
         if (toolbox) toolbox.style.display = '';
         if (chatSidebar) chatSidebar.style.display = '';
@@ -103,6 +159,11 @@ export default function UnifiedToolbox({
         link.click();
       }).catch((err) => {
         console.error("Screenshot failed:", err);
+        // Restore videos and remove temp canvases
+        tempCanvases.forEach(({ video, canvas: tempCanvas }) => {
+          video.style.opacity = '';
+          tempCanvas.remove();
+        });
         if (toolbox) toolbox.style.display = '';
         if (chatSidebar) chatSidebar.style.display = '';
         if (itoSidebar) itoSidebar.style.display = '';
@@ -143,7 +204,6 @@ export default function UnifiedToolbox({
                   setActiveToolbox("instructor");
                   setShowStudentStickers(false);
                   setShowStudentFilters(false);
-                  setShowStudentWhisper(false);
                 }}
                 style={{ color: '#fbbf24', borderColor: '#fbbf24' }}
               >
@@ -200,25 +260,6 @@ export default function UnifiedToolbox({
             </button>
 
           </div>
-          
-          {/* Whisper Section for Instructors */}
-          {isInstructorClient && (
-            <button 
-              className={`gb-btn ${showStudentWhisper ? 'active' : ''}`}
-              onClick={() => {
-                const nextState = !showStudentWhisper;
-                setShowStudentWhisper(nextState);
-                setShowStudentStickers(false);
-                setShowStudentFilters(false);
-                setActiveItoSection(null);
-                if (nextState) setIsSidebarOpen(false);
-              }}
-              style={{ marginTop: '16px' }}
-            >
-              <MessageSquare size={18} />
-              <span>Private Whisper</span>
-            </button>
-          )}
         </div>
       </div>
     </div>

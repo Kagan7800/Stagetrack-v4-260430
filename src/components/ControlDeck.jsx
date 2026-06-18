@@ -18,12 +18,15 @@ export default function ControlDeck() {
     stageTimer, setStageTimer,
     activeTheme, setActiveTheme,
     resetStudentState,
-    spotlightGuestId, setSpotlightGuestId
+    spotlightGuestId, setSpotlightGuestId,
+    handleToggleInvite, isFirebaseUpdating,
+    sendWhisper, isChatOpen, setIsChatOpen
   } = useAppContext();
 
   const isInstructorClient = sessionStorage.getItem('stagetrack_role') !== 'student';
   const fileInputRef = useRef(null);
-  const [activeCdTab, setActiveCdTab] = useState(null); // 'timer', 'system', 'upload', or 'activities'
+  const [activeCdTab, setActiveCdTab] = useState(null); // 'timer', 'system', 'upload', 'activities', or 'whisper'
+  const [whisperText, setWhisperText] = useState('');
 
   const activities = [
     { name: '1,2,3,4 Wheel', filename: '1,2,3,4_wheel.html' },
@@ -89,6 +92,13 @@ export default function ControlDeck() {
         if (targetBtns[fId]) handleToggleGuestButton(targetId, fId);
       });
     }
+  };
+
+  const handleSendWhisper = () => {
+    if (!activeGuest) return;
+    if (!whisperText.trim()) return;
+    sendWhisper(activeGuest.id, whisperText.trim());
+    setWhisperText('');
   };
 
   return (
@@ -313,13 +323,15 @@ export default function ControlDeck() {
 
             <h2>
               {activeCdTab === 'timer' 
-                ? 'STAGE TIMER' 
+                ? 'TIMER' 
                 : activeCdTab === 'system' 
                 ? 'SYSTEM' 
                 : activeCdTab === 'upload' 
-                ? 'UPLOAD MEDIA' 
+                ? 'UPLOADS' 
                 : activeCdTab === 'activities' 
                 ? 'ACTIVITIES' 
+                : activeCdTab === 'whisper'
+                ? 'WHISPER'
                 : showInstructorStickers 
                 ? 'INSTRUCTOR REWARDS' 
                 : (showStudentStickers || isPeoStickersOpen)
@@ -332,25 +344,11 @@ export default function ControlDeck() {
             {activeCdTab === null && !showInstructorStickers && !showStudentStickers && !isPeoStickersOpen && !showStudentFilters ? (
               <>
                 <div className="controls-row top-row">
-                  {/* INVITE */}
                   <button 
-                    onClick={async () => {
-                      const params = new URLSearchParams(window.location.search);
-                      const sid = params.get('session');
-                      if (!sid) {
-                        alert("No active session to invite to.");
-                        return;
-                      }
-                      const inviteUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?session=' + sid;
-                      try {
-                        await navigator.clipboard.writeText(inviteUrl);
-                        alert("Invite link copied to clipboard!");
-                      } catch {
-                        prompt("Copy this link:", inviteUrl);
-                      }
-                    }}
+                    onClick={handleToggleInvite}
+                    disabled={isFirebaseUpdating}
                   >
-                    INVITE
+                    {isFirebaseUpdating ? 'Generating...' : 'INVITE'}
                   </button>
 
                   {/* SPOTLIGHT */}
@@ -388,19 +386,36 @@ export default function ControlDeck() {
                 </div>
 
                 <div className="controls-row middle-row">
-                  {/* UPLOAD MEDIA */}
-                  <button onClick={() => setActiveCdTab('upload')}>
-                    UPLOAD MEDIA
+                  {/* UPLOADS */}
+                  <button 
+                    onClick={() => setActiveCdTab(activeCdTab === 'upload' ? null : 'upload')}
+                    className={activeCdTab === 'upload' ? 'active' : ''}
+                  >
+                    UPLOADS
                   </button>
 
-                  {/* STAGE TIMER */}
-                  <button onClick={() => setActiveCdTab('timer')}>
-                    STAGE TIMER
+                  {/* TIMER */}
+                  <button 
+                    onClick={() => setActiveCdTab(activeCdTab === 'timer' ? null : 'timer')}
+                    className={activeCdTab === 'timer' ? 'active' : ''}
+                  >
+                    TIMER
                   </button>
 
-                  {/* SYSTEM */}
-                  <button onClick={() => setActiveCdTab('system')}>
-                    SYSTEM
+                  {/* WHISPER */}
+                  <button 
+                    onClick={() => setActiveCdTab(activeCdTab === 'whisper' ? null : 'whisper')}
+                    className={activeCdTab === 'whisper' ? 'active' : ''}
+                  >
+                    WHISPER
+                  </button>
+
+                  {/* CHAT */}
+                  <button 
+                    onClick={() => setIsChatOpen(!isChatOpen)}
+                    className={isChatOpen ? 'active' : ''}
+                  >
+                    CHAT
                   </button>
                 </div>
 
@@ -433,6 +448,14 @@ export default function ControlDeck() {
                     className={showInstructorStickers ? 'active' : ''}
                   >
                     IC STICKERS
+                  </button>
+
+                  {/* SYSTEM */}
+                  <button 
+                    onClick={() => setActiveCdTab(activeCdTab === 'system' ? null : 'system')}
+                    className={activeCdTab === 'system' ? 'active' : ''}
+                  >
+                    SYSTEM
                   </button>
                 </div>
               </>
@@ -573,6 +596,46 @@ export default function ControlDeck() {
                   >
                     Reset
                   </button>
+                )}
+              </div>
+            ) : activeCdTab === 'whisper' ? (
+              <div className="controls-row middle-row" style={{ width: '100%', margin: '0.5rem 0', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
+                {activeGuest ? (
+                  <>
+                    <input
+                      type="text"
+                      className="whisper-input"
+                      placeholder={`Whisper to ${activeGuest.name}...`}
+                      value={whisperText}
+                      onChange={(e) => setWhisperText(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          handleSendWhisper();
+                        }
+                      }}
+                      style={{ 
+                        flex: 1, 
+                        maxWidth: '300px', 
+                        padding: '6px 12px', 
+                        borderRadius: '6px', 
+                        border: '1px solid var(--glass-border)', 
+                        background: 'rgba(0,0,0,0.4)', 
+                        color: 'white', 
+                        fontSize: '0.85rem',
+                        fontFamily: 'inherit'
+                      }}
+                    />
+                    <button
+                      onClick={handleSendWhisper}
+                      style={{ background: 'var(--primary-color)', color: 'white' }}
+                    >
+                      Send
+                    </button>
+                  </>
+                ) : (
+                  <span style={{ color: '#ef4444', fontSize: '0.85rem', fontWeight: 'bold' }}>
+                    Please select a student in the grid first to whisper!
+                  </span>
                 )}
               </div>
             ) : activeCdTab === 'system' ? (

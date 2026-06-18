@@ -130,12 +130,12 @@
             container-type: size;
             
             /* XPRIZE/Engineering: Uses vmin to guarantee a perfect circle that scales responsively */
-            width: 80vmin;
-            height: 80vmin;
+            width: 100vmin;
+            height: 100vmin;
             
             /* Max/Min safety constraints so it never breaks layout boundaries or cuts off */
-            max-width: 95%;
-            max-height: 95%;
+            max-width: 100%;
+            max-height: 100%;
             min-width: 150px;
             min-height: 150px;
             
@@ -207,13 +207,7 @@
 
         /* Control UI Status Tip */
         .status-tip {
-            display: none;
-            position: absolute;
-            bottom: 4vh;
-            font-size: 2.2vh;
-            color: #94a3b8;
-            font-weight: 600;
-            letter-spacing: 1px;
+            display: none !important;
         }
     </style>
 </head>
@@ -245,9 +239,13 @@
     </div>
 
     <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        let mode = urlParams.get('mode') || 'normal'; // 'normal', 'spacebar', 'bpm'
+        let bpm = parseInt(urlParams.get('bpm')) || 60;
+
         let currentStep = 1;
         let totalStepsExecuted = 0;
-        let maxStepsAllowed = 16; // Runs the 1,2,3,4 sequence exactly 4 times (16 beats)
+        let maxStepsAllowed = 16; // Runs the 1,2,3,4 sequence exactly 4 times (16 beats) in normal mode
         let timerInterval = null;
         let isRunning = false;
         let expectedTime = null;
@@ -270,7 +268,23 @@
             }
         }
 
-        window.addEventListener('load', notifyParent);
+        function initMode() {
+            if (mode === 'spacebar') {
+                tipText.innerText = "⌨️ Press Spacebar or Click to go to next number.";
+                tipText.style.display = 'block';
+            } else if (mode === 'bpm') {
+                tipText.innerText = `⚡ BPM mode: ${bpm} BPM. Click or Spacebar to start.`;
+                tipText.style.display = 'block';
+            } else {
+                tipText.innerText = "🖱️ Click Anywhere to Start Rhythm Beat";
+                tipText.style.display = 'none';
+            }
+        }
+
+        window.addEventListener('load', () => {
+            initMode();
+            notifyParent();
+        });
 
         function updateClapVisuals(step) {
             // Instantly toggle the "Clap!" bubble popups based on beat numbers
@@ -310,10 +324,19 @@
             }
         }
 
+        function advanceStep() {
+            // Progress step order cleanly clockwise
+            currentStep = (currentStep % 4) + 1;
+            maskLayer.style.transform = `rotate(${(currentStep - 1) * 90}deg)`;
+            updateClapVisuals(currentStep);
+            updateMascotState(currentStep, true);
+            notifyParent();
+        }
+
         function runRhythmStep() {
             if (!isRunning) return;
 
-            if (totalStepsExecuted >= maxStepsAllowed) {
+            if (mode === 'normal' && totalStepsExecuted >= maxStepsAllowed) {
                 // Auto-stop and clear states once 16 beats are complete
                 isRunning = false;
                 totalStepsExecuted = 0;
@@ -334,18 +357,28 @@
             totalStepsExecuted++;
             notifyParent();
 
-            // High-precision self-correcting timer loop (adjusted to 60 BPM / 1000ms)
+            // High-precision self-correcting timer loop (adjusted based on BPM)
+            const interval = 60000 / bpm;
             const drift = Date.now() - expectedTime;
-            expectedTime += 1000;
-            timerInterval = setTimeout(runRhythmStep, Math.max(0, 1000 - drift));
+            expectedTime += interval;
+            timerInterval = setTimeout(runRhythmStep, Math.max(0, interval - drift));
         }
 
         function toggleSequence() {
+            if (mode === 'spacebar') {
+                advanceStep();
+                return;
+            }
+
             if (isRunning) {
                 // Click to Pause
                 clearTimeout(timerInterval);
                 isRunning = false;
-                tipText.innerText = "⏸️ Paused. Click to resume.";
+                if (mode === 'bpm') {
+                    tipText.innerText = `⏸️ Paused. Click or Spacebar to resume.`;
+                } else {
+                    tipText.innerText = "⏸️ Paused. Click to resume.";
+                }
                 updateMascotState(currentStep, false);
                 notifyParent();
             } else {
@@ -356,9 +389,14 @@
                     totalStepsExecuted = 1;
                 }
                 isRunning = true;
-                tipText.innerText = "⚡ Playing Rhythm... Click to pause.";
-                expectedTime = Date.now() + 1000;
-                timerInterval = setTimeout(runRhythmStep, 1000);
+                const interval = 60000 / bpm;
+                if (mode === 'bpm') {
+                    tipText.innerText = `⚡ Playing Rhythm at ${bpm} BPM... Click to pause.`;
+                } else {
+                    tipText.innerText = "⚡ Playing Rhythm... Click to pause.";
+                }
+                expectedTime = Date.now() + interval;
+                timerInterval = setTimeout(runRhythmStep, interval);
                 updateMascotState(currentStep, true);
                 notifyParent();
             }
@@ -379,6 +417,34 @@
                     maskLayer.style.transform = `rotate(${(currentStep - 1) * 90}deg)`;
                     updateClapVisuals(currentStep);
                     updateMascotState(currentStep, true);
+                }
+            } else if (event.data && event.data.type === 'ADVANCE_STEP') {
+                if (mode === 'spacebar') {
+                    advanceStep();
+                }
+            } else if (event.data && event.data.type === 'SET_MODE') {
+                mode = event.data.mode || 'normal';
+                if (event.data.bpm) {
+                    bpm = event.data.bpm;
+                }
+                // Stop any running timer
+                if (timerInterval) {
+                    clearTimeout(timerInterval);
+                    timerInterval = null;
+                }
+                isRunning = false;
+                totalStepsExecuted = 0;
+                initMode();
+                updateMascotState(currentStep, false);
+                notifyParent();
+            } else if (event.data && event.data.type === 'SET_BPM') {
+                bpm = event.data.bpm || 60;
+                if (mode === 'bpm') {
+                    if (isRunning) {
+                        tipText.innerText = `⚡ Playing Rhythm at ${bpm} BPM... Click to pause.`;
+                    } else {
+                        tipText.innerText = `⚡ BPM mode: ${bpm} BPM. Click or Spacebar to start.`;
+                    }
                 }
             }
         });

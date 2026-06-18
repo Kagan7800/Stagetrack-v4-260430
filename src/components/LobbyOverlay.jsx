@@ -21,7 +21,6 @@ const STO_STICKERS = [
   'Drums.svg',
   'Fish.svg',
   'Flowers 6.svg',
-  'Giraffe.png',
   'Guitar.svg',
   'Kitten.svg',
   'Piano.svg',

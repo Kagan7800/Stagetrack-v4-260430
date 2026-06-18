@@ -1,33 +1,27 @@
 import { useRef, useState, useEffect, useCallback } from 'react';
 import { Eraser, Undo2, Redo2, Trash2 } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
-import { BanjoMascotState } from './BanjoMascotState';
 import { syncWheelBeatToFirebase } from '../firebase';
 
-const isRhythmWheelActivity = (url, type) => {
+const isRhythmWheelActivity = (url) => {
   return url && url.includes('1,2,3,4');
 };
 
-export function CentralStageDeck({ currentBeat, isPlaying, mediaUrl, onClick }) {
+export function CentralStageDeck({ mediaUrl, onClick }) {
   return (
     <div 
       className="central-stage-deck" 
       onClick={onClick}
-      style={{ cursor: 'pointer' }}
+      style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
     >
-      <div className="central-stage-inner">
-        {/* LEFT COLUMN: Banjo Mascot */}
-        <div className="central-stage-column left-col">
-          <BanjoMascotState currentBeat={currentBeat} isPlaying={isPlaying} style={{ marginRight: 0 }} />
-        </div>
-
-        {/* RIGHT COLUMN: The Pure Instrument Frame */}
-        <div className="central-stage-column right-col">
+      <div className="central-stage-inner" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%', maxWidth: 'none', gap: 0 }}>
+        {/* Centered wheel frame */}
+        <div className="central-stage-column" style={{ width: '100%', height: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
           <iframe 
             src={mediaUrl} 
             title="Rhythm Wheel"
             style={{ 
-              height: '90%', 
+              height: '100%', 
               aspectRatio: '1 / 1', 
               maxWidth: '100%', 
               maxHeight: '100%', 
@@ -51,6 +45,9 @@ export default function PresentationContainer({
   const { drawingPaths, setDrawingPaths, mediaType: globalMediaType, sessionId, rhythmBeat } = useAppContext();
   const mediaType = propMediaType || globalMediaType;
 
+  const displayUrl = mediaUrl || '/assets/MF_images/Music_Fun_with_my_Little_One.jpg';
+  const displayType = mediaUrl ? mediaType : (mediaType === 'metronome' ? 'metronome' : 'image');
+
   const canvasRef = useRef(null);
   const contextRef = useRef(null);
   const [isDrawing, setIsDrawing] = useState(false);
@@ -61,15 +58,9 @@ export default function PresentationContainer({
   const selectedColorRef = useRef('#ec4899');
   const currentPathRef = useRef(null);
 
-  const [currentStep, setCurrentStep] = useState(1);
-  const [isRunning, setIsRunning] = useState(false);
-
   useEffect(() => {
     const handleMessage = (event) => {
       if (event.data && event.data.type === 'RHYTHM_UPDATE') {
-        setCurrentStep(event.data.currentStep);
-        setIsRunning(event.data.isRunning);
-
         // Sync to Firebase if we are the instructor client
         const isInstructorClient = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('stagetrack_role') !== 'student' : true;
         if (isInstructorClient && sessionId) {
@@ -81,11 +72,10 @@ export default function PresentationContainer({
     return () => window.removeEventListener('message', handleMessage);
   }, [sessionId]);
 
-  // Student Sync: Snap client mascot and iframe step when Firestore updates
+  // Student Sync: Snap iframe step when Firestore updates
   useEffect(() => {
     const isStudent = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('stagetrack_role') === 'student' : false;
     if (isStudent && rhythmBeat !== undefined) {
-      setCurrentStep(rhythmBeat);
       const iframe = document.querySelector('.central-stage-deck iframe');
       if (iframe && iframe.contentWindow) {
         iframe.contentWindow.postMessage({ type: 'SET_STEP', step: rhythmBeat }, '*');
@@ -98,7 +88,7 @@ export default function PresentationContainer({
       if (e.code === 'Space' || e.key === ' ' || e.keyCode === 32) {
         if (['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName)) return;
         
-        if (mediaUrl && mediaUrl.includes('1,2,3,4_click.html')) {
+        if (displayUrl && (displayUrl.includes('1,2,3,4_click.html') || displayUrl.includes('mode=spacebar'))) {
           e.preventDefault();
           const iframe = document.querySelector('.central-stage-deck iframe');
           if (iframe && iframe.contentWindow) {
@@ -109,10 +99,10 @@ export default function PresentationContainer({
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [mediaUrl]);
+  }, [displayUrl]);
 
   const handleDeckClick = () => {
-    if (mediaUrl && mediaUrl.includes('1,2,3,4_click.html')) {
+    if (displayUrl && (displayUrl.includes('1,2,3,4_click.html') || displayUrl.includes('mode=spacebar'))) {
       const iframe = document.querySelector('.central-stage-deck iframe');
       if (iframe && iframe.contentWindow) {
         iframe.contentWindow.postMessage({ type: 'ADVANCE_STEP' }, '*');
@@ -298,10 +288,10 @@ export default function PresentationContainer({
   return (
     <div className="pc-canvas-area">
       {/* Media Layer */}
-      {(mediaUrl || mediaType === 'metronome') && (
+      {(displayUrl || displayType === 'metronome') && (
         <div 
-          className={`media-container ${mediaType === 'video' ? 'video-active' : ''}`}
-          style={isRhythmWheelActivity(mediaUrl, mediaType) ? {
+          className={`media-container ${displayType === 'video' ? 'video-active' : ''} ${displayType === 'image' ? 'instructor-view-tile' : ''}`}
+          style={isRhythmWheelActivity(displayUrl, displayType) ? {
             position: 'absolute',
             top: 0,
             left: 0,
@@ -315,7 +305,7 @@ export default function PresentationContainer({
             zIndex: 20,
             background: 'transparent',
             overflow: 'visible'
-          } : mediaType === 'iframe' ? { 
+          } : displayType === 'iframe' ? { 
             position: 'absolute',
             top: '50%',
             left: 0,
@@ -327,7 +317,7 @@ export default function PresentationContainer({
             maxHeight: 'none', 
             borderRadius: 0, 
             zIndex: 20
-          } : mediaType === 'video' || mediaType === 'metronome' ? {
+          } : displayType === 'video' || displayType === 'metronome' ? {
             position: 'absolute',
             top: 0,
             left: 0,
@@ -342,31 +332,34 @@ export default function PresentationContainer({
           } : {}}
         >
 
-          {isRhythmWheelActivity(mediaUrl, mediaType) ? (
+          {isRhythmWheelActivity(displayUrl, displayType) ? (
             <CentralStageDeck 
-              currentBeat={currentStep} 
-              isPlaying={isRunning} 
-              mediaUrl={mediaUrl} 
+              mediaUrl={displayUrl} 
               onClick={handleDeckClick}
             />
-          ) : mediaType === 'video' ? (
-            <video src={mediaUrl} controls autoPlay />
-          ) : mediaType === 'iframe' ? (
+          ) : displayType === 'video' ? (
+            <video src={displayUrl} controls autoPlay />
+          ) : displayType === 'iframe' ? (
             <iframe 
-              src={mediaUrl} 
+              src={displayUrl} 
               allowtransparency="true"
               style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none', background: 'transparent', backgroundColor: 'transparent' }} 
               allowFullScreen 
               loading="eager"
               fetchPriority="high"
             />
-          ) : mediaType === 'metronome' ? (
+          ) : displayType === 'metronome' ? (
             null
           ) : (
-            <img src={mediaUrl} alt="Uploaded Media" />
+            <img 
+              src={displayUrl} 
+              alt="Uploaded Media" 
+            />
           )}
         </div>
       )}
+
+
 
       {/* Drawing Canvas Layer */}
       <canvas

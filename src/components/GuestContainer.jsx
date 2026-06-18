@@ -126,7 +126,12 @@ export default function GuestContainer({
     return blank ? blank.id : null;
   }, [participants]);
 
-  const isPending = isInstructorClient && participant.isBlank && participant.id === firstBlankId && pendingRequest !== null;
+  const isPending = isInstructorClient && participant.isBlank && pendingRequest !== null && (
+    participant.id === firstBlankId ||
+    (!firstBlankId && participant.id === 'blank-1') ||
+    (participant.id === 'portrait-blank-top') ||
+    (participant.id === 'portrait-blank-end')
+  );
 
   const isJoinedUser = !participant.isBlank && 
     ((participant.isInstructor && isInstructorClient) || 
@@ -222,15 +227,17 @@ export default function GuestContainer({
           <PeoBorder color="#fbbf24" />
 
           {/* Live webcam feed background (same size as other PEOs, grayscale) */}
-          {pendingStream && (
-            <video 
-              ref={pendingVideoRef} 
-              autoPlay 
-              playsInline 
-              muted 
-              className="gc-video-element grayscale-video"
-            />
-          )}
+          <div className="gc-capture-wrapper" style={{ position: 'absolute', inset: 0, borderRadius: 'inherit', overflow: 'hidden', zIndex: 1, pointerEvents: 'none' }}>
+            {pendingStream && (
+              <video 
+                ref={pendingVideoRef} 
+                autoPlay 
+                playsInline 
+                muted 
+                className="gc-video-element grayscale-video"
+              />
+            )}
+          </div>
 
           {/* Sparkle glisten overlay (only visible to IC) */}
           <div className="sparkle-overlay">
@@ -333,37 +340,39 @@ export default function GuestContainer({
           }
         }}
       >
-        <img 
-          src="/assets/lights.png" 
-          alt="Lights" 
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            zIndex: 2,
-            borderRadius: '12px'
-          }}
-        />
-        {hasCover && (
-          <div 
-            className="peo-background-cover"
+        <div className="gc-capture-wrapper" style={{ position: 'absolute', inset: 0, borderRadius: 'inherit', overflow: 'hidden', zIndex: 1, pointerEvents: 'none' }}>
+          <img 
+            src="/assets/lights.png" 
+            alt="Lights" 
             style={{
               position: 'absolute',
               top: 0,
               left: 0,
-              right: 0,
-              bottom: 0,
-              backgroundImage: `url(${coverData.coverUrl})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              zIndex: 1,
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              zIndex: 2,
               borderRadius: '12px'
             }}
           />
-        )}
+          {hasCover && (
+            <div 
+              className="peo-background-cover"
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundImage: `url(${coverData.coverUrl})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                zIndex: 1,
+                borderRadius: '12px'
+              }}
+            />
+          )}
+        </div>
 
         {/* Special "Attach Link" label for students */}
         {!isInstructorClient && (
@@ -472,15 +481,17 @@ export default function GuestContainer({
         <PeoBorder color={participant.selectedBorder} />
       )}
       {/* Joined user live webcam video stream feed */}
-      {isJoinedUser && !isClosed && joinedStream && (
-        <video 
-          ref={joinedVideoRef} 
-          autoPlay 
-          playsInline 
-          muted 
-          className="gc-video-element"
-        />
-      )}
+      <div className="gc-capture-wrapper" style={{ position: 'absolute', inset: 0, borderRadius: 'inherit', overflow: 'hidden', zIndex: 1, pointerEvents: 'none' }}>
+        {isJoinedUser && !isClosed && joinedStream && (
+          <video 
+            ref={joinedVideoRef} 
+            autoPlay 
+            playsInline 
+            muted 
+            className="gc-video-element"
+          />
+        )}
+      </div>
 
       {/* Selected Icon Sticker Overlay Badge */}
       {participant.selectedIcon && (
@@ -499,9 +510,9 @@ export default function GuestContainer({
             zIndex: 12, 
             display: 'flex', 
             alignItems: 'center', 
-            justifyContent: (participant.isInstructor && isInstructorClient) ? 'space-between' : 'center',
+            justifyContent: 'center',
             gap: '8px',
-            padding: (participant.isInstructor && isInstructorClient) ? '0px 10px' : '2px 6px',
+            padding: (participant.isInstructor && isInstructorClient) ? '0px 24px' : '2px 6px',
             overflow: 'visible'
           }}
         >
@@ -534,8 +545,8 @@ export default function GuestContainer({
                   transform: 'rotate(-15deg)',
                   transition: 'all 0.2s ease',
                   textShadow: (activeItoSection === 'studio') ? '0 0 8px rgba(239, 68, 68, 0.5)' : 'none',
-                  position: 'relative',
-                  left: '-20px'
+                  position: 'absolute',
+                  left: '-12px'
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.color = '#ef4444';
@@ -553,7 +564,18 @@ export default function GuestContainer({
                 I
               </button>
               
-              <span>{participant.name}</span>
+              <span
+                style={{
+                  maxWidth: '100%',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  display: 'inline-block',
+                  textAlign: 'center'
+                }}
+              >
+                {participant.name}
+              </span>
 
               <button
                 onClick={(e) => {
@@ -590,8 +612,8 @@ export default function GuestContainer({
                   transform: 'rotate(15deg)',
                   transition: 'all 0.2s ease',
                   textShadow: (isSidebarOpen && activeToolbox === 'student') ? '0 0 8px rgba(239, 68, 68, 0.5)' : 'none',
-                  position: 'relative',
-                  left: '20px'
+                  position: 'absolute',
+                  right: '-12px'
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.color = '#ef4444';
@@ -721,13 +743,14 @@ export default function GuestContainer({
         const isTrumpet = s.name === 'Trumpet.svg';
         const isSpecialStar = s.name === 'ic star1.png' || s.name === 'ic star1_red.png' || s.name === 'ic_gold_star.png';
         const isItoSticker = isIcSticker || s.position === 'crown' || s.position === 'birthday';
+        const isGiraffe = s.name === 'Giraffe.png';
 
         return (
           <img 
             key={s.id} 
             src={`/assets/svg_stickers/${s.name}`} 
             alt={s.name} 
-            className={`gc-sticker pos-${s.position} ${isIcSticker ? 'ic-placed' : ''} ${(s.name === 'Sun with sunglasses.svg' && typeof s.position === 'number') ? 'sun-special' : ''} ${isLargeSticker ? 'large-sticker' : ''} ${isTrumpet ? 'trumpet-special' : ''} ${isSpecialStar ? 'ic-star-special' : ''}`} 
+            className={`gc-sticker pos-${s.position} ${isIcSticker ? 'ic-placed' : ''} ${(s.name === 'Sun with sunglasses.svg' && typeof s.position === 'number') ? 'sun-special' : ''} ${isLargeSticker ? 'large-sticker' : ''} ${isTrumpet ? 'trumpet-special' : ''} ${isSpecialStar ? 'ic-star-special' : ''} ${isGiraffe ? 'giraffe-special' : ''}`} 
             style={{ ...style, zIndex: (isSpecialStar || isItoSticker) ? 10000 : 11 }}
           />
         );

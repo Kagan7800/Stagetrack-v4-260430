@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from 'react';
+import { useEffect } from 'react';
 import { ChevronRight } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import InstructorToolbox from './InstructorToolbox';
@@ -20,26 +20,6 @@ export default function LeftSidebar() {
   } = useAppContext();
 
   const activeGuest = participants.find(p => p.id === activeGuestId);
-
-  const inactivityTimerRef = useRef(null);
-
-  const resetInactivityTimer = useCallback(() => {
-    if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current);
-    inactivityTimerRef.current = setTimeout(() => {
-      setIsSidebarOpen(false);
-    }, 20000); // 20 seconds
-  }, [setIsSidebarOpen]);
-
-  useEffect(() => {
-    if (isSidebarOpen) {
-      resetInactivityTimer();
-    } else {
-      if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current);
-    }
-    return () => {
-      if (inactivityTimerRef.current) clearTimeout(inactivityTimerRef.current);
-    };
-  }, [isSidebarOpen, resetInactivityTimer]);
 
   // Automatically open the sidebar when a guest is selected
   useEffect(() => {
@@ -104,9 +84,6 @@ export default function LeftSidebar() {
   return (
     <div 
       className="glass-panel sidebar" 
-      onMouseMove={resetInactivityTimer}
-      onClick={resetInactivityTimer}
-      onKeyDown={resetInactivityTimer}
       style={{ 
         height: 'calc(100% + 10px)', 
         marginTop: '-10px',

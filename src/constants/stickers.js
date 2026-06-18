@@ -3,7 +3,8 @@ export const instructorStickers = [
   { id: 'RealCrown.png', name: 'Crown' },
   { id: 'Happy_Birthday.png', name: 'Birthday' },
   { id: 'Star.png', name: 'Star' },
-  { id: 'ic_gold_star.png', name: 'Gold Star' }
+  { id: 'ic_gold_star.png', name: 'Gold Star' },
+  { id: 'Giraffe.png', name: 'Giraffe' }
 ];
 
 export const studentStickers = [
@@ -13,7 +14,6 @@ export const studentStickers = [
   { id: 'Drums.svg', name: 'Drums' },
   { id: 'Fish.svg', name: 'Fish' },
   { id: 'Flowers 6.svg', name: 'Flowers' },
-  { id: 'Giraffe.png', name: 'Giraffe' },
   { id: 'Guitar.svg', name: 'Guitar' },
   { id: 'Kitten.svg', name: 'Kitten' },
   { id: 'Microphone.svg', name: 'Microphone' },

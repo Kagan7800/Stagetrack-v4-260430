@@ -49,15 +49,15 @@ export default function PeoBorder({ color }) {
         stroke={strokeColor} 
         fill="none"
         style={{
-          strokeWidth: 'calc(4px * var(--lobby-scale, 1))',
+          strokeWidth: 'calc(2px * var(--lobby-scale, 1))',
           vectorEffect: 'non-scaling-stroke'
         }}
       >
         <rect 
-          x="2" 
-          y="2" 
-          width="96" 
-          height="96" 
+          x="1" 
+          y="1" 
+          width="98" 
+          height="98" 
           rx="6" 
           ry="6" 
         />

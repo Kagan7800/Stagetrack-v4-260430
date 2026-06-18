@@ -2,6 +2,7 @@
 import { createContext, useContext, useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { doc, onSnapshot, setDoc, updateDoc } from 'firebase/firestore';
 import { db, ensureAuthenticated } from '../firebase';
+import { useGuestContainer } from '../components/StudioLiveLayoutView';
 
 const AppContext = createContext();
 
@@ -9,6 +10,12 @@ export function AppProvider({ children }) {
   const [sessionId, setSessionId] = useState(null);
   const [rhythmBeat, setRhythmBeat] = useState(1);
   const isRemoteUpdate = useRef(false);
+
+  const { gcUsers, handleToggleInvite, isFirebaseUpdating } = useGuestContainer(sessionId, "instructor-ic");
+  const gcUsersRef = useRef([]);
+  useEffect(() => {
+    gcUsersRef.current = gcUsers;
+  }, [gcUsers]);
 
   // Detect if this is a fresh session (tab opened/restored or system restarted)
   useEffect(() => {
@@ -65,6 +72,12 @@ export function AppProvider({ children }) {
   const [isJoined, setIsJoined] = useState(() => {
     try {
       const params = new URLSearchParams(window.location.search);
+      const roleParam = params.get('role');
+      if (roleParam === 'guest' || roleParam === 'student') {
+        sessionStorage.setItem('stagetrack_role', 'student');
+        return false;
+      }
+
       const hasUserParam = params.get('users') || params.get('user') || params.get('count') || params.get('peo') || params.get('peos');
       if (hasUserParam) {
         sessionStorage.setItem('stagetrack_role', 'instructor');
@@ -248,8 +261,8 @@ export function AppProvider({ children }) {
   const [guestStickers, setGuestStickers] = useState({});
   const [equippedSticker, setEquippedSticker] = useState(null);
   const [isDoodling, setIsDoodlingInternal] = useState(false);
-  const [mediaUrl, setMediaUrlInternal] = useState(null);
-  const [mediaType, setMediaTypeInternal] = useState(null);
+  const [mediaUrl, setMediaUrlInternal] = useState('/assets/MF_images/Music_Fun_with_my_Little_One.jpg');
+  const [mediaType, setMediaTypeInternal] = useState('image');
   const [isChatOpen, setIsChatOpen] = useState(false);
 
   // Clear all stickers and buttons globally
@@ -797,8 +810,8 @@ export function AppProvider({ children }) {
     setGuestButtons({});
     setIsDoodlingInternal(false);
     if (mediaUrl) URL.revokeObjectURL(mediaUrl);
-    setMediaUrlInternal(null);
-    setMediaTypeInternal(null);
+    setMediaUrlInternal('/assets/MF_images/Music_Fun_with_my_Little_One.jpg');
+    setMediaTypeInternal('image');
     setIsChatOpen(false);
     setMessages([
       { id: 'initial-1', text: "Hello! Here is a self message in darker purple.", sender: "self", status: "public" },
@@ -901,9 +914,20 @@ export function AppProvider({ children }) {
         selectedBorder: pendingRequest.selectedBorder
       }
     }));
+
+    const currentGcUsers = gcUsersRef.current || [];
+    const newGuestUser = {
+      uid: activeId,
+      role: 'guest',
+      joinedAt: Date.now(),
+      slotIndex: currentGcUsers.length
+    };
+    const updatedGcUsers = [...currentGcUsers.filter(u => u.uid !== activeId), newGuestUser];
+
     updateDoc(doc(db, "sessions", sessionId), { 
       lobbyResponse: { status: 'accepted', joinedUser: { ...pendingRequest, id: activeId } },
-      lobbyRequest: null
+      lobbyRequest: null,
+      activeUsers: updatedGcUsers
     }).catch(e=>console.error(e));
 
     setPendingRequest(null);
@@ -922,6 +946,12 @@ export function AppProvider({ children }) {
     const initFirebaseSession = async () => {
       await ensureAuthenticated();
       const params = new URLSearchParams(window.location.search);
+      const roleParam = params.get('role');
+      if (roleParam === 'guest' || roleParam === 'student') {
+        sessionStorage.setItem('stagetrack_role', 'student');
+        setIsJoined(false);
+      }
+      
       let sid = params.get('session');
       
       if (!sid) {
@@ -1084,7 +1114,8 @@ export function AppProvider({ children }) {
     resetStudentState,
     activeTheme, setActiveTheme,
     spotlightGuestId, setSpotlightGuestId,
-    stageTimer, setStageTimer
+    stageTimer, setStageTimer,
+    gcUsers, handleToggleInvite, isFirebaseUpdating
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
