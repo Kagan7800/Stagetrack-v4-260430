@@ -132,24 +132,26 @@
         #giraffe-arm {
             transition: transform 0.15s cubic-bezier(0.25, 0.8, 0.25, 1.1);
             transform-origin: 0px 0px;
+            transform: rotate(100deg); /* Neutral pointing down */
         }
         #giraffe-arm.raise {
-            transform: rotate(-110deg);
+            transform: rotate(0deg); /* Raised up/left as cropped */
         }
         #giraffe-arm.tap {
-            transform: rotate(-70deg);
+            transform: rotate(40deg); /* Striking down */
         }
 
         #bear-arm {
             transition: transform 0.15s cubic-bezier(0.25, 0.8, 0.25, 1.1);
             transform-origin: 0px 0px;
+            transform: rotate(-100deg); /* Neutral pointing down */
         }
         #bear-arm.slow-raise {
             transition: transform 0.4s ease-in-out;
-            transform: rotate(110deg);
+            transform: rotate(0deg); /* Raised up/left as cropped */
         }
         #bear-arm.tap {
-            transform: rotate(70deg);
+            transform: rotate(-40deg); /* Striking down */
         }
 
         /* Translucent overlay caption bar */
@@ -222,79 +224,30 @@
             <!-- GIRAFFE (left, Banjo) -->
             <g id="giraffe" transform="translate(350,350)">
                 <g id="giraffe-character">
-                    <!-- Body circle -->
-                    <circle cx="0" cy="40" r="90" fill="#F4C96B"/>
-                    <!-- Neck -->
-                    <rect x="-15" y="-120" width="30" height="120" rx="10" fill="#F4C96B"/>
-                    <!-- Head -->
-                    <ellipse cx="0" cy="-140" rx="35" ry="25" fill="#F4C96B"/>
-                    <!-- Ears -->
-                    <ellipse cx="-35" cy="-145" rx="15" ry="8" fill="#F4C96B" transform="rotate(-30, -35, -145)"/>
-                    <ellipse cx="35" cy="-145" rx="15" ry="8" fill="#F4C96B" transform="rotate(30, 35, -145)"/>
-                    <!-- Horns -->
-                    <line x1="-10" y1="-140" x2="-15" y2="-170" stroke="#F4C96B" stroke-width="8" stroke-linecap="round"/>
-                    <circle cx="-15" cy="-170" r="8" fill="#D89A3A"/>
-                    <line x1="10" y1="-140" x2="15" y2="-170" stroke="#F4C96B" stroke-width="8" stroke-linecap="round"/>
-                    <circle cx="15" cy="-170" r="8" fill="#D89A3A"/>
-                    <!-- Spots -->
-                    <circle cx="-30" cy="20" r="12" fill="#D89A3A"/>
-                    <circle cx="30" cy="40" r="14" fill="#D89A3A"/>
-                    <circle cx="-10" cy="-40" r="8" fill="#D89A3A"/>
-                    <circle cx="10" cy="-90" r="8" fill="#D89A3A"/>
-                    <!-- Eyes -->
-                    <g id="giraffe-eyes">
-                        <circle cx="-15" cy="-142" r="8" fill="white"/>
-                        <circle id="giraffe-pupil-l" cx="-15" cy="-142" r="4" fill="#333"/>
-                        <circle cx="15" cy="-142" r="8" fill="white"/>
-                        <circle id="giraffe-pupil-r" cx="15" cy="-142" r="4" fill="#333"/>
-                    </g>
-                    <!-- Smile -->
-                    <path d="M -10 -130 Q 0 -122 10 -130" fill="none" stroke="#333" stroke-width="4" stroke-linecap="round"/>
-                    <!-- Guitar -->
-                    <rect x="-95" y="15" width="70" height="10" rx="3" fill="#D2B48C" transform="rotate(-20)"/>
-                    <ellipse cx="10" cy="15" rx="30" ry="38" fill="#CD853F" transform="rotate(-20)"/>
-                    <ellipse cx="10" cy="15" rx="10" ry="12" fill="#8B4513" transform="rotate(-20)"/>
+                    <!-- High-quality Giraffe Body image -->
+                    <image id="giraffe-body-img" href="/assets/svg_stickers/giraffe_body.png" x="-85" y="-330" width="170" height="510"/>
+
                     <!-- Banjo's Right Arm (for tapping) -->
-                    <g id="giraffe-arm" transform="translate(45, 30)">
-                        <rect x="-9" y="0" width="18" height="70" rx="9" fill="#F4C96B"/>
-                        <rect x="-9" y="60" width="18" height="16" rx="4" fill="#D89A3A"/>
+                    <g id="giraffe-arm" transform="translate(45, -240)">
+                        <image id="giraffe-arm-img" href="/assets/svg_stickers/giraffe_arm.png" x="-35" y="0" width="70" height="120"/>
                     </g>
                     <!-- Label -->
-                    <text x="0" y="90" font-size="28" font-weight="900" fill="#fff" text-anchor="middle" font-family="Arial">BANJO</text>
+                    <text x="0" y="210" font-size="28" font-weight="900" fill="#fff" text-anchor="middle" font-family="Arial">BANJO</text>
                 </g>
             </g>
 
             <!-- BEAR (right) -->
             <g id="bear" transform="translate(1250,350)">
                 <g id="bear-character">
-                    <!-- Body -->
-                    <circle cx="0" cy="40" r="100" fill="#8B6E4A"/>
-                    <!-- Head -->
-                    <circle cx="0" cy="-60" r="70" fill="#8B6E4A"/>
-                    <!-- Ears -->
-                    <circle cx="-60" cy="-110" r="24" fill="#8B6E4A"/>
-                    <circle cx="-60" cy="-110" r="14" fill="#E6A875"/>
-                    <circle cx="60" cy="-110" r="24" fill="#8B6E4A"/>
-                    <circle cx="60" cy="-110" r="14" fill="#E6A875"/>
-                    <!-- Snout -->
-                    <ellipse cx="0" cy="-50" rx="24" ry="18" fill="#E6A875"/>
-                    <ellipse cx="0" cy="-58" rx="12" ry="7" fill="#333"/>
-                    <!-- Eyes -->
-                    <g id="bear-eyes">
-                        <circle cx="-24" cy="-75" r="14" fill="white"/>
-                        <circle id="bear-pupil-l" cx="-24" cy="-75" r="7" fill="#333"/>
-                        <circle cx="24" cy="-75" r="14" fill="white"/>
-                        <circle id="bear-pupil-r" cx="24" cy="-75" r="7" fill="#333"/>
-                    </g>
-                    <!-- Smile -->
-                    <path d="M -10 -44 Q 0 -38 10 -44" fill="none" stroke="#333" stroke-width="4" stroke-linecap="round"/>
+                    <!-- High-quality Bear Body image -->
+                    <image id="bear-body-img" href="/assets/svg_stickers/bear_body.png" x="-95" y="-230" width="190" height="380"/>
+
                     <!-- Bear's Left Arm (for tapping) -->
-                    <g id="bear-arm" transform="translate(-50, 30)">
-                        <rect x="-9" y="0" width="18" height="70" rx="9" fill="#8B6E4A"/>
-                        <rect x="-9" y="60" width="18" height="16" rx="4" fill="#E6A875"/>
+                    <g id="bear-arm" transform="translate(-60, -180)">
+                        <image id="bear-arm-img" href="/assets/svg_stickers/bear_arm.png" x="-35" y="0" width="70" height="110"/>
                     </g>
                     <!-- Label -->
-                    <text x="0" y="90" font-size="28" font-weight="900" fill="#fff" text-anchor="middle" font-family="Arial">BEAR</text>
+                    <text x="0" y="185" font-size="28" font-weight="900" fill="#fff" text-anchor="middle" font-family="Arial">BEAR</text>
                 </g>
             </g>
 
@@ -339,49 +292,8 @@
             }
         }
 
-        function setBearGaze(direction) {
-            const pupilL = document.getElementById('bear-pupil-l');
-            const pupilR = document.getElementById('bear-pupil-r');
-            if (!pupilL || !pupilR) return;
-            if (direction === 'left') {
-                pupilL.setAttribute('cx', '-28');
-                pupilL.setAttribute('cy', '-73');
-                pupilR.setAttribute('cx', '20');
-                pupilR.setAttribute('cy', '-73');
-            } else if (direction === 'down') {
-                pupilL.setAttribute('cx', '-24');
-                pupilL.setAttribute('cy', '-70');
-                pupilR.setAttribute('cx', '24');
-                pupilR.setAttribute('cy', '-70');
-            } else { // straight / default
-                pupilL.setAttribute('cx', '-24');
-                pupilL.setAttribute('cy', '-75');
-                pupilR.setAttribute('cx', '24');
-                pupilR.setAttribute('cy', '-75');
-            }
-        }
-
-        function setGiraffeGaze(direction) {
-            const pupilL = document.getElementById('giraffe-pupil-l');
-            const pupilR = document.getElementById('giraffe-pupil-r');
-            if (!pupilL || !pupilR) return;
-            if (direction === 'right') {
-                pupilL.setAttribute('cx', '-11');
-                pupilL.setAttribute('cy', '-140');
-                pupilR.setAttribute('cx', '19');
-                pupilR.setAttribute('cy', '-140');
-            } else if (direction === 'down') {
-                pupilL.setAttribute('cx', '-15');
-                pupilL.setAttribute('cy', '-138');
-                pupilR.setAttribute('cx', '15');
-                pupilR.setAttribute('cy', '-138');
-            } else { // straight / default
-                pupilL.setAttribute('cx', '-15');
-                pupilL.setAttribute('cy', '-142');
-                pupilR.setAttribute('cx', '15');
-                pupilR.setAttribute('cy', '-142');
-            }
-        }
+        function setBearGaze(direction) {}
+        function setGiraffeGaze(direction) {}
 
         function updateVisuals() {
             clearAnimTimeouts();
