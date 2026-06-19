@@ -4,7 +4,7 @@ import { useAppContext } from '../context/AppContext';
 import { syncWheelBeatToFirebase } from '../firebase';
 
 const isRhythmWheelActivity = (url) => {
-  return url && url.includes('1,2,3,4');
+  return url && url.includes('1,2,3,4_wheel');
 };
 
 export function CentralStageDeck({ mediaUrl, onClick }) {
@@ -76,7 +76,7 @@ export default function PresentationContainer({
   useEffect(() => {
     const isStudent = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('stagetrack_role') === 'student' : false;
     if (isStudent && rhythmBeat !== undefined) {
-      const iframe = document.querySelector('.central-stage-deck iframe');
+      const iframe = document.querySelector('.media-container iframe');
       if (iframe && iframe.contentWindow) {
         iframe.contentWindow.postMessage({ type: 'SET_STEP', step: rhythmBeat }, '*');
       }
@@ -90,7 +90,7 @@ export default function PresentationContainer({
         
         if (displayUrl && (displayUrl.includes('1,2,3,4_click.html') || displayUrl.includes('mode=spacebar'))) {
           e.preventDefault();
-          const iframe = document.querySelector('.central-stage-deck iframe');
+          const iframe = document.querySelector('.media-container iframe');
           if (iframe && iframe.contentWindow) {
             iframe.contentWindow.postMessage({ type: 'ADVANCE_STEP' }, '*');
           }
@@ -102,8 +102,9 @@ export default function PresentationContainer({
   }, [displayUrl]);
 
   const handleDeckClick = () => {
+    if (isDoodling) return;
     if (displayUrl && (displayUrl.includes('1,2,3,4_click.html') || displayUrl.includes('mode=spacebar'))) {
-      const iframe = document.querySelector('.central-stage-deck iframe');
+      const iframe = document.querySelector('.media-container iframe');
       if (iframe && iframe.contentWindow) {
         iframe.contentWindow.postMessage({ type: 'ADVANCE_STEP' }, '*');
       }
@@ -286,7 +287,7 @@ export default function PresentationContainer({
   };
 
   return (
-    <div className="pc-canvas-area">
+    <div className="pc-canvas-area" onClick={handleDeckClick}>
       {/* Media Layer */}
       {(displayUrl || displayType === 'metronome') && (
         <div 

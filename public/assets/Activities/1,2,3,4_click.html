@@ -4,209 +4,126 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>1,2,3,4_click</title>
-    <link href="https://fonts.googleapis.com/css2?family=Risque&display=swap" rel="stylesheet">
     <style>
-        /* Reset and eliminate all browser scrolls/margins to fully cover a 16:9 PC monitor */
         html, body {
             margin: 0;
             padding: 0;
             width: 100%;
             height: 100%;
-            background: transparent;
+            background: #F7EEDD;
             overflow: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-family: 'Risque', serif;
             cursor: pointer;
             user-select: none;
         }
 
-        /* Forces a strict responsive 16:9 widescreen canvas box */
         .canvas-16-9 {
             position: relative;
             width: 100%;
             height: 100%;
-            background: transparent;
-            backdrop-filter: none;
-            -webkit-backdrop-filter: none;
-            border: none;
-            border-radius: 24px;
-            box-shadow: none;
-            box-sizing: border-box;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 8px; /* Minimal padding for safety */
+            box-sizing: border-box;
         }
 
-        /* Banjo Mascot Container */
-        .banjo-container {
-            display: none !important;
-            justify-content: center;
-            align-items: center;
-            width: 43.2vmin;
-            height: 43.2vmin;
-            max-width: 338px;
-            max-height: 338px;
-            min-width: 216px;
-            min-height: 216px;
-            margin-right: 6vmin; /* Spacer between mascot and wheel */
-            position: relative;
-            container-type: size;
-            transition: transform 0.3s ease;
-        }
-
-        .banjo-character {
-            width: 100%;
-            height: 100%;
-            position: relative;
-        }
-
-        /* Vector Mascot Animations & States */
-        .ear, .arm {
-            transition: transform 0.15s cubic-bezier(0.25, 0.8, 0.25, 1.1);
-        }
-
-        /* Pose 1: Idle (Floppy ears down, arms resting at side) */
-        .sprite-idle .left-ear { transform: rotate(0deg); transform-origin: 50px 70px; }
-        .sprite-idle .right-ear { transform: rotate(0deg); transform-origin: 150px 70px; }
-        .sprite-idle .left-arm { transform: rotate(0deg); transform-origin: 55px 140px; }
-        .sprite-idle .right-arm { transform: rotate(0deg); transform-origin: 145px 140px; }
-
-        /* Pose 2: Listening Ears (Ears perking upwards, arms listening) */
-        .sprite-listening-ears .left-ear { transform: rotate(45deg); transform-origin: 50px 70px; }
-        .sprite-listening-ears .right-ear { transform: rotate(-45deg); transform-origin: 150px 70px; }
-        .sprite-listening-ears .left-arm { transform: rotate(-10deg); transform-origin: 55px 140px; }
-        .sprite-listening-ears .right-arm { transform: rotate(10deg); transform-origin: 145px 140px; }
-
-        /* Pose 3: Clapping Hands (Arms clap together in the center) */
-        .sprite-clapping-hands .left-ear { transform: rotate(10deg); transform-origin: 50px 70px; }
-        .sprite-clapping-hands .right-ear { transform: rotate(-10deg); transform-origin: 150px 70px; }
-        .sprite-clapping-hands .left-arm { transform: translate(30px, -12px) rotate(-40deg); transform-origin: 55px 140px; }
-        .sprite-clapping-hands .right-arm { transform: translate(-30px, -12px) rotate(40deg); transform-origin: 145px 140px; }
-
-        /* Disney-style theatrical motion triggers */
-        @keyframes anticipation {
-            0% { transform: scale(1); }
-            50% { transform: translateY(-6%) scale(1.05); }
-            100% { transform: scale(1); }
-        }
-        .animate-anticipation {
-            animation: anticipation 0.22s ease-out;
-        }
-
-        @keyframes strike-pop {
-            0% { transform: scale(1); }
-            30% { transform: scale(1.1) translateY(-3%); }
-            100% { transform: scale(1); }
-        }
-        .animate-strike-pop {
-            animation: strike-pop 0.16s ease-out;
-        }
-
-        /* Starburst graphic popup for visual rhythm reinforcement */
-        .visual-rhythm-burst {
-            position: absolute;
-            top: -2cqw;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 8cqw;
-            animation: burst-fade 0.35s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
-            pointer-events: none;
-            z-index: 15;
-        }
-        @keyframes burst-fade {
-            0% { opacity: 0; transform: translateX(-50%) scale(0.3) rotate(-15deg); }
-            40% { opacity: 1; transform: translateX(-50%) scale(1.4) rotate(10deg); }
-            100% { opacity: 0; transform: translateX(-50%) scale(1) rotate(0deg); }
-        }
-
-        /* Main Blue Circle Background Base - Acts as size container query context */
-        .wheel-base {
-            position: relative;
-            background-color: #0b41cd;
-            border-radius: 50%;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.12);
-            container-type: size;
-            
-            /* XPRIZE/Engineering: Uses vmin to guarantee a perfect circle that scales responsively */
-            width: 100vmin;
-            height: 100vmin;
-            
-            /* Max/Min safety constraints so it never breaks layout boundaries or cuts off */
+        /* SVG Sizing */
+        svg {
             max-width: 100%;
             max-height: 100%;
-            min-width: 150px;
-            min-height: 150px;
-            
-            /* Layout spacing */
-            margin: auto;
-            transition: transform 0.3s ease; /* For a soft, magical scale-up on interaction */
         }
 
-        .wheel-base:hover {
-            /* Disney tactile magic: subtle pop when the instructor or child interacts */
-            transform: scale(1.02); 
-        }
-
-        /* Fixed Numbers Grid Layout - Keeps numbers completely static */
-        .num-quadrant {
-            position: absolute;
-            font-size: 16cqw; /* XPRIZE: Locks size proportionally to the container */
-            font-weight: bold;
-            color: #ffffff;
-            width: 50%;
-            height: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 2; /* Below yellow mask to allow hiding */
-            font-family: 'Risque', serif;
-        }
-        .q1 { top: 0; right: 0; }
-        .q2 { bottom: 0; right: 0; }
-        .q3 { bottom: 0; left: 0; }
-        .q4 { top: 0; left: 0; }
-
-        /* Playful "Clap" Indicator Sparks matching your slide style */
-        .clap-text {
-            font-size: 5.6cqw; /* Locks bubble size proportionally to the wheel container */
-            position: absolute;
-            color: #0b41cd;
-            font-weight: bold;
-            background: #ffffff;
-            padding: 0.8cqw 2.4cqw;
-            border-radius: 2.4cqw;
-            box-shadow: 0 0.8cqw 2cqw rgba(0,0,0,0.1);
-            letter-spacing: 0.2cqw;
-            display: none !important;
-            font-family: 'Risque', serif;
-            z-index: 10; /* Above yellow mask */
+        /* Storyboard Styles */
+        .drum {
+            fill: #FFE4B5;
+            stroke: #D4A574;
+            stroke-width: 6;
         }
         
-        /* Radiating positions for Clap! bubbles relative to container dimensions */
-        .c2_clap { bottom: -3cqw; right: -6cqw; transform: rotate(15deg); }
-        .c3_clap { bottom: -3cqw; left: -6cqw; transform: rotate(-15deg); }
-        .c4_clap { top: -3cqw; left: -6cqw; transform: rotate(15deg); }
-
-        /* The Moving Yellow Mask Layer - Uses a 90-degree CSS mask clip path */
-        .yellow-mask {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #ffe600;
-            border-radius: 50%;
-            z-index: 5; /* Above numbers, below claps */
-            clip-path: polygon(50% 50%, 50% 0%, 0% 0%, 0% 100%, 100% 100%, 100% 50%); /* Fixed top-right cutout */
-            transition: none; /* Metronome-like instant snapping transition */
-            transform-origin: 50% 50%;
-            transform: rotate(0deg);
+        .block {
+            fill: rgba(255, 255, 255, 0.25);
+            stroke: #ffffff;
+            stroke-width: 6;
+            transition: all 0.25s ease;
+        }
+        
+        .label {
+            font-family: Arial, sans-serif;
+            font-size: 80px;
+            fill: #ffffff;
+            text-anchor: middle;
+            dominant-baseline: middle;
+            font-weight: bold;
         }
 
-        /* Control UI Status Tip */
+        .block-group.glowing .block {
+            fill: #FFE600 !important;
+            stroke: #FF9900 !important;
+            filter: drop-shadow(0 0 15px rgba(255, 230, 0, 0.8));
+        }
+
+        /* Dipping drums animation */
+        .drum-group {
+            transition: transform 0.15s cubic-bezier(0.25, 0.8, 0.25, 1.1);
+        }
+        .drum-group.dipped {
+            transform: translateY(20px);
+        }
+
+        /* Character animation transitions */
+        #giraffe {
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        #giraffe.pointing {
+            transform: translate(350px, 350px) rotate(-6deg) scaleY(0.98);
+            transform-origin: 350px 350px;
+        }
+        #giraffe.tap {
+            transform: translate(350px, 350px) rotate(5deg) scaleY(0.95);
+            transform-origin: 350px 350px;
+        }
+        #giraffe.hop {
+            transform: translate(350px, 310px) rotate(3deg);
+            transform-origin: 350px 350px;
+        }
+
+        #bear {
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        #bear.bounce {
+            transform: translate(1250px, 330px) scaleY(0.95);
+            transform-origin: 1250px 350px;
+        }
+        #bear.clap {
+            transform: translate(1250px, 340px) scale(1.1);
+            transform-origin: 1250px 350px;
+        }
+
+        /* Translucent overlay caption bar */
+        .story-caption {
+            position: absolute;
+            bottom: 24px;
+            left: 5%;
+            right: 5%;
+            background: rgba(11, 16, 54, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 16px 24px;
+            color: #ffffff;
+            font-size: 2.2vh;
+            font-weight: 500;
+            line-height: 1.4;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            z-index: 100;
+            font-family: Arial, sans-serif;
+            transition: all 0.3s ease;
+        }
+
         .status-tip {
             display: none !important;
         }
@@ -215,40 +132,125 @@
 <body onclick="advanceStep()">
 
     <div class="canvas-16-9">
-        <!-- Banjo Mascot Vector Drawing Container -->
-        <div id="banjoContainer" class="banjo-container">
-            <div id="banjoCharacter" class="banjo-character sprite-idle">
-                <img src="/assets/svg_stickers/Giraffe.png" alt="Giraffe Mascot" style="width: 100%; height: 100%; object-fit: contain;" />
-            </div>
-        </div>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 600" width="100%" height="100%">
+            <!-- Background -->
+            <rect width="100%" height="100%" fill="#F7EEDD"/>
 
-        <!-- PC Rhythm Wheel -->
-        <div class="wheel-base">
-            <div class="num-quadrant q1">1</div>
-            <div class="num-quadrant q2">2</div>
-            <div class="num-quadrant q3">3</div>
-            <div class="num-quadrant q4">4</div>
+            <!-- Drums (arc) -->
+            <g id="drumGroup1" class="drum-group">
+                <ellipse cx="350" cy="200" rx="120" ry="60" class="drum"/>
+            </g>
+            <g id="drumGroup2" class="drum-group">
+                <ellipse cx="650" cy="200" rx="120" ry="60" class="drum"/>
+            </g>
+            <g id="drumGroup3" class="drum-group">
+                <ellipse cx="950" cy="200" rx="120" ry="60" class="drum"/>
+            </g>
+            <g id="drumGroup4" class="drum-group">
+                <ellipse cx="1250" cy="200" rx="120" ry="60" class="drum"/>
+            </g>
 
-            <div id="maskLayer" class="yellow-mask"></div>
+            <!-- Blocks 1–4 -->
+            <g id="block1" class="block-group">
+                <rect x="250" y="40" width="200" height="200" rx="40" class="block"/>
+                <text x="350" y="150" class="label">1</text>
+            </g>
+            <g id="block2" class="block-group">
+                <rect x="550" y="40" width="200" height="200" rx="40" class="block"/>
+                <text x="650" y="150" class="label">2</text>
+            </g>
+            <g id="block3" class="block-group">
+                <rect x="850" y="40" width="200" height="200" rx="40" class="block"/>
+                <text x="950" y="150" class="label">3</text>
+            </g>
+            <g id="block4" class="block-group">
+                <rect x="1150" y="40" width="200" height="200" rx="40" class="block"/>
+                <text x="1250" y="150" class="label">4</text>
+            </g>
 
-            <span id="clap2" class="clap-text c2_clap">Clap!</span>
-            <span id="clap3" class="clap-text c3_clap">Clap!</span>
-            <span id="clap4" class="clap-text c4_clap">Clap!</span>
-        </div>
+            <!-- GIRAFFE (left, Banjo) -->
+            <g id="giraffe" transform="translate(350,350)">
+                <!-- Body circle -->
+                <circle cx="0" cy="40" r="90" fill="#F4C96B"/>
+                <!-- Neck -->
+                <rect x="-15" y="-120" width="30" height="120" rx="10" fill="#F4C96B"/>
+                <!-- Head -->
+                <ellipse cx="0" cy="-140" rx="35" ry="25" fill="#F4C96B"/>
+                <!-- Ears -->
+                <ellipse cx="-35" cy="-145" rx="15" ry="8" fill="#F4C96B" transform="rotate(-30, -35, -145)"/>
+                <ellipse cx="35" cy="-145" rx="15" ry="8" fill="#F4C96B" transform="rotate(30, 35, -145)"/>
+                <!-- Horns -->
+                <line x1="-10" y1="-140" x2="-15" y2="-170" stroke="#F4C96B" stroke-width="8" stroke-linecap="round"/>
+                <circle cx="-15" cy="-170" r="8" fill="#D89A3A"/>
+                <line x1="10" y1="-140" x2="15" y2="-170" stroke="#F4C96B" stroke-width="8" stroke-linecap="round"/>
+                <circle cx="15" cy="-170" r="8" fill="#D89A3A"/>
+                <!-- Spots -->
+                <circle cx="-30" cy="20" r="12" fill="#D89A3A"/>
+                <circle cx="30" cy="40" r="14" fill="#D89A3A"/>
+                <circle cx="-10" cy="-40" r="8" fill="#D89A3A"/>
+                <circle cx="10" cy="-90" r="8" fill="#D89A3A"/>
+                <!-- Eyes -->
+                <circle cx="-15" cy="-142" r="5" fill="#333"/>
+                <circle cx="15" cy="-142" r="5" fill="#333"/>
+                <!-- Smile -->
+                <path d="M -10 -130 Q 0 -122 10 -130" fill="none" stroke="#333" stroke-width="4" stroke-linecap="round"/>
+                <!-- Guitar -->
+                <rect x="-95" y="15" width="70" height="10" rx="3" fill="#D2B48C" transform="rotate(-20)"/>
+                <ellipse cx="10" cy="15" rx="30" ry="38" fill="#CD853F" transform="rotate(-20)"/>
+                <ellipse cx="10" cy="15" rx="10" ry="12" fill="#8B4513" transform="rotate(-20)"/>
+                <!-- Label -->
+                <text x="0" y="90" font-size="28" font-weight="900" fill="#fff" text-anchor="middle" font-family="Arial">BANJO</text>
+            </g>
 
-        <div id="tipText" class="status-tip">🖱️ Click Anywhere to Start Rhythm Beat</div>
+            <!-- BEAR (right) -->
+            <g id="bear" transform="translate(1250,350)">
+                <!-- Body -->
+                <circle cx="0" cy="40" r="100" fill="#8B6E4A"/>
+                <!-- Head -->
+                <circle cx="0" cy="-60" r="70" fill="#8B6E4A"/>
+                <!-- Ears -->
+                <circle cx="-60" cy="-110" r="24" fill="#8B6E4A"/>
+                <circle cx="-60" cy="-110" r="14" fill="#E6A875"/>
+                <circle cx="60" cy="-110" r="24" fill="#8B6E4A"/>
+                <circle cx="60" cy="-110" r="14" fill="#E6A875"/>
+                <!-- Snout -->
+                <ellipse cx="0" cy="-50" rx="24" ry="18" fill="#E6A875"/>
+                <ellipse cx="0" cy="-58" rx="12" ry="7" fill="#333"/>
+                <!-- Eyes -->
+                <circle cx="-24" cy="-75" r="14" fill="white"/>
+                <circle cx="-20" cy="-75" r="7" fill="#333"/>
+                <circle cx="24" cy="-75" r="14" fill="white"/>
+                <circle cx="28" cy="-75" r="7" fill="#333"/>
+                <!-- Smile -->
+                <path d="M -10 -44 Q 0 -38 10 -44" fill="none" stroke="#333" stroke-width="4" stroke-linecap="round"/>
+                <!-- Label -->
+                <text x="0" y="90" font-size="28" font-weight="900" fill="#fff" text-anchor="middle" font-family="Arial">BEAR</text>
+            </g>
+
+            <!-- Speech Bubbles -->
+            <g id="giraffeBubble" opacity="0" transform="translate(350, 160)">
+                <rect x="-90" y="-70" width="180" height="60" rx="15" fill="white" stroke="#D89A3A" stroke-width="4"/>
+                <polygon points="-12,-12 0,5 12,-12" fill="white" stroke="#D89A3A" stroke-width="4"/>
+                <rect x="-14" y="-14" width="28" height="6" fill="white"/>
+                <text id="giraffeBubbleText" x="0" y="-40" font-size="26" font-weight="bold" fill="#333" text-anchor="middle" dominant-baseline="middle" font-family="Arial">One</text>
+            </g>
+
+            <g id="bearBubble" opacity="0" transform="translate(1250, 240)">
+                <rect x="-90" y="-70" width="180" height="60" rx="15" fill="white" stroke="#8B6E4A" stroke-width="4"/>
+                <polygon points="-12,-12 0,5 12,-12" fill="white" stroke="#8B6E4A" stroke-width="4"/>
+                <rect x="-14" y="-14" width="28" height="6" fill="white"/>
+                <text id="bearBubbleText" x="0" y="-40" font-size="26" font-weight="bold" fill="#333" text-anchor="middle" dominant-baseline="middle" font-family="Arial">One!</text>
+            </g>
+        </svg>
+
+        <!-- Dynamic Translucent Overlay Story Caption -->
+        <div id="story-caption" class="story-caption"></div>
     </div>
 
     <script>
-        let currentStep = 1;
+        let currentStep = 1; // Beat step (1 to 4)
+        let storyPhase = 0;  // Story phase (0 to 5)
         let activeTimeout = null;
-
-        const maskLayer = document.getElementById('maskLayer');
-        const clap2 = document.getElementById('clap2');
-        const clap3 = document.getElementById('clap3');
-        const clap4 = document.getElementById('clap4');
-        const banjoCharacter = document.getElementById('banjoCharacter');
-        const banjoContainer = document.getElementById('banjoContainer');
 
         function notifyParent(step, isRunning) {
             if (window.parent && window.parent !== window) {
@@ -260,58 +262,125 @@
             }
         }
 
-        window.addEventListener('load', function() {
-            notifyParent(currentStep, false);
-        });
+        function updateVisuals() {
+            // 1. Clear all glowing blocks and dipped drums
+            for (let i = 1; i <= 4; i++) {
+                document.getElementById(`block${i}`).classList.remove('glowing');
+                document.getElementById(`drumGroup${i}`).classList.remove('dipped');
+            }
 
-        function updateClapVisuals(step) {
-            // Instantly toggle the "Clap!" bubble popups based on beat numbers
-            clap2.style.display = (step === 2) ? 'block' : 'none';
-            clap3.style.display = (step === 3) ? 'block' : 'none';
-            clap4.style.display = (step === 4) ? 'block' : 'none';
-        }
-
-        function updateMascotState(step) {
-            // Remove previous animation classes
-            banjoContainer.classList.remove('animate-anticipation', 'animate-strike-pop');
+            // 2. Hide speech bubbles
+            const gBubble = document.getElementById('giraffeBubble');
+            const bBubble = document.getElementById('bearBubble');
+            const gBubbleText = document.getElementById('giraffeBubbleText');
+            const bBubbleText = document.getElementById('bearBubbleText');
             
-            // Remove existing burst element
-            const oldBurst = banjoCharacter.querySelector('.visual-rhythm-burst');
-            if (oldBurst) oldBurst.remove();
+            gBubble.style.opacity = '0';
+            bBubble.style.opacity = '0';
 
-            if (step === 1) {
-                banjoCharacter.className = 'banjo-character sprite-listening-ears';
-                // Trigger reflow to restart CSS scale/translation animation
-                void banjoContainer.offsetWidth;
-                banjoContainer.classList.add('animate-anticipation');
-            } else if (step === 2 || step === 3 || step === 4) {
-                banjoCharacter.className = 'banjo-character sprite-clapping-hands';
-                void banjoContainer.offsetWidth;
-                banjoContainer.classList.add('animate-strike-pop');
+            // 3. Reset character animations
+            const giraffe = document.getElementById('giraffe');
+            const bear = document.getElementById('bear');
+            giraffe.className = '';
+            bear.className = '';
 
-                // Create visual rhythm burst star above character head
-                const burst = document.createElement('span');
-                burst.className = 'visual-rhythm-burst';
-                burst.innerText = '🌟';
-                banjoCharacter.appendChild(burst);
+            const caption = document.getElementById('story-caption');
+
+            // 4. Update elements based on story phase and step
+            if (storyPhase === 0) {
+                caption.innerHTML = "<strong>Banjo (Giraffe)</strong> steps forward with a soft strum on his guitar. He sets the emotional tone: <em>'We’re going to count together.'</em>";
+            }
+            else if (storyPhase === 1) { // Banjo's Blocks
+                document.getElementById(`block${currentStep}`).classList.add('glowing');
+                giraffe.className = 'pointing';
+                
+                const counts = ["One", "Two", "Three", "Four"];
+                gBubbleText.textContent = counts[currentStep - 1];
+                gBubble.style.opacity = '1';
+                
+                caption.innerHTML = `<strong>Banjo</strong> introduces the beats visually: Block ${currentStep} glows — <em>"${counts[currentStep - 1]}"</em>`;
+            }
+            else if (storyPhase === 2) { // Banjo's Drums
+                document.getElementById(`drumGroup${currentStep}`).classList.add('dipped');
+                giraffe.className = 'tap';
+                bear.className = 'bounce';
+                
+                const counts = ["One", "Two", "Three", "Four"];
+                gBubbleText.textContent = counts[currentStep - 1];
+                gBubble.style.opacity = '1';
+                
+                caption.innerHTML = `<strong>Banjo</strong> taps Drum ${currentStep} with a soft, toddler-safe motion — <em>"${counts[currentStep - 1]}"</em>. Bear bounces!`;
+            }
+            else if (storyPhase === 3) { // Bear's Turn
+                document.getElementById(`drumGroup${currentStep}`).classList.add('dipped');
+                bear.className = 'bounce';
+                
+                const counts = ["One!", "Two!", "Three!", "Four!"];
+                bBubbleText.textContent = counts[currentStep - 1];
+                bBubble.style.opacity = '1';
+                
+                caption.innerHTML = `<strong>Bear</strong> tries the sequence: He taps Drum ${currentStep} and says <em>"${counts[currentStep - 1]}"</em> (His timing is adorable!)`;
+            }
+            else if (storyPhase === 4) { // Celebration
+                giraffe.className = 'hop';
+                bear.className = 'clap';
+                
+                gBubbleText.textContent = "Yay!";
+                bBubbleText.textContent = "Yay!";
+                gBubble.style.opacity = '1';
+                bBubble.style.opacity = '1';
+                
+                caption.innerHTML = "<strong>Banjo</strong> strums and does a little hop. <strong>Bear</strong> beams and claps! <em>'Yay!'</em>";
+            }
+            else if (storyPhase === 5) { // Repeat together
+                document.getElementById(`block${currentStep}`).classList.add('glowing');
+                document.getElementById(`drumGroup${currentStep}`).classList.add('dipped');
+                giraffe.className = 'tap';
+                bear.className = 'bounce';
+                
+                const gCounts = ["One", "Two", "Three", "Four"];
+                const bCounts = ["One!", "Two!", "Three!", "Four!"];
+                gBubbleText.textContent = gCounts[currentStep - 1];
+                bBubbleText.textContent = bCounts[currentStep - 1];
+                gBubble.style.opacity = '1';
+                bBubble.style.opacity = '1';
+                
+                caption.innerHTML = `They repeat the count together, perfectly synced: Beat ${currentStep} — <em>"${gCounts[currentStep - 1]}"</em>`;
             }
         }
 
-        function advanceStep() {
-            // Progress step order cleanly clockwise
-            currentStep = (currentStep % 4) + 1;
-            maskLayer.style.transform = `rotate(${(currentStep - 1) * 90}deg)`;
-            updateClapVisuals(currentStep);
-            updateMascotState(currentStep);
+        function advanceStep(fromParent = false) {
+            if (storyPhase === 0) {
+                storyPhase = 1;
+                currentStep = 1;
+            } else if (storyPhase === 4) {
+                storyPhase = 5;
+                currentStep = 1;
+            } else {
+                currentStep = (currentStep % 4) + 1;
+                if (currentStep === 1) {
+                    if (storyPhase === 1) storyPhase = 2;
+                    else if (storyPhase === 2) storyPhase = 3;
+                    else if (storyPhase === 3) storyPhase = 4;
+                    else if (storyPhase === 5) storyPhase = 0;
+                }
+            }
 
-            // Notify parent that we are running (beat just hit)
-            notifyParent(currentStep, true);
+            updateVisuals();
 
-            if (activeTimeout) clearTimeout(activeTimeout);
-            activeTimeout = setTimeout(() => {
-                notifyParent(currentStep, false);
-            }, 600);
+            if (!fromParent) {
+                notifyParent(currentStep, true);
+                if (activeTimeout) clearTimeout(activeTimeout);
+                activeTimeout = setTimeout(() => {
+                    notifyParent(currentStep, false);
+                }, 600);
+            }
         }
+
+        window.addEventListener('load', () => {
+            updateVisuals();
+            notifyParent(currentStep, false);
+        });
 
         window.addEventListener('keydown', function(e) {
             if (e.code === 'Space' || e.key === ' ' || e.keyCode === 32) {
@@ -327,10 +396,9 @@
                 } else if (event.data.type === 'SET_STEP') {
                     const step = event.data.step;
                     if (step >= 1 && step <= 4) {
-                        currentStep = step;
-                        maskLayer.style.transform = `rotate(${(currentStep - 1) * 90}deg)`;
-                        updateClapVisuals(currentStep);
-                        updateMascotState(currentStep, true);
+                        if (step !== currentStep) {
+                            advanceStep(true);
+                        }
                     }
                 }
             }
