@@ -20,7 +20,8 @@ export default function ControlDeck() {
     resetStudentState,
     spotlightGuestId, setSpotlightGuestId,
     handleToggleInvite, isFirebaseUpdating,
-    sendWhisper, isChatOpen, setIsChatOpen
+    sendWhisper, isChatOpen, setIsChatOpen,
+    curtainsOpen, setCurtainsOpen
   } = useAppContext();
 
   const isInstructorClient = sessionStorage.getItem('stagetrack_role') !== 'student';
@@ -416,6 +417,14 @@ export default function ControlDeck() {
                     className={isChatOpen ? 'active' : ''}
                   >
                     CHAT
+                  </button>
+
+                  {/* CURTAINS */}
+                  <button 
+                    onClick={() => setCurtainsOpen(!curtainsOpen)}
+                    className={`curtains-btn ${curtainsOpen ? 'open' : 'closed'}`}
+                  >
+                    {curtainsOpen ? '🎬 CLOSE CURTAINS' : '🎭 OPEN CURTAINS'}
                   </button>
                 </div>
 

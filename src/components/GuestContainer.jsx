@@ -1,3 +1,5 @@
+// src/components/GuestContainer.jsx
+
 import { Pause } from 'lucide-react';
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useAppContext } from '../context/AppContext';
@@ -11,20 +13,20 @@ const getGlowColor = (color) => {
   return color;
 };
 
-
 export default function GuestContainer({ 
-  participant, 
-  isActive, 
+  participant = { id: 'blank-1', isBlank: true }, 
+  isActive = false, 
   onClick, 
   onDoubleClick,
   stickers = [],
   buttons = { raiseHand: false, mute: false },
   nudges = {},
-  globalPause
+  globalPause = false,
+  stream = null
 }) {
   const { 
-    participants, 
-    blankCovers, 
+    participants = [], 
+    blankCovers = {}, 
     setBlankCovers, 
     pendingRequest, 
     approveRequest, 
@@ -39,6 +41,11 @@ export default function GuestContainer({
     activeItoSection,
     setActiveItoSection
   } = useAppContext();
+
+  // Ensure safe participant object reference
+  const safeParticipant = participant || { id: 'blank-1', isBlank: true };
+  const pId = safeParticipant.id || 'blank-1';
+
   const [isEditing, setIsEditing] = useState(false);
   
   // Local state for forms
@@ -72,8 +79,6 @@ export default function GuestContainer({
   }, [buttons?.whisper, buttons?.whisperTime]);
 
   // Webcams state
-  const [pendingStream, setPendingStream] = useState(null);
-  const pendingVideoRef = useRef(null);
 
   const [joinedStream, setJoinedStream] = useState(null);
   const joinedVideoRef = useRef(null);
@@ -82,7 +87,6 @@ export default function GuestContainer({
   const lastClickTimeRef = useRef(0);
 
   const handleCellClick = (e) => {
-    // Prevent click handling if target is within edit form or buttons
     if (e.target.closest('.blank-peo-edit-form') || e.target.closest('.edit-blank-btn') || e.target.closest('button')) {
       return;
     }
@@ -91,13 +95,13 @@ export default function GuestContainer({
     const timeSinceLastClick = now - lastClickTimeRef.current;
 
     if (e.detail === 2 || (timeSinceLastClick > 0 && timeSinceLastClick < 450)) {
-      lastClickTimeRef.current = 0; // Reset
+      lastClickTimeRef.current = 0;
       if (clickTimeoutRef.current) {
         clearTimeout(clickTimeoutRef.current);
         clickTimeoutRef.current = null;
       }
       if (onDoubleClick) {
-        onDoubleClick(participant);
+        onDoubleClick(safeParticipant);
       }
       return;
     }
@@ -111,7 +115,7 @@ export default function GuestContainer({
     clickTimeoutRef.current = setTimeout(() => {
       clickTimeoutRef.current = null;
       if (onClick) {
-        onClick(participant);
+        onClick(safeParticipant);
       }
     }, 450);
   };
@@ -119,70 +123,37 @@ export default function GuestContainer({
   const isInstructorClient = sessionStorage.getItem('stagetrack_role') !== 'student';
   const isClosed = globalPause || (buttons && buttons.mute) || false;
 
-  // Find the very first available blank cell dynamically, robust against MOCK_USER_COUNT changes or manual edits
   const firstBlankId = useMemo(() => {
     if (!participants) return null;
-    const blank = participants.find(p => p.isBlank);
+    const blank = participants.find(p => p && p.isBlank);
     return blank ? blank.id : null;
   }, [participants]);
 
-  const isPending = isInstructorClient && participant.isBlank && pendingRequest !== null && (
-    participant.id === firstBlankId ||
-    (!firstBlankId && participant.id === 'blank-1') ||
-    (participant.id === 'portrait-blank-top') ||
-    (participant.id === 'portrait-blank-end')
+  const isPending = isInstructorClient && safeParticipant.isBlank && pendingRequest !== null && (
+    pId === firstBlankId ||
+    (!firstBlankId && pId === 'blank-1') ||
+    (pId === 'portrait-blank-top') ||
+    (pId === 'portrait-blank-end')
   );
 
-  const isJoinedUser = !participant.isBlank && 
-    ((participant.isInstructor && isInstructorClient) || 
-     (participant.id && String(participant.id).startsWith('active-joined')));
+  const shouldShowWebcam = !safeParticipant.isBlank && (
+    (isInstructorClient && safeParticipant.isInstructor) ||
+    (!isInstructorClient && pId === activeGuestId)
+  );
 
-  // Handle webcam stream for pending request slot (Instructor view)
+  // Handle webcam stream for active joined participant (only for local user, fallback if no stream prop provided)
   useEffect(() => {
     let activeStream = null;
-    if (isPending) {
-      navigator.mediaDevices.getUserMedia({ video: true, audio: false })
-        .then((s) => {
-          activeStream = s;
-          setPendingStream(s);
-          if (pendingVideoRef.current) {
-            pendingVideoRef.current.srcObject = s;
-          }
-        })
-        .catch((err) => {
-          console.log("Webcam access blocked in instructor pending view:", err);
-        });
-    } else {
-      const timer = setTimeout(() => {
-        setPendingStream(prev => prev === null ? prev : null);
-      }, 0);
-      return () => clearTimeout(timer);
-    }
-    return () => {
-      if (activeStream) {
-        activeStream.getTracks().forEach(track => track.stop());
-      }
-    };
-  }, [isPending]);
-
-  // Handle webcam stream for active joined participant
-  useEffect(() => {
-    let activeStream = null;
-    if (isJoinedUser && !isClosed) {
+    if (shouldShowWebcam && !isClosed && !stream) {
       if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
         navigator.mediaDevices.getUserMedia({ video: true, audio: false })
           .then((s) => {
             activeStream = s;
             setJoinedStream(s);
-            if (joinedVideoRef.current) {
-              joinedVideoRef.current.srcObject = s;
-            }
           })
           .catch((err) => {
             console.log("Webcam access blocked in joined student view:", err);
           });
-      } else {
-        console.warn("navigator.mediaDevices is not available. Ensure you are on HTTPS or localhost.");
       }
     } else {
       const timer = setTimeout(() => {
@@ -195,12 +166,19 @@ export default function GuestContainer({
         activeStream.getTracks().forEach(track => track.stop());
       }
     };
-  }, [isJoinedUser, isClosed]);
+  }, [shouldShowWebcam, isClosed, stream]);
+
+  // Keep video source object in sync with stream prop or local stream
+  useEffect(() => {
+    if (joinedVideoRef.current) {
+      joinedVideoRef.current.srcObject = stream || joinedStream;
+    }
+  }, [stream, joinedStream]);
 
   // Fetch current values when form is opened
   useEffect(() => {
-    if (participant.isBlank) {
-      const coverData = blankCovers[participant.id] || {};
+    if (safeParticipant.isBlank) {
+      const coverData = (blankCovers && blankCovers[pId]) || {};
       const targetCoverUrl = coverData.coverUrl || '';
       const targetHyperlink = coverData.hyperlink || '';
       const timer = setTimeout(() => {
@@ -209,47 +187,31 @@ export default function GuestContainer({
       }, 0);
       return () => clearTimeout(timer);
     }
-  }, [isEditing, participant.id, participant.isBlank, blankCovers]);
+  }, [isEditing, pId, safeParticipant.isBlank, blankCovers]);
 
   const canEditThisBlank = isInstructorClient;
 
-  if (participant.isBlank) {
+  // RENDER BLANK SLOT
+  if (safeParticipant.isBlank) {
     if (isPending) {
       return (
         <div 
           className="video-cell blank-peo-container pending-request-cell"
           style={{ 
-            backgroundColor: pendingRequest.color, 
+            backgroundColor: pendingRequest?.color || '#1e293b', 
             boxShadow: '0 0 20px #fbbf24',
             cursor: 'default' 
           }}
         >
           <PeoBorder color="#fbbf24" />
 
-          {/* Live webcam feed background (same size as other PEOs, grayscale) */}
-          <div className="gc-capture-wrapper" style={{ position: 'absolute', inset: 0, borderRadius: 'inherit', overflow: 'hidden', zIndex: 1, pointerEvents: 'none' }}>
-            {pendingStream && (
-              <video 
-                ref={pendingVideoRef} 
-                autoPlay 
-                playsInline 
-                muted 
-                className="gc-video-element grayscale-video"
-              />
-            )}
-          </div>
-
-          {/* Sparkle glisten overlay (only visible to IC) */}
           <div className="sparkle-overlay">
             <div className="sparkle" style={{ top: '15%', left: '20%', width: '25px', height: '25px', animationDelay: '0s', animationDuration: '2s' }} />
             <div className="sparkle" style={{ top: '40%', left: '75%', width: '18px', height: '18px', animationDelay: '0.5s', animationDuration: '1.8s' }} />
             <div className="sparkle" style={{ top: '75%', left: '30%', width: '22px', height: '22px', animationDelay: '1.1s', animationDuration: '2.2s' }} />
-            <div className="sparkle" style={{ top: '25%', left: '60%', width: '15px', height: '15px', animationDelay: '0.3s', animationDuration: '1.5s' }} />
-            <div className="sparkle" style={{ top: '65%', left: '80%', width: '20px', height: '20px', animationDelay: '0.8s', animationDuration: '2.1s' }} />
           </div>
 
-          {/* Icon Badge Overlay */}
-          {pendingRequest.selectedIcon && (
+          {pendingRequest?.selectedIcon && (
             <img 
               src={`/assets/svg_stickers/${pendingRequest.selectedIcon}`}
               alt="Selected Icon"
@@ -259,16 +221,16 @@ export default function GuestContainer({
 
           <div className="pending-names-wrapper" style={{ zIndex: 10 }}>
             <span className="pending-label-title">Access Request</span>
-            <span className="pending-adult-name">{pendingRequest.myName}</span>
+            <span className="pending-adult-name">{pendingRequest?.myName || pendingRequest?.name || 'Guest'}</span>
             <span className="pending-connector">&</span>
-            <span className="pending-child-name">{pendingRequest.myLittleOne}</span>
+            <span className="pending-child-name">{pendingRequest?.myLittleOne || ''}</span>
           </div>
 
           <div className="pending-approval-overlay" style={{ zIndex: 10 }}>
-            <button className="accept-request-btn" onClick={(e) => { e.stopPropagation(); approveRequest(); }}>
+            <button className="accept-request-btn" onClick={(e) => { e.stopPropagation(); approveRequest && approveRequest(); }}>
               Accept
             </button>
-            <button className="deny-request-btn" onClick={(e) => { e.stopPropagation(); denyRequest(); }}>
+            <button className="deny-request-btn" onClick={(e) => { e.stopPropagation(); denyRequest && denyRequest(); }}>
               No access
             </button>
           </div>
@@ -276,7 +238,7 @@ export default function GuestContainer({
       );
     }
 
-    const coverData = blankCovers[participant.id] || {};
+    const coverData = (blankCovers && blankCovers[pId]) || {};
     const hasCover = !!coverData.coverUrl;
 
     const convertGoogleDriveLink = (url) => {
@@ -295,7 +257,7 @@ export default function GuestContainer({
       if (file) {
         const reader = new FileReader();
         reader.onloadend = () => {
-          setTempCoverUrl(reader.result); // Base64 representation of image
+          setTempCoverUrl(reader.result);
         };
         reader.readAsDataURL(file);
       }
@@ -306,9 +268,9 @@ export default function GuestContainer({
       if (tempCoverUrl && !tempCoverUrl.startsWith('data:image/')) {
         finalCoverUrl = convertGoogleDriveLink(tempCoverUrl);
       }
-      setBlankCovers(prev => ({
-        ...prev,
-        [participant.id]: {
+      setBlankCovers && setBlankCovers(prev => ({
+        ...(prev || {}),
+        [pId]: {
           coverUrl: finalCoverUrl,
           hyperlink: tempLink
         }
@@ -317,9 +279,9 @@ export default function GuestContainer({
     };
 
     const handleClear = () => {
-      setBlankCovers(prev => {
-        const updated = { ...prev };
-        delete updated[participant.id];
+      setBlankCovers && setBlankCovers(prev => {
+        const updated = { ...(prev || {}) };
+        delete updated[pId];
         return updated;
       });
       setTempCoverUrl('');
@@ -374,14 +336,12 @@ export default function GuestContainer({
           )}
         </div>
 
-        {/* Special "Attach Link" label for students */}
         {!isInstructorClient && (
           <div className="gc-name-badge" style={{ zIndex: 12 }}>
             Attach Link
           </div>
         )}
 
-        {/* Upload Cover Trigger */}
         {canEditThisBlank && !isEditing && (
           <button 
             className="edit-blank-btn"
@@ -395,7 +355,6 @@ export default function GuestContainer({
           </button>
         )}
 
-        {/* Edit Form Overlay */}
         {isEditing && (
           <div className="blank-peo-edit-form" style={{ zIndex: 10 }} onClick={(e) => e.stopPropagation()}>
             <h4>Upload Cover & Link</h4>
@@ -453,22 +412,25 @@ export default function GuestContainer({
     );
   }
 
+  // RENDER PARTICIPANT SLOT
   const showActiveGlow = isActive && !isClosed;
-  const showRaiseHandGlow = buttons.raiseHand && !isClosed;
-  const showGreenFilter = buttons.greenFilter && !isClosed;
-  const showBlueFilter = buttons.blueFilter && !isClosed;
-  const showPurpleFilter = buttons.purpleFilter && !isClosed;
-  const showOrangeFilter = buttons.orangeFilter && !isClosed;
+  const showRaiseHandGlow = buttons?.raiseHand && !isClosed;
+  const showGreenFilter = buttons?.greenFilter && !isClosed;
+  const showBlueFilter = buttons?.blueFilter && !isClosed;
+  const showPurpleFilter = buttons?.purpleFilter && !isClosed;
+  const showOrangeFilter = buttons?.orangeFilter && !isClosed;
   const showGrayscale = isClosed;
-  const isNonInteractive = isClosed || participant.isBlank;
-  const isSpotlight = participant.isBlank;
+  const isNonInteractive = isClosed || safeParticipant.isBlank;
+  const isSpotlight = safeParticipant.isBlank;
 
-  const glowColor = getGlowColor(participant.selectedBorder);
-  const borderStyle = participant.selectedBorder && !isClosed ? {
+  const glowColor = getGlowColor(safeParticipant.selectedBorder);
+  const borderStyle = safeParticipant.selectedBorder && !isClosed ? {
     boxShadow: showActiveGlow 
       ? `0 0 20px #ffffff, 0 0 10px ${glowColor}`
       : `0 0 12px ${glowColor}`
   } : {};
+
+  const safeStickers = Array.isArray(stickers) ? stickers : [];
 
   return (
     <div 
@@ -476,13 +438,12 @@ export default function GuestContainer({
       onClick={handleCellClick}
       style={borderStyle}
     >
-      {/* SVG-based PEO Border component */}
-      {participant.selectedBorder && !isClosed && (
-        <PeoBorder color={participant.selectedBorder} />
+      {safeParticipant.selectedBorder && !isClosed && (
+        <PeoBorder color={safeParticipant.selectedBorder} />
       )}
-      {/* Joined user live webcam video stream feed */}
+
       <div className="gc-capture-wrapper" style={{ position: 'absolute', inset: 0, borderRadius: 'inherit', overflow: 'hidden', zIndex: 1, pointerEvents: 'none' }}>
-        {isJoinedUser && !isClosed && joinedStream && (
+        {(stream || (shouldShowWebcam && joinedStream)) && !isClosed && (
           <video 
             ref={joinedVideoRef} 
             autoPlay 
@@ -493,40 +454,38 @@ export default function GuestContainer({
         )}
       </div>
 
-      {/* Selected Icon Sticker Overlay Badge */}
-      {participant.selectedIcon && (
+      {safeParticipant.selectedIcon && (
         <img 
-          src={`/assets/svg_stickers/${participant.selectedIcon}`}
+          src={`/assets/svg_stickers/${safeParticipant.selectedIcon}`}
           alt="Selected Icon"
           className="gc-sticker pos-1"
         />
       )}
 
-      {/* Name Badge */}
-      {participant.name && (
+      {safeParticipant.name && (
         <div 
-          className={`gc-name-badge ${participant.isInstructor && isInstructorClient ? 'instructor-badge' : ''}`}
+          className={`gc-name-badge ${safeParticipant.isInstructor && isInstructorClient ? 'instructor-badge' : ''}`}
           style={{ 
             zIndex: 12, 
             display: 'flex', 
             alignItems: 'center', 
             justifyContent: 'center',
             gap: '8px',
-            padding: (participant.isInstructor && isInstructorClient) ? '0px 24px' : '2px 6px',
+            padding: (safeParticipant.isInstructor && isInstructorClient) ? '0px 24px' : '2px 6px',
             overflow: 'visible'
           }}
         >
-          {participant.isInstructor && isInstructorClient ? (
+          {safeParticipant.isInstructor && isInstructorClient ? (
             <>
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   const isStudioOpen = activeItoSection === 'studio';
                   if (isStudioOpen) {
-                    setActiveItoSection(null);
+                    setActiveItoSection && setActiveItoSection(null);
                   } else {
-                    setActiveItoSection('studio');
-                    setIsSidebarOpen(false); // Close left panel
+                    setActiveItoSection && setActiveItoSection('studio');
+                    setIsSidebarOpen && setIsSidebarOpen(false);
                   }
                 }}
                 className="ic-toggle-btn"
@@ -548,17 +507,6 @@ export default function GuestContainer({
                   position: 'absolute',
                   left: '-12px'
                 }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.color = '#ef4444';
-                  e.currentTarget.style.transform = 'rotate(-15deg) scale(1.2)';
-                  e.currentTarget.style.textShadow = '0 0 10px rgba(239, 68, 68, 0.5)';
-                }}
-                onMouseLeave={(e) => {
-                  const isStudioActive = activeItoSection === 'studio';
-                  e.currentTarget.style.color = isStudioActive ? '#ef4444' : 'white';
-                  e.currentTarget.style.transform = 'rotate(-15deg) scale(1)';
-                  e.currentTarget.style.textShadow = isStudioActive ? '0 0 8px rgba(239, 68, 68, 0.5)' : 'none';
-                }}
                 title="Toggle Instructor Tools"
               >
                 I
@@ -574,7 +522,7 @@ export default function GuestContainer({
                   textAlign: 'center'
                 }}
               >
-                {participant.name}
+                {safeParticipant.name}
               </span>
 
               <button
@@ -582,18 +530,18 @@ export default function GuestContainer({
                   e.stopPropagation();
                   const isStoOpen = isSidebarOpen && activeToolbox === 'student';
                   if (isStoOpen) {
-                    setIsSidebarOpen(false);
-                    setActiveToolbox(null);
-                    setActiveGuestId(null);
+                    setIsSidebarOpen && setIsSidebarOpen(false);
+                    setActiveToolbox && setActiveToolbox(null);
+                    setActiveGuestId && setActiveGuestId(null);
                   } else {
-                    setActiveToolbox('student');
+                    setActiveToolbox && setActiveToolbox('student');
                     if (!activeGuestId) {
-                      const firstGuest = participants.find(p => !p.isBlank && !p.isInstructor);
+                      const firstGuest = (participants || []).find(p => p && !p.isBlank && !p.isInstructor);
                       if (firstGuest) {
-                        setActiveGuestId(firstGuest.id);
+                        setActiveGuestId && setActiveGuestId(firstGuest.id);
                       }
                     }
-                    setIsSidebarOpen(true);
+                    setIsSidebarOpen && setIsSidebarOpen(true);
                   }
                 }}
                 className="ic-toggle-btn"
@@ -615,54 +563,30 @@ export default function GuestContainer({
                   position: 'absolute',
                   right: '-12px'
                 }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.color = '#ef4444';
-                  e.currentTarget.style.transform = 'rotate(15deg) scale(1.2)';
-                  e.currentTarget.style.textShadow = '0 0 10px rgba(239, 68, 68, 0.5)';
-                }}
-                onMouseLeave={(e) => {
-                  const isStoActive = isSidebarOpen && activeToolbox === 'student';
-                  e.currentTarget.style.color = isStoActive ? '#ef4444' : 'white';
-                  e.currentTarget.style.transform = 'rotate(15deg) scale(1)';
-                  e.currentTarget.style.textShadow = isStoActive ? '0 0 8px rgba(239, 68, 68, 0.5)' : 'none';
-                }}
                 title="Toggle Student Tools"
               >
                 S
               </button>
             </>
           ) : (
-            participant.name
+            safeParticipant.name
           )}
         </div>
       )}
 
-      {/* Hand Raise Glow Layer (z-index: 15) */}
       {showRaiseHandGlow && <div className="hand-raise-glow"></div>}
-
-      {/* Neon Green Filter Overlay (z-index: 18) */}
       {showGreenFilter && <div className="neon-green-overlay"></div>}
-
-      {/* Neon Blue Filter Overlay (z-index: 18) */}
       {showBlueFilter && <div className="neon-blue-overlay"></div>}
-
-      {/* Neon Purple Filter Overlay (z-index: 18) */}
       {showPurpleFilter && <div className="neon-purple-overlay"></div>}
-
-      {/* Neon Orange Filter Overlay (z-index: 18) */}
       {showOrangeFilter && <div className="neon-orange-overlay"></div>}
 
-
-
-      {/* Pause Overlay (transparent, centered pause icon) */}
       {globalPause && (
         <div className="peo-pause-overlay" style={{ zIndex: 12 }}>
           <Pause size={28} color="#ffffff" />
         </div>
       )}
 
-      {/* Whisper Overlay */}
-      {showWhisper && buttons.whisper && (
+      {showWhisper && buttons?.whisper && (
         <div className="peo-whisper-overlay" style={{ zIndex: 25 }}>
           <div className="whisper-bubble">
             {buttons.whisper}
@@ -670,21 +594,20 @@ export default function GuestContainer({
         </div>
       )}
 
-      {/* Stickers */}
-      {stickers.filter(s => !(activeTheme === 'sor' && (s.position === 'confetti' || s.name === 'Confetti.svg'))).map((s) => {
-        const nudge = nudges[s.position] || {};
+      {safeStickers.filter(s => s && !(activeTheme === 'sor' && (s.position === 'confetti' || s.name === 'Confetti.svg'))).map((s) => {
+        const nudge = (nudges && nudges[s.position]) || {};
         let style = {};
         
-        if (s.position === 1) { // top-left
+        if (s.position === 1) {
            style.marginTop = nudge.y ? `${nudge.y}px` : undefined;
            style.marginLeft = nudge.x ? `${nudge.x}px` : undefined;
-        } else if (s.position === 2) { // top-right
+        } else if (s.position === 2) {
            style.marginTop = nudge.y ? `${nudge.y}px` : undefined;
            style.marginRight = nudge.x ? `${-nudge.x}px` : undefined;
-        } else if (s.position === 3) { // bottom-left
+        } else if (s.position === 3) {
            style.marginBottom = nudge.y ? `${-nudge.y}px` : undefined;
            style.marginLeft = nudge.x ? `${nudge.x}px` : undefined;
-        } else if (s.position === 4) { // bottom-right
+        } else if (s.position === 4) {
            style.marginBottom = nudge.y ? `${-nudge.y}px` : undefined;
            style.marginRight = nudge.x ? `${-nudge.x}px` : undefined;
         }
@@ -747,7 +670,7 @@ export default function GuestContainer({
 
         return (
           <img 
-            key={s.id} 
+            key={s.id || `${s.name}-${s.position}`} 
             src={`/assets/svg_stickers/${s.name}`} 
             alt={s.name} 
             className={`gc-sticker pos-${s.position} ${isIcSticker ? 'ic-placed' : ''} ${(s.name === 'Sun with sunglasses.svg' && typeof s.position === 'number') ? 'sun-special' : ''} ${isLargeSticker ? 'large-sticker' : ''} ${isTrumpet ? 'trumpet-special' : ''} ${isSpecialStar ? 'ic-star-special' : ''} ${isGiraffe ? 'giraffe-special' : ''}`} 
@@ -755,7 +678,6 @@ export default function GuestContainer({
           />
         );
       })}
-
     </div>
   );
 }

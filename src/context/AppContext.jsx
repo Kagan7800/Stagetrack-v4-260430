@@ -1,576 +1,388 @@
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useContext, useState, useMemo, useCallback, useEffect, useRef } from 'react';
-import { doc, onSnapshot, setDoc, updateDoc } from 'firebase/firestore';
-import { db, ensureAuthenticated } from '../firebase';
-import { useGuestContainer } from '../components/StudioLiveLayoutView';
+// src/context/AppContext.jsx
 
-const AppContext = createContext();
+import { createContext, useContext, useState, useEffect } from 'react';
+import { db } from '../firebase';
+import { doc, onSnapshot, updateDoc, arrayUnion, setDoc, getDoc } from 'firebase/firestore';
+
+export const AppContext = createContext(null);
 
 export function AppProvider({ children }) {
+  // Session & User Identifiers
   const [sessionId, setSessionId] = useState(null);
-  const [rhythmBeat, setRhythmBeat] = useState(1);
-  const isRemoteUpdate = useRef(false);
-
-  const { gcUsers, handleToggleInvite, isFirebaseUpdating } = useGuestContainer(sessionId, "instructor-ic");
-  const gcUsersRef = useRef([]);
-  useEffect(() => {
-    gcUsersRef.current = gcUsers;
-  }, [gcUsers]);
-
-  // Detect if this is a fresh session (tab opened/restored or system restarted)
-  useEffect(() => {
-    try {
-      const sessionActive = sessionStorage.getItem('stagetrack_session_active');
-      if (!sessionActive) {
-        sessionStorage.setItem('stagetrack_session_active', 'true');
-        // If there's no other active tab updating the heartbeat, clear session storage items in localStorage
-        const lastActiveTime = localStorage.getItem('stagetrack_last_active_time');
-        const isMultiTabSession = lastActiveTime && (Date.now() - Number(lastActiveTime) <= 8000);
-        if (!isMultiTabSession) {
-          localStorage.removeItem('stagetrack_guest_stickers');
-          localStorage.removeItem('stagetrack_guest_buttons');
-          localStorage.removeItem('stagetrack_global_pause');
-          localStorage.removeItem('stagetrack_global_mute');
-          localStorage.removeItem('stagetrack_lobby_request');
-          localStorage.removeItem('stagetrack_lobby_response');
-        }
-      }
-    } catch (e) {
-      console.error('Session initialization error:', e);
-    }
-  }, []);
-
-  const MOCK_USER_COUNT = useMemo(() => {
-    if (typeof window === 'undefined') return 12;
-    try {
-      const params = new URLSearchParams(window.location.search);
-      const urlVal = params.get('users') || params.get('user') || params.get('count') || params.get('peo') || params.get('peos');
-      if (urlVal) {
-        const parsed = parseInt(urlVal, 10);
-        if (!isNaN(parsed) && parsed >= 1 && parsed <= 16) {
-          return parsed;
-        }
-      }
-    } catch { /* ignore */ }
-    return 5;
-  }, []);
-
-  const totalSlots = MOCK_USER_COUNT === 1
-    ? 3
-    : (MOCK_USER_COUNT === 2 
-        ? 2 
-        : (MOCK_USER_COUNT === 3 
-            ? 4 
-            : (MOCK_USER_COUNT === 4 
-                ? 4 
-                : (MOCK_USER_COUNT <= 6 
-                    ? 6 
-                    : (MOCK_USER_COUNT <= 8 
-                        ? 8 
-                        : (MOCK_USER_COUNT <= 12 ? 12 : 16))))));
-
-  const [isJoined, setIsJoined] = useState(() => {
-    try {
-      const params = new URLSearchParams(window.location.search);
-      const roleParam = params.get('role');
-      if (roleParam === 'guest' || roleParam === 'student') {
-        sessionStorage.setItem('stagetrack_role', 'student');
-        return false;
-      }
-
-      const hasUserParam = params.get('users') || params.get('user') || params.get('count') || params.get('peo') || params.get('peos');
-      if (hasUserParam) {
-        sessionStorage.setItem('stagetrack_role', 'instructor');
-        return true;
-      }
-
-      const role = sessionStorage.getItem('stagetrack_role');
-      if (role === 'instructor') {
-        return true;
-      }
-
-      const res = localStorage.getItem('stagetrack_lobby_response');
-      if (res && JSON.parse(res).status === 'accepted') {
-        return true;
-      }
-    } catch { /* ignore */ }
-    return false;
-  });
-
-  const [lobbyStatus, setLobbyStatus] = useState(() => {
-    try {
-      const saved = localStorage.getItem('stagetrack_lobby_response');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (parsed.status === 'pending') return 'waiting';
-        if (parsed.status === 'denied') return 'denied';
-      }
-    } catch {
-      // Ignore parsing errors
-    }
-    return 'initial';
-  });
-  const [pendingRequest, setPendingRequest] = useState(() => {
-    try {
-      const saved = localStorage.getItem('stagetrack_lobby_request');
-      return saved ? JSON.parse(saved) : null;
-    } catch {
-      return null;
-    }
-  });
-
-  const generateDefaultParticipants = useCallback(() => {
-    const getDisplayOrder = (slots) => {
-      if (slots === 2) return [0, 1];
-      if (slots === 3) return [0, 2, 1];
-      if (slots === 4) return [0, 2, 1, 3];
-      if (slots === 6) return [0, 3, 1, 4, 2, 5];
-      if (slots < 8) {
-        return Array.from({ length: slots }, (_, i) => i);
-      }
-      const halfLength = slots / 2;
-      const numRows = slots / 4;
-      const order = [];
-      for (let r = 0; r < numRows; r++) {
-        order.push(r * 2);
-        order.push(r * 2 + 1);
-        order.push(halfLength + r * 2);
-        order.push(halfLength + r * 2 + 1);
-      }
-      return order;
-    };
-
-    const getBlankPriorityList = (slots) => {
-      if (slots === 2) return [];
-      if (slots === 3) return [2, 1];
-      if (slots === 4) return [3, 1];
-      if (slots === 6) return [5, 2];
-      
-      const halfLength = slots / 2;
-      const numRows = slots / 4;
-      
-      const leftColBottomLeft = (numRows - 1) * 2;
-      const leftColBottomRight = (numRows - 1) * 2 + 1;
-      const rightColTopLeft = halfLength;
-      const rightColBottomRight = halfLength + (numRows - 1) * 2 + 1;
-      
-      return [
-        rightColBottomRight,
-        leftColBottomLeft,
-        rightColTopLeft,
-        leftColBottomRight
-      ];
-    };
-
-    const list = new Array(totalSlots);
-
-    // Initialize list with Instructor
-    list[0] = { 
-      id: 'instructor-ic', 
-      name: 'Instructor', 
-      color: '#3b82f6', 
-      initial: 'I', 
-      isInstructor: true 
-    };
-
-    const numBlanks = totalSlots - MOCK_USER_COUNT;
-    const blankPriority = getBlankPriorityList(totalSlots);
-    let blankIndices = blankPriority.slice(0, numBlanks);
-
-    if (MOCK_USER_COUNT === 9) {
-      blankIndices = [11, 6, 4];
-    }
-
-    const blankIndexMap = {};
-    blankIndices.forEach((idx, i) => {
-      blankIndexMap[idx] = i + 1;
-    });
-
-    for (let idx = 1; idx < totalSlots; idx++) {
-      if (blankIndices.includes(idx)) {
-        list[idx] = { 
-          id: `blank-${idx}`, 
-          isBlank: true, 
-          blankIndex: blankIndexMap[idx] 
-        };
-      } else {
-        list[idx] = {
-          id: idx + 1, // temporary placeholder, will be mapped below
-          name: '',
-          color: '',
-          initial: ''
-        };
-      }
-    }
-
-    // Post-processing to assign names and IDs sequentially in display order
-    const displayOrder = getDisplayOrder(totalSlots);
-    let studentCounter = 0;
-    displayOrder.forEach(idx => {
-      if (idx >= list.length || !list[idx]) return;
-      if (list[idx].isInstructor || list[idx].isBlank) return;
-      
-      studentCounter++;
-      const nameVal = String(studentCounter);
-      
-      let mappedSlotNum = idx + 1;
-      if (totalSlots >= 8) {
-        const halfLength = totalSlots / 2;
-        if (idx < halfLength) {
-          const row = Math.floor(idx / 2);
-          const col = idx % 2;
-          mappedSlotNum = row * 4 + col + 1;
-        } else {
-          const rightIdx = idx - halfLength;
-          const row = Math.floor(rightIdx / 2);
-          const col = rightIdx % 2;
-          mappedSlotNum = row * 4 + col + 3;
-        }
-      } else if (totalSlots === 4) {
-        mappedSlotNum = idx === 0 ? 1 : 
-                        idx === 1 ? 2 : 
-                        idx === 2 ? 3 : 4;
-      }
-
-      list[idx].id = mappedSlotNum;
-      list[idx].name = nameVal;
-      list[idx].initial = nameVal;
-      list[idx].color = `hsl(${(studentCounter * 137.5) % 360}, 70%, 60%)`;
-    });
-
-    return list;
-  }, [totalSlots, MOCK_USER_COUNT]);
-
-  const [participants, setParticipants] = useState(() => generateDefaultParticipants());
-  useEffect(() => {
-    if (sessionId && !isRemoteUpdate.current) {
-      updateDoc(doc(db, "sessions", sessionId), { participants }).catch(e=>console.error(e));
-    }
-  }, [participants, sessionId]);
-
+  const [isJoined, setIsJoined] = useState(false);
+  const [lobbyStatus, setLobbyStatus] = useState('initial'); // 'initial' | 'pending' | 'approved' | 'rejected'
   const [activeGuestId, setActiveGuestId] = useState(null);
-  const [activeToolbox, setActiveToolbox] = useState('instructor');
-  const [guestButtons, setGuestButtons] = useState(() => {
-    try {
-      const saved = localStorage.getItem('stagetrack_guest_buttons');
-      return saved ? JSON.parse(saved) : {};
-    } catch {
-      return {};
-    }
-  });
-  const [guestStickers, setGuestStickers] = useState({});
-  const [equippedSticker, setEquippedSticker] = useState(null);
-  const [isDoodling, setIsDoodlingInternal] = useState(false);
-  const [mediaUrl, setMediaUrlInternal] = useState('/assets/MF_images/Music_Fun_with_my_Little_One.jpg');
-  const [mediaType, setMediaTypeInternal] = useState('image');
-  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [pendingRequest, setPendingRequest] = useState(null);
+  const [gcUsers, setGcUsers] = useState([]);
 
-  // Clear all stickers and buttons globally
-  const clearAllStage = useCallback(() => {
-    setGuestStickers({});
-    setGuestButtons({});
-  }, []);
+  // UI & Tool States
+  const [participants, setParticipants] = useState([
+    { id: 'instructor-ic', name: 'Instructor', isInstructor: true, color: '#3b82f6' }
+  ]);
+  const [drawingPaths, setDrawingPaths] = useState([]);
+  const [mediaUrl, setMediaUrl] = useState('/assets/MF_images/Music_Fun_with_my_Little_One.jpg');
+  const [mediaType, setMediaType] = useState('image');
+  const [isChatOpen, setIsChatOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [activeToolbox, setActiveToolbox] = useState(null);
+  const [guestStickers, setGuestStickers] = useState({});
+  const [guestButtons, setGuestButtons] = useState({});
+  const [stickerNudges, setStickerNudges] = useState({});
+  const [isDoodling, setIsDoodling] = useState(false);
+  const [globalMute, setGlobalMute] = useState(false);
+  const [globalPause, setGlobalPause] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [activeTheme, setActiveTheme] = useState('default');
+  const [activeItoSection, setActiveItoSection] = useState(null);
+  const [stageTimer, setStageTimer] = useState(null);
+  const [curtainsOpen, setCurtainsOpen] = useState(true);
   const [showInstructorStickers, setShowInstructorStickers] = useState(false);
   const [showStudentStickers, setShowStudentStickers] = useState(false);
   const [showStudentFilters, setShowStudentFilters] = useState(false);
-  const [showStudentWhisper, setShowStudentWhisper] = useState(false);
   const [isPeoStickersOpen, setIsPeoStickersOpen] = useState(false);
-  const [globalMute, setGlobalMute] = useState(() => {
-    try {
-      const saved = localStorage.getItem('stagetrack_global_mute');
-      return saved === null ? true : saved === 'true';
-    } catch {
-      return true;
-    }
-  });
-  const [globalPause, setGlobalPause] = useState(() => {
-    try {
-      return localStorage.getItem('stagetrack_global_pause') === 'true';
-    } catch {
-      return false;
-    }
-  });
-  const [activeTheme, setActiveTheme] = useState(() => {
-    try {
-      const saved = localStorage.getItem('stagetrack_active_theme');
-      return saved === 'sor' ? 'sor' : 'music-fun';
-    } catch {
-      return 'music-fun';
-    }
-  });
+  const [isFirebaseUpdating, setIsFirebaseUpdating] = useState(false);
 
-  const [spotlightGuestId, setSpotlightGuestId] = useState(null);
-  const [stageTimer, setStageTimer] = useState({ endTime: null, duration: 0, isRunning: false });
-
-  // ITO Section State
-  const [activeItoSection, setActiveItoSection] = useState(null);
-
-  // Sync timers to local storage to persist across refresh
+  // 1. EXTRACT SESSION ID & ENFORCE LOBBY STOPPER ON MOUNT
   useEffect(() => {
-    try {
-      localStorage.setItem('stagetrack_active_theme', activeTheme);
-      if (sessionId && !isRemoteUpdate.current) {
-        updateDoc(doc(db, "sessions", sessionId), { activeTheme }).catch(e=>console.error(e));
+    const urlParams = new URLSearchParams(window.location.search);
+    const paramSession = urlParams.get('session') || 'session-hm898y4nq';
+    const roleParam = urlParams.get('role');
+
+    const isStudent = sessionStorage.getItem('stagetrack_role') === 'student' || 
+                      roleParam === 'guest' || 
+                      roleParam === 'student';
+    
+    const timer = setTimeout(() => {
+      setSessionId(paramSession);
+
+      if (isStudent) {
+        sessionStorage.setItem('stagetrack_role', 'student');
+
+        // Check if session changed from saved session
+        const savedSession = sessionStorage.getItem('stagetrack_session_id');
+        if (paramSession !== savedSession) {
+          sessionStorage.removeItem('stagetrack_lobby_response');
+          sessionStorage.removeItem('stagetrack_active_guest_id');
+          sessionStorage.setItem('stagetrack_session_id', paramSession);
+        }
+
+        // STRICT CHECK: Guest ONLY enters if explicitly approved in sessionStorage
+        const savedRes = sessionStorage.getItem('stagetrack_lobby_response');
+        if (savedRes) {
+          try {
+            const parsed = JSON.parse(savedRes);
+            if ((parsed.status === 'approved' || parsed.status === 'accepted') && parsed.joinedUser) {
+              setIsJoined(true);
+              setLobbyStatus('approved');
+              setActiveGuestId(parsed.joinedUser.id);
+              return;
+            }
+          } catch { /* ignore parse error */ }
+        }
+
+        // IF NOT APPROVED -> FORCE GUEST TO STAY IN LOBBY OVERLAY
+        setIsJoined(false);
+        setLobbyStatus('initial');
+      } else {
+        // Instructor client is joined automatically
+        setIsJoined(true);
+        sessionStorage.setItem('stagetrack_role', 'instructor');
       }
-    } catch { /* ignore */ }
-  }, [activeTheme, sessionId]);
+    }, 0);
 
-  // Keep-alive heartbeat interval to identify active sessions across tabs
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    try {
-      localStorage.setItem('stagetrack_last_active_time', String(Date.now()));
-    } catch { /* ignore */ }
-
-    const interval = setInterval(() => {
-      try {
-        localStorage.setItem('stagetrack_last_active_time', String(Date.now()));
-      } catch { /* ignore */ }
-    }, 2000);
-
-    return () => {
-      clearInterval(interval);
-    };
+    return () => clearTimeout(timer);
   }, []);
 
+  // 1.5. INITIALIZE FIRESTORE SESSION DOCUMENT ON MOUNT FOR INSTRUCTOR (Preserves active session states on reload)
   useEffect(() => {
-    try {
-      localStorage.setItem('stagetrack_guest_buttons', JSON.stringify(guestButtons));
-      if (sessionId && !isRemoteUpdate.current) {
-        updateDoc(doc(db, "sessions", sessionId), { guestButtons }).catch(e=>console.error(e));
-      }
-    } catch { /* ignore */ }
-  }, [guestButtons, sessionId]);
+    if (!sessionId) return;
+    const isInstructor = sessionStorage.getItem('stagetrack_role') === 'instructor';
+    if (!isInstructor) return;
 
-  useEffect(() => {
-    try {
-      localStorage.setItem('stagetrack_guest_stickers', JSON.stringify(guestStickers));
-      if (sessionId && !isRemoteUpdate.current) {
-        updateDoc(doc(db, "sessions", sessionId), { guestStickers }).catch(e=>console.error(e));
-      }
-    } catch { /* ignore */ }
-  }, [guestStickers, sessionId]);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem('stagetrack_global_mute', String(globalMute));
-      if (sessionId && !isRemoteUpdate.current) {
-        updateDoc(doc(db, "sessions", sessionId), { globalMute }).catch(e=>console.error(e));
-      }
-    } catch { /* ignore */ }
-  }, [globalMute, sessionId]);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem('stagetrack_global_pause', String(globalPause));
-      if (sessionId && !isRemoteUpdate.current) {
-        updateDoc(doc(db, "sessions", sessionId), { globalPause }).catch(e=>console.error(e));
-      }
-    } catch { /* ignore */ }
-  }, [globalPause, sessionId]);
-
-  // Chat Moderation State
-  const [messages, setMessages] = useState([
-    { id: 'initial-1', text: "Hello! Here is a self message in darker purple.", sender: "self", status: "public" },
-    { id: 'initial-2', text: "Hello there! This is a guest message in green.", sender: "other", senderName: "2", status: "public" },
-    { id: 'initial-3', text: "I have a private question/pending issue in red.", sender: "other", senderName: "3", status: "pending" }
-  ]);
-  useEffect(() => {
-    if (sessionId && !isRemoteUpdate.current) {
-      updateDoc(doc(db, "sessions", sessionId), { messages }).catch(e=>console.error(e));
-    }
-  }, [messages, sessionId]);
-
-  // Metronome State
-  const [metronomeBpm, setMetronomeBpm] = useState(120);
-  const [isMetronomePlaying, setIsMetronomePlaying] = useState(false);
-
-  // Drawing Canvas Strokes
-  const [drawingPaths, setDrawingPaths] = useState([]);
-  const [blankCovers, setBlankCovers] = useState({});
-
-
-
-  // If global pause is activated, close the active student STO panel, clear all student stickers and buttons
-  useEffect(() => {
-    if (globalPause) {
-      setTimeout(() => {
-        setActiveGuestId(null);
-        setGuestStickers({});
-        setGuestButtons({});
-      }, 0);
-    }
-  }, [globalPause]);
-
-  // Enforce active guest validity (cannot be blank)
-  useEffect(() => {
-    if (activeGuestId !== null) {
-      const activeGuest = participants.find(p => p.id === activeGuestId);
-      if (!activeGuest || activeGuest.isBlank) {
-        setTimeout(() => {
-          setActiveGuestId(null);
-        }, 0);
-      }
-    }
-  }, [activeGuestId, participants]);
-
-  // MUTUAL EXCLUSIVITY: Doodling vs Upload
-  const setIsDoodling = useCallback((val) => {
-    setIsDoodlingInternal(val);
-    if (val) {
-      // Starting doodling clears upload
-      if (mediaUrl) URL.revokeObjectURL(mediaUrl);
-      setMediaUrlInternal(null);
-      setMediaTypeInternal(null);
-    }
-  }, [mediaUrl]);
-
-  const setMediaUpload = useCallback((url, type) => {
-    setIsDoodlingInternal(false); // Starting upload clears doodling
-    if (mediaUrl) URL.revokeObjectURL(mediaUrl);
-    setMediaUrlInternal(url);
-    setMediaTypeInternal(type);
-  }, [mediaUrl]);
-
-  const clearMedia = useCallback(() => {
-    if (mediaUrl) URL.revokeObjectURL(mediaUrl);
-    setMediaUrlInternal(null);
-    setMediaTypeInternal(null);
-  }, [mediaUrl]);
-
-  const handleModerateMessage = useCallback((msgId, action) => {
-    setMessages(prev => prev.map(msg => {
-      if (msg.id === msgId) {
-        if (action === 'show') return { ...msg, status: 'public' };
-        if (action === 'ignore') return { ...msg, status: 'ignored' };
-        if (action === 'reply_private') return { ...msg, status: 'private' };
-      }
-      return msg;
-    }));
-
-    if (action === 'show') {
-      setIsChatOpen(true);
-    } else if (action === 'reply_private') {
-      setIsChatOpen(true);
-      setTimeout(() => {
-        setMessages(prev => [
-          ...prev,
-          { id: crypto.randomUUID(), text: "I will answer that privately.", sender: "self", status: "private" }
-        ]);
-      }, 500);
-    }
-  }, [setMessages, setIsChatOpen]);
-
-  const handleSendChatMessage = useCallback((text) => {
-    setMessages(prev => [...prev, { id: crypto.randomUUID(), text, sender: "self", status: "public" }]);
-  }, [setMessages]);
-
-  const toggleGuestButton = useCallback((guestId, btnName) => {
-    setGuestButtons(prev => {
-      const current = prev[guestId] || { raiseHand: false, mute: false, chat: false };
-      const nextVal = !current[btnName];
-      const updated = { ...current, [btnName]: nextVal };
-      
-      if (btnName === 'raiseHand') {
-        if (nextVal) {
-          updated.raiseHandTime = Date.now();
+    const sessionRef = doc(db, "sessions", sessionId);
+    const initDoc = async () => {
+      try {
+        const docSnap = await getDoc(sessionRef);
+        if (!docSnap.exists()) {
+          // Document does not exist, initialize it cleanly
+          await setDoc(sessionRef, {
+            createdAt: Date.now(),
+            activeUsers: [
+              {
+                uid: 'instructor-ic',
+                role: 'ic',
+                isInstructor: true,
+                joinedAt: Date.now(),
+                slotIndex: 0,
+                name: 'Instructor'
+              }
+            ],
+            guestStickers: {},
+            guestButtons: {},
+            messages: [],
+            lobbyRequest: null,
+            lobbyResponse: null,
+            globalMute: false,
+            globalPause: false,
+            activeTheme: 'default',
+            isDoodling: false,
+            mediaUrl: '/assets/MF_images/Music_Fun_with_my_Little_One.jpg',
+            mediaType: 'image',
+            curtainsOpen: true,
+            stageTimer: null,
+            drawingPaths: []
+          });
+          console.log("Session document initialized successfully in Firestore.");
         } else {
-          updated.raiseHandTime = null;
-        }
-      }
-      
-      const filterKeys = ['greenFilter', 'blueFilter', 'purpleFilter', 'orangeFilter'];
-      if (filterKeys.includes(btnName) && nextVal) {
-        filterKeys.forEach(k => {
-          if (k !== btnName) {
-            updated[k] = false;
+          // Document already exists, make sure instructor is in activeUsers if not already there
+          const data = docSnap.data();
+          const hasInstructor = (data.activeUsers || []).some(u => u.uid === 'instructor-ic' || u.isInstructor);
+          if (!hasInstructor) {
+            const instructorUser = {
+              uid: 'instructor-ic',
+              role: 'ic',
+              isInstructor: true,
+              joinedAt: Date.now(),
+              slotIndex: 0,
+              name: 'Instructor'
+            };
+            await updateDoc(sessionRef, {
+              activeUsers: [instructorUser, ...(data.activeUsers || [])]
+            });
+            console.log("Instructor rejoined existing session document in Firestore.");
+          } else {
+            console.log("Instructor already present in existing session document.");
           }
-        });
-      }
-      
-      return {
-        ...prev,
-        [guestId]: updated
-      };
-    });
-  }, [setGuestButtons]);
-
-  const handleToggleGuestButton = useCallback((guestId, btnName) => {
-    const currentState = guestButtons[guestId]?.[btnName] || false;
-    const newState = !currentState;
-    
-    toggleGuestButton(guestId, btnName);
-    
-    if (btnName === 'mute' && newState === true) {
-      setActiveGuestId(null);
-    }
-    
-    if (btnName === 'chat') {
-      setIsChatOpen(newState);
-    }
-  }, [guestButtons, toggleGuestButton, setActiveGuestId]);
-
-  const sendWhisper = useCallback((guestId, message) => {
-    setGuestButtons(prev => {
-      const current = prev[guestId] || { raiseHand: false, mute: false, chat: false };
-      return {
-        ...prev,
-        [guestId]: {
-          ...current,
-          whisper: message,
-          whisperTime: Date.now()
         }
-      };
+      } catch (err) {
+        console.error("Failed to initialize session in Firestore:", err);
+      }
+    };
+    initDoc();
+  }, [sessionId]);
+
+  // 2. FIRESTORE REALTIME SYNC (Handles Lobby Requests, Acceptances, and Room States)
+  useEffect(() => {
+    if (!sessionId) return;
+
+    const sessionRef = doc(db, "sessions", sessionId);
+    const unsubscribe = onSnapshot(sessionRef, (snap) => {
+      if (!snap.exists()) return;
+      const data = snap.data();
+
+      // Instructor side: Catch incoming lobby requests
+      const isInstructor = sessionStorage.getItem('stagetrack_role') === 'instructor';
+      if (isInstructor) {
+        if (data.lobbyRequest) {
+          setPendingRequest(data.lobbyRequest);
+        } else {
+          setPendingRequest(null);
+        }
+      }
+
+      // Guest side: Auto-restore pending status on reload/reconnect if lobbyRequest matches local ID
+      if (!isInstructor && lobbyStatus === 'initial') {
+        const myGuestId = sessionStorage.getItem('stagetrack_active_guest_id');
+        if (myGuestId && data.lobbyRequest && data.lobbyRequest.id === myGuestId) {
+          setLobbyStatus('pending');
+        }
+      }
+
+      // Guest side: Catch approval from Instructor
+      if (!isInstructor && lobbyStatus === 'pending') {
+        const myGuestId = sessionStorage.getItem('stagetrack_active_guest_id');
+        const approvedId = data.lobbyResponse?.approvedGuestId;
+        // Robust matching: exact ID match OR both are guest prefixed IDs ('active-joined') to handle timestamp mismatches
+        const isMatch = approvedId === myGuestId ||
+          (myGuestId && approvedId && myGuestId.startsWith('active-joined') && approvedId.startsWith('active-joined'));
+
+        if (data.lobbyResponse && isMatch) {
+          const status = data.lobbyResponse.status;
+          if (status === 'approved' || status === 'accepted') {
+            const finalGuestId = approvedId || myGuestId || `active-joined-${Date.now()}`;
+            const approvedUser = { id: finalGuestId, name: data.lobbyResponse.guestName || 'Guest' };
+            sessionStorage.setItem('stagetrack_lobby_response', JSON.stringify({
+              status: 'approved',
+              joinedUser: approvedUser
+            }));
+            sessionStorage.setItem('stagetrack_active_guest_id', finalGuestId);
+            setActiveGuestId(finalGuestId);
+            setLobbyStatus('approved');
+            setIsJoined(true);
+          } else if (status === 'rejected' || status === 'denied') {
+            setLobbyStatus('rejected');
+            setIsJoined(false);
+          }
+        }
+      }
+
+      // Guest auto-disconnect check: reset client if guest kicked/room reset
+      if (!isInstructor && isJoined) {
+        const myGuestId = sessionStorage.getItem('stagetrack_active_guest_id');
+        const isStillActive = (data.activeUsers || []).some(u => u.uid === myGuestId);
+        if (!isStillActive) {
+          setIsJoined(false);
+          setLobbyStatus('initial');
+          setActiveGuestId(null);
+          sessionStorage.removeItem('stagetrack_lobby_response');
+          sessionStorage.removeItem('stagetrack_active_guest_id');
+        }
+      }
+
+      // Update active users grid and map to participants list
+      if (data.activeUsers) {
+        setGcUsers(data.activeUsers);
+        const mapped = data.activeUsers.map((u, index) => ({
+          id: u.uid,
+          name: u.name || 'Guest',
+          role: u.role,
+          isInstructor: !!u.isInstructor,
+          color: u.color || `hsl(${(index * 137.5) % 360}, 70%, 60%)`,
+          initial: u.name ? u.name[0].toUpperCase() : '?'
+        }));
+        setParticipants(mapped);
+      }
+
+      // Synchronize other states
+      if (data.mediaUrl !== undefined) setMediaUrl(data.mediaUrl);
+      if (data.mediaType !== undefined) setMediaType(data.mediaType);
+      if (data.isDoodling !== undefined) setIsDoodling(data.isDoodling);
+      if (data.drawingPaths !== undefined) setDrawingPaths(data.drawingPaths);
+      if (data.curtainsOpen !== undefined) setCurtainsOpen(data.curtainsOpen);
+      if (data.globalMute !== undefined) setGlobalMute(data.globalMute);
+      if (data.globalPause !== undefined) setGlobalPause(data.globalPause);
+      if (data.activeTheme !== undefined) setActiveTheme(data.activeTheme);
+      if (data.stageTimer !== undefined) setStageTimer(data.stageTimer);
+      if (data.guestStickers !== undefined) setGuestStickers(data.guestStickers);
+      if (data.guestButtons !== undefined) setGuestButtons(data.guestButtons);
+      if (data.messages !== undefined) setMessages(data.messages);
     });
-  }, [setGuestButtons]);
 
-  const handleAddSticker = useCallback((targetId, stickerName, isInstructor) => {
-    // If it's the instructor adding a sticker to the instructor container
-    if (isInstructor && targetId === 'instructor') {
-      if (stickerName === 'Confetti.svg') {
-        setGuestStickers(prev => {
-          const nextStickers = { ...prev };
-          
-          // Check if any participant does NOT have confetti
-          const anyoneMissingConfetti = participants.some(p => {
-            const current = prev[p.id] || [];
-            return !current.some(s => s.position === 'confetti');
-          });
+    return () => unsubscribe();
+  }, [sessionId, lobbyStatus, isJoined]);
 
-          participants.forEach(p => {
-            let current = [...(prev[p.id] || [])];
-            const existingConfettiIdx = current.findIndex(s => s.position === 'confetti');
-            
-            if (anyoneMissingConfetti) {
-              if (existingConfettiIdx === -1) {
-                current.push({ id: crypto.randomUUID(), name: 'Confetti.svg', position: 'confetti' });
-              }
-            } else {
-              if (existingConfettiIdx !== -1) {
-                current.splice(existingConfettiIdx, 1);
-              }
+  // --- HANDLERS TO UPDATE FIRESTORE AND LOCAL STATE ---
+
+  const approveRequest = async () => {
+    if (!pendingRequest || !sessionId) return;
+    const activeId = pendingRequest.id || `active-joined-${Date.now()}`;
+    const guestDisplayName = pendingRequest.name || `${pendingRequest.myName || 'Guest'}${pendingRequest.myLittleOne ? ' & ' + pendingRequest.myLittleOne : ''}`;
+
+    try {
+      const sessionRef = doc(db, "sessions", sessionId);
+      const newGuestUser = {
+        uid: activeId,
+        role: 'student',
+        isInstructor: false,
+        name: guestDisplayName,
+        joinedAt: Date.now(),
+        slotIndex: gcUsers.length
+      };
+
+      // Add guest to active users, send accepted response, and clear request
+      await updateDoc(sessionRef, {
+        activeUsers: [...gcUsers.filter(u => u.uid !== activeId), newGuestUser],
+        lobbyResponse: {
+          approvedGuestId: activeId,
+          guestName: guestDisplayName,
+          status: 'approved'
+        },
+        lobbyRequest: null
+      });
+
+      if (pendingRequest.selectedIcon) {
+        await updateDoc(sessionRef, {
+          [`guestStickers.${activeId}`]: [
+            {
+              id: crypto.randomUUID(),
+              name: pendingRequest.selectedIcon,
+              position: 1
             }
-            nextStickers[p.id] = current;
-          });
-          
-          return nextStickers;
+          ]
         });
-        return;
       }
 
-      if (stickerName === 'UNDO_ALL_PEO') {
-        setGuestStickers({});
-        return;
-      }
-
-      if (activeGuestId === null) return;
-      targetId = activeGuestId;
+      setPendingRequest(null);
+    } catch (err) {
+      console.error("Error approving request:", err);
     }
+  };
 
-    // Otherwise, guest/PEO stickers
-    setGuestStickers(prev => {
-      let current = [...(prev[targetId] || [])];
+  const denyRequest = async () => {
+    if (!pendingRequest || !sessionId) return;
+    const activeId = pendingRequest.id;
+
+    try {
+      const sessionRef = doc(db, "sessions", sessionId);
+      await updateDoc(sessionRef, {
+        lobbyResponse: {
+          approvedGuestId: activeId,
+          status: 'rejected'
+        },
+        lobbyRequest: null
+      });
+      setPendingRequest(null);
+    } catch (err) {
+      console.error("Error denying request:", err);
+    }
+  };
+
+  const resetStudentState = async () => {
+    if (!sessionId) return;
+    try {
+      const sessionRef = doc(db, "sessions", sessionId);
+      await updateDoc(sessionRef, {
+        lobbyRequest: null,
+        lobbyResponse: null,
+        activeUsers: [
+          {
+            uid: 'instructor-ic',
+            role: 'ic',
+            isInstructor: true,
+            joinedAt: Date.now(),
+            slotIndex: 0,
+            name: 'Instructor'
+          }
+        ],
+        guestStickers: {},
+        guestButtons: {},
+        messages: [],
+        drawingPaths: [],
+        curtainsOpen: true,
+        globalMute: false,
+        globalPause: false,
+        stageTimer: null,
+        mediaUrl: '/assets/MF_images/Music_Fun_with_my_Little_One.jpg',
+        mediaType: 'image',
+        isDoodling: false,
+        activeTheme: 'default'
+      });
+
+      // Local resets
+      setPendingRequest(null);
+      setGuestStickers({});
+      setGuestButtons({});
+      setMessages([]);
+      setDrawingPaths([]);
+      setCurtainsOpen(true);
+      setGlobalMute(false);
+      setGlobalPause(false);
+      setStageTimer(null);
+      setMediaUrl('/assets/MF_images/Music_Fun_with_my_Little_One.jpg');
+      setMediaType('image');
+      setIsDoodling(false);
+      setActiveTheme('default');
+    } catch (err) {
+      console.error("Error resetting student state:", err);
+    }
+  };
+
+  const handleAddSticker = async (targetId, stickerName, isInstructor) => {
+    if (!sessionId) return;
+    try {
+      const sessionRef = doc(db, "sessions", sessionId);
+      let current = [...(guestStickers[targetId] || [])];
 
       if (stickerName === 'Confetti.svg') {
         const existingConfetti = current.findIndex(s => s.position === 'confetti');
@@ -579,7 +391,8 @@ export function AppProvider({ children }) {
         } else {
           current.push({ id: crypto.randomUUID(), name: stickerName, position: 'confetti' });
         }
-        return { ...prev, [targetId]: current };
+        await updateDoc(sessionRef, { [`guestStickers.${targetId}`]: current });
+        return;
       }
 
       if (!isInstructor && stickerName === 'UNDO_LAST_PEO') {
@@ -587,7 +400,8 @@ export function AppProvider({ children }) {
         if (lastPeoIndex !== -1) {
           current.splice(lastPeoIndex, 1);
         }
-        return { ...prev, [targetId]: current };
+        await updateDoc(sessionRef, { [`guestStickers.${targetId}`]: current });
+        return;
       }
 
       if (isInstructor) {
@@ -595,13 +409,15 @@ export function AppProvider({ children }) {
           const icUndoSlots = ['tc', 'tl-c', 'tr-c', 'lc', 'rc-1', 'rc-2', 'birthday', 'crown'];
           const lastIcIndex = current.findLastIndex(s => icUndoSlots.includes(s.position));
           if (lastIcIndex !== -1) current.splice(lastIcIndex, 1);
-          return { ...prev, [targetId]: current };
+          await updateDoc(sessionRef, { [`guestStickers.${targetId}`]: current });
+          return;
         }
 
         if (stickerName === 'UNDO_ALL_IC') {
           const icUndoSlots = ['tc', 'tl-c', 'tr-c', 'lc', 'rc-1', 'rc-2', 'birthday', 'crown'];
           current = current.filter(s => !icUndoSlots.includes(s.position));
-          return { ...prev, [targetId]: current };
+          await updateDoc(sessionRef, { [`guestStickers.${targetId}`]: current });
+          return;
         }
 
         if (stickerName === 'Happy_Birthday.png') {
@@ -613,7 +429,8 @@ export function AppProvider({ children }) {
             current.push({ id: crypto.randomUUID(), name: 'Happy_Birthday.png', position: 'birthday' });
             current.push({ id: crypto.randomUUID(), name: 'RealCrown.png', position: 'crown' });
           }
-          return { ...prev, [targetId]: current };
+          await updateDoc(sessionRef, { [`guestStickers.${targetId}`]: current });
+          return;
         }
 
         if (stickerName === 'RealCrown.png') {
@@ -624,15 +441,16 @@ export function AppProvider({ children }) {
             current = current.filter(s => s.position !== 'tc' && s.position !== 'crown');
             current.push({ id: crypto.randomUUID(), name: 'RealCrown.png', position: 'crown' });
           }
-          return { ...prev, [targetId]: current };
+          await updateDoc(sessionRef, { [`guestStickers.${targetId}`]: current });
+          return;
         }
       }
 
-      // Check if the sticker already exists (toggle off)
       const existingIndex = current.findIndex(s => s.name === stickerName);
       if (existingIndex !== -1) {
         current.splice(existingIndex, 1);
-        return { ...prev, [targetId]: current };
+        await updateDoc(sessionRef, { [`guestStickers.${targetId}`]: current });
+        return;
       }
 
       const hasSun = current.some(s => s.position === 'sun');
@@ -641,32 +459,24 @@ export function AppProvider({ children }) {
         : ['tc', 'tl-c', 'tr-c', 'lc', 'rc-1', 'rc-2'];
 
       if (isInstructor) {
-        // Calculate consecutive count of active instructor stickers to vary angle and size of each next added sticker
         const activeIcStickersCount = current.filter(s => icSlots.includes(s.position)).length;
         const rotations = [-15, 15, -7, 10, -12, 5, -5, 12, 0];
         const scales = [0.85, 1.15, 0.9, 1.1, 0.95, 1.05, 1.0];
         
-        // Add slight random variations to angle and size to prevent identical overlapping and collisions
-        const randomAngle = (Math.random() - 0.5) * 8; // -4 to +4 degrees variation
-        const randomScale = (Math.random() - 0.5) * 0.1; // -0.05 to +0.05 scale variation
+        const randomAngle = (Math.random() - 0.5) * 8;
+        const randomScale = (Math.random() - 0.5) * 0.1;
         
         const rotation = Number((rotations[activeIcStickersCount % rotations.length] + randomAngle).toFixed(1));
         const scale = Number((scales[activeIcStickersCount % scales.length] + randomScale).toFixed(2));
 
-        // Find the first unoccupied slot among the active slots
         const occupiedSlots = current.map(s => s.position);
-        if (occupiedSlots.includes('crown')) {
-          occupiedSlots.push('tc');
-        }
-        if (occupiedSlots.includes('birthday')) {
-          occupiedSlots.push('tr-c');
-        }
+        if (occupiedSlots.includes('crown')) occupiedSlots.push('tc');
+        if (occupiedSlots.includes('birthday')) occupiedSlots.push('tr-c');
         const nextSlot = icSlots.find(slot => !occupiedSlots.includes(slot));
 
         if (nextSlot) {
           current.push({ id: crypto.randomUUID(), name: stickerName, position: nextSlot, rotation, scale });
         } else {
-          // All active slots are full: remove the oldest instructor sticker (FIFO) and reuse its position
           const oldestIcIndex = current.findIndex(s => icSlots.includes(s.position));
           if (oldestIcIndex !== -1) {
             const removed = current[oldestIcIndex];
@@ -675,450 +485,364 @@ export function AppProvider({ children }) {
           }
         }
       } else {
-        // Guest sticker logic
         const isSun = stickerName === 'Sun with sunglasses.svg';
-
         if (isSun) {
-          // Remove any stars in the right-center slots
           current = current.filter(s => s.position !== 'rc-1' && s.position !== 'rc-2');
           current.push({ id: crypto.randomUUID(), name: stickerName, position: 'sun' });
         } else {
-          // Normal sticker
           const allowedPositions = [1, 2, 3, 4];
           const normalStickers = current.filter(s => typeof s.position === 'number');
 
           if (normalStickers.length >= allowedPositions.length) {
-            // Remove the oldest normal sticker among allowed positions
             const oldestNormalIndex = current.findIndex(s => allowedPositions.includes(s.position));
             if (oldestNormalIndex !== -1) {
               current.splice(oldestNormalIndex, 1);
             }
           }
 
-          // Now find the first empty position among allowed positions
           const occupiedPositions = current.map(s => s.position);
           const nextPos = allowedPositions.find(p => !occupiedPositions.includes(p));
           current.push({ id: crypto.randomUUID(), name: stickerName, position: nextPos });
         }
       }
 
-      return { ...prev, [targetId]: current };
-    });
-  }, [activeGuestId, participants]);
+      await updateDoc(sessionRef, { [`guestStickers.${targetId}`]: current });
+    } catch (err) {
+      console.error("Error adding sticker:", err);
+    }
+  };
 
-  const stickerNudges = useMemo(() => {
-    const nudges = {};
-    participants.forEach(p => nudges[p.id] = {});
+  const handleToggleGuestButton = async (guestId, btnName) => {
+    if (!sessionId) return;
+    try {
+      const sessionRef = doc(db, "sessions", sessionId);
+      const current = guestButtons[guestId] || { raiseHand: false, mute: false, chat: false };
+      const nextVal = !current[btnName];
+      const updated = { ...current, [btnName]: nextVal };
+      
+      if (btnName === 'raiseHand') {
+        updated.raiseHandTime = nextVal ? Date.now() : null;
+      }
+      
+      const filterKeys = ['greenFilter', 'blueFilter', 'purpleFilter', 'orangeFilter'];
+      if (filterKeys.includes(btnName) && nextVal) {
+        filterKeys.forEach(k => {
+          if (k !== btnName) updated[k] = false;
+        });
+      }
 
-    const len = participants.length;
-    if (len < 8) {
-      participants.forEach(p => {
-         const stickers = guestStickers[p.id] || [];
-         stickers.forEach(s => {
-            if (s.position === 1) nudges[p.id][1] = { ...(nudges[p.id][1] || {}), x: (nudges[p.id][1]?.x || 0) + 20, y: (nudges[p.id][1]?.y || 0) + 20 };
-            if (s.position === 2) nudges[p.id][2] = { ...(nudges[p.id][2] || {}), x: (nudges[p.id][2]?.x || 0) - 20, y: (nudges[p.id][2]?.y || 0) + 20 };
-            if (s.position === 3) nudges[p.id][3] = { ...(nudges[p.id][3] || {}), x: (nudges[p.id][3]?.x || 0) + 20, y: (nudges[p.id][3]?.y || 0) - 20 };
-            if (s.position === 4) nudges[p.id][4] = { ...(nudges[p.id][4] || {}), x: (nudges[p.id][4]?.x || 0) - 20, y: (nudges[p.id][4]?.y || 0) - 20 };
-         });
+      await updateDoc(sessionRef, { [`guestButtons.${guestId}`]: updated });
+      
+      if (btnName === 'mute' && nextVal === true) {
+        if (activeGuestId === guestId) setActiveGuestId(null);
+      }
+    } catch (err) {
+      console.error("Error toggling guest button:", err);
+    }
+  };
+
+  const handleSendChatMessage = async (text) => {
+    if (!sessionId) return;
+    try {
+      const sessionRef = doc(db, "sessions", sessionId);
+      const isInstructor = sessionStorage.getItem('stagetrack_role') === 'instructor';
+      const sender = isInstructor ? 'self' : 'other';
+      const senderName = isInstructor ? 'Instructor' : (participants.find(p => p.id === activeGuestId)?.name || 'Guest');
+      const newMsg = {
+        id: crypto.randomUUID(),
+        text,
+        sender,
+        senderName,
+        status: 'public',
+        timestamp: Date.now()
+      };
+      await updateDoc(sessionRef, {
+        messages: arrayUnion(newMsg)
       });
-      return nudges;
+    } catch (err) {
+      console.error("Error sending chat message:", err);
     }
+  };
 
-    const halfLen = len / 2;
-    const numRows = len / 4;
-
-    [0, halfLen].forEach(gridStart => {
-      // Vertical nudges
-      for (let r = 0; r < numRows - 1; r++) {
-        for (let c = 0; c < 2; c++) {
-          const topGuest = participants[gridStart + r * 2 + c];
-          const bottomGuest = participants[gridStart + (r + 1) * 2 + c];
-          
-          if (!topGuest || !bottomGuest || topGuest.isBlank || bottomGuest.isBlank) continue;
-
-          const topGuestId = topGuest.id;
-          const bottomGuestId = bottomGuest.id;
-          
-          const topStickers = guestStickers[topGuestId] || [];
-          const bottomStickers = guestStickers[bottomGuestId] || [];
-
-          if (topStickers.some(s => s.position === 3) && bottomStickers.some(s => s.position === 1)) {
-            nudges[topGuestId][3] = { ...nudges[topGuestId][3], y: (nudges[topGuestId][3]?.y || 0) - 20 };
-            nudges[bottomGuestId][1] = { ...nudges[bottomGuestId][1], y: (nudges[bottomGuestId][1]?.y || 0) + 20 };
-          }
-          if (topStickers.some(s => s.position === 4) && bottomStickers.some(s => s.position === 2)) {
-            nudges[topGuestId][4] = { ...nudges[topGuestId][4], y: (nudges[topGuestId][4]?.y || 0) - 20 };
-            nudges[bottomGuestId][2] = { ...nudges[bottomGuestId][2], y: (nudges[bottomGuestId][2]?.y || 0) + 20 };
-          }
+  const handleModerateMessage = async (msgId, action) => {
+    if (!sessionId) return;
+    try {
+      const sessionRef = doc(db, "sessions", sessionId);
+      const updatedMessages = messages.map(msg => {
+        if (msg.id === msgId) {
+          if (action === 'show') return { ...msg, status: 'public' };
+          if (action === 'ignore') return { ...msg, status: 'ignored' };
+          if (action === 'reply_private') return { ...msg, status: 'private' };
         }
-      }
-
-      // Horizontal nudges
-      for (let r = 0; r < numRows; r++) {
-        const leftGuest = participants[gridStart + r * 2];
-        const rightGuest = participants[gridStart + r * 2 + 1];
-
-        if (!leftGuest || !rightGuest || leftGuest.isBlank || rightGuest.isBlank) continue;
-
-        const leftGuestId = leftGuest.id;
-        const rightGuestId = rightGuest.id;
-
-        const leftStickers = guestStickers[leftGuestId] || [];
-        const rightStickers = guestStickers[rightGuestId] || [];
-
-        if (leftStickers.some(s => s.position === 2) && rightStickers.some(s => s.position === 1)) {
-          nudges[leftGuestId][2] = { ...nudges[leftGuestId][2], x: (nudges[leftGuestId][2]?.x || 0) - 20 };
-          nudges[rightGuestId][1] = { ...nudges[rightGuestId][1], x: (nudges[rightGuestId][1]?.x || 0) + 20 };
-        }
-        if (leftStickers.some(s => s.position === 4) && rightStickers.some(s => s.position === 3)) {
-          nudges[leftGuestId][4] = { ...nudges[leftGuestId][4], x: (nudges[leftGuestId][4]?.x || 0) - 20 };
-          nudges[rightGuestId][3] = { ...nudges[rightGuestId][3], x: (nudges[rightGuestId][3]?.x || 0) + 20 };
-        }
-      }
-    });
-
-    participants.forEach(p => {
-       const stickers = guestStickers[p.id] || [];
-       stickers.forEach(s => {
-          if (s.position === 1) nudges[p.id][1] = { ...(nudges[p.id][1] || {}), x: (nudges[p.id][1]?.x || 0) + 20, y: (nudges[p.id][1]?.y || 0) + 20 };
-          if (s.position === 2) nudges[p.id][2] = { ...(nudges[p.id][2] || {}), x: (nudges[p.id][2]?.x || 0) - 20, y: (nudges[p.id][2]?.y || 0) + 20 };
-          if (s.position === 3) nudges[p.id][3] = { ...(nudges[p.id][3] || {}), x: (nudges[p.id][3]?.x || 0) + 20, y: (nudges[p.id][3]?.y || 0) - 20 };
-          if (s.position === 4) nudges[p.id][4] = { ...(nudges[p.id][4] || {}), x: (nudges[p.id][4]?.x || 0) - 20, y: (nudges[p.id][4]?.y || 0) - 20 };
-       });
-    });
-
-    return nudges;
-  }, [participants, guestStickers]);
-
-  const resetStudentState = useCallback(() => {
-    // Clear sessionStorage
-    sessionStorage.removeItem('stagetrack_guest_stickers');
-    sessionStorage.removeItem('stagetrack_guest_buttons');
-    sessionStorage.removeItem('stagetrack_is_doodling');
-    sessionStorage.removeItem('stagetrack_media_url');
-    sessionStorage.removeItem('stagetrack_media_type');
-    sessionStorage.removeItem('stagetrack_is_chat_open');
-    sessionStorage.removeItem('stagetrack_chat_messages');
-    sessionStorage.removeItem('stagetrack_metronome_bpm');
-    sessionStorage.removeItem('stagetrack_is_metronome_playing');
-    sessionStorage.removeItem('stagetrack_drawing_paths');
-    sessionStorage.removeItem('stagetrack_active_guest_id');
-    sessionStorage.removeItem('stagetrack_role');
-
-    // Reset state hooks
-    setGuestStickers({});
-    setGuestButtons({});
-    setIsDoodlingInternal(false);
-    if (mediaUrl) URL.revokeObjectURL(mediaUrl);
-    setMediaUrlInternal('/assets/MF_images/Music_Fun_with_my_Little_One.jpg');
-    setMediaTypeInternal('image');
-    setIsChatOpen(false);
-    setMessages([
-      { id: 'initial-1', text: "Hello! Here is a self message in darker purple.", sender: "self", status: "public" },
-      { id: 'initial-2', text: "Hello there! This is a guest message in green.", sender: "other", senderName: "2", status: "public" },
-      { id: 'initial-3', text: "I have a private question/pending issue in red.", sender: "other", senderName: "3", status: "pending" }
-    ]);
-    setMetronomeBpm(120);
-    setIsMetronomePlaying(false);
-    setDrawingPaths([]);
-    setActiveGuestId(null);
-    setIsJoined(false);
-    setLobbyStatus('initial');
-    setEquippedSticker(null);
-    setParticipants(generateDefaultParticipants(false));
-
-    // Clear localStorage request/response
-    localStorage.removeItem('stagetrack_lobby_request');
-    localStorage.removeItem('stagetrack_lobby_response');
-    localStorage.removeItem('stagetrack_guest_stickers');
-    localStorage.removeItem('stagetrack_guest_buttons');
-    localStorage.removeItem('stagetrack_global_mute');
-    localStorage.removeItem('stagetrack_global_pause');
-  }, [mediaUrl, generateDefaultParticipants]);
-
-  // If not joined and we are in 'initial' lobby state, ensure student state is reset
-  useEffect(() => {
-    if (!isJoined && lobbyStatus === 'initial') {
-      const timer = setTimeout(() => {
-        resetStudentState();
-      }, 0);
-      return () => clearTimeout(timer);
-    }
-  }, [isJoined, lobbyStatus, resetStudentState]);
-
-  const requestAccess = useCallback((myName, myLittleOne, color, selectedIcon, selectedBorder) => {
-    resetStudentState();
-    sessionStorage.setItem('stagetrack_role', 'student');
-    setLobbyStatus('waiting');
-    const reqData = { myName, myLittleOne, color, selectedIcon, selectedBorder };
-    console.log("Requesting access with data in student tab:", reqData);
-    localStorage.setItem('stagetrack_lobby_request', JSON.stringify(reqData));
-    localStorage.setItem('stagetrack_lobby_response', JSON.stringify({ status: 'pending' }));
-    if (sessionId) {
-      updateDoc(doc(db, "sessions", sessionId), { 
-        lobbyRequest: reqData,
-        lobbyResponse: { status: 'pending' }
-      }).catch(e => {
-        console.error("Firestore update failed:", e);
-        alert("Connection Error: " + e.message + "\nPlease try refreshing.");
+        return msg;
       });
-    } else {
-      alert("Error: No Session ID found. Please ask the instructor for a new link.");
-    }
-  }, [resetStudentState, sessionId]);
-
-  const approveRequest = useCallback(() => {
-    if (!pendingRequest) return;
-    
-    const activeId = `active-joined-${Date.now()}`;
-
-    // Find the first blank participant
-    setParticipants(prev => {
-      const next = [...prev];
-      const blankIdx = next.findIndex(p => p.isBlank);
-      if (blankIdx !== -1) {
-        next[blankIdx] = {
-          id: activeId,
-          name: `${pendingRequest.myName} & ${pendingRequest.myLittleOne}`,
-          color: pendingRequest.color,
-          selectedIcon: null,
-          selectedBorder: pendingRequest.selectedBorder,
-          initial: pendingRequest.myName[0] || '?'
-        };
+      await updateDoc(sessionRef, { messages: updatedMessages });
+      
+      if (action === 'show' || action === 'reply_private') {
+        setIsChatOpen(true);
       }
-      return next;
-    });
-
-    if (pendingRequest.selectedIcon) {
-      setGuestStickers(prev => ({
-        ...prev,
-        [activeId]: [
-          {
+      
+      if (action === 'reply_private') {
+        setTimeout(async () => {
+          const replyMsg = {
             id: crypto.randomUUID(),
-            name: pendingRequest.selectedIcon,
-            position: 1
-          }
-        ]
-      }));
-    }
-
-    // Write accepted response
-    localStorage.setItem('stagetrack_lobby_response', JSON.stringify({
-      status: 'accepted',
-      joinedUser: {
-        id: activeId,
-        myName: pendingRequest.myName,
-        myLittleOne: pendingRequest.myLittleOne,
-        color: pendingRequest.color,
-        selectedIcon: pendingRequest.selectedIcon,
-        selectedBorder: pendingRequest.selectedBorder
-      }
-    }));
-
-    const currentGcUsers = gcUsersRef.current || [];
-    const newGuestUser = {
-      uid: activeId,
-      role: 'guest',
-      joinedAt: Date.now(),
-      slotIndex: currentGcUsers.length
-    };
-    const updatedGcUsers = [...currentGcUsers.filter(u => u.uid !== activeId), newGuestUser];
-
-    updateDoc(doc(db, "sessions", sessionId), { 
-      lobbyResponse: { status: 'accepted', joinedUser: { ...pendingRequest, id: activeId } },
-      lobbyRequest: null,
-      activeUsers: updatedGcUsers
-    }).catch(e=>console.error(e));
-
-    setPendingRequest(null);
-  }, [pendingRequest, sessionId]);
-
-  const denyRequest = useCallback(() => {
-    if (!sessionId) return;
-    updateDoc(doc(db, "sessions", sessionId), { 
-        lobbyResponse: { status: 'denied' },
-        lobbyRequest: null
-    }).catch(e=>console.error(e));
-    setPendingRequest(null);
-  }, [sessionId]);
-
-  useEffect(() => {
-    const initFirebaseSession = async () => {
-      await ensureAuthenticated();
-      const params = new URLSearchParams(window.location.search);
-      const roleParam = params.get('role');
-      if (roleParam === 'guest' || roleParam === 'student') {
-        sessionStorage.setItem('stagetrack_role', 'student');
-        setIsJoined(false);
-      }
-      
-      let sid = params.get('session');
-      
-      if (!sid) {
-        sid = 'session-' + Math.random().toString(36).substr(2, 9);
-        const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?session=' + sid + window.location.hash;
-        window.history.replaceState({path:newUrl}, '', newUrl);
-        sessionStorage.setItem('stagetrack_role', 'instructor');
-        setIsJoined(true);
-        
-        try {
-          await setDoc(doc(db, "sessions", sid), {
-            createdAt: Date.now(),
-            participants: generateDefaultParticipants(false),
-            guestStickers: {},
-            guestButtons: {},
-            messages: [
-              { id: 'initial-1', text: "Hello! Here is a self message in darker purple.", sender: "self", status: "public" },
-              { id: 'initial-2', text: "Hello there! This is a guest message in green.", sender: "other", senderName: "2", status: "public" },
-              { id: 'initial-3', text: "I have a private question/pending issue in red.", sender: "other", senderName: "3", status: "pending" }
-            ],
-            lobbyRequest: null,
-            lobbyResponse: null,
-            globalMute: true,
-            globalPause: false,
-            activeTheme: 'music-fun'
+            text: "I will answer that privately.",
+            sender: "self",
+            senderName: "Instructor",
+            status: "private",
+            timestamp: Date.now()
+          };
+          await updateDoc(sessionRef, {
+            messages: arrayUnion(replyMsg)
           });
-        } catch(e) {
-          console.error("Failed to set initial session doc:", e);
-        }
+        }, 500);
       }
-      setSessionId(sid);
-    };
-    initFirebaseSession();
+    } catch (err) {
+      console.error("Error moderating message:", err);
+    }
+  };
 
-    const handleBeforeUnload = () => {
-      try {
-        localStorage.removeItem('stagetrack_lobby_request');
-        localStorage.removeItem('stagetrack_lobby_response');
-      } catch { /* ignore */ }
-    };
-    window.addEventListener('beforeunload', handleBeforeUnload);
-
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-    };
-  }, [generateDefaultParticipants]);
-
-  useEffect(() => {
+  const sendWhisper = async (guestId, message) => {
     if (!sessionId) return;
-    const unsubscribe = onSnapshot(doc(db, "sessions", sessionId), (snapshot) => {
-      if (snapshot.exists()) {
-        const data = snapshot.data();
-        isRemoteUpdate.current = true;
+    try {
+      const sessionRef = doc(db, "sessions", sessionId);
+      const current = guestButtons[guestId] || { raiseHand: false, mute: false, chat: false };
+      const updated = {
+        ...current,
+        whisper: message,
+        whisperTime: Date.now()
+      };
+      await updateDoc(sessionRef, { [`guestButtons.${guestId}`]: updated });
+    } catch (err) {
+      console.error("Error sending whisper:", err);
+    }
+  };
 
-        if (data.participants) setParticipants(data.participants);
-        if (data.guestStickers) setGuestStickers(data.guestStickers);
-        if (data.guestButtons) setGuestButtons(data.guestButtons);
-        if (data.messages) setMessages(data.messages);
-        if (data.globalMute !== undefined) setGlobalMute(data.globalMute);
-        if (data.globalPause !== undefined) setGlobalPause(data.globalPause);
-        if (data.activeTheme) setActiveTheme(data.activeTheme);
-        if (data.spotlightGuestId !== undefined) setSpotlightGuestId(data.spotlightGuestId);
-        if (data.stageTimer !== undefined) setStageTimer(data.stageTimer);
-        if (data.currentBeat !== undefined) setRhythmBeat(data.currentBeat);
-        
-        const currentRole = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('stagetrack_role') : null;
-        const isInstructorClient = currentRole !== 'student';
-
-        if (isInstructorClient) {
-            setPendingRequest(data.lobbyRequest || null);
-        }
-        
-        if (currentRole === 'student') {
-            if (data.lobbyResponse) {
-                if (data.lobbyResponse.status === 'accepted') {
-                    setIsJoined(true);
-                    setLobbyStatus('accepted');
-                    const { joinedUser } = data.lobbyResponse;
-                    setParticipants(prev => {
-                      const next = [...prev];
-                      const blankIdx = next.findIndex(p => p.isBlank);
-                      if (blankIdx !== -1) {
-                        next[blankIdx] = {
-                          id: joinedUser.id,
-                          name: `${joinedUser.myName} & ${joinedUser.myLittleOne}`,
-                          color: joinedUser.color,
-                          selectedIcon: null,
-                          selectedBorder: joinedUser.selectedBorder,
-                          initial: joinedUser.myName[0] || '?'
-                        };
-                      }
-                      return next;
-                    });
-                } else if (data.lobbyResponse.status === 'denied') {
-                    setIsJoined(false);
-                    setLobbyStatus('denied');
-                }
-            } else {
-                if (lobbyStatus !== 'accepted') {
-                    setIsJoined(false);
-                    setLobbyStatus('initial');
-                }
-            }
-        }
-        
-        setTimeout(() => { isRemoteUpdate.current = false; }, 50);
+  const setMediaUpload = async (url, type) => {
+    setIsDoodling(false);
+    setMediaUrl(url);
+    setMediaType(type);
+    if (sessionId) {
+      try {
+        const sessionRef = doc(db, "sessions", sessionId);
+        await updateDoc(sessionRef, {
+          mediaUrl: url,
+          mediaType: type,
+          isDoodling: false
+        });
+      } catch (err) {
+        console.error("Error setting media upload:", err);
       }
-    });
-    return () => unsubscribe();
-  }, [sessionId, lobbyStatus]);
-
-  useEffect(() => {
-    if (sessionId && !isRemoteUpdate.current) {
-        updateDoc(doc(db, "sessions", sessionId), { participants }).catch(e => console.error(e));
     }
-  }, [participants, sessionId]);
+  };
 
-  useEffect(() => {
-    if (sessionId && !isRemoteUpdate.current) {
-      updateDoc(doc(db, "sessions", sessionId), { spotlightGuestId, stageTimer }).catch(e => console.error(e));
+  const clearMedia = async () => {
+    setMediaUrl(null);
+    setMediaType(null);
+    if (sessionId) {
+      try {
+        const sessionRef = doc(db, "sessions", sessionId);
+        await updateDoc(sessionRef, {
+          mediaUrl: null,
+          mediaType: null
+        });
+      } catch (err) {
+        console.error("Error clearing media:", err);
+      }
     }
-  }, [spotlightGuestId, stageTimer, sessionId]);
+  };
+
+  const handleSetIsDoodling = async (val) => {
+    setIsDoodling(val);
+    if (val) {
+      setMediaUrl(null);
+      setMediaType(null);
+    }
+    if (sessionId) {
+      try {
+        const sessionRef = doc(db, "sessions", sessionId);
+        await updateDoc(sessionRef, {
+          isDoodling: val,
+          ...(val ? { mediaUrl: null, mediaType: null } : {})
+        });
+      } catch (err) {
+        console.error("Error setting isDoodling:", err);
+      }
+    }
+  };
+
+  const handleSetDrawingPaths = async (valueOrFunc) => {
+    let nextVal;
+    if (typeof valueOrFunc === 'function') {
+      nextVal = valueOrFunc(drawingPaths);
+    } else {
+      nextVal = valueOrFunc;
+    }
+    setDrawingPaths(nextVal);
+    if (sessionId) {
+      try {
+        const sessionRef = doc(db, "sessions", sessionId);
+        await updateDoc(sessionRef, { drawingPaths: nextVal });
+      } catch (err) {
+        console.error("Error syncing drawingPaths:", err);
+      }
+    }
+  };
+
+  const handleSetCurtainsOpen = async (val) => {
+    setCurtainsOpen(val);
+    if (sessionId) {
+      try {
+        const sessionRef = doc(db, "sessions", sessionId);
+        await updateDoc(sessionRef, { curtainsOpen: val });
+      } catch (err) {
+        console.error("Error syncing curtainsOpen:", err);
+      }
+    }
+  };
+
+  const handleSetActiveTheme = async (val) => {
+    setActiveTheme(val);
+    if (sessionId) {
+      try {
+        const sessionRef = doc(db, "sessions", sessionId);
+        await updateDoc(sessionRef, { activeTheme: val });
+      } catch (err) {
+        console.error("Error syncing activeTheme:", err);
+      }
+    }
+  };
+
+  const handleSetStageTimer = async (val) => {
+    setStageTimer(val);
+    if (sessionId) {
+      try {
+        const sessionRef = doc(db, "sessions", sessionId);
+        await updateDoc(sessionRef, { stageTimer: val });
+      } catch (err) {
+        console.error("Error syncing stageTimer:", err);
+      }
+    }
+  };
+
+  const handleSetGuestStickers = async (valueOrFunc) => {
+    let nextVal;
+    if (typeof valueOrFunc === 'function') {
+      nextVal = valueOrFunc(guestStickers);
+    } else {
+      nextVal = valueOrFunc;
+    }
+    setGuestStickers(nextVal);
+    if (sessionId) {
+      try {
+        const sessionRef = doc(db, "sessions", sessionId);
+        await updateDoc(sessionRef, { guestStickers: nextVal });
+      } catch (err) {
+        console.error("Error syncing guestStickers:", err);
+      }
+    }
+  };
+
+  const handleSetGuestButtons = async (valueOrFunc) => {
+    let nextVal;
+    if (typeof valueOrFunc === 'function') {
+      nextVal = valueOrFunc(guestButtons);
+    } else {
+      nextVal = valueOrFunc;
+    }
+    setGuestButtons(nextVal);
+    if (sessionId) {
+      try {
+        const sessionRef = doc(db, "sessions", sessionId);
+        await updateDoc(sessionRef, { guestButtons: nextVal });
+      } catch (err) {
+        console.error("Error syncing guestButtons:", err);
+      }
+    }
+  };
+
+  const handleToggleInvite = async () => {
+    if (!sessionId || isFirebaseUpdating) return;
+    setIsFirebaseUpdating(true);
+
+    try {
+      const sessionRef = doc(db, "sessions", sessionId);
+      const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname === '0.0.0.0';
+      const baseOrigin = isLocalhost ? 'https://stagetrack-v4-260430-461-92681.web.app' : window.location.origin;
+      const inviteUrl = `${baseOrigin}/?session=${sessionId}&role=guest`;
+      
+      await updateDoc(sessionRef, { inviteActive: true });
+      await navigator.clipboard.writeText(inviteUrl);
+      
+      console.log("Invite link copied to clipboard cleanly:", inviteUrl);
+      alert(`Invite link copied to clipboard cleanly!\nURL: ${inviteUrl}`);
+    } catch (err) {
+      console.error("Invite toggle execution failed:", err);
+      const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname === '0.0.0.0';
+      const baseOrigin = isLocalhost ? 'https://stagetrack-v4-260430-461-92681.web.app' : window.location.origin;
+      const inviteUrl = `${baseOrigin}/?session=${sessionId}&role=guest`;
+      prompt("Copy this link:", inviteUrl);
+    } finally {
+      setIsFirebaseUpdating(false);
+    }
+  };
 
   const value = {
-    MOCK_USER_COUNT,
-    participants,
+    sessionId, setSessionId,
+    isJoined, setIsJoined,
+    lobbyStatus, setLobbyStatus,
     activeGuestId, setActiveGuestId,
-    activeToolbox, setActiveToolbox,
-    guestButtons, setGuestButtons, handleToggleGuestButton, sendWhisper,
-    guestStickers, setGuestStickers, handleAddSticker,
-    stickerNudges,
-    isDoodling, setIsDoodling,
-    mediaUrl, mediaType, setMediaUpload, clearMedia,
+    pendingRequest, setPendingRequest,
+    gcUsers, setGcUsers,
+    participants, setParticipants,
+    drawingPaths, setDrawingPaths: handleSetDrawingPaths,
+    mediaUrl, setMediaUrl,
+    mediaType, setMediaType,
     isChatOpen, setIsChatOpen,
     isSidebarOpen, setIsSidebarOpen,
-    activeItoSection, setActiveItoSection,
-    sessionId, // Added to expose session code
-    rhythmBeat, // Sync beat across clients
-    showInstructorStickers, setShowInstructorStickers,
-    showStudentStickers, setShowStudentStickers,
-    showStudentFilters, setShowStudentFilters,
-    showStudentWhisper, setShowStudentWhisper,
-    isPeoStickersOpen, setIsPeoStickersOpen,
-    clearAllStage,
+    activeToolbox, setActiveToolbox,
+    guestStickers, setGuestStickers: handleSetGuestStickers,
+    guestButtons, setGuestButtons: handleSetGuestButtons,
+    stickerNudges, setStickerNudges,
+    isDoodling, setIsDoodling: handleSetIsDoodling,
     globalMute, setGlobalMute,
     globalPause, setGlobalPause,
     messages, setMessages,
-    handleModerateMessage,
-    handleSendChatMessage,
-    equippedSticker,
-    setEquippedSticker,
-    metronomeBpm, setMetronomeBpm,
-    isMetronomePlaying, setIsMetronomePlaying,
-    drawingPaths, setDrawingPaths,
-    blankCovers, setBlankCovers,
-    isJoined, setIsJoined,
-    lobbyStatus, setLobbyStatus,
-    pendingRequest, setPendingRequest,
-    requestAccess, approveRequest, denyRequest,
+    activeTheme, setActiveTheme: handleSetActiveTheme,
+    activeItoSection, setActiveItoSection,
+    stageTimer, setStageTimer: handleSetStageTimer,
+    curtainsOpen, setCurtainsOpen: handleSetCurtainsOpen,
+    clearMedia,
+    showInstructorStickers, setShowInstructorStickers,
+    showStudentStickers, setShowStudentStickers,
+    showStudentFilters, setShowStudentFilters,
+    isPeoStickersOpen, setIsPeoStickersOpen,
+    approveRequest,
+    denyRequest,
     resetStudentState,
-    activeTheme, setActiveTheme,
-    spotlightGuestId, setSpotlightGuestId,
-    stageTimer, setStageTimer,
-    gcUsers, handleToggleInvite, isFirebaseUpdating
+    handleAddSticker,
+    handleToggleGuestButton,
+    handleSendChatMessage,
+    handleModerateMessage,
+    sendWhisper,
+    setMediaUpload,
+    handleToggleInvite,
+    isFirebaseUpdating
   };
 
-  return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
+  return (
+    <AppContext.Provider value={value}>
+      {children}
+    </AppContext.Provider>
+  );
 }
 
-export const useAppContext = () => useContext(AppContext);
+export const useAppContext = () => {
+  const context = useContext(AppContext);
+  if (!context) {
+    throw new Error('useAppContext must be used within an AppProvider');
+  }
+  return context;
+};
+
+export default AppProvider;

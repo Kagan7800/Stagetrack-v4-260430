@@ -36,12 +36,6 @@
         }
 
         /* Storyboard Styles */
-        .drum {
-            fill: #FFE4B5;
-            stroke: #D4A574;
-            stroke-width: 6;
-        }
-        
         .block {
             fill: rgba(255, 255, 255, 0.25);
             stroke: #ffffff;
@@ -63,6 +57,38 @@
             stroke: #FF9900 !important;
             filter: drop-shadow(0 0 15px rgba(255, 230, 0, 0.8));
         }
+
+        /* Drum colors left-to-right */
+        .drum-red {
+            fill: #FF4D4D;
+            stroke: #CC3333;
+            stroke-width: 6;
+            transition: all 0.2s ease;
+        }
+        .drum-orange {
+            fill: #FFA64D;
+            stroke: #CC7A33;
+            stroke-width: 6;
+            transition: all 0.2s ease;
+        }
+        .drum-yellow {
+            fill: #FFE64D;
+            stroke: #CCA333;
+            stroke-width: 6;
+            transition: all 0.2s ease;
+        }
+        .drum-blue {
+            fill: #4D90FF;
+            stroke: #3366CC;
+            stroke-width: 6;
+            transition: all 0.2s ease;
+        }
+
+        /* glowing drum effect */
+        .glowing-drum.drum-red { fill: #FF9999 !important; filter: drop-shadow(0 0 15px #FF4D4D); }
+        .glowing-drum.drum-orange { fill: #FFE0B3 !important; filter: drop-shadow(0 0 15px #FFA64D); }
+        .glowing-drum.drum-yellow { fill: #FFFFB3 !important; filter: drop-shadow(0 0 15px #FFE64D); }
+        .glowing-drum.drum-blue { fill: #B3D1FF !important; filter: drop-shadow(0 0 15px #4D90FF); }
 
         /* Dipping drums animation */
         .drum-group {
@@ -129,29 +155,26 @@
         }
 
         /* Arm movements */
-        #giraffe-arm {
-            transition: transform 0.15s cubic-bezier(0.25, 0.8, 0.25, 1.1);
+        #giraffe-arm-left {
+            transition: transform 0.12s cubic-bezier(0.25, 0.8, 0.25, 1.15);
             transform-origin: 0px 0px;
             transform: rotate(100deg); /* Neutral pointing down */
         }
-        #giraffe-arm.raise {
-            transform: rotate(0deg); /* Raised up/left as cropped */
-        }
-        #giraffe-arm.tap {
-            transform: rotate(40deg); /* Striking down */
-        }
-
-        #bear-arm {
-            transition: transform 0.15s cubic-bezier(0.25, 0.8, 0.25, 1.1);
+        #giraffe-arm-right {
+            transition: transform 0.12s cubic-bezier(0.25, 0.8, 0.25, 1.15);
             transform-origin: 0px 0px;
             transform: rotate(-100deg); /* Neutral pointing down */
         }
-        #bear-arm.slow-raise {
-            transition: transform 0.4s ease-in-out;
-            transform: rotate(0deg); /* Raised up/left as cropped */
+
+        #bear-arm-left {
+            transition: transform 0.12s cubic-bezier(0.25, 0.8, 0.25, 1.15);
+            transform-origin: 0px 0px;
+            transform: rotate(-100deg); /* Neutral pointing down */
         }
-        #bear-arm.tap {
-            transform: rotate(-40deg); /* Striking down */
+        #bear-arm-right {
+            transition: transform 0.12s cubic-bezier(0.25, 0.8, 0.25, 1.15);
+            transform-origin: 0px 0px;
+            transform: scaleX(-1) rotate(-100deg); /* Neutral pointing down (mirrored) */
         }
 
         /* Translucent overlay caption bar */
@@ -187,21 +210,7 @@
     <div class="canvas-16-9">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 600" width="100%" height="100%">
             <!-- Background -->
-            <rect width="100%" height="100%" fill="#F7EEDD"/>
-
-            <!-- Drums (arc) -->
-            <g id="drumGroup1" class="drum-group">
-                <ellipse cx="350" cy="200" rx="120" ry="60" class="drum"/>
-            </g>
-            <g id="drumGroup2" class="drum-group">
-                <ellipse cx="650" cy="200" rx="120" ry="60" class="drum"/>
-            </g>
-            <g id="drumGroup3" class="drum-group">
-                <ellipse cx="950" cy="200" rx="120" ry="60" class="drum"/>
-            </g>
-            <g id="drumGroup4" class="drum-group">
-                <ellipse cx="1250" cy="200" rx="120" ry="60" class="drum"/>
-            </g>
+            <image href="/assets/MF_images/jungle_bg.png" x="0" y="0" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" />
 
             <!-- Blocks 1–4 -->
             <g id="block1" class="block-group">
@@ -222,48 +231,94 @@
             </g>
 
             <!-- GIRAFFE (left, Banjo) -->
-            <g id="giraffe" transform="translate(350,350)">
+            <g id="giraffe" transform="translate(315,350)">
                 <g id="giraffe-character">
                     <!-- High-quality Giraffe Body image -->
-                    <image id="giraffe-body-img" href="/assets/svg_stickers/giraffe_body.png" x="-85" y="-330" width="170" height="510"/>
+                    <image id="giraffe-body-img" href="/assets/svg_stickers/giraffe_body_drum.png" x="-172" y="-350" width="344" height="500"/>
 
-                    <!-- Banjo's Right Arm (for tapping) -->
-                    <g id="giraffe-arm" transform="translate(45, -240)">
-                        <image id="giraffe-arm-img" href="/assets/svg_stickers/giraffe_arm.png" x="-35" y="0" width="70" height="120"/>
+                    <!-- Banjo's Left Arm (for tapping drums 1 & 2) -->
+                    <g id="giraffe-arm-left" transform="translate(-65, -180)">
+                        <image id="giraffe-arm-left-img" href="/assets/svg_stickers/giraffe_arm_l.png" x="-47" y="-2" width="110" height="290"/>
                     </g>
+
+                    <!-- Banjo's Right Arm (for tapping drums 3 & 4) -->
+                    <g id="giraffe-arm-right" transform="translate(65, -180)">
+                        <image id="giraffe-arm-right-img" href="/assets/svg_stickers/giraffe_arm_r.png" x="-39" y="-6" width="110" height="290"/>
+                    </g>
+
                     <!-- Label -->
-                    <text x="0" y="210" font-size="28" font-weight="900" fill="#fff" text-anchor="middle" font-family="Arial">BANJO</text>
+                    <text x="0" y="180" font-size="28" font-weight="900" fill="#fff" text-anchor="middle" font-family="Arial" stroke="#000" stroke-width="2">BANJO</text>
                 </g>
             </g>
 
             <!-- BEAR (right) -->
-            <g id="bear" transform="translate(1250,350)">
+            <g id="bear" transform="translate(1285,480)">
                 <g id="bear-character">
                     <!-- High-quality Bear Body image -->
                     <image id="bear-body-img" href="/assets/svg_stickers/bear_body.png" x="-95" y="-230" width="190" height="380"/>
 
-                    <!-- Bear's Left Arm (for tapping) -->
-                    <g id="bear-arm" transform="translate(-60, -180)">
-                        <image id="bear-arm-img" href="/assets/svg_stickers/bear_arm.png" x="-35" y="0" width="70" height="110"/>
+                    <!-- Bear's Left Arm -->
+                    <g id="bear-arm-left" transform="translate(-60, -180)">
+                        <image id="bear-arm-left-img" href="/assets/svg_stickers/bear_arm.png" x="-35" y="0" width="70" height="110"/>
+                        <!-- Drumstick in left paw -->
+                        <rect x="-4" y="95" width="8" height="50" rx="3" fill="#D8A060" stroke="#8B5A2B" stroke-width="2"/>
+                        <circle cx="0" cy="148" r="6" fill="#D8A060" stroke="#8B5A2B" stroke-width="2"/>
                     </g>
+
+                    <!-- Bear's Right Arm (mirrored) -->
+                    <g id="bear-arm-right" transform="translate(60, -180)">
+                        <image id="bear-arm-right-img" href="/assets/svg_stickers/bear_arm.png" x="-35" y="0" width="70" height="110"/>
+                        <!-- Drumstick in right paw -->
+                        <rect x="-4" y="95" width="8" height="50" rx="3" fill="#D8A060" stroke="#8B5A2B" stroke-width="2"/>
+                        <circle cx="0" cy="148" r="6" fill="#D8A060" stroke="#8B5A2B" stroke-width="2"/>
+                    </g>
+
                     <!-- Label -->
-                    <text x="0" y="185" font-size="28" font-weight="900" fill="#fff" text-anchor="middle" font-family="Arial">BEAR</text>
+                    <text x="0" y="180" font-size="28" font-weight="900" fill="#fff" text-anchor="middle" font-family="Arial" stroke="#000" stroke-width="2">BEAR</text>
                 </g>
             </g>
 
             <!-- Speech Bubbles -->
-            <g id="giraffeBubble" opacity="0" transform="translate(350, 160)">
+            <g id="giraffeBubble" opacity="0" transform="translate(315, 100)">
                 <rect x="-90" y="-70" width="180" height="60" rx="15" fill="white" stroke="#D89A3A" stroke-width="4"/>
                 <polygon points="-12,-12 0,5 12,-12" fill="white" stroke="#D89A3A" stroke-width="4"/>
                 <rect x="-14" y="-14" width="28" height="6" fill="white"/>
                 <text id="giraffeBubbleText" x="0" y="-40" font-size="26" font-weight="bold" fill="#333" text-anchor="middle" dominant-baseline="middle" font-family="Arial">One</text>
             </g>
 
-            <g id="bearBubble" opacity="0" transform="translate(1250, 240)">
+            <g id="bearBubble" opacity="0" transform="translate(1285, 220)">
                 <rect x="-90" y="-70" width="180" height="60" rx="15" fill="white" stroke="#8B6E4A" stroke-width="4"/>
                 <polygon points="-12,-12 0,5 12,-12" fill="white" stroke="#8B6E4A" stroke-width="4"/>
                 <rect x="-14" y="-14" width="28" height="6" fill="white"/>
                 <text id="bearBubbleText" x="0" y="-40" font-size="26" font-weight="bold" fill="#333" text-anchor="middle" dominant-baseline="middle" font-family="Arial">One!</text>
+            </g>
+
+            <!-- Banjo's Drums -->
+            <g id="banjoDrum1" class="drum-group">
+                <ellipse cx="150" cy="450" rx="75" ry="35" class="drum-red"/>
+            </g>
+            <g id="banjoDrum2" class="drum-group">
+                <ellipse cx="260" cy="450" rx="75" ry="35" class="drum-orange"/>
+            </g>
+            <g id="banjoDrum3" class="drum-group">
+                <ellipse cx="370" cy="450" rx="75" ry="35" class="drum-yellow"/>
+            </g>
+            <g id="banjoDrum4" class="drum-group">
+                <ellipse cx="480" cy="450" rx="75" ry="35" class="drum-blue"/>
+            </g>
+
+            <!-- Bear's Drums -->
+            <g id="bearDrum1" class="drum-group">
+                <ellipse cx="1120" cy="450" rx="75" ry="35" class="drum-red"/>
+            </g>
+            <g id="bearDrum2" class="drum-group">
+                <ellipse cx="1230" cy="450" rx="75" ry="35" class="drum-orange"/>
+            </g>
+            <g id="bearDrum3" class="drum-group">
+                <ellipse cx="1340" cy="450" rx="75" ry="35" class="drum-yellow"/>
+            </g>
+            <g id="bearDrum4" class="drum-group">
+                <ellipse cx="1450" cy="450" rx="75" ry="35" class="drum-blue"/>
             </g>
         </svg>
 
@@ -301,7 +356,19 @@
             // 1. Clear all glowing blocks and dipped drums
             for (let i = 1; i <= 4; i++) {
                 document.getElementById(`block${i}`).classList.remove('glowing');
-                document.getElementById(`drumGroup${i}`).classList.remove('dipped');
+                
+                const banjoDrum = document.getElementById(`banjoDrum${i}`);
+                if (banjoDrum) {
+                    banjoDrum.classList.remove('dipped');
+                    const ellipse = banjoDrum.querySelector('ellipse');
+                    if (ellipse) ellipse.classList.remove('glowing-drum');
+                }
+                const bearDrum = document.getElementById(`bearDrum${i}`);
+                if (bearDrum) {
+                    bearDrum.classList.remove('dipped');
+                    const ellipse = bearDrum.querySelector('ellipse');
+                    if (ellipse) ellipse.classList.remove('glowing-drum');
+                }
             }
 
             // 2. Hide speech bubbles
@@ -319,43 +386,57 @@
             giraffeChar.className = '';
             bearChar.className = '';
 
-            const giraffeArm = document.getElementById('giraffe-arm');
-            const bearArm = document.getElementById('bear-arm');
-            giraffeArm.className = '';
-            bearArm.className = '';
+            const gArmLeft = document.getElementById('giraffe-arm-left');
+            const gArmRight = document.getElementById('giraffe-arm-right');
+            const bArmLeft = document.getElementById('bear-arm-left');
+            const bArmRight = document.getElementById('bear-arm-right');
+
+            gArmLeft.style.transform = '';
+            gArmRight.style.transform = '';
+            bArmLeft.style.transform = '';
+            bArmRight.style.transform = '';
 
             const caption = document.getElementById('story-caption');
 
             // 4. State updates based on story phase
             if (storyPhase === 0) { // Intro
-                document.getElementById('giraffe').setAttribute('transform', 'translate(350, 350)');
-                document.getElementById('bear').setAttribute('transform', 'translate(1250, 350)');
+                document.getElementById('giraffe').setAttribute('transform', 'translate(315, 350)');
+                document.getElementById('bear').setAttribute('transform', 'translate(1285, 480)');
                 
                 setGiraffeGaze('straight');
                 setBearGaze('left');
 
-                caption.innerHTML = "<strong>Banjo (Giraffe)</strong> steps forward with a soft strum on his guitar. He sets the emotional tone: <em>'We’re going to count together.'</em>";
+                caption.innerHTML = "<strong>Banjo (Giraffe)</strong> starts the moment with calm energy. He sets the emotional tone: <em>'We’re going to count together.'</em>";
             }
             else if (storyPhase === 1) { // Banjo's Demonstration
-                const banjoX = [350, 550, 750, 950][currentStep - 1];
-                document.getElementById('giraffe').setAttribute('transform', `translate(${banjoX}, 350)`);
-                document.getElementById('bear').setAttribute('transform', 'translate(1250, 350)');
+                document.getElementById('giraffe').setAttribute('transform', 'translate(315, 350)');
+                document.getElementById('bear').setAttribute('transform', 'translate(1285, 480)');
 
                 setBearGaze('left');
                 setGiraffeGaze('down');
 
+                const isLeft = (currentStep === 1 || currentStep === 2);
+                const activeArm = isLeft ? gArmLeft : gArmRight;
+
                 // Start raising arm
-                giraffeArm.classList.add('raise');
+                activeArm.style.transform = 'rotate(0deg)';
 
                 // Tap animation timing
                 animTimeouts.push(setTimeout(() => {
-                    giraffeArm.classList.remove('raise');
-                    giraffeArm.classList.add('tap');
+                    if (currentStep === 1) activeArm.style.transform = 'rotate(20deg)';
+                    else if (currentStep === 2) activeArm.style.transform = 'rotate(40deg)';
+                    else if (currentStep === 3) activeArm.style.transform = 'rotate(-40deg)';
+                    else if (currentStep === 4) activeArm.style.transform = 'rotate(-20deg)';
                 }, 180));
 
                 animTimeouts.push(setTimeout(() => {
                     // Strike moment: Drum dips and Block glows
-                    document.getElementById(`drumGroup${currentStep}`).classList.add('dipped');
+                    const banjoDrum = document.getElementById(`banjoDrum${currentStep}`);
+                    if (banjoDrum) {
+                        banjoDrum.classList.add('dipped');
+                        const ellipse = banjoDrum.querySelector('ellipse');
+                        if (ellipse) ellipse.classList.add('glowing-drum');
+                    }
                     document.getElementById(`block${currentStep}`).classList.add('glowing');
 
                     // Speech
@@ -373,31 +454,40 @@
 
                 // Reset arm
                 animTimeouts.push(setTimeout(() => {
-                    giraffeArm.classList.remove('tap');
+                    activeArm.style.transform = '';
                 }, 600));
             }
             else if (storyPhase === 2) { // Bear's Imitation
-                const bearX = [500, 700, 900, 1250][currentStep - 1];
-                document.getElementById('giraffe').setAttribute('transform', 'translate(350, 350)');
-                document.getElementById('bear').setAttribute('transform', `translate(${bearX}, 350)`);
+                document.getElementById('giraffe').setAttribute('transform', 'translate(315, 350)');
+                document.getElementById('bear').setAttribute('transform', 'translate(1285, 480)');
 
                 setGiraffeGaze('right');
                 setBearGaze('down');
 
+                const isLeft = (currentStep === 1 || currentStep === 2);
+                const activeArm = isLeft ? bArmLeft : bArmRight;
+
                 // Slower raise for toddler hesitation
                 animTimeouts.push(setTimeout(() => {
-                    bearArm.classList.add('slow-raise');
+                    activeArm.style.transform = isLeft ? 'rotate(0deg)' : 'scaleX(-1) rotate(0deg)';
                 }, 100));
 
                 // Strike timing
                 animTimeouts.push(setTimeout(() => {
-                    bearArm.classList.remove('slow-raise');
-                    bearArm.classList.add('tap');
+                    if (currentStep === 1) activeArm.style.transform = 'rotate(-30deg)';
+                    else if (currentStep === 2) activeArm.style.transform = 'rotate(-50deg)';
+                    else if (currentStep === 3) activeArm.style.transform = 'scaleX(-1) rotate(-50deg)';
+                    else if (currentStep === 4) activeArm.style.transform = 'scaleX(-1) rotate(-30deg)';
                 }, 550));
 
                 animTimeouts.push(setTimeout(() => {
                     // Strike moment: Drum dips and Block glows
-                    document.getElementById(`drumGroup${currentStep}`).classList.add('dipped');
+                    const bearDrum = document.getElementById(`bearDrum${currentStep}`);
+                    if (bearDrum) {
+                        bearDrum.classList.add('dipped');
+                        const ellipse = bearDrum.querySelector('ellipse');
+                        if (ellipse) ellipse.classList.add('glowing-drum');
+                    }
                     document.getElementById(`block${currentStep}`).classList.add('glowing');
 
                     // Speech
@@ -410,12 +500,12 @@
 
                 // Reset arm
                 animTimeouts.push(setTimeout(() => {
-                    bearArm.classList.remove('tap');
+                    activeArm.style.transform = '';
                 }, 1000));
             }
             else if (storyPhase === 3) { // Celebration
-                document.getElementById('giraffe').setAttribute('transform', 'translate(350, 350)');
-                document.getElementById('bear').setAttribute('transform', 'translate(1250, 350)');
+                document.getElementById('giraffe').setAttribute('transform', 'translate(315, 350)');
+                document.getElementById('bear').setAttribute('transform', 'translate(1285, 480)');
 
                 setGiraffeGaze('right');
                 setBearGaze('left');
@@ -428,31 +518,49 @@
                 gBubble.style.opacity = '1';
                 bBubble.style.opacity = '1';
 
-                caption.innerHTML = "<strong>Banjo</strong> strums his guitar and hops. <strong>Bear</strong> claps and beams! <em>'Yay, we did it!'</em>";
+                caption.innerHTML = "<strong>Banjo</strong> waves his drumsticks and hops. <strong>Bear</strong> claps and beams! <em>'Yay, we did it!'</em>";
             }
             else if (storyPhase === 4) { // Repeat together in sync
-                const banjoX = [230, 530, 830, 1130][currentStep - 1];
-                const bearX = [470, 770, 1070, 1370][currentStep - 1];
-                document.getElementById('giraffe').setAttribute('transform', `translate(${banjoX}, 350)`);
-                document.getElementById('bear').setAttribute('transform', `translate(${bearX}, 350)`);
+                document.getElementById('giraffe').setAttribute('transform', 'translate(315, 350)');
+                document.getElementById('bear').setAttribute('transform', 'translate(1285, 480)');
 
                 setGiraffeGaze('down');
                 setBearGaze('down');
 
-                giraffeArm.classList.add('raise');
-                bearArm.classList.add('raise');
+                const isLeft = (currentStep === 1 || currentStep === 2);
+                const gActiveArm = isLeft ? gArmLeft : gArmRight;
+                const bActiveArm = isLeft ? bArmLeft : bArmRight;
+
+                gActiveArm.style.transform = 'rotate(0deg)';
+                bActiveArm.style.transform = isLeft ? 'rotate(0deg)' : 'scaleX(-1) rotate(0deg)';
 
                 // Tap animation timing
                 animTimeouts.push(setTimeout(() => {
-                    giraffeArm.classList.remove('raise');
-                    giraffeArm.classList.add('tap');
-                    bearArm.classList.remove('raise');
-                    bearArm.classList.add('tap');
+                    if (currentStep === 1) gActiveArm.style.transform = 'rotate(20deg)';
+                    else if (currentStep === 2) gActiveArm.style.transform = 'rotate(40deg)';
+                    else if (currentStep === 3) gActiveArm.style.transform = 'rotate(-40deg)';
+                    else if (currentStep === 4) gActiveArm.style.transform = 'rotate(-20deg)';
+
+                    if (currentStep === 1) bActiveArm.style.transform = 'rotate(-30deg)';
+                    else if (currentStep === 2) bActiveArm.style.transform = 'rotate(-50deg)';
+                    else if (currentStep === 3) bActiveArm.style.transform = 'scaleX(-1) rotate(-50deg)';
+                    else if (currentStep === 4) bActiveArm.style.transform = 'scaleX(-1) rotate(-30deg)';
                 }, 180));
 
                 animTimeouts.push(setTimeout(() => {
                     // Strike moment
-                    document.getElementById(`drumGroup${currentStep}`).classList.add('dipped');
+                    const banjoDrum = document.getElementById(`banjoDrum${currentStep}`);
+                    if (banjoDrum) {
+                        banjoDrum.classList.add('dipped');
+                        const ellipse = banjoDrum.querySelector('ellipse');
+                        if (ellipse) ellipse.classList.add('glowing-drum');
+                    }
+                    const bearDrum = document.getElementById(`bearDrum${currentStep}`);
+                    if (bearDrum) {
+                        bearDrum.classList.add('dipped');
+                        const ellipse = bearDrum.querySelector('ellipse');
+                        if (ellipse) ellipse.classList.add('glowing-drum');
+                    }
                     document.getElementById(`block${currentStep}`).classList.add('glowing');
 
                     const gCounts = ["One", "Two", "Three", "Four"];
@@ -467,8 +575,8 @@
 
                 // Reset arms
                 animTimeouts.push(setTimeout(() => {
-                    giraffeArm.classList.remove('tap');
-                    bearArm.classList.remove('tap');
+                    gActiveArm.style.transform = '';
+                    bActiveArm.style.transform = '';
                 }, 600));
             }
         }

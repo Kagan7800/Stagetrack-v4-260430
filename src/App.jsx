@@ -1,4 +1,5 @@
-// file:///c:/0-Music%20Fun/Backups/backup%20for%20firestore/src/App.jsx
+// src/App.jsx
+
 import { useState, useEffect, useRef } from 'react';
 import PresentationContainer from './components/PresentationContainer';
 import Chat from './components/Chat';
@@ -96,7 +97,9 @@ function App() {
     isPeoStickersOpen,
     stageTimer, setStageTimer,
     gcUsers,
-    pendingRequest
+    pendingRequest,
+    remoteStreams,
+    localStream
   } = useAppContext();
 
   const isRhythmWheel = mediaUrl && mediaUrl.includes('1,2,3,4');
@@ -149,11 +152,7 @@ function App() {
   const loggedInGc = participants.find(p => p.id && String(p.id).startsWith('active-joined')) ||
                      participants.find(p => !p.isInstructor && !p.isBlank && p.id !== 'instructor-ic');
 
-  const otherGcs = participants.filter(p => 
-    !p.isBlank && 
-    !p.isInstructor && 
-    p.id !== (loggedInGc ? loggedInGc.id : null)
-  );
+  const joinedGuests = participants.filter(p => !p.isBlank && !p.isInstructor && (gcUsers || []).some(u => u.uid === p.id));
 
   const isStoOpen = isSidebarOpen && activeToolbox === 'student';
   const isItoOpen = isSidebarOpen && activeToolbox === 'instructor';
@@ -164,7 +163,6 @@ function App() {
     setActivityKey(prev => prev + 1);
   };
 
-  // Inactivity timer for all portrait panels (Chat, ITO, STO)
   useEffect(() => {
     if (!isPortrait || !isAnyPanelOpen) return;
 
@@ -176,7 +174,7 @@ function App() {
     const timer = setTimeout(() => {
       setIsChatOpen(false);
       setIsSidebarOpen(false);
-    }, 20000); // 20 seconds
+    }, 20000);
 
     return () => {
       window.removeEventListener('mousemove', resetInactivity);
@@ -190,20 +188,14 @@ function App() {
   let rightParticipants = [];
   if (isPortrait) {
     const pSlot1 = ic;
-    const pSlot2 = loggedInGc || { id: 'portrait-blank-top', isBlank: true };
     if (isAnyPanelOpen) {
-      // Remove all 4 PEO containers in view when a utility panel is opened
       rightParticipants = [];
     } else {
-      const pOther = [...otherGcs];
-      if (pOther.length % 2 !== 0) {
-        pOther.push({ id: 'portrait-blank-end', isBlank: true });
-      }
-      rightParticipants = [pSlot1, pSlot2, ...pOther];
+      rightParticipants = pendingRequest !== null
+        ? [pSlot1, ...joinedGuests, participants.find(p => p.isBlank) || { id: 'blank-1', isBlank: true, blankIndex: 1 }]
+        : [pSlot1, ...joinedGuests];
     }
   }
-
-  const joinedGuests = participants.filter(p => !p.isBlank && !p.isInstructor && (gcUsers || []).some(u => u.uid === p.id));
   const instructorUser = participants.find(p => p.isInstructor) || { 
     id: 'instructor-ic', 
     name: 'Instructor', 
@@ -214,17 +206,14 @@ function App() {
 
   const leftParticipants = [instructorUser];
   
-  const rightParticipantsLandscape = joinedGuests.length === 0
-    ? [participants.find(p => p.isBlank) || { id: 'blank-1', isBlank: true, blankIndex: 1 }]
-    : ((joinedGuests.length === 1 || pendingRequest !== null)
-        ? [...joinedGuests, participants.find(p => p.isBlank) || { id: 'blank-1', isBlank: true, blankIndex: 1 }]
-        : joinedGuests
-      );
+  const rightParticipantsLandscape = pendingRequest !== null
+    ? [...joinedGuests, participants.find(p => p.isBlank) || { id: 'blank-1', isBlank: true, blankIndex: 1 }]
+    : joinedGuests;
 
   const halfLength = Math.max(leftParticipants.length, rightParticipantsLandscape.length);
 
   const toggleITO = () => {
-    setIsChatOpen(false); // Close chat if toggling ITO
+    setIsChatOpen(false);
     if (isSidebarOpen && activeToolbox === 'instructor') {
       setIsSidebarOpen(false);
       setActiveToolbox(null);
@@ -237,7 +226,7 @@ function App() {
   };
 
   const toggleSTO = () => {
-    setIsChatOpen(false); // Close chat if toggling STO
+    setIsChatOpen(false);
     if (isSidebarOpen && activeToolbox === 'student') {
       setIsSidebarOpen(false);
       setActiveToolbox(null);
@@ -321,7 +310,6 @@ function App() {
         }}
       />
 
-
       {/* LAYER 1.5: GLOBAL CONFETTI OVERLAY FOR SOR THEME */}
       {activeTheme === 'sor' && isConfettiActive && (
         <div className="global-confetti-container">
@@ -331,40 +319,58 @@ function App() {
 
       {/* LAYER 2: INTERACTIVE UI HOUSING */}
       <div style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', height: '100%', width: '100%' }}>
-      {/* Top Banner */}
-      {!isPortrait ? (
-        activeTheme !== 'sor' ? (
-          <div className="top-banner" style={{ backgroundImage: "url('/banner.png')", backgroundSize: '100% 100%', backgroundRepeat: 'no-repeat', backgroundPosition: 'center', position: 'relative' }}>
-            {/* Left Side Logo */}
-            <div style={{ position: 'absolute', left: '70px', height: '100%', display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
+        {/* Top Banner */}
+        {!isPortrait ? (
+          activeTheme !== 'sor' ? (
+            <div className="top-banner" style={{ backgroundImage: "url('/banner.png')", backgroundSize: '100% 100%', backgroundRepeat: 'no-repeat', backgroundPosition: 'center', position: 'relative' }}>
+              <div style={{ position: 'absolute', left: '70px', height: '100%', display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
+                <img 
+                  src="/greenStagetrack_studio.png" 
+                  alt="Stagetrack Studio" 
+                  style={{ 
+                    height: '70%', 
+                    maxWidth: '100%', 
+                    objectFit: 'contain',
+                    filter: 'drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.25))'
+                  }} 
+                />
+              </div>
+
               <img 
-                src="/greenStagetrack_studio.png" 
-                alt="Stagetrack Studio" 
+                src="/assets/Logo_modern.png" 
+                alt="Music Fun Logo" 
                 style={{ 
-                  height: '70%', 
-                  maxWidth: '100%', 
+                  height: '100%', 
+                  width: 'auto', 
                   objectFit: 'contain',
-                  filter: 'drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.25))'
+                  filter: 'drop-shadow(0px 3px 6px rgba(0, 0, 0, 0.3))'
                 }} 
               />
+
+              {stageTimer && (stageTimer.isRunning || stageTimer.duration > 0) && (
+                <StageTimerDisplay stageTimer={stageTimer} setStageTimer={setStageTimer} isInstructorClient={isInstructorClient} />
+              )}
             </div>
+          ) : (
+            <div className="top-banner" style={{ backgroundImage: "radial-gradient(ellipse at top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0) 70%), linear-gradient(to bottom, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.1) 100%), url('/assets/SOR/1ui_sor top banner-052826 3.png')", backgroundSize: '100% 100%', backgroundRepeat: 'no-repeat', backgroundPosition: 'center', position: 'relative' }}>
+              <img 
+                src="/assets/SOR/2logo-sor-053126.png" 
+                alt="School of Rock Logo" 
+                style={{ 
+                  height: '100%', 
+                  width: 'calc(10.4vh * 32768 / 6180)', 
+                  objectFit: 'fill',
+                  zIndex: 1000
+                }} 
+              />
+              <div className="gradient-divider-bar" style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '6px' }}></div>
 
-            <img 
-              src="/assets/logo_modern.png" 
-              alt="Music Fun Logo" 
-              style={{ 
-                height: '100%', 
-                width: 'auto', 
-                objectFit: 'contain',
-                filter: 'drop-shadow(0px 3px 6px rgba(0, 0, 0, 0.3))'
-              }} 
-            />
-
-            {stageTimer && (stageTimer.isRunning || stageTimer.duration > 0) && (
-              <StageTimerDisplay stageTimer={stageTimer} setStageTimer={setStageTimer} isInstructorClient={isInstructorClient} />
-            )}
-          </div>
-        ) : (
+              {stageTimer && (stageTimer.isRunning || stageTimer.duration > 0) && (
+                <StageTimerDisplay stageTimer={stageTimer} setStageTimer={setStageTimer} isInstructorClient={isInstructorClient} />
+              )}
+            </div>
+          )
+        ) : activeTheme === 'sor' ? (
           <div className="top-banner" style={{ backgroundImage: "radial-gradient(ellipse at top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0) 70%), linear-gradient(to bottom, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.1) 100%), url('/assets/SOR/1ui_sor top banner-052826 3.png')", backgroundSize: '100% 100%', backgroundRepeat: 'no-repeat', backgroundPosition: 'center', position: 'relative' }}>
             <img 
               src="/assets/SOR/2logo-sor-053126.png" 
@@ -382,310 +388,290 @@ function App() {
               <StageTimerDisplay stageTimer={stageTimer} setStageTimer={setStageTimer} isInstructorClient={isInstructorClient} />
             )}
           </div>
-        )
-      ) : activeTheme === 'sor' ? (
-        <div className="top-banner" style={{ backgroundImage: "radial-gradient(ellipse at top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0) 70%), linear-gradient(to bottom, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.1) 100%), url('/assets/SOR/1ui_sor top banner-052826 3.png')", backgroundSize: '100% 100%', backgroundRepeat: 'no-repeat', backgroundPosition: 'center', position: 'relative' }}>
-          <img 
-            src="/assets/SOR/2logo-sor-053126.png" 
-            alt="School of Rock Logo" 
-            style={{ 
-              height: '100%', 
-              width: 'calc(10.4vh * 32768 / 6180)', 
-              objectFit: 'fill',
-              zIndex: 1000
-            }} 
-          />
-          <div className="gradient-divider-bar" style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '6px' }}></div>
-
-          {stageTimer && (stageTimer.isRunning || stageTimer.duration > 0) && (
-            <StageTimerDisplay stageTimer={stageTimer} setStageTimer={setStageTimer} isInstructorClient={isInstructorClient} />
-          )}
-        </div>
-      ) : (
-        <div className="top-banner" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'relative' }}>
-          <div style={{ 
-            display: 'flex', 
-            flexDirection: 'column', 
-            alignItems: 'center',
-            padding: '12px 30px',
-            backgroundColor: 'rgba(11, 25, 46, 0.75)', 
-            borderTop: '2.5px solid #facc15', 
-            borderBottom: '2.5px solid #facc15',
-            borderRadius: '4px'
-          }}>
-            <img 
-              src="/assets/All/mftext_only.png" 
-              alt="Music Fun" 
-              style={{ 
-                height: 'auto',
-                maxHeight: '8.6vh', 
-                maxWidth: '80%', 
-                objectFit: 'contain',
-                filter: 'brightness(0) saturate(100%) invert(86%) sepia(87%) saturate(588%) hue-rotate(346deg) brightness(104%) contrast(97%) drop-shadow(0px 2px 4px rgba(0,0,0,0.25))'
-              }} 
-            />
-          </div>
-
-          {stageTimer && (stageTimer.isRunning || stageTimer.duration > 0) && (
-            <StageTimerDisplay stageTimer={stageTimer} setStageTimer={setStageTimer} isInstructorClient={isInstructorClient} />
-          )}
-        </div>
-      )}
-
-      {/* Main Content Layout */}
-      <div className="main-content">
-        {/* Left Sidebar containing both ITO and STO accordions */}
-        {isInstructorSidebarVisible && !isPortrait && (
-          <div className={`instructor-left-sidebar ${isSidebarOpen ? 'open' : 'closed'}`}>
-            <LeftSidebar />
-          </div>
-        )}
-
-        {/* Center Grid */}
-        {isPortrait ? (
-          <div 
-            className="center-grid-area" 
-            data-columns="1" 
-            data-total-peos={participants.length}
-            data-sidebar-open={isSidebarOpen ? "true" : "false"}
-            data-chat-open={isChatOpen ? "true" : "false"}
-          >
-            <div className="center-wrapper" style={{ justifyContent: 'center' }}>
-              <div className={`pc-width-keeper ${isChatOpen ? 'pc-sidebar-open' : ''}`}>
-                 <div 
-                  className={`pc-gt-unified ${mediaType === 'iframe' || mediaType === 'metronome' ? 'metronome-active' : ''} ${isRhythmWheel ? 'rhythm-wheel-container' : 'presentation-container-parent'}`}
-                 >
-                    <PresentationContainer 
-                      isDoodling={isDoodling}
-                      mediaUrl={mediaUrl}
-                      mediaType={mediaType}
-                      onClearMedia={clearMedia}
-                    />
-                </div>
-              </div>
-            </div>
-            
-            <div 
-              className="portrait-bottom-container"
-              onMouseMove={resetInactivity}
-              onClick={resetInactivity}
-              onTouchStart={resetInactivity}
-            >
-              {!isAnyPanelOpen ? (
-                /* Show all 4 PEO containers when no panel is open */
-                <div className="side-peos right-peos-sidebar">
-                  {rightParticipants.map(p => {
-                    const isMe = p.id && String(p.id).startsWith('active-joined');
-                    return (
-                      <GuestContainer 
-                        key={p.id}
-                        participant={p}
-                        isActive={activeGuestId === p.id}
-                        onClick={() => {
-                          if (isMe) {
-                            if (isSidebarOpen && activeToolbox === 'student') {
-                              setIsSidebarOpen(false);
-                            } else {
-                              setIsSidebarOpen(true);
-                              setActiveGuestId(p.id);
-                              setActiveToolbox("student");
-                            }
-                            return;
-                          }
-                          if (!isInstructorClient && p.id !== loggedInGc?.id) return;
-                          if (p.isBlank) return;
-                          setActiveGuestId(p.id);
-                          setActiveToolbox("student");
-                          setIsSidebarOpen(true);
-                        }}
-                        onDoubleClick={() => handleDoubleClick(p)}
-                        stickers={guestStickers[p.id] || []}
-                        buttons={guestButtons[p.id] || {}}
-                        nudges={stickerNudges[p.id] || {}}
-                        isDoodling={isDoodling}
-                        globalMute={globalMute}
-                        globalPause={globalPause}
-                      />
-                    );
-                  })}
-                </div>
-              ) : (
-                /* Show the opened panel instead of PEOs */
-                <div className="portrait-active-panel-wrapper">
-                  {isChatOpen && (
-                    <div className="portrait-chat-panel">
-                      <div className="toolbox-header-custom">
-                        <span>Chat</span>
-                        <button className="close-panel-btn" onClick={() => setIsChatOpen(false)}>✕</button>
-                      </div>
-                      <Chat 
-                        messages={messages} 
-                        onSendMessage={handleSendChatMessage} 
-                        onModerate={handleModerateMessage}
-                        onClose={() => setIsChatOpen(false)} 
-                      />
-                    </div>
-                  )}
-                  
-                  {isItoOpen && (
-                    <div className="portrait-ito-panel">
-                      <div className="toolbox-header-custom">
-                        <span>Class Content</span>
-                        <button className="close-panel-btn" onClick={() => setIsSidebarOpen(false)}>✕</button>
-                      </div>
-                      <InstructorToolbox />
-                    </div>
-                  )}
-
-                  {isStoOpen && activeGuest && (
-                    <div className="portrait-sto-panel">
-                      <div className="toolbox-header-custom">
-                        <span>Student Tools</span>
-                        <button className="close-panel-btn" onClick={() => setIsSidebarOpen(false)}>✕</button>
-                      </div>
-                      <UnifiedToolbox 
-                        activeGuest={activeGuest}
-                        guestButtons={guestButtons}
-                        toggleGuestButton={handleToggleGuestButton}
-                        onAddSticker={handleAddSticker}
-                        onClose={() => setIsSidebarOpen(false)}
-                      />
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Small square buttons at the bottom for Chat, ITO, STO (for portrait view) */}
-              <div className="portrait-buttons-row">
-                <button 
-                  className={`square-action-btn ${isChatOpen ? 'active' : ''}`}
-                  onClick={() => {
-                    setIsChatOpen(p => !p);
-                    setIsSidebarOpen(false); // Close other panels
-                  }}
-                  title="Chat"
-                >
-                  Chat
-                </button>
-                <button 
-                  className={`square-action-btn ${isSidebarOpen && activeToolbox === 'instructor' ? 'active' : ''}`}
-                  onClick={toggleITO}
-                  title="ITO"
-                >
-                  ITO
-                </button>
-                <button 
-                  className={`square-action-btn ${isSidebarOpen && activeToolbox === 'student' ? 'active' : ''}`}
-                  onClick={toggleSTO}
-                  title="STO"
-                >
-                  STO
-                </button>
-              </div>
-            </div>
-          </div>
         ) : (
-          /* Center Grid (Landscape/Desktop) */
-          <div className={`center-grid-area ${isChatOpen ? 'sidebars-open' : ''}`} data-columns={halfLength <= 3 ? "1" : "2"} data-left-open={false} data-right-open={isChatOpen}>
-             <div className="side-peos" data-columns={halfLength <= 3 ? "1" : "2"}>
-               {leftParticipants.map(p => {
-                 return (
-                   <GuestContainer 
-                     key={p.id}
-                     participant={p}
-                     isActive={activeGuestId === p.id}
-                     onClick={() => {
-                       if (!isInstructorClient && p.id !== loggedInGc?.id) return;
-                       if (p.isBlank) return;
-                        if (activeGuestId === p.id && activeToolbox === "student" && isSidebarOpen) {
-                          setIsSidebarOpen(false);
-                        } else {
-                          setActiveGuestId(p.id);
-                          setActiveToolbox("student");
-                          setIsSidebarOpen(true);
-                        }
-                     }}
-                     onDoubleClick={() => handleDoubleClick(p)}
-                     stickers={guestStickers[p.id] || []}
-                     buttons={guestButtons[p.id] || {}}
-                     nudges={stickerNudges[p.id] || {}}
-                     isDoodling={isDoodling}
-                     globalMute={globalMute}
-                     globalPause={globalPause}
-                   />
-                 );
-               })}
-             </div>
+          <div className="top-banner" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'relative' }}>
+            <div style={{ 
+              display: 'flex', 
+              flexDirection: 'column', 
+              alignItems: 'center',
+              padding: '12px 30px',
+              backgroundColor: 'rgba(11, 25, 46, 0.75)', 
+              borderTop: '2.5px solid #facc15', 
+              borderBottom: '2.5px solid #facc15',
+              borderRadius: '4px'
+            }}>
+              <img 
+                src="/assets/All/mftext_only.png" 
+                alt="Music Fun" 
+                style={{ 
+                  height: 'auto',
+                  maxHeight: '8.6vh', 
+                  maxWidth: '80%', 
+                  objectFit: 'contain',
+                  filter: 'brightness(0) saturate(100%) invert(86%) sepia(87%) saturate(588%) hue-rotate(346deg) brightness(104%) contrast(97%) drop-shadow(0px 2px 4px rgba(0,0,0,0.25))'
+                }} 
+              />
+            </div>
 
-              <div className="center-wrapper" style={{ position: 'relative', alignSelf: 'flex-start' }}>
-                <div style={{ 
-                  display: 'flex', 
-                  flexDirection: 'column', 
-                  width: 'fit-content', 
-                  alignItems: 'center', 
-                  height: '100%', 
-                  justifyContent: ((isInstructorClient && showInstructorStickers) || showStudentStickers || showStudentFilters || isPeoStickersOpen || (isInstructorClient && activeItoSection === 'studio')) ? 'space-between' : 'center' 
-                }}>
-                 <div className={`pc-width-keeper ${isChatOpen ? 'pc-sidebar-open' : ''}`}>
-                    <div 
-                      className={`pc-gt-unified ${mediaType === 'iframe' || mediaType === 'metronome' ? 'metronome-active' : ''} ${isRhythmWheel ? 'rhythm-wheel-container' : 'presentation-container-parent'}`}
-                    >
-                       <PresentationContainer 
-                         isDoodling={isDoodling}
-                         mediaUrl={mediaUrl}
-                         mediaType={mediaType}
-                         onClearMedia={clearMedia}
-                       />
-                   </div>
-                 </div>
-                 <ControlDeck />
-               </div>
-             </div>
-             
-             <div className="side-peos" data-columns={halfLength <= 3 ? "1" : "2"}>
-               {rightParticipantsLandscape.map(p => {
-                 return (
-                   <GuestContainer 
-                     key={p.id}
-                     participant={p}
-                     isActive={activeGuestId === p.id}
-                     onClick={() => {
-                       if (!isInstructorClient && p.id !== loggedInGc?.id) return;
-                       if (p.isBlank) return;
-                        if (activeGuestId === p.id && activeToolbox === "student" && isSidebarOpen) {
-                          setIsSidebarOpen(false);
-                        } else {
-                          setActiveGuestId(p.id);
-                          setActiveToolbox("student");
-                          setIsSidebarOpen(true);
-                        }
-                     }}
-                     onDoubleClick={() => handleDoubleClick(p)}
-                     stickers={guestStickers[p.id] || []}
-                     buttons={guestButtons[p.id] || {}}
-                     nudges={stickerNudges[p.id] || {}}
-                     isDoodling={isDoodling}
-                     globalMute={globalMute}
-                     globalPause={globalPause}
-                   />
-                 );
-               })}
+            {stageTimer && (stageTimer.isRunning || stageTimer.duration > 0) && (
+              <StageTimerDisplay stageTimer={stageTimer} setStageTimer={setStageTimer} isInstructorClient={isInstructorClient} />
+            )}
+          </div>
+        )}
+
+        {/* Main Content Layout */}
+        <div className="main-content">
+          {/* Left Sidebar containing both ITO and STO accordions */}
+          {isInstructorSidebarVisible && !isPortrait && (
+            <div className={`instructor-left-sidebar ${isSidebarOpen ? 'open' : 'closed'}`}>
+              <LeftSidebar />
+            </div>
+          )}
+
+          {/* Center Grid */}
+          {isPortrait ? (
+            <div 
+              className="center-grid-area" 
+              data-columns="1" 
+              data-total-peos={participants.length}
+              data-sidebar-open={isSidebarOpen ? "true" : "false"}
+              data-chat-open={isChatOpen ? "true" : "false"}
+            >
+              <div className="center-wrapper" style={{ justifyContent: 'center' }}>
+                <div className={`pc-width-keeper ${isChatOpen ? 'pc-sidebar-open' : ''}`}>
+                   <div 
+                    className={`pc-gt-unified ${mediaType === 'iframe' || mediaType === 'metronome' ? 'metronome-active' : ''} ${isRhythmWheel ? 'rhythm-wheel-container' : 'presentation-container-parent'}`}
+                   >
+                      <PresentationContainer 
+                        isDoodling={isDoodling}
+                        mediaUrl={mediaUrl}
+                        mediaType={mediaType}
+                        onClearMedia={clearMedia}
+                      />
+                  </div>
+                </div>
               </div>
-          </div>
-        )}
+              
+              <div 
+                className="portrait-bottom-container"
+                onMouseMove={resetInactivity}
+                onClick={resetInactivity}
+                onTouchStart={resetInactivity}
+              >
+                {!isAnyPanelOpen ? (
+                  <div className="side-peos right-peos-sidebar">
+                    {rightParticipants.map(p => {
+                      const isMe = p.id && String(p.id).startsWith('active-joined');
+                      return (
+                        <GuestContainer 
+                          key={p.id}
+                          participant={p}
+                          stream={p.stream || (typeof remoteStreams !== 'undefined' ? remoteStreams[p.id] : null) || (p.isInstructor ? localStream : null)}
+                          isActive={activeGuestId === p.id}
+                          onClick={() => {
+                            if (isMe) {
+                              if (isSidebarOpen && activeToolbox === 'student') {
+                                setIsSidebarOpen(false);
+                              } else {
+                                setIsSidebarOpen(true);
+                                setActiveGuestId(p.id);
+                                setActiveToolbox("student");
+                              }
+                              return;
+                            }
+                            if (!isInstructorClient && p.id !== loggedInGc?.id) return;
+                            if (p.isBlank) return;
+                            setActiveGuestId(p.id);
+                            setActiveToolbox("student");
+                            setIsSidebarOpen(true);
+                          }}
+                          onDoubleClick={() => handleDoubleClick(p)}
+                          stickers={guestStickers[p.id] || []}
+                          buttons={guestButtons[p.id] || {}}
+                          nudges={stickerNudges[p.id] || {}}
+                          isDoodling={isDoodling}
+                          globalMute={globalMute}
+                          globalPause={globalPause}
+                        />
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="portrait-active-panel-wrapper">
+                    {isChatOpen && (
+                      <div className="portrait-chat-panel">
+                        <div className="toolbox-header-custom">
+                          <span>Chat</span>
+                          <button className="close-panel-btn" onClick={() => setIsChatOpen(false)}>✕</button>
+                        </div>
+                        <Chat 
+                          messages={messages} 
+                          onSendMessage={handleSendChatMessage} 
+                          onModerate={handleModerateMessage}
+                          onClose={() => setIsChatOpen(false)} 
+                        />
+                      </div>
+                    )}
+                    
+                    {isItoOpen && (
+                      <div className="portrait-ito-panel">
+                        <div className="toolbox-header-custom">
+                          <span>Class Content</span>
+                          <button className="close-panel-btn" onClick={() => setIsSidebarOpen(false)}>✕</button>
+                        </div>
+                        <InstructorToolbox />
+                      </div>
+                    )}
 
-        {/* Right Sidebar (only for landscape view) */}
-        {isChatOpen && !isPortrait && (
-          <div className="right-sidebar">
-             <Chat 
-               messages={messages} 
-               onSendMessage={handleSendChatMessage} 
-               onModerate={handleModerateMessage}
-               onClose={() => setIsChatOpen(false)} 
-             />
-          </div>
-        )}
-      </div>
+                    {isStoOpen && activeGuest && (
+                      <div className="portrait-sto-panel">
+                        <div className="toolbox-header-custom">
+                          <span>Student Tools</span>
+                          <button className="close-panel-btn" onClick={() => setIsSidebarOpen(false)}>✕</button>
+                        </div>
+                        <UnifiedToolbox 
+                          activeGuest={activeGuest}
+                          guestButtons={guestButtons}
+                          toggleGuestButton={handleToggleGuestButton}
+                          onAddSticker={handleAddSticker}
+                          onClose={() => setIsSidebarOpen(false)}
+                        />
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                <div className="portrait-buttons-row">
+                  <button 
+                    className={`square-action-btn ${isChatOpen ? 'active' : ''}`}
+                    onClick={() => {
+                      setIsChatOpen(p => !p);
+                      setIsSidebarOpen(false);
+                    }}
+                    title="Chat"
+                  >
+                    Chat
+                  </button>
+                  <button 
+                    className={`square-action-btn ${isSidebarOpen && activeToolbox === 'instructor' ? 'active' : ''}`}
+                    onClick={toggleITO}
+                    title="ITO"
+                  >
+                    ITO
+                  </button>
+                  <button 
+                    className={`square-action-btn ${isSidebarOpen && activeToolbox === 'student' ? 'active' : ''}`}
+                    onClick={toggleSTO}
+                    title="STO"
+                  >
+                    STO
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className={`center-grid-area ${isChatOpen ? 'sidebars-open' : ''}`} data-columns={halfLength <= 3 ? "1" : "2"} data-left-open={false} data-right-open={isChatOpen}>
+               <div className="side-peos" data-columns={halfLength <= 3 ? "1" : "2"}>
+                 {leftParticipants.map(p => {
+                   return (
+                     <GuestContainer 
+                       key={p.id}
+                       participant={p}
+                       stream={p.stream || (typeof remoteStreams !== 'undefined' ? remoteStreams[p.id] : null) || (p.isInstructor ? localStream : null)}
+                       isActive={activeGuestId === p.id}
+                       onClick={() => {
+                         if (!isInstructorClient && p.id !== loggedInGc?.id) return;
+                         if (p.isBlank) return;
+                          if (activeGuestId === p.id && activeToolbox === "student" && isSidebarOpen) {
+                            setIsSidebarOpen(false);
+                          } else {
+                            setActiveGuestId(p.id);
+                            setActiveToolbox("student");
+                            setIsSidebarOpen(true);
+                          }
+                       }}
+                       onDoubleClick={() => handleDoubleClick(p)}
+                       stickers={guestStickers[p.id] || []}
+                       buttons={guestButtons[p.id] || {}}
+                       nudges={stickerNudges[p.id] || {}}
+                       isDoodling={isDoodling}
+                       globalMute={globalMute}
+                       globalPause={globalPause}
+                     />
+                   );
+                 })}
+               </div>
+
+                <div className="center-wrapper" style={{ position: 'relative', alignSelf: 'flex-start' }}>
+                  <div style={{ 
+                    display: 'flex', 
+                    flexDirection: 'column', 
+                    width: 'fit-content', 
+                    alignItems: 'center', 
+                    height: '100%', 
+                    justifyContent: ((isInstructorClient && showInstructorStickers) || showStudentStickers || showStudentFilters || isPeoStickersOpen || (isInstructorClient && activeItoSection === 'studio')) ? 'space-between' : 'center' 
+                  }}>
+                   <div className={`pc-width-keeper ${isChatOpen ? 'pc-sidebar-open' : ''}`}>
+                      <div 
+                        className={`pc-gt-unified ${mediaType === 'iframe' || mediaType === 'metronome' ? 'metronome-active' : ''} ${isRhythmWheel ? 'rhythm-wheel-container' : 'presentation-container-parent'}`}
+                      >
+                         <PresentationContainer 
+                           isDoodling={isDoodling}
+                           mediaUrl={mediaUrl}
+                           mediaType={mediaType}
+                           onClearMedia={clearMedia}
+                         />
+                     </div>
+                   </div>
+                   <ControlDeck />
+                 </div>
+               </div>
+               
+               <div className="side-peos" data-columns={halfLength <= 3 ? "1" : "2"}>
+                 {rightParticipantsLandscape.map(p => {
+                   return (
+                     <GuestContainer 
+                       key={p.id}
+                       participant={p}
+                       stream={p.stream || (typeof remoteStreams !== 'undefined' ? remoteStreams[p.id] : null) || (p.isInstructor ? localStream : null)}
+                       isActive={activeGuestId === p.id}
+                       onClick={() => {
+                         if (!isInstructorClient && p.id !== loggedInGc?.id) return;
+                         if (p.isBlank) return;
+                          if (activeGuestId === p.id && activeToolbox === "student" && isSidebarOpen) {
+                            setIsSidebarOpen(false);
+                          } else {
+                            setActiveGuestId(p.id);
+                            setActiveToolbox("student");
+                            setIsSidebarOpen(true);
+                          }
+                       }}
+                       onDoubleClick={() => handleDoubleClick(p)}
+                       stickers={guestStickers[p.id] || []}
+                       buttons={guestButtons[p.id] || {}}
+                       nudges={stickerNudges[p.id] || {}}
+                       isDoodling={isDoodling}
+                       globalMute={globalMute}
+                       globalPause={globalPause}
+                     />
+                   );
+                 })}
+                </div>
+            </div>
+          )}
+
+          {/* Right Sidebar */}
+          {isChatOpen && !isPortrait && (
+            <div className="right-sidebar">
+               <Chat 
+                 messages={messages} 
+                 onSendMessage={handleSendChatMessage} 
+                 onModerate={handleModerateMessage}
+                 onClose={() => setIsChatOpen(false)} 
+               />
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

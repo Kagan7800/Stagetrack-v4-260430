@@ -42,7 +42,7 @@ export default function PresentationContainer({
   mediaUrl, 
   mediaType: propMediaType
 }) {
-  const { drawingPaths, setDrawingPaths, mediaType: globalMediaType, sessionId, rhythmBeat } = useAppContext();
+  const { drawingPaths, setDrawingPaths, mediaType: globalMediaType, sessionId, rhythmBeat, curtainsOpen } = useAppContext();
   const mediaType = propMediaType || globalMediaType;
 
   const displayUrl = mediaUrl || '/assets/MF_images/Music_Fun_with_my_Little_One.jpg';
@@ -57,6 +57,48 @@ export default function PresentationContainer({
   const [selectedColor, setSelectedColor] = useState('#ec4899');
   const selectedColorRef = useRef('#ec4899');
   const currentPathRef = useRef(null);
+
+  // SVG Curtain Transition States
+  const [renderedUrl, setRenderedUrl] = useState(displayUrl);
+  const [renderedType, setRenderedType] = useState(displayType);
+  const [localCurtainsOpen, setLocalCurtainsOpen] = useState(true);
+  const isCurtainOpen = curtainsOpen && localCurtainsOpen;
+
+  const firstRenderRef = useRef(true);
+
+  useEffect(() => {
+    if (firstRenderRef.current) {
+      firstRenderRef.current = false;
+      return;
+    }
+
+    let active = true;
+    let openTimer = null;
+    
+    // 1. Close local curtains
+    setLocalCurtainsOpen(false);
+
+    // 2. Wait for transition to close (1200ms matching transition timing)
+    const closeTimer = setTimeout(() => {
+      if (!active) return;
+      // 3. Switch media behind closed curtains
+      setRenderedUrl(displayUrl);
+      setRenderedType(displayType);
+
+      // 4. Wait a bit for layout, then open curtains
+      openTimer = setTimeout(() => {
+        if (!active) return;
+        setLocalCurtainsOpen(true);
+      }, 150);
+      
+    }, 1200);
+
+    return () => {
+      active = false;
+      clearTimeout(closeTimer);
+      if (openTimer) clearTimeout(openTimer);
+    };
+  }, [displayUrl, displayType]);
 
   useEffect(() => {
     const handleMessage = (event) => {
@@ -141,7 +183,7 @@ export default function PresentationContainer({
     
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    drawingPaths.forEach(path => {
+    (drawingPaths || []).forEach(path => {
       if (!path.points || path.points.length === 0) return;
       ctx.beginPath();
       ctx.lineCap = 'round';
@@ -266,7 +308,7 @@ export default function PresentationContainer({
   };
 
   const handleUndo = () => {
-    if (drawingPaths.length === 0) return;
+    if (!drawingPaths || drawingPaths.length === 0) return;
     const nextPaths = [...drawingPaths];
     const undone = nextPaths.pop();
     setRedoStack(prev => [...prev, undone]);
@@ -278,7 +320,7 @@ export default function PresentationContainer({
     const nextRedo = [...redoStack];
     const redone = nextRedo.pop();
     setRedoStack(nextRedo);
-    setDrawingPaths(prev => [...prev, redone]);
+    setDrawingPaths(prev => [...(prev || []), redone]);
   };
 
   const handleClear = () => {
@@ -287,161 +329,216 @@ export default function PresentationContainer({
   };
 
   return (
-    <div className="pc-canvas-area" onClick={handleDeckClick}>
-      {/* Media Layer */}
-      {(displayUrl || displayType === 'metronome') && (
-        <div 
-          className={`media-container ${displayType === 'video' ? 'video-active' : ''} ${displayType === 'image' ? 'instructor-view-tile' : ''}`}
-          style={isRhythmWheelActivity(displayUrl, displayType) ? {
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            width: '100%',
-            height: '100%',
-            maxWidth: '100%',
-            maxHeight: '100%',
-            borderRadius: 0,
-            zIndex: 20,
-            background: 'transparent',
-            overflow: 'visible'
-          } : displayType === 'iframe' ? { 
-            position: 'absolute',
-            top: '50%',
-            left: 0,
-            transform: 'translateY(-50%)',
-            width: '100%', 
-            height: 0,
-            paddingBottom: '56.25%', // 16:9 aspect ratio
-            maxWidth: '100%', 
-            maxHeight: 'none', 
-            borderRadius: 0, 
-            zIndex: 20
-          } : displayType === 'video' || displayType === 'metronome' ? {
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            width: '100%',
-            height: '100%',
-            maxWidth: '100%',
-            maxHeight: '100%',
-            borderRadius: 0,
-            zIndex: 20
-          } : {}}
-        >
-
-          {isRhythmWheelActivity(displayUrl, displayType) ? (
-            <CentralStageDeck 
-              mediaUrl={displayUrl} 
-              onClick={handleDeckClick}
-            />
-          ) : displayType === 'video' ? (
-            <video src={displayUrl} controls autoPlay />
-          ) : displayType === 'iframe' ? (
-            <iframe 
-              src={displayUrl} 
-              allowtransparency="true"
-              style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none', background: 'transparent', backgroundColor: 'transparent' }} 
-              allowFullScreen 
-              loading="eager"
-              fetchPriority="high"
-            />
-          ) : displayType === 'metronome' ? (
-            null
-          ) : (
-            <img 
-              src={displayUrl} 
-              alt="Uploaded Media" 
-            />
-          )}
-        </div>
-      )}
-
-
-
-      {/* Drawing Canvas Layer */}
-      <canvas
-        ref={canvasRef}
-        className={`doodle-canvas ${isDoodling ? 'active' : ''} ${selectedColor === 'eraser' ? 'eraser-active' : ''}`}
-        onMouseDown={startDrawing}
-        onMouseMove={draw}
-        onMouseUp={stopDrawing}
-        onMouseOut={stopDrawing}
-      />
-
-      {/* Doodle Color Picker Overlay */}
-      {isDoodling && (
-        <div className="doodle-color-picker glass-panel">
-          {popularColors.map((color) => (
-            <button
-              key={color.value}
-              className={`color-dot ${selectedColor === color.value ? 'active' : ''}`}
-              style={{ backgroundColor: color.value }}
-              onClick={() => handleColorChange(color.value)}
-              title={color.name}
-              aria-label={`Select ${color.name}`}
-            />
-          ))}
-          <button
-            className={`eraser-btn ${selectedColor === 'eraser' ? 'active' : ''}`}
-            onClick={() => handleColorChange('eraser')}
-            title="Eraser"
-            aria-label="Select Eraser"
+    <div className="pc-canvas-area" onClick={handleDeckClick} style={{ position: 'relative', overflow: 'hidden', width: '100%', height: '100%' }}>
+      {/* 1. Underlying Stage Scenes */}
+      <div className="scene-content" style={{ width: '100%', height: '100%' }}>
+        {/* Media Layer */}
+        {(renderedUrl || renderedType === 'metronome') && (
+          <div 
+            className={`media-container ${renderedType === 'video' ? 'video-active' : ''} ${renderedType === 'image' ? 'instructor-view-tile' : ''}`}
+            style={isRhythmWheelActivity(renderedUrl, renderedType) ? {
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              width: '100%',
+              height: '100%',
+              maxWidth: '100%',
+              maxHeight: '100%',
+              borderRadius: 0,
+              zIndex: 20,
+              background: 'transparent',
+              overflow: 'visible'
+            } : renderedType === 'iframe' ? { 
+              position: 'absolute',
+              top: '50%',
+              left: 0,
+              transform: 'translateY(-50%)',
+              width: '100%', 
+              height: 0,
+              paddingBottom: '56.25%',
+              maxWidth: '100%', 
+              maxHeight: 'none', 
+              borderRadius: 0, 
+              zIndex: 20
+            } : renderedType === 'video' || renderedType === 'metronome' ? {
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              width: '100%',
+              height: '100%',
+              maxWidth: '100%',
+              maxHeight: '100%',
+              borderRadius: 0,
+              zIndex: 20
+            } : {}}
           >
-            <Eraser size={14} />
-          </button>
 
-          {/* Divider */}
-          <div className="picker-divider"></div>
-
-          {/* Brush Size Slider */}
-          <div className="brush-slider-wrapper" title={`Brush Size: ${brushSize}px`}>
-            <input 
-              type="range"
-              min="2"
-              max="20"
-              value={brushSize}
-              onChange={(e) => setBrushSize(parseInt(e.target.value, 10))}
-              className="brush-slider"
-            />
-            <span className="brush-size-text">{brushSize}px</span>
+            {isRhythmWheelActivity(renderedUrl, renderedType) ? (
+              <CentralStageDeck 
+                mediaUrl={renderedUrl} 
+                onClick={handleDeckClick}
+              />
+            ) : renderedType === 'video' ? (
+              <video src={renderedUrl} controls autoPlay />
+            ) : renderedType === 'iframe' ? (
+              <iframe 
+                src={renderedUrl} 
+                allowtransparency="true"
+                style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none', background: 'transparent', backgroundColor: 'transparent' }} 
+                allowFullScreen 
+                loading="eager"
+                fetchPriority="high"
+              />
+            ) : renderedType === 'metronome' ? (
+              null
+            ) : (
+              <img 
+                src={renderedUrl} 
+                alt="Uploaded Media" 
+              />
+            )}
           </div>
+        )}
 
-          {/* Divider */}
-          <div className="picker-divider"></div>
+        {/* Drawing Canvas Layer */}
+        <canvas
+          ref={canvasRef}
+          className={`doodle-canvas ${isDoodling ? 'active' : ''} ${selectedColor === 'eraser' ? 'eraser-active' : ''}`}
+          onMouseDown={startDrawing}
+          onMouseMove={draw}
+          onMouseUp={stopDrawing}
+          onMouseOut={stopDrawing}
+        />
 
-          {/* Undo, Redo, and Clear Buttons */}
-          <button 
-            onClick={handleUndo} 
-            disabled={drawingPaths.length === 0} 
-            className="doodle-action-btn"
-            title="Undo"
-          >
-            <Undo2 size={14} />
-          </button>
-          
-          <button 
-            onClick={handleRedo} 
-            disabled={redoStack.length === 0} 
-            className="doodle-action-btn"
-            title="Redo"
-          >
-            <Redo2 size={14} />
-          </button>
-          
-          <button 
-            onClick={handleClear} 
-            disabled={drawingPaths.length === 0 && redoStack.length === 0} 
-            className="doodle-action-btn clear-btn"
-            title="Clear Canvas"
-          >
-            <Trash2 size={14} />
-          </button>
-        </div>
-      )}
+        {/* Doodle Color Picker Overlay */}
+        {isDoodling && (
+          <div className="doodle-color-picker glass-panel">
+            {popularColors.map((color) => (
+              <button
+                key={color.value}
+                className={`color-dot ${selectedColor === color.value ? 'active' : ''}`}
+                style={{ backgroundColor: color.value }}
+                onClick={() => handleColorChange(color.value)}
+                title={color.name}
+                aria-label={`Select ${color.name}`}
+              />
+            ))}
+            <button
+              className={`eraser-btn ${selectedColor === 'eraser' ? 'active' : ''}`}
+              onClick={() => handleColorChange('eraser')}
+              title="Eraser"
+              aria-label="Select Eraser"
+            >
+              <Eraser size={14} />
+            </button>
+
+            {/* Divider */}
+            <div className="picker-divider"></div>
+
+            {/* Brush Size Slider */}
+            <div className="brush-slider-wrapper" title={`Brush Size: ${brushSize}px`}>
+              <input 
+                type="range"
+                min="2"
+                max="20"
+                value={brushSize}
+                onChange={(e) => setBrushSize(parseInt(e.target.value, 10))}
+                className="brush-slider"
+              />
+              <span className="brush-size-text">{brushSize}px</span>
+            </div>
+
+            {/* Divider */}
+            <div className="picker-divider"></div>
+
+            {/* Undo, Redo, and Clear Buttons */}
+            <button 
+              onClick={handleUndo} 
+              disabled={!drawingPaths || drawingPaths.length === 0} 
+              className="doodle-action-btn"
+              title="Undo"
+            >
+              <Undo2 size={14} />
+            </button>
+            
+            <button 
+              onClick={handleRedo} 
+              disabled={redoStack.length === 0} 
+              className="doodle-action-btn"
+              title="Redo"
+            >
+              <Redo2 size={14} />
+            </button>
+            
+            <button 
+              onClick={handleClear} 
+              disabled={(!drawingPaths || drawingPaths.length === 0) && redoStack.length === 0} 
+              className="doodle-action-btn clear-btn"
+              title="Clear Canvas"
+            >
+              <Trash2 size={14} />
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* 3. Static Curtain Overlay */}
+      <div 
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          pointerEvents: isCurtainOpen ? 'none' : 'auto',
+          zIndex: 9998,
+          overflow: 'hidden'
+        }}
+      >
+        {/* LEFT CURTAIN PANEL */}
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            height: '100%',
+            width: '50.2%',
+            transition: 'transform 1.2s cubic-bezier(0.25, 1, 0.5, 1)',
+            transformOrigin: 'left',
+            willChange: 'transform',
+            transform: isCurtainOpen ? 'translateX(-100%)' : 'translateX(0)',
+            overflow: 'hidden',
+            backgroundImage: 'url(/assets/pc_container/Stage_curtains.png)',
+            backgroundPosition: 'left center',
+            backgroundSize: '200% 100%',
+            backgroundRepeat: 'no-repeat'
+          }}
+        />
+
+        {/* RIGHT CURTAIN PANEL */}
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            right: 0,
+            height: '100%',
+            width: '50.2%',
+            transition: 'transform 1.2s cubic-bezier(0.25, 1, 0.5, 1)',
+            transformOrigin: 'right',
+            willChange: 'transform',
+            transform: isCurtainOpen ? 'translateX(100%)' : 'translateX(0)',
+            overflow: 'hidden',
+            backgroundImage: 'url(/assets/pc_container/Stage_curtains.png)',
+            backgroundPosition: 'right center',
+            backgroundSize: '200% 100%',
+            backgroundRepeat: 'no-repeat'
+          }}
+        />
+      </div>
     </div>
   );
 }
