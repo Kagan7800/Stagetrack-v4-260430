@@ -173,8 +173,18 @@ export function AppProvider({ children }) {
 
       // Instructor side: Catch incoming lobby requests
       const isInstructor = sessionStorage.getItem('stagetrack_role') === 'instructor';
+      
+      console.log("[Lobby Sync] Snapshot listener fired:", {
+        isInstructor,
+        lobbyStatus,
+        isJoined,
+        lobbyRequest: data.lobbyRequest,
+        lobbyResponse: data.lobbyResponse
+      });
+
       if (isInstructor) {
         if (data.lobbyRequest) {
+          console.log("[Lobby Sync] Instructor detected pending request:", data.lobbyRequest);
           setPendingRequest(data.lobbyRequest);
         } else {
           setPendingRequest(null);
@@ -184,7 +194,9 @@ export function AppProvider({ children }) {
       // Guest side: Auto-restore pending status on reload/reconnect if lobbyRequest matches local ID
       if (!isInstructor && lobbyStatus === 'initial') {
         const myGuestId = sessionStorage.getItem('stagetrack_active_guest_id');
+        console.log("[Lobby Sync] Auto-restore check:", { myGuestId, lobbyRequestExists: !!data.lobbyRequest, requestId: data.lobbyRequest?.id });
         if (myGuestId && data.lobbyRequest && data.lobbyRequest.id === myGuestId) {
+          console.log("[Lobby Sync] Restoring pending lobby status...");
           setLobbyStatus('pending');
         }
       }
@@ -193,13 +205,14 @@ export function AppProvider({ children }) {
       if (!isInstructor && lobbyStatus === 'pending') {
         const myGuestId = sessionStorage.getItem('stagetrack_active_guest_id');
         const approvedId = data.lobbyResponse?.approvedGuestId;
-        // Robust matching: exact ID match OR both are guest prefixed IDs ('active-joined') to handle timestamp mismatches
-        const isMatch = approvedId === myGuestId ||
-          (myGuestId && approvedId && myGuestId.startsWith('active-joined') && approvedId.startsWith('active-joined'));
+        const isMatch = approvedId === myGuestId;
+
+        console.log("[Lobby Sync] Guest approval matching check:", { myGuestId, approvedId, isMatch, responseStatus: data.lobbyResponse?.status });
 
         if (data.lobbyResponse && isMatch) {
           const status = data.lobbyResponse.status;
           if (status === 'approved' || status === 'accepted') {
+            console.log("[Lobby Sync] MATCH APPROVED! Admitting guest into session...");
             const finalGuestId = approvedId || myGuestId || `active-joined-${Date.now()}`;
             const approvedUser = { id: finalGuestId, name: data.lobbyResponse.guestName || 'Guest' };
             sessionStorage.setItem('stagetrack_lobby_response', JSON.stringify({
@@ -211,6 +224,7 @@ export function AppProvider({ children }) {
             setLobbyStatus('approved');
             setIsJoined(true);
           } else if (status === 'rejected' || status === 'denied') {
+            console.log("[Lobby Sync] Guest REJECTED/DENIED.");
             setLobbyStatus('rejected');
             setIsJoined(false);
           }
@@ -221,7 +235,9 @@ export function AppProvider({ children }) {
       if (!isInstructor && isJoined) {
         const myGuestId = sessionStorage.getItem('stagetrack_active_guest_id');
         const isStillActive = (data.activeUsers || []).some(u => u.uid === myGuestId);
+        console.log("[Lobby Sync] Guest auto-disconnect validation:", { myGuestId, isStillActive, activeUsers: data.activeUsers });
         if (!isStillActive) {
+          console.log("[Lobby Sync] Guest is no longer in activeUsers list. Disconnecting...");
           setIsJoined(false);
           setLobbyStatus('initial');
           setActiveGuestId(null);
