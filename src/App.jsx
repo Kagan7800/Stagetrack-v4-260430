@@ -10,6 +10,8 @@ import { useAppContext } from './context/AppContext';
 import UnifiedToolbox from './components/UnifiedToolbox';
 import InstructorToolbox from './components/InstructorToolbox';
 import ControlDeck from './components/ControlDeck';
+import PersonalizedExplanationGenerator from './components/PersonalizedExplanationGenerator';
+import { Sparkles } from 'lucide-react';
 
 function StageTimerDisplay({ stageTimer, setStageTimer, isInstructorClient }) {
   const [timeLeft, setTimeLeft] = useState(() => {
@@ -75,6 +77,7 @@ function StageTimerDisplay({ stageTimer, setStageTimer, isInstructorClient }) {
 }
 
 function App() {
+  const [showExplanationGenerator, setShowExplanationGenerator] = useState(false);
   const {
     participants,
     activeGuestId, setActiveGuestId,
@@ -347,6 +350,57 @@ function App() {
                 }} 
               />
 
+              <button
+                onClick={() => setShowExplanationGenerator(prev => !prev)}
+                className="banner-action-btn animate-fade-in"
+                style={{
+                  position: 'absolute',
+                  right: (stageTimer && (stageTimer.isRunning || stageTimer.duration > 0)) ? '220px' : '20px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: showExplanationGenerator 
+                    ? 'linear-gradient(135deg, rgba(59, 130, 246, 0.3) 0%, rgba(37, 99, 235, 0.3) 100%)' 
+                    : 'linear-gradient(135deg, rgba(250, 204, 21, 0.25) 0%, rgba(255, 140, 0, 0.25) 100%)',
+                  border: showExplanationGenerator ? '1.5px solid #3b82f6' : '1.5px solid #facc15',
+                  color: '#fff',
+                  borderRadius: '20px',
+                  padding: '6px 16px',
+                  cursor: 'pointer',
+                  fontSize: '0.85rem',
+                  fontWeight: 'bold',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  transition: 'all 0.2s ease',
+                  boxShadow: showExplanationGenerator 
+                    ? '0 0 10px rgba(59, 130, 246, 0.2)' 
+                    : '0 0 10px rgba(250, 204, 21, 0.2)',
+                  fontFamily: 'inherit',
+                  zIndex: 200
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = showExplanationGenerator
+                    ? 'linear-gradient(135deg, rgba(59, 130, 246, 0.45) 0%, rgba(37, 99, 235, 0.45) 100%)'
+                    : 'linear-gradient(135deg, rgba(250, 204, 21, 0.45) 0%, rgba(255, 140, 0, 0.45) 100%)';
+                  e.currentTarget.style.boxShadow = showExplanationGenerator
+                    ? '0 0 15px rgba(59, 130, 246, 0.45)'
+                    : '0 0 15px rgba(250, 204, 21, 0.45)';
+                  e.currentTarget.style.transform = 'translateY(-50%) scale(1.03)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = showExplanationGenerator
+                    ? 'linear-gradient(135deg, rgba(59, 130, 246, 0.3) 0%, rgba(37, 99, 235, 0.3) 100%)'
+                    : 'linear-gradient(135deg, rgba(250, 204, 21, 0.25) 0%, rgba(255, 140, 0, 0.25) 100%)';
+                  e.currentTarget.style.boxShadow = showExplanationGenerator
+                    ? '0 0 10px rgba(59, 130, 246, 0.2)'
+                    : '0 0 10px rgba(250, 204, 21, 0.2)';
+                  e.currentTarget.style.transform = 'translateY(-50%) scale(1)';
+                }}
+              >
+                <Sparkles size={14} style={{ color: showExplanationGenerator ? '#60a5fa' : '#facc15' }} />
+                <span>{showExplanationGenerator ? 'Live Classroom' : 'Explanation Generator'}</span>
+              </button>
+
               {stageTimer && (stageTimer.isRunning || stageTimer.duration > 0) && (
                 <StageTimerDisplay stageTimer={stageTimer} setStageTimer={setStageTimer} isInstructorClient={isInstructorClient} />
               )}
@@ -364,6 +418,57 @@ function App() {
                 }} 
               />
               <div className="gradient-divider-bar" style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '6px' }}></div>
+              
+              <button
+                onClick={() => setShowExplanationGenerator(prev => !prev)}
+                className="banner-action-btn animate-fade-in"
+                style={{
+                  position: 'absolute',
+                  right: (stageTimer && (stageTimer.isRunning || stageTimer.duration > 0)) ? '220px' : '20px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: showExplanationGenerator 
+                    ? 'linear-gradient(135deg, rgba(59, 130, 246, 0.3) 0%, rgba(37, 99, 235, 0.3) 100%)' 
+                    : 'linear-gradient(135deg, rgba(239, 68, 68, 0.25) 0%, rgba(185, 28, 28, 0.25) 100%)',
+                  border: showExplanationGenerator ? '1.5px solid #3b82f6' : '1.5px solid #ef4444',
+                  color: '#fff',
+                  borderRadius: '20px',
+                  padding: '6px 16px',
+                  cursor: 'pointer',
+                  fontSize: '0.85rem',
+                  fontWeight: 'bold',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  transition: 'all 0.2s ease',
+                  boxShadow: showExplanationGenerator 
+                    ? '0 0 10px rgba(59, 130, 246, 0.2)' 
+                    : '0 0 10px rgba(239, 68, 68, 0.2)',
+                  fontFamily: 'inherit',
+                  zIndex: 200
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = showExplanationGenerator
+                    ? 'linear-gradient(135deg, rgba(59, 130, 246, 0.45) 0%, rgba(37, 99, 235, 0.45) 100%)'
+                    : 'linear-gradient(135deg, rgba(239, 68, 68, 0.45) 0%, rgba(185, 28, 28, 0.45) 100%)';
+                  e.currentTarget.style.boxShadow = showExplanationGenerator
+                    ? '0 0 15px rgba(59, 130, 246, 0.45)'
+                    : '0 0 15px rgba(239, 68, 68, 0.45)';
+                  e.currentTarget.style.transform = 'translateY(-50%) scale(1.03)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = showExplanationGenerator
+                    ? 'linear-gradient(135deg, rgba(59, 130, 246, 0.3) 0%, rgba(37, 99, 235, 0.3) 100%)'
+                    : 'linear-gradient(135deg, rgba(239, 68, 68, 0.25) 0%, rgba(185, 28, 28, 0.25) 100%)';
+                  e.currentTarget.style.boxShadow = showExplanationGenerator
+                    ? '0 0 10px rgba(59, 130, 246, 0.2)'
+                    : '0 0 10px rgba(239, 68, 68, 0.2)';
+                  e.currentTarget.style.transform = 'translateY(-50%) scale(1)';
+                }}
+              >
+                <Sparkles size={14} style={{ color: showExplanationGenerator ? '#60a5fa' : '#ef4444' }} />
+                <span>{showExplanationGenerator ? 'Live Classroom' : 'Explanation Generator'}</span>
+              </button>
 
               {stageTimer && (stageTimer.isRunning || stageTimer.duration > 0) && (
                 <StageTimerDisplay stageTimer={stageTimer} setStageTimer={setStageTimer} isInstructorClient={isInstructorClient} />
@@ -420,13 +525,17 @@ function App() {
         )}
 
         {/* Main Content Layout */}
-        <div className="main-content">
-          {/* Left Sidebar containing both ITO and STO accordions */}
-          {isInstructorSidebarVisible && !isPortrait && (
-            <div className={`instructor-left-sidebar ${isSidebarOpen ? 'open' : 'closed'}`}>
-              <LeftSidebar />
-            </div>
-          )}
+        <div className="main-content" style={showExplanationGenerator ? { padding: '16px', boxSizing: 'border-box' } : {}}>
+          {showExplanationGenerator ? (
+            <PersonalizedExplanationGenerator onClose={() => setShowExplanationGenerator(false)} />
+          ) : (
+            <>
+              {/* Left Sidebar containing both ITO and STO accordions */}
+              {isInstructorSidebarVisible && !isPortrait && (
+                <div className={`instructor-left-sidebar ${isSidebarOpen ? 'open' : 'closed'}`}>
+                  <LeftSidebar />
+                </div>
+              )}
 
           {/* Center Grid */}
           {isPortrait ? (
@@ -660,16 +769,18 @@ function App() {
             </div>
           )}
 
-          {/* Right Sidebar */}
-          {isChatOpen && !isPortrait && (
-            <div className="right-sidebar">
-               <Chat 
-                 messages={messages} 
-                 onSendMessage={handleSendChatMessage} 
-                 onModerate={handleModerateMessage}
-                 onClose={() => setIsChatOpen(false)} 
-               />
-            </div>
+              {/* Right Sidebar */}
+              {isChatOpen && !isPortrait && (
+                <div className="right-sidebar">
+                   <Chat 
+                     messages={messages} 
+                     onSendMessage={handleSendChatMessage} 
+                     onModerate={handleModerateMessage}
+                     onClose={() => setIsChatOpen(false)} 
+                   />
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
