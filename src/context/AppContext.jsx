@@ -1,7 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 // src/context/AppContext.jsx
 
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { db } from '../firebase';
 import { doc, onSnapshot, updateDoc, arrayUnion, setDoc, getDoc } from 'firebase/firestore';
 
@@ -18,9 +18,17 @@ export function AppProvider({ children }) {
 
   // UI & Tool States
   const [participants, setParticipants] = useState([
-    { id: 'instructor-ic', name: 'Instructor', isInstructor: true, color: '#3b82f6' }
+    { id: 'instructor-ic', name: 'Instructor', isInstructor: true, color: '#3b82f6' },
+    ...Array.from({ length: 7 }, (_, i) => ({
+      id: `blank-${i + 1}`,
+      name: `Blank ${i + 1}`,
+      isBlank: true,
+      blankIndex: i + 1
+    }))
   ]);
   const [drawingPaths, setDrawingPaths] = useState([]);
+  const isFirebaseDrawingUpdatingRef = useRef(false);
+  const pendingDrawingPathsRef = useRef(null);
   const [mediaUrl, setMediaUrl] = useState('/assets/MF_images/Music_Fun_with_my_Little_One.jpg');
   const [mediaType, setMediaType] = useState('image');
   const [isChatOpen, setIsChatOpen] = useState(false);
@@ -49,9 +57,11 @@ export function AppProvider({ children }) {
     const paramSession = urlParams.get('session') || 'session-hm898y4nq';
     const roleParam = urlParams.get('role');
 
-    const isStudent = sessionStorage.getItem('stagetrack_role') === 'student' || 
+    const savedRole = sessionStorage.getItem('stagetrack_role');
+    const isStudent = savedRole === 'student' || 
                       roleParam === 'guest' || 
-                      roleParam === 'student';
+                      roleParam === 'student' ||
+                      (!savedRole && roleParam !== 'instructor');
     
     const timer = setTimeout(() => {
       setSessionId(paramSession);
@@ -249,15 +259,48 @@ export function AppProvider({ children }) {
       // Update active users grid and map to participants list
       if (data.activeUsers) {
         setGcUsers(data.activeUsers);
-        const mapped = data.activeUsers.map((u, index) => ({
-          id: u.uid,
-          name: u.name || 'Guest',
-          role: u.role,
-          isInstructor: !!u.isInstructor,
-          color: u.color || `hsl(${(index * 137.5) % 360}, 70%, 60%)`,
-          initial: u.name ? u.name[0].toUpperCase() : '?'
-        }));
-        setParticipants(mapped);
+        
+        // Find instructor
+        const dbInstructor = data.activeUsers.find(u => u.isInstructor || u.role === 'ic' || u.uid === 'instructor-ic');
+        const instructorUser = {
+          id: dbInstructor?.uid || 'instructor-ic',
+          name: dbInstructor?.name || 'Instructor',
+          role: 'ic',
+          isInstructor: true,
+          color: dbInstructor?.color || '#3b82f6',
+          initial: 'I'
+        };
+
+        // Find joined guests (non-instructors)
+        const joinedGuests = data.activeUsers.filter(u => u.uid !== instructorUser.id && !u.isInstructor && u.role !== 'ic');
+
+        // Map to 7 slots (indices 1 to 7)
+        const guestSlots = Array.from({ length: 7 }, (_, i) => {
+          const slotIndex = i + 1;
+          const guest = joinedGuests.find(g => g.slotIndex === slotIndex) || joinedGuests.find(g => !g.slotIndex && joinedGuests.indexOf(g) === i);
+          if (guest) {
+            return {
+              id: guest.uid,
+              name: guest.name || 'Guest',
+              role: 'student',
+              isInstructor: false,
+              color: guest.color || `hsl(${(slotIndex * 137.5) % 360}, 70%, 60%)`,
+              initial: guest.name ? guest.name[0].toUpperCase() : '?',
+              slotIndex: slotIndex,
+              selectedBorder: guest.selectedBorder || '',
+              selectedIcon: guest.selectedIcon || null
+            };
+          } else {
+            return {
+              id: `blank-${slotIndex}`,
+              name: `Blank ${slotIndex}`,
+              isBlank: true,
+              blankIndex: slotIndex
+            };
+          }
+        });
+
+        setParticipants([instructorUser, ...guestSlots]);
       }
 
       // Synchronize other states
@@ -287,13 +330,27 @@ export function AppProvider({ children }) {
 
     try {
       const sessionRef = doc(db, "sessions", sessionId);
+      
+      // Find the first available slotIndex between 1 and 7
+      const occupiedSlots = gcUsers.map(u => u.slotIndex).filter(idx => idx !== undefined && idx !== null && idx !== 0);
+      let nextSlotIndex = 1;
+      for (let i = 1; i <= 7; i++) {
+        if (!occupiedSlots.includes(i)) {
+          nextSlotIndex = i;
+          break;
+        }
+      }
+
       const newGuestUser = {
         uid: activeId,
         role: 'student',
         isInstructor: false,
         name: guestDisplayName,
         joinedAt: Date.now(),
-        slotIndex: gcUsers.length
+        slotIndex: nextSlotIndex,
+        color: pendingRequest.color || pendingRequest.selectedBorder || `hsl(${(nextSlotIndex * 137.5) % 360}, 70%, 60%)`,
+        selectedBorder: pendingRequest.selectedBorder || '',
+        selectedIcon: pendingRequest.selectedIcon || null
       };
 
       // Add guest to active users, send accepted response, and clear request
@@ -307,17 +364,7 @@ export function AppProvider({ children }) {
         lobbyRequest: null
       });
 
-      if (pendingRequest.selectedIcon) {
-        await updateDoc(sessionRef, {
-          [`guestStickers.${activeId}`]: [
-            {
-              id: crypto.randomUUID(),
-              name: pendingRequest.selectedIcon,
-              position: 1
-            }
-          ]
-        });
-      }
+
 
       setPendingRequest(null);
     } catch (err) {
@@ -695,14 +742,34 @@ export function AppProvider({ children }) {
       nextVal = valueOrFunc;
     }
     setDrawingPaths(nextVal);
-    if (sessionId) {
+    
+    if (!sessionId) return;
+
+    if (isFirebaseDrawingUpdatingRef.current) {
+      pendingDrawingPathsRef.current = nextVal;
+      return;
+    }
+
+    isFirebaseDrawingUpdatingRef.current = true;
+
+    const syncToFirebase = async (val) => {
       try {
         const sessionRef = doc(db, "sessions", sessionId);
-        await updateDoc(sessionRef, { drawingPaths: nextVal });
+        await updateDoc(sessionRef, { drawingPaths: val });
       } catch (err) {
         console.error("Error syncing drawingPaths:", err);
+      } finally {
+        isFirebaseDrawingUpdatingRef.current = false;
+        if (pendingDrawingPathsRef.current !== null) {
+          const nextValToSync = pendingDrawingPathsRef.current;
+          pendingDrawingPathsRef.current = null;
+          isFirebaseDrawingUpdatingRef.current = true;
+          syncToFirebase(nextValToSync);
+        }
       }
-    }
+    };
+
+    syncToFirebase(nextVal);
   };
 
   const handleSetCurtainsOpen = async (val) => {

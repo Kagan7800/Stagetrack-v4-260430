@@ -3,12 +3,12 @@ import { getFirestore, doc, updateDoc } from "firebase/firestore";
 import { getAuth, signInAnonymously } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyABldZ-IWolMQh1bHyfao7s4-rjD7uUfy8",
-  authDomain: "stagetrack-v4-260430-461-92681.firebaseapp.com",
-  projectId: "stagetrack-v4-260430-461-92681",
-  storageBucket: "stagetrack-v4-260430-461-92681.firebasestorage.app",
-  messagingSenderId: "839589213291",
-  appId: "1:839589213291:web:45eb3702e75e0b3e0a2d2e"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID
 };
 
 // Initialize Firebase

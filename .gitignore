@@ -28,4 +28,6 @@ scratch/
 *_original_backup.png
 public/assets/SOR/1ui_sor logo-052826.png
 
-
+# Environment variables
+.env
+functions/.env

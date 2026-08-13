@@ -2,6 +2,8 @@ import { useState, useRef } from 'react';
 import { X, Sparkles } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import { instructorStickers, studentStickers } from '../constants/stickers';
+import UnifiedToolbox from './UnifiedToolbox';
+import html2canvas from 'html2canvas';
 
 export default function ControlDeck() {
   const {
@@ -100,6 +102,104 @@ export default function ControlDeck() {
     if (!whisperText.trim()) return;
     sendWhisper(activeGuest.id, whisperText.trim());
     setWhisperText('');
+  };
+
+  const handleScreenshot = () => {
+    const target = document.querySelector('.app-container');
+    if (!target) return;
+
+    const toolbox = document.querySelector('.toolbox-panel');
+    const chatSidebar = document.querySelector('.right-sidebar');
+    const itoSidebar = document.querySelector('.instructor-left-sidebar');
+    const closeMedia = document.querySelector('.close-media-btn');
+    
+    if (toolbox) toolbox.style.display = 'none';
+    if (chatSidebar) chatSidebar.style.display = 'none';
+    if (itoSidebar) itoSidebar.style.display = 'none';
+    if (closeMedia) closeMedia.style.display = 'none';
+
+    const videoElements = target.querySelectorAll('video');
+    const tempCanvases = [];
+
+    videoElements.forEach((video) => {
+      if (video.readyState >= 2) {
+        try {
+          const rect = video.getBoundingClientRect();
+          const canvas = document.createElement('canvas');
+          canvas.width = video.videoWidth || rect.width || 300;
+          canvas.height = video.videoHeight || rect.height || 150;
+          
+          const ctx = canvas.getContext('2d');
+          
+          const computedStyle = window.getComputedStyle(video);
+          const transform = computedStyle.transform;
+          const isMirrored = transform.includes('matrix(-1') || 
+                             video.classList.contains('gc-video-element') || 
+                             video.classList.contains('lobby-camera-video-elem');
+          
+          if (isMirrored) {
+            ctx.translate(canvas.width, 0);
+            ctx.scale(-1, 1);
+          }
+          
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          
+          canvas.style.position = 'absolute';
+          canvas.style.top = video.style.top || '0';
+          canvas.style.left = video.style.left || '0';
+          canvas.style.width = '100%';
+          canvas.style.height = '100%';
+          canvas.style.objectFit = 'cover';
+          canvas.style.borderRadius = computedStyle.borderRadius || '11px';
+          canvas.style.zIndex = computedStyle.zIndex || '1';
+          
+          tempCanvases.push({ video, canvas });
+          video.parentNode.insertBefore(canvas, video);
+          video.style.opacity = '0';
+        } catch (e) {
+          console.error("Failed to copy video to canvas", e);
+        }
+      }
+    });
+
+    setTimeout(() => {
+      html2canvas(target, {
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#090d16',
+        scale: 2
+      }).then((canvas) => {
+        tempCanvases.forEach(({ video, canvas: tempCanvas }) => {
+          video.style.opacity = '';
+          tempCanvas.remove();
+        });
+
+        if (toolbox) toolbox.style.display = '';
+        if (chatSidebar) chatSidebar.style.display = '';
+        if (itoSidebar) itoSidebar.style.display = '';
+        if (closeMedia) closeMedia.style.display = '';
+
+        setActiveCdTab(null);
+        setIsChatOpen(false);
+        setIsSidebarOpen(false);
+
+        const image = canvas.toDataURL('image/png');
+        const link = document.createElement('a');
+        link.download = `screenshot-${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.png`;
+        link.href = image;
+        link.click();
+      }).catch((err) => {
+        console.error("Screenshot failed:", err);
+        tempCanvases.forEach(({ video, canvas: tempCanvas }) => {
+          video.style.opacity = '';
+          tempCanvas.remove();
+        });
+        if (toolbox) toolbox.style.display = '';
+        if (chatSidebar) chatSidebar.style.display = '';
+        if (itoSidebar) itoSidebar.style.display = '';
+        if (closeMedia) closeMedia.style.display = '';
+      });
+    }, 50);
   };
 
   return (
@@ -333,6 +433,8 @@ export default function ControlDeck() {
                 ? 'ACTIVITIES' 
                 : activeCdTab === 'whisper'
                 ? 'WHISPER'
+                : activeCdTab === 'student_tools'
+                ? 'STUDENT TOOLS'
                 : showInstructorStickers 
                 ? 'INSTRUCTOR REWARDS' 
                 : (showStudentStickers || isPeoStickersOpen)
@@ -383,6 +485,14 @@ export default function ControlDeck() {
                     onClick={() => handleAddSticker('instructor', 'Confetti.svg', true)}
                   >
                     CONFETTI
+                  </button>
+
+                  {/* STUDENT TOOLS */}
+                  <button 
+                    onClick={() => setActiveCdTab(activeCdTab === 'student_tools' ? null : 'student_tools')}
+                    className={activeCdTab === 'student_tools' ? 'active' : ''}
+                  >
+                    STUDENT TOOLS
                   </button>
                 </div>
 
@@ -644,6 +754,56 @@ export default function ControlDeck() {
                 ) : (
                   <span style={{ color: '#ef4444', fontSize: '0.85rem', fontWeight: 'bold' }}>
                     Please select a student in the grid first to whisper!
+                  </span>
+                )}
+              </div>
+            ) : activeCdTab === 'student_tools' ? (
+              <div className="controls-row middle-row" style={{ width: '100%', margin: '0.5rem 0' }}>
+                {activeGuest ? (
+                  <>
+                    <button 
+                      className={targetBtns.raiseHand ? 'active' : ''}
+                      onClick={() => handleToggleGuestButton(activeGuest.id, 'raiseHand')}
+                    >
+                      RAISE HAND
+                    </button>
+                    <button 
+                      className={targetBtns.mute ? 'active' : ''}
+                      onClick={() => handleToggleGuestButton(activeGuest.id, 'mute')}
+                    >
+                      MUTE/PAUSE
+                    </button>
+                    <button 
+                      className={targetBtns.chat ? 'active' : ''}
+                      onClick={() => handleToggleGuestButton(activeGuest.id, 'chat')}
+                    >
+                      CHAT
+                    </button>
+                    <button 
+                      className={(showStudentStickers || isPeoStickersOpen) ? 'active' : ''}
+                      onClick={() => {
+                        const isAlreadyOpen = showStudentStickers || isPeoStickersOpen;
+                        if (isAlreadyOpen) {
+                          setShowStudentStickers(false);
+                          setIsPeoStickersOpen(false);
+                        } else {
+                          setShowStudentStickers(true);
+                        }
+                        setShowStudentFilters(false);
+                        setActiveItoSection(null);
+                      }}
+                    >
+                      STICKERS
+                    </button>
+                    <button 
+                      onClick={handleScreenshot}
+                    >
+                      TAKE A PICTURE
+                    </button>
+                  </>
+                ) : (
+                  <span style={{ color: '#ef4444', fontSize: '0.85rem', fontWeight: 'bold' }}>
+                    Please select a student in the grid first to view student tools!
                   </span>
                 )}
               </div>

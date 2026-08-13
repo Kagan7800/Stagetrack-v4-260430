@@ -531,7 +531,7 @@ body {
 
 /* Guest Container (gc) */
 .video-cell {
-  background: rgba(11, 25, 46, 0.7) !important;
+  background: rgba(11, 25, 46, 0.7);
   border-radius: 12px;
   border: 1px solid var(--glass-border);
   position: relative;
@@ -2633,6 +2633,8 @@ body {
   padding: 12px !important;
   border-radius: 12px;
   box-shadow: 0 0 20px rgba(34, 197, 94, 0.45);
+  border: none !important;
+  overflow: hidden !important;
   animation: borderPulse 2s infinite ease-in-out;
   background-size: cover;
   background-position: center;
@@ -3116,11 +3118,13 @@ body {
   gap: calc(15px * var(--lobby-scale)) !important;
   width: 100% !important;
   box-sizing: border-box;
-  margin-bottom: calc(5px * var(--lobby-scale)) !important;
+  margin-bottom: 0 !important;
+  flex: 1 !important;
 }
 
 .lobby-ai-chat-input {
   flex: 1 !important;
+  height: 100% !important;
   background: rgba(255, 255, 255, 0.08) !important;
   border: calc(1.5px * var(--lobby-scale)) solid rgba(255, 255, 255, 0.2) !important;
   border-radius: calc(14px * var(--lobby-scale)) !important;
@@ -3147,14 +3151,14 @@ body {
   background: transparent !important;
   color: #fbbf24 !important;
   font-weight: 900 !important;
-  font-size: calc(96px * var(--lobby-scale)) !important;
+  font-size: calc(144px * var(--lobby-scale)) !important;
   width: 100% !important;
   height: calc(100px * var(--lobby-scale)) !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   border-radius: calc(14px * var(--lobby-scale)) !important;
-  border: calc(1.5px * var(--lobby-scale)) solid #fbbf24 !important;
+  border: none !important;
   cursor: pointer !important;
   transition: all 0.2s !important;
   box-sizing: border-box;
@@ -3385,8 +3389,8 @@ body {
 
 .lobby-camera-icon-badge {
   position: absolute;
-  top: calc(15px * var(--lobby-scale));
-  left: calc(-83px * var(--lobby-scale));
+  top: calc(-240px * var(--lobby-scale));
+  left: calc(-240px * var(--lobby-scale));
   width: calc(480px * var(--lobby-scale));
   height: calc(480px * var(--lobby-scale));
   z-index: 12;
@@ -3818,15 +3822,15 @@ body {
 
 .lobby-instructor-bypass-btn {
   position: absolute;
-  bottom: 24px;
+  top: calc(105px * var(--lobby-scale) + 30px);
   left: 50%;
   transform: translateX(-50%);
   background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: calc(2px * var(--lobby-scale)) solid rgba(255, 255, 255, 0.2);
   color: rgba(255, 255, 255, 0.7);
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-size: 0.85rem;
+  padding: calc(24px * var(--lobby-scale)) calc(48px * var(--lobby-scale));
+  border-radius: calc(60px * var(--lobby-scale));
+  font-size: calc(72px * var(--lobby-scale));
   font-weight: 600;
   cursor: pointer;
   z-index: 100;
@@ -4178,9 +4182,10 @@ body {
   }
 
   .lobby-ai-chat-button {
-    font-size: 16px !important;
+    font-size: 24px !important;
     height: 40px !important;
     border-radius: 8px !important;
+    border: none !important;
   }
 
   .lobby-ai-chat-history {
@@ -4236,13 +4241,13 @@ body {
   /* Keep bypass button float at top right */
   .lobby-instructor-bypass-btn {
     position: absolute !important;
-    top: 15px !important;
+    top: 45px !important;
     right: 15px !important;
     bottom: auto !important;
     left: auto !important;
-    padding: 8px 16px !important;
-    font-size: 12px !important;
-    border-radius: 8px !important;
+    padding: 16px 32px !important;
+    font-size: 24px !important;
+    border-radius: 16px !important;
     background: rgba(255, 255, 255, 0.12) !important;
     border: 1px solid rgba(255, 255, 255, 0.25) !important;
     color: white !important;
@@ -4276,9 +4281,10 @@ body {
   }
 
   .lobby-ai-chat-button {
-    font-size: max(16px, calc(96px * var(--lobby-scale))) !important;
+    font-size: max(24px, calc(144px * var(--lobby-scale))) !important;
     height: max(32px, calc(100px * var(--lobby-scale))) !important;
     margin-bottom: max(8px, calc(20px * var(--lobby-scale))) !important;
+    border: none !important;
   }
 
   .lobby-status-retry-btn {
@@ -5224,13 +5230,14 @@ body {
   padding: clamp(0.25rem, 0.8vw, 0.5rem) clamp(1rem, 2vw, 2rem) !important;
   border-radius: 12px;
   width: 100%;
-  height: var(--peo-height, 31.25vh) !important;
+  height: auto !important;
+  min-height: var(--peo-height, 31.25vh) !important;
   box-sizing: border-box;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .studio-controls h2 {
-  margin-bottom: calc(clamp(0.2rem, 0.4vw, 0.35rem) + 10px);
+  margin-bottom: calc(clamp(0.2rem, 0.4vw, 0.35rem) + 2px);
   letter-spacing: 2px;
   margin-top: 0;
   font-size: clamp(1rem, 2.5vw, 1.25rem); /* slightly smaller to fit single row height */
@@ -5241,7 +5248,7 @@ body {
   display: flex;
   justify-content: center;
   gap: clamp(0.4rem, 0.95vw, 0.8rem);
-  margin: clamp(0.1rem, 0.3vw, 0.25rem) 0;
+  margin: clamp(0.05rem, 0.15vw, 0.1rem) 0;
   flex-wrap: wrap;
   width: 100%;
   box-sizing: border-box;
@@ -5253,13 +5260,20 @@ body {
   font-weight: bold;
   border: none;
   border-radius: 8px;
-  padding: clamp(0.35rem, 0.7vw, 0.55rem) clamp(0.8rem, 1.6vw, 1.4rem);
+  padding: clamp(0.35rem, 0.6vw, 0.55rem) clamp(0.4rem, 1vw, 1rem);
   cursor: pointer;
   transition: all 0.25s ease;
-  font-size: clamp(0.65rem, 1.3vw, 0.85rem);
-  white-space: nowrap;
-  letter-spacing: 0.05em;
-  word-spacing: 0.1em;
+  font-size: clamp(0.65rem, 1.2vw, 0.85rem);
+  letter-spacing: 0.03em;
+  word-spacing: 0.05em;
+  flex: 1 1 0px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  white-space: normal;
+  word-break: break-word;
+  line-height: 1.15;
 }
 
 .top-row button:not(:disabled):hover,

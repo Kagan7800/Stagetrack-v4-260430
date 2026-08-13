@@ -81,22 +81,18 @@ export default function InstructorToolbox() {
   if (!isInstructorClient) return null;
 
   return (
-    <div className="glass-panel sidebar instructor-toolbox" style={{ height: '100%', borderRight: 'none', position: 'relative' }}>
-      <div className="toolbox-header" style={{ minHeight: '52px', borderBottom: '1px solid var(--glass-border)', display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '12px 16px' }}>
-          <span style={{ color: '#ffffff', textShadow: themeTextShadow, fontSize: '0.8rem', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'normal', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block', width: '100%', lineHeight: '1.2', textAlign: 'center' }} title="Class Content">
-            Class<br />Content
+    <div className="glass-panel sidebar instructor-toolbox" style={{ height: '100%', borderRight: 'none', position: 'relative', display: 'flex', flexDirection: 'column' }}>
+      <div className="toolbox-header" style={{ minHeight: '52px', borderBottom: '1px solid var(--glass-border)', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: '12px 16px' }}>
+          <span style={{ color: '#ffffff', textShadow: themeTextShadow, fontSize: '0.8rem', fontWeight: '900', textTransform: 'uppercase', letterSpacing: '0.05em', whiteSpace: 'normal', overflow: 'hidden', display: 'block', width: '100%', lineHeight: '1.2', textAlign: 'center' }} title="Session Content">
+            Session<br />Content
           </span>
+          <div style={{ color: '#ffffff', fontSize: '0.65rem', fontWeight: '600', marginTop: '4px', textTransform: 'none', letterSpacing: 'normal' }}>
+            {new Date().toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: '2-digit' })}
+          </div>
       </div>
 
-      <div className="toolbox-content" style={{ padding: '16px', height: 'calc(100% - 52px)', boxSizing: 'border-box', display: 'flex', flexDirection: 'column' }}>
-        <div style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.8rem', textAlign: 'center', marginBottom: '12px', fontWeight: '600', letterSpacing: '0.03em' }}>
-          Today's Class {new Date().toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: '2-digit' })}
-        </div>
-
-        {/* Thin line under date */}
-        <div style={{ width: '100%', height: '1px', background: 'var(--glass-border)', margin: '4px 0 12px 0', opacity: 0.5 }} />
-
-        {/* 1st Class Dropdown */}
+      <div className="toolbox-content" style={{ padding: '16px', flex: 1, overflowY: 'auto', boxSizing: 'border-box', display: 'flex', flexDirection: 'column' }}>
+        {/* 1st Session Dropdown */}
         <div style={{ display: 'flex', flexDirection: 'column', width: '100%', boxSizing: 'border-box', marginBottom: '16px' }}>
           <button 
             onClick={() => setIsClassDropdownOpen(!isClassDropdownOpen)}
@@ -119,7 +115,7 @@ export default function InstructorToolbox() {
             onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.15)'}
             onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.08)'}
           >
-            <span>1st Class</span>
+            <span>1st Session</span>
             {isClassDropdownOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
           </button>
 
@@ -311,82 +307,80 @@ export default function InstructorToolbox() {
             </div>
           )}
         </div>
-        <div className="toolbox-section" style={{ display: 'flex', flexDirection: 'column', gap: '16px', flex: 1 }}>
-          <button 
-            className={`ito-section-btn ${activeItoSection === 'studio' ? 'active' : ''}`}
-            onClick={() => handleSectionClick('studio')}
-            style={{ 
-              width: '100%', 
-              padding: '12px', 
-              background: activeItoSection === 'studio' ? 'rgba(255,255,255,0.15)' : 'transparent', 
-              color: '#ffffff', 
-              border: `1px solid ${activeItoSection === 'studio' ? 'rgba(255,255,255,0.4)' : 'transparent'}`,
-              borderRadius: '8px',
-              fontSize: '1.1rem',
-              fontWeight: activeItoSection === 'studio' ? 'bold' : 'normal',
-              cursor: 'pointer',
-              transition: 'all 0.2s',
-              textAlign: 'center',
-              whiteSpace: 'normal',
-              wordWrap: 'break-word',
-              lineHeight: '1.2',
-              marginTop: 'auto',
-              position: 'relative',
-              top: '15px'
-            }}
-          >
-            Studio Controls
-          </button>
+      </div>
 
-          <div style={{ width: '100%', height: '1px', background: 'var(--glass-border)', margin: '4px 0', opacity: 0.5, position: 'relative', top: '0px' }} />
+      <div className="toolbox-footer" style={{ padding: '0px 16px 25px 16px', borderTop: '1px solid var(--glass-border)', display: 'flex', flexDirection: 'column', background: 'rgba(11, 25, 46, 0.9)' }}>
+        <button 
+          className={`ito-section-btn ${activeItoSection === 'studio' ? 'active' : ''}`}
+          onClick={() => handleSectionClick('studio')}
+          style={{ 
+            width: '100%', 
+            padding: '10px 12px', 
+            marginBottom: '0px',
+            background: activeItoSection === 'studio' ? 'rgba(255,255,255,0.15)' : 'transparent', 
+            color: '#ffffff', 
+            border: `1px solid ${activeItoSection === 'studio' ? 'rgba(255,255,255,0.4)' : 'transparent'}`,
+            borderRadius: '8px',
+            fontSize: '1.1rem',
+            fontWeight: activeItoSection === 'studio' ? 'bold' : 'normal',
+            cursor: 'pointer',
+            transition: 'all 0.2s',
+            textAlign: 'center',
+            whiteSpace: 'normal',
+            wordWrap: 'break-word',
+            lineHeight: '1.2'
+          }}
+        >
+          Studio Controls
+        </button>
 
-          <button 
-            onClick={() => {
-              setActiveToolbox(null);
-              setIsSidebarOpen(false);
-              setActiveItoSection(null);
-            }}
+        <div style={{ width: '100%', height: '1px', background: 'var(--glass-border)', opacity: 0.5, marginTop: '4.5px', marginBottom: '4.5px' }} />
+
+        <button 
+          onClick={() => {
+            setActiveToolbox(null);
+            setIsSidebarOpen(false);
+            setActiveItoSection(null);
+          }}
+          style={{ 
+            background: 'transparent',
+            border: 'none',
+            cursor: 'pointer',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: '100%',
+            padding: '0px',
+            marginTop: '0px'
+          }}
+          onMouseEnter={(e) => {
+            const img = e.currentTarget.querySelector('img');
+            if (img) {
+              img.style.filter = 'drop-shadow(0 0 5px rgba(255, 255, 255, 0.6))';
+              img.style.transform = 'scaleX(-1) scale(1.1)';
+            }
+          }}
+          onMouseLeave={(e) => {
+            const img = e.currentTarget.querySelector('img');
+            if (img) {
+              img.style.filter = 'none';
+              img.style.transform = 'scaleX(-1) scale(1)';
+            }
+          }}
+          title="Close Session Content"
+        >
+          <img 
+            src="/assets/Lobby/Arrow.svg" 
+            alt="Close" 
             style={{ 
-              background: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              width: '100%',
-              padding: '4px 0',
-              position: 'relative',
-              top: '-15px'
-            }}
-            onMouseEnter={(e) => {
-              const img = e.currentTarget.querySelector('img');
-              if (img) {
-                img.style.filter = 'drop-shadow(0 0 5px rgba(255, 255, 255, 0.6))';
-                img.style.transform = 'scaleX(-1) scale(1.1)';
-              }
-            }}
-            onMouseLeave={(e) => {
-              const img = e.currentTarget.querySelector('img');
-              if (img) {
-                img.style.filter = 'none';
-                img.style.transform = 'scaleX(-1) scale(1)';
-              }
-            }}
-            title="Close Class Content"
-          >
-            <img 
-              src="/assets/Lobby/Arrow.svg" 
-              alt="Close" 
-              style={{ 
-                width: '40px', 
-                height: '30px',
-                transform: 'scaleX(-1)',
-                transition: 'filter 0.2s ease, transform 0.2s ease',
-                objectFit: 'contain'
-              }} 
-            />
-          </button>
-        </div>
+              width: '40px', 
+              height: '30px',
+              transform: 'scaleX(-1)',
+              transition: 'filter 0.2s ease, transform 0.2s ease',
+              objectFit: 'contain'
+            }} 
+          />
+        </button>
       </div>
     </div>
   );

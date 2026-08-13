@@ -148,7 +148,7 @@ function App() {
   }, [participants, isSidebarOpen, isChatOpen, activeItoSection]);
 
   const isInstructorClient = sessionStorage.getItem('stagetrack_role') !== 'student';
-  const isInstructorSidebarVisible = true;
+  const isInstructorSidebarVisible = isInstructorClient;
   const activeGuest = participants.find(p => p.id === activeGuestId);
 
   const ic = participants.find(p => p.isInstructor) || participants[0];
@@ -207,11 +207,9 @@ function App() {
     isInstructor: true 
   };
 
-  const leftParticipants = [instructorUser];
+  const leftParticipants = participants.slice(0, 4);
   
-  const rightParticipantsLandscape = pendingRequest !== null
-    ? [...joinedGuests, participants.find(p => p.isBlank) || { id: 'blank-1', isBlank: true, blankIndex: 1 }]
-    : joinedGuests;
+  const rightParticipantsLandscape = participants.slice(4, 8);
 
   const halfLength = Math.max(leftParticipants.length, rightParticipantsLandscape.length);
 
@@ -398,7 +396,7 @@ function App() {
                 }}
               >
                 <Sparkles size={14} style={{ color: showExplanationGenerator ? '#60a5fa' : '#facc15' }} />
-                <span>{showExplanationGenerator ? 'Live Classroom' : 'Explanation Generator'}</span>
+                <span>{showExplanationGenerator ? 'Live Classroom' : 'About your Little One'}</span>
               </button>
 
               {stageTimer && (stageTimer.isRunning || stageTimer.duration > 0) && (
@@ -467,7 +465,7 @@ function App() {
                 }}
               >
                 <Sparkles size={14} style={{ color: showExplanationGenerator ? '#60a5fa' : '#ef4444' }} />
-                <span>{showExplanationGenerator ? 'Live Classroom' : 'Explanation Generator'}</span>
+                <span>{showExplanationGenerator ? 'Live Classroom' : 'About your Little One'}</span>
               </button>
 
               {stageTimer && (stageTimer.isRunning || stageTimer.duration > 0) && (
@@ -747,13 +745,13 @@ function App() {
                        onClick={() => {
                          if (!isInstructorClient && p.id !== loggedInGc?.id) return;
                          if (p.isBlank) return;
-                          if (activeGuestId === p.id && activeToolbox === "student" && isSidebarOpen) {
-                            setIsSidebarOpen(false);
-                          } else {
-                            setActiveGuestId(p.id);
-                            setActiveToolbox("student");
-                            setIsSidebarOpen(true);
-                          }
+                         if (activeGuestId === p.id && activeToolbox === "student" && isSidebarOpen) {
+                           setIsSidebarOpen(false);
+                         } else {
+                           setActiveGuestId(p.id);
+                           setActiveToolbox("student");
+                           setIsSidebarOpen(true);
+                         }
                        }}
                        onDoubleClick={() => handleDoubleClick(p)}
                        stickers={guestStickers[p.id] || []}
@@ -772,12 +770,12 @@ function App() {
               {/* Right Sidebar */}
               {isChatOpen && !isPortrait && (
                 <div className="right-sidebar">
-                   <Chat 
-                     messages={messages} 
-                     onSendMessage={handleSendChatMessage} 
-                     onModerate={handleModerateMessage}
-                     onClose={() => setIsChatOpen(false)} 
-                   />
+                    <Chat 
+                      messages={messages} 
+                      onSendMessage={handleSendChatMessage} 
+                      onModerate={handleModerateMessage}
+                      onClose={() => setIsChatOpen(false)} 
+                    />
                 </div>
               )}
             </>

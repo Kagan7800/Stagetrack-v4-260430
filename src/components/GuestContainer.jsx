@@ -3,7 +3,37 @@
 import { Pause } from 'lucide-react';
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useAppContext } from '../context/AppContext';
-import PeoBorder from './PeoBorder';
+const getBorderStyle = (borderValue, innerBg = 'rgba(11, 25, 46, 0.7)') => {
+  if (!borderValue) return {};
+  
+  let colorVal = borderValue;
+  if (colorVal.endsWith('_2')) {
+    colorVal = colorVal.substring(0, colorVal.length - 2);
+  }
+
+  if (colorVal === 'url(#peo-gradient-185)' || colorVal.includes('peo-gradient-185')) {
+    return {
+      border: '2px solid transparent',
+      backgroundImage: `linear-gradient(${innerBg}, ${innerBg}), linear-gradient(135deg, #F7F27C, rgba(247, 242, 124, 0))`,
+      backgroundOrigin: 'border-box',
+      backgroundClip: 'padding-box, border-box'
+    };
+  }
+  
+  if (colorVal === 'url(#peo-gradient-186)' || colorVal.includes('peo-gradient-186')) {
+    return {
+      border: '2px solid transparent',
+      backgroundImage: `linear-gradient(${innerBg}, ${innerBg}), linear-gradient(135deg, rgba(252, 0, 0, 0.59), #FBFF49)`,
+      backgroundOrigin: 'border-box',
+      backgroundClip: 'padding-box, border-box'
+    };
+  }
+
+  return {
+    border: `2px solid ${colorVal}`,
+    backgroundColor: innerBg
+  };
+};
 
 const getGlowColor = (color) => {
   if (!color) return 'rgba(34, 197, 94, 0.45)';
@@ -141,6 +171,20 @@ export default function GuestContainer({
     (!isInstructorClient && pId === activeGuestId)
   );
 
+  const showActiveGlow = isActive && !isClosed;
+  const glowColor = getGlowColor(safeParticipant.selectedBorder);
+  const hasCustomBorder = !!safeParticipant.selectedBorder && !isClosed;
+
+  const captureWrapperStyle = {
+    position: 'absolute',
+    inset: '0',
+    borderRadius: 'inherit',
+    overflow: 'hidden',
+    zIndex: 1,
+    pointerEvents: 'none',
+    backgroundColor: 'rgba(11, 25, 46, 0.7)'
+  };
+
   // Handle webcam stream for active joined participant (only for local user, fallback if no stream prop provided)
   useEffect(() => {
     let activeStream = null;
@@ -198,26 +242,19 @@ export default function GuestContainer({
         <div 
           className="video-cell blank-peo-container pending-request-cell"
           style={{ 
-            backgroundColor: pendingRequest?.color || '#1e293b', 
             boxShadow: '0 0 20px #fbbf24',
-            cursor: 'default' 
+            cursor: 'default',
+            border: '2px solid #fbbf24',
+            backgroundColor: pendingRequest?.color || '#1e293b'
           }}
         >
-          <PeoBorder color="#fbbf24" />
-
-          <div className="sparkle-overlay">
+          <div className="sparkle-overlay" style={{ inset: 0, borderRadius: 'inherit' }}>
             <div className="sparkle" style={{ top: '15%', left: '20%', width: '25px', height: '25px', animationDelay: '0s', animationDuration: '2s' }} />
             <div className="sparkle" style={{ top: '40%', left: '75%', width: '18px', height: '18px', animationDelay: '0.5s', animationDuration: '1.8s' }} />
             <div className="sparkle" style={{ top: '75%', left: '30%', width: '22px', height: '22px', animationDelay: '1.1s', animationDuration: '2.2s' }} />
           </div>
 
-          {pendingRequest?.selectedIcon && (
-            <img 
-              src={`/assets/svg_stickers/${pendingRequest.selectedIcon}`}
-              alt="Selected Icon"
-              className="gc-sticker pos-1"
-            />
-          )}
+
 
           <div className="pending-names-wrapper" style={{ zIndex: 10 }}>
             <span className="pending-label-title">Access Request</span>
@@ -294,7 +331,7 @@ export default function GuestContainer({
 
     return (
       <div 
-        className={`video-cell spotlight-cell blank-peo-container ${hasCover ? 'has-cover' : ''}`}
+        className={`video-cell blank-peo-container ${hasCover ? 'has-cover' : ''}`}
         style={hasHyperlink ? { cursor: 'pointer' } : {}}
         onClick={(e) => {
           if (hasHyperlink && !e.target.closest('.blank-peo-edit-form') && !e.target.closest('.edit-blank-btn')) {
@@ -302,21 +339,7 @@ export default function GuestContainer({
           }
         }}
       >
-        <div className="gc-capture-wrapper" style={{ position: 'absolute', inset: 0, borderRadius: 'inherit', overflow: 'hidden', zIndex: 1, pointerEvents: 'none' }}>
-          <img 
-            src="/assets/lights.png" 
-            alt="Lights" 
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-              zIndex: 2,
-              borderRadius: '12px'
-            }}
-          />
+        <div className="gc-capture-wrapper" style={captureWrapperStyle}>
           {hasCover && (
             <div 
               className="peo-background-cover"
@@ -335,12 +358,6 @@ export default function GuestContainer({
             />
           )}
         </div>
-
-        {!isInstructorClient && (
-          <div className="gc-name-badge" style={{ zIndex: 12 }}>
-            Attach Link
-          </div>
-        )}
 
         {canEditThisBlank && !isEditing && (
           <button 
@@ -413,7 +430,6 @@ export default function GuestContainer({
   }
 
   // RENDER PARTICIPANT SLOT
-  const showActiveGlow = isActive && !isClosed;
   const showRaiseHandGlow = buttons?.raiseHand && !isClosed;
   const showGreenFilter = buttons?.greenFilter && !isClosed;
   const showBlueFilter = buttons?.blueFilter && !isClosed;
@@ -421,10 +437,9 @@ export default function GuestContainer({
   const showOrangeFilter = buttons?.orangeFilter && !isClosed;
   const showGrayscale = isClosed;
   const isNonInteractive = isClosed || safeParticipant.isBlank;
-  const isSpotlight = safeParticipant.isBlank;
 
-  const glowColor = getGlowColor(safeParticipant.selectedBorder);
-  const borderStyle = safeParticipant.selectedBorder && !isClosed ? {
+  const borderStyle = hasCustomBorder ? {
+    ...getBorderStyle(safeParticipant.selectedBorder, 'rgba(11, 25, 46, 0.7)'),
     boxShadow: showActiveGlow 
       ? `0 0 20px #ffffff, 0 0 10px ${glowColor}`
       : `0 0 12px ${glowColor}`
@@ -434,15 +449,11 @@ export default function GuestContainer({
 
   return (
     <div 
-      className={`video-cell ${showActiveGlow ? 'active-gc' : ''} ${showGrayscale ? 'grayscale-sharp' : ''} ${isNonInteractive ? 'non-interactive' : ''} ${isSpotlight ? 'spotlight-cell' : ''}`} 
+      className={`video-cell ${showActiveGlow ? 'active-gc' : ''} ${showGrayscale ? 'grayscale-sharp' : ''} ${isNonInteractive ? 'non-interactive' : ''}`} 
       onClick={handleCellClick}
       style={borderStyle}
     >
-      {safeParticipant.selectedBorder && !isClosed && (
-        <PeoBorder color={safeParticipant.selectedBorder} />
-      )}
-
-      <div className="gc-capture-wrapper" style={{ position: 'absolute', inset: 0, borderRadius: 'inherit', overflow: 'hidden', zIndex: 1, pointerEvents: 'none' }}>
+      <div className="gc-capture-wrapper" style={captureWrapperStyle}>
         {(stream || (shouldShowWebcam && joinedStream)) && !isClosed && (
           <video 
             ref={joinedVideoRef} 
@@ -458,119 +469,44 @@ export default function GuestContainer({
         <img 
           src={`/assets/svg_stickers/${safeParticipant.selectedIcon}`}
           alt="Selected Icon"
-          className="gc-sticker pos-1"
+          style={{
+            position: 'absolute',
+            top: '2%',
+            left: '-8%',
+            width: '45%',
+            height: '45%',
+            zIndex: 10,
+            pointerEvents: 'none',
+            filter: 'drop-shadow(0px 4px 8px rgba(0, 0, 0, 0.3))'
+          }}
         />
       )}
 
-      {safeParticipant.name && (
+      {safeParticipant.name && safeParticipant.isInstructor && (
         <div 
-          className={`gc-name-badge ${safeParticipant.isInstructor && isInstructorClient ? 'instructor-badge' : ''}`}
+          className="gc-name-badge instructor-badge"
           style={{ 
             zIndex: 12, 
             display: 'flex', 
             alignItems: 'center', 
             justifyContent: 'center',
             gap: '8px',
-            padding: (safeParticipant.isInstructor && isInstructorClient) ? '0px 24px' : '2px 6px',
+            padding: '2px 12px',
             overflow: 'visible'
           }}
         >
-          {safeParticipant.isInstructor && isInstructorClient ? (
-            <>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  const isStudioOpen = activeItoSection === 'studio';
-                  if (isStudioOpen) {
-                    setActiveItoSection && setActiveItoSection(null);
-                  } else {
-                    setActiveItoSection && setActiveItoSection('studio');
-                    setIsSidebarOpen && setIsSidebarOpen(false);
-                  }
-                }}
-                className="ic-toggle-btn"
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                  color: (activeItoSection === 'studio') ? '#ef4444' : 'white',
-                  fontFamily: '"Risque", serif',
-                  fontSize: '29px',
-                  lineHeight: '1',
-                  padding: '0 4px',
-                  transform: 'rotate(-15deg)',
-                  transition: 'all 0.2s ease',
-                  textShadow: (activeItoSection === 'studio') ? '0 0 8px rgba(239, 68, 68, 0.5)' : 'none',
-                  position: 'absolute',
-                  left: '-12px'
-                }}
-                title="Toggle Instructor Tools"
-              >
-                I
-              </button>
-              
-              <span
-                style={{
-                  maxWidth: '100%',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                  display: 'inline-block',
-                  textAlign: 'center'
-                }}
-              >
-                {safeParticipant.name}
-              </span>
-
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  const isStoOpen = isSidebarOpen && activeToolbox === 'student';
-                  if (isStoOpen) {
-                    setIsSidebarOpen && setIsSidebarOpen(false);
-                    setActiveToolbox && setActiveToolbox(null);
-                    setActiveGuestId && setActiveGuestId(null);
-                  } else {
-                    setActiveToolbox && setActiveToolbox('student');
-                    if (!activeGuestId) {
-                      const firstGuest = (participants || []).find(p => p && !p.isBlank && !p.isInstructor);
-                      if (firstGuest) {
-                        setActiveGuestId && setActiveGuestId(firstGuest.id);
-                      }
-                    }
-                    setIsSidebarOpen && setIsSidebarOpen(true);
-                  }
-                }}
-                className="ic-toggle-btn"
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                  color: (isSidebarOpen && activeToolbox === 'student') ? '#ef4444' : 'white',
-                  fontFamily: '"Risque", serif',
-                  fontSize: '29px',
-                  lineHeight: '1',
-                  padding: '0 4px',
-                  transform: 'rotate(15deg)',
-                  transition: 'all 0.2s ease',
-                  textShadow: (isSidebarOpen && activeToolbox === 'student') ? '0 0 8px rgba(239, 68, 68, 0.5)' : 'none',
-                  position: 'absolute',
-                  right: '-12px'
-                }}
-                title="Toggle Student Tools"
-              >
-                S
-              </button>
-            </>
-          ) : (
-            safeParticipant.name
-          )}
+          <span
+            style={{
+              maxWidth: '100%',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              display: 'inline-block',
+              textAlign: 'center'
+            }}
+          >
+            {safeParticipant.name}
+          </span>
         </div>
       )}
 
@@ -594,7 +530,7 @@ export default function GuestContainer({
         </div>
       )}
 
-      {safeStickers.filter(s => s && !(activeTheme === 'sor' && (s.position === 'confetti' || s.name === 'Confetti.svg'))).map((s) => {
+      {safeStickers.filter(s => s && s.name !== safeParticipant.selectedIcon && !(activeTheme === 'sor' && (s.position === 'confetti' || s.name === 'Confetti.svg'))).map((s) => {
         const nudge = (nudges && nudges[s.position]) || {};
         let style = {};
         

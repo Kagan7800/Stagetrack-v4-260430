@@ -1,45 +1,55 @@
 import { useEffect } from 'react';
-import { ChevronRight } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import InstructorToolbox from './InstructorToolbox';
-import UnifiedToolbox from './UnifiedToolbox';
 
 export default function LeftSidebar() {
   const {
     isSidebarOpen,
     setIsSidebarOpen,
-    activeGuestId,
-    activeToolbox,
-    participants,
-    guestButtons,
-    handleToggleGuestButton,
-    handleAddSticker,
-    setActiveGuestId,
-    setGlobalMute,
-    activeTheme
+    setActiveToolbox,
+    setActiveItoSection
   } = useAppContext();
 
-  const activeGuest = participants.find(p => p.id === activeGuestId);
+  const isInstructorClient = sessionStorage.getItem('stagetrack_role') !== 'student';
 
-  // Automatically open the sidebar when a guest is selected
   useEffect(() => {
-    if (activeGuestId !== null) {
-      setIsSidebarOpen(true);
-    }
-  }, [activeGuestId, setIsSidebarOpen]);
+    if (!isSidebarOpen || !isInstructorClient) return;
 
-  const mode = (activeGuestId === null || activeToolbox === 'instructor') ? 'ITO' : 'STO';
+    const handleOutsideClick = (e) => {
+      // 1. If click is inside the sidebar itself, do nothing
+      const sidebarEl = document.querySelector('.glass-panel.sidebar');
+      if (sidebarEl && sidebarEl.contains(e.target)) {
+        return;
+      }
 
-  // Auto-Muting / Routing Side Effects on Mode Shift
-  useEffect(() => {
-    if (mode === 'ITO') {
-      setGlobalMute(true);
-      console.log("Switching to Admin Channel: Main room stream muted.");
-    } else {
-      setGlobalMute(false);
-      console.log("Switching to Stage Channel: Open broadcast restored.");
-    }
-  }, [mode, setGlobalMute]);
+      // 2. If click is on any element that opens or interacts with the sidebar, do nothing to prevent immediate close on toggle
+      if (e.target.closest('.sidebar-handle') || e.target.closest('.video-cell')) {
+        return;
+      }
+
+      // 3. If click is on any element inside the control deck / studio controls, do nothing (so they can use those controls)
+      if (e.target.closest('.control-deck-outer') || e.target.closest('.control-deck') || e.target.closest('.studio-controls')) {
+        return;
+      }
+
+      // Otherwise, close the sidebar and clean up states
+      setIsSidebarOpen(false);
+      setActiveToolbox(null);
+      setActiveItoSection(null);
+    };
+
+    // Use a small timeout to register the listener so it doesn't fire on the same click that opened it
+    const timer = setTimeout(() => {
+      document.addEventListener('click', handleOutsideClick);
+    }, 0);
+
+    return () => {
+      clearTimeout(timer);
+      document.removeEventListener('click', handleOutsideClick);
+    };
+  }, [isSidebarOpen, isInstructorClient, setIsSidebarOpen, setActiveToolbox, setActiveItoSection]);
+
+  if (!isInstructorClient) return null;
 
   if (!isSidebarOpen) {
     return (
@@ -51,35 +61,23 @@ export default function LeftSidebar() {
         tabIndex={0}
         style={{ zIndex: 100 }}
       >
-        <ChevronRight size={20} />
+        <svg 
+          xmlns="http://www.w3.org/2000/svg" 
+          width="20" 
+          height="20" 
+          viewBox="0 0 24 24" 
+          fill="none" 
+          stroke="currentColor" 
+          strokeWidth="2" 
+          strokeLinecap="round" 
+          strokeLinejoin="round" 
+          className="lucide lucide-chevron-right"
+        >
+          <path d="m9 18 6-6-6-6"/>
+        </svg>
       </div>
     );
   }
-
-  // Determine flex values based on expansion states
-  const showSto = activeGuestId !== null && activeGuest && activeToolbox === 'student';
-  const showIto = activeGuestId === null || activeToolbox === 'instructor';
-  
-  const isSor = activeTheme === 'sor';
-
-  // Dynamic border/glow styles
-  const transmissionGlowStyle = mode === 'ITO' 
-    ? { borderRight: '2px solid rgba(245, 158, 11, 0.7)', boxShadow: '0 0 15px rgba(245, 158, 11, 0.15)' }
-    : { 
-        borderRight: isSor 
-          ? '2px solid rgba(239, 68, 68, 0.7)' // Red in SOR
-          : '2px solid rgba(59, 130, 246, 0.7)', // Blue in Music
-        boxShadow: isSor 
-          ? '0 0 15px rgba(239, 68, 68, 0.15)' 
-          : '0 0 15px rgba(59, 130, 246, 0.15)'
-      };
-
-  const panelGridBorderStyle = { 
-    borderTop: mode === 'ITO' 
-      ? '2.5px solid rgba(245, 158, 11, 0.7)' 
-      : (isSor ? '2.5px solid #ef4444' : '2.5px solid #3b82f6')
-  };
-
 
   return (
     <div 
@@ -96,54 +94,13 @@ export default function LeftSidebar() {
         width: '150px',
         transition: 'width 0.3s ease',
         background: 'rgba(11, 25, 46, 0.7)',
-        ...transmissionGlowStyle
+        borderRight: '2px solid rgba(245, 158, 11, 0.7)',
+        boxShadow: '0 0 15px rgba(245, 158, 11, 0.15)'
       }}
     >
-
-      {/* 1. Instructor Tools (ITO) Section */}
-      {showIto && (
-        <div 
-          style={{ 
-            display: 'flex', 
-            flexDirection: 'column', 
-            borderBottom: showSto ? '1px solid var(--glass-border)' : 'none',
-            flex: 1,
-            minHeight: 0,
-            overflow: 'hidden',
-            transition: 'border-color 0.2s ease',
-            ...panelGridBorderStyle
-          }}
-        >
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, background: 'rgba(11, 25, 46, 0.7)', overflow: 'hidden' }}>
-            <InstructorToolbox />
-          </div>
-        </div>
-      )}
-
-      {/* 2. Student Tools (STO) Section */}
-      {showSto && (
-        <div 
-          style={{ 
-            display: 'flex', 
-            flexDirection: 'column', 
-            flex: 1,
-            minHeight: 0,
-            overflow: 'hidden',
-            transition: 'border-color 0.2s ease',
-            ...panelGridBorderStyle
-          }}
-        >
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, background: 'rgba(11, 25, 46, 0.7)', overflow: 'hidden' }}>
-            <UnifiedToolbox 
-              activeGuest={activeGuest}
-              guestButtons={guestButtons}
-              toggleGuestButton={handleToggleGuestButton}
-              onAddSticker={handleAddSticker}
-              onClose={() => setActiveGuestId(null)}
-            />
-          </div>
-        </div>
-      )}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minHeight: 0, background: 'rgba(11, 25, 46, 0.7)', overflow: 'hidden' }}>
+        <InstructorToolbox />
+      </div>
     </div>
   );
 }

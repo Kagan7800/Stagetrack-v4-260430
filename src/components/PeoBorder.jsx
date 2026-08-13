@@ -49,17 +49,17 @@ export default function PeoBorder({ color }) {
         stroke={strokeColor} 
         fill="none"
         style={{
-          strokeWidth: 'calc(2px * var(--lobby-scale, 1))',
+          strokeWidth: 'calc(4px * var(--lobby-scale, 1))',
           vectorEffect: 'non-scaling-stroke'
         }}
       >
         <rect 
-          x="1" 
-          y="1" 
-          width="98" 
-          height="98" 
-          rx="6" 
-          ry="6" 
+          x="0" 
+          y="0" 
+          width="100" 
+          height="100" 
+          rx="12" 
+          ry="12" 
         />
       </g>
     </svg>
