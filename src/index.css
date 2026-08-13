@@ -751,8 +751,15 @@ body {
   bottom: auto !important;
   top: 50% !important;
   left: auto !important;
-  right: -14px !important;
+  right: 0 !important;
   transform: translateY(-50%) !important;
+}
+
+/* Diagonal Xylophone when placed on borders/badge */
+.lobby-camera-icon-badge[src*="Xylophone" i],
+.video-cell > img[src*="Xylophone" i],
+.gc-sticker[src*="Xylophone" i] {
+  transform: rotate(-45deg) !important;
 }
 
 /* Hand Raise Glow Layer */
