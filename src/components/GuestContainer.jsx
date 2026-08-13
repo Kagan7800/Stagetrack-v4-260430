@@ -471,8 +471,8 @@ export default function GuestContainer({
           alt="Selected Icon"
           style={{
             position: 'absolute',
-            top: '2%',
-            left: '-8%',
+            top: '-22.5%',
+            left: '-22.5%',
             width: '45%',
             height: '45%',
             zIndex: 10,
