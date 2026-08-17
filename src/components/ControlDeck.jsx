@@ -2,7 +2,6 @@ import { useState, useRef } from 'react';
 import { X, Sparkles } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import { instructorStickers, studentStickers } from '../constants/stickers';
-import UnifiedToolbox from './UnifiedToolbox';
 import html2canvas from 'html2canvas';
 
 export default function ControlDeck() {
@@ -23,13 +22,20 @@ export default function ControlDeck() {
     spotlightGuestId, setSpotlightGuestId,
     handleToggleInvite, isFirebaseUpdating,
     sendWhisper, isChatOpen, setIsChatOpen,
+    setIsSidebarOpen,
     curtainsOpen, setCurtainsOpen
   } = useAppContext();
 
   const isInstructorClient = sessionStorage.getItem('stagetrack_role') !== 'student';
   const fileInputRef = useRef(null);
-  const [activeCdTab, setActiveCdTab] = useState(null); // 'timer', 'system', 'upload', 'activities', or 'whisper'
+  const [activeCdTab, setActiveCdTab] = useState(null); // 'timer', 'system', 'upload', 'activities', 'whisper', or 'first_session'
   const [whisperText, setWhisperText] = useState('');
+  const [isCountingDropdownOpen, setIsCountingDropdownOpen] = useState(false);
+  const [isMakeMusicDropdownOpen, setIsMakeMusicDropdownOpen] = useState(false);
+  const [bpmValue, setBpmValue] = useState(() => {
+    const saved = sessionStorage.getItem('last_counting_bpm');
+    return saved ? parseInt(saved) : 60;
+  });
 
   const activities = [
     { name: '1,2,3,4 Wheel', filename: '1,2,3,4_wheel.html' },
@@ -66,7 +72,7 @@ export default function ControlDeck() {
 
   const shouldShowStudentStickers = showStudentStickers;
   const shouldShowStudentFilters = showStudentFilters;
-  const shouldShowStudioControls = isInstructorClient && (activeItoSection === 'studio' || showInstructorStickers || showStudentStickers || isPeoStickersOpen || showStudentFilters);
+  const shouldShowStudioControls = isInstructorClient && activeItoSection !== 'closed';
   // Always show instructor deck if no other specific deck is requested
   const shouldShowInstructorDeck = !isInstructorClient && showInstructorStickers && !shouldShowStudentStickers && !shouldShowStudentFilters && !isPeoStickersOpen;
 
@@ -328,7 +334,7 @@ export default function ControlDeck() {
             
             <button
               onClick={() => {
-                setActiveItoSection(null);
+                setActiveItoSection('closed');
                 setActiveCdTab(null);
                 setShowInstructorStickers(false);
                 setShowStudentStickers(false);
@@ -422,27 +428,7 @@ export default function ControlDeck() {
               </button>
             )}
 
-            <h2>
-              {activeCdTab === 'timer' 
-                ? 'TIMER' 
-                : activeCdTab === 'system' 
-                ? 'SYSTEM' 
-                : activeCdTab === 'upload' 
-                ? 'UPLOADS' 
-                : activeCdTab === 'activities' 
-                ? 'ACTIVITIES' 
-                : activeCdTab === 'whisper'
-                ? 'WHISPER'
-                : activeCdTab === 'student_tools'
-                ? 'STUDENT TOOLS'
-                : showInstructorStickers 
-                ? 'INSTRUCTOR REWARDS' 
-                : (showStudentStickers || isPeoStickersOpen)
-                ? 'STICKERS'
-                : showStudentFilters
-                ? 'STUDENT FILTERS'
-                : 'STUDIO CONTROLS'}
-            </h2>
+
 
             {activeCdTab === null && !showInstructorStickers && !showStudentStickers && !isPeoStickersOpen && !showStudentFilters ? (
               <>
@@ -451,58 +437,43 @@ export default function ControlDeck() {
                     onClick={handleToggleInvite}
                     disabled={isFirebaseUpdating}
                   >
-                    {isFirebaseUpdating ? 'Generating...' : 'INVITE'}
+                    {isFirebaseUpdating ? 'Generating...' : 'Invite'}
                   </button>
 
-                  {/* SPOTLIGHT */}
-                  <button 
-                    onClick={() => {
-                      if (activeGuestId) {
-                        setSpotlightGuestId(spotlightGuestId === activeGuestId ? null : activeGuestId);
-                      }
-                    }}
-                    disabled={!activeGuestId}
-                    className={spotlightGuestId === activeGuestId && activeGuestId ? 'active' : ''}
-                    title={activeGuestId ? "Spotlight the selected student" : "Select a student to spotlight"}
-                    style={{
-                      opacity: activeGuestId ? 1 : 0.5,
-                      cursor: activeGuestId ? 'pointer' : 'not-allowed'
-                    }}
-                  >
-                    SPOTLIGHT
-                  </button>
+
 
                   {/* DOODLING */}
                   <button 
                     onClick={() => setIsDoodling(!isDoodling)}
                     className={isDoodling ? 'active' : ''}
                   >
-                    DOODLING
+                    Doodling
                   </button>
 
                   {/* CONFETTI */}
                   <button 
                     onClick={() => handleAddSticker('instructor', 'Confetti.svg', true)}
                   >
-                    CONFETTI
+                    Confetti
                   </button>
 
-                  {/* STUDENT TOOLS */}
-                  <button 
-                    onClick={() => setActiveCdTab(activeCdTab === 'student_tools' ? null : 'student_tools')}
-                    className={activeCdTab === 'student_tools' ? 'active' : ''}
-                  >
-                    STUDENT TOOLS
-                  </button>
                 </div>
 
                 <div className="controls-row middle-row">
+                  {/* 1ST SESSION */}
+                  <button 
+                    onClick={() => setActiveCdTab(activeCdTab === 'first_session' ? null : 'first_session')}
+                    className={activeCdTab === 'first_session' ? 'active' : ''}
+                  >
+                    1st Session
+                  </button>
+
                   {/* UPLOADS */}
                   <button 
                     onClick={() => setActiveCdTab(activeCdTab === 'upload' ? null : 'upload')}
                     className={activeCdTab === 'upload' ? 'active' : ''}
                   >
-                    UPLOADS
+                    Uploads
                   </button>
 
                   {/* TIMER */}
@@ -510,7 +481,7 @@ export default function ControlDeck() {
                     onClick={() => setActiveCdTab(activeCdTab === 'timer' ? null : 'timer')}
                     className={activeCdTab === 'timer' ? 'active' : ''}
                   >
-                    TIMER
+                    Timer
                   </button>
 
                   {/* WHISPER */}
@@ -518,7 +489,7 @@ export default function ControlDeck() {
                     onClick={() => setActiveCdTab(activeCdTab === 'whisper' ? null : 'whisper')}
                     className={activeCdTab === 'whisper' ? 'active' : ''}
                   >
-                    WHISPER
+                    Whisper
                   </button>
 
                   {/* CHAT */}
@@ -526,7 +497,7 @@ export default function ControlDeck() {
                     onClick={() => setIsChatOpen(!isChatOpen)}
                     className={isChatOpen ? 'active' : ''}
                   >
-                    CHAT
+                    Chat
                   </button>
 
                   {/* CURTAINS */}
@@ -534,7 +505,7 @@ export default function ControlDeck() {
                     onClick={() => setCurtainsOpen(!curtainsOpen)}
                     className={`curtains-btn ${curtainsOpen ? 'open' : 'closed'}`}
                   >
-                    {curtainsOpen ? '🎬 CLOSE CURTAINS' : '🎭 OPEN CURTAINS'}
+                    {curtainsOpen ? '🎬 Close Curtains' : '🎭 Open Curtains'}
                   </button>
                 </div>
 
@@ -551,7 +522,7 @@ export default function ControlDeck() {
                     }}
                     className={showStudentStickers ? 'active' : ''}
                   >
-                    STICKERS
+                    Stickers
                   </button>
 
                   {/* IC STICKERS */}
@@ -566,7 +537,7 @@ export default function ControlDeck() {
                     }}
                     className={showInstructorStickers ? 'active' : ''}
                   >
-                    IC STICKERS
+                    IC Stickers
                   </button>
 
                   {/* SYSTEM */}
@@ -574,10 +545,124 @@ export default function ControlDeck() {
                     onClick={() => setActiveCdTab(activeCdTab === 'system' ? null : 'system')}
                     className={activeCdTab === 'system' ? 'active' : ''}
                   >
-                    SYSTEM
+                    System
                   </button>
                 </div>
               </>
+            ) : activeCdTab === 'first_session' ? (
+              <div className="controls-row middle-row" style={{ width: '100%', margin: '0.5rem 0', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', justifyContent: 'center', width: '100%' }}>
+                  <button
+                    onClick={() => {
+                      setMediaUpload('/assets/MF_images/Music_Fun_with_my_Little_One.jpg', 'image');
+                      setActiveCdTab(null);
+                    }}
+                    style={{ background: mediaUrl === '/assets/MF_images/Music_Fun_with_my_Little_One.jpg' ? 'rgba(255, 230, 0, 0.25)' : undefined }}
+                  >
+                    Welcome Page
+                  </button>
+                  <button
+                    onClick={() => {
+                      setMediaUpload('/assets/MF_images/banjo.mp4', 'video');
+                      setActiveCdTab(null);
+                    }}
+                    style={{ background: mediaUrl === '/assets/MF_images/banjo.mp4' ? 'rgba(255, 230, 0, 0.25)' : undefined }}
+                  >
+                    Intro Video
+                  </button>
+                  <button
+                    onClick={() => setIsCountingDropdownOpen(!isCountingDropdownOpen)}
+                    className={isCountingDropdownOpen ? 'active' : ''}
+                  >
+                    Counting Activity {isCountingDropdownOpen ? '▲' : '▼'}
+                  </button>
+                  <button
+                    onClick={() => setIsMakeMusicDropdownOpen(!isMakeMusicDropdownOpen)}
+                    className={isMakeMusicDropdownOpen ? 'active' : ''}
+                  >
+                    Make Music {isMakeMusicDropdownOpen ? '▲' : '▼'}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setMediaUpload('/assets/Activities/Class_all/goodbye.jpg', 'image');
+                      setActiveCdTab(null);
+                    }}
+                    style={{ background: mediaUrl === '/assets/Activities/Class_all/goodbye.jpg' ? 'rgba(255, 230, 0, 0.25)' : undefined }}
+                  >
+                    Closing Page
+                  </button>
+                </div>
+
+                {isCountingDropdownOpen && (
+                  <div style={{ display: 'flex', gap: '10px', alignItems: 'center', background: 'rgba(0,0,0,0.3)', padding: '6px 12px', borderRadius: '8px' }}>
+                    <button
+                      onClick={() => {
+                        setMediaUpload('/assets/Activities/1,2,3,4_wheel.html?mode=spacebar', 'iframe');
+                        setActiveCdTab(null);
+                      }}
+                    >
+                      Spacebar Mode
+                    </button>
+                    <button
+                      onClick={() => {
+                        setMediaUpload(`/assets/Activities/1,2,3,4_wheel.html?mode=bpm&bpm=${bpmValue}`, 'iframe');
+                        setActiveCdTab(null);
+                      }}
+                    >
+                      BPM Mode
+                    </button>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#fff', fontSize: '0.85rem' }}>
+                      <label>BPM:</label>
+                      <input
+                        type="number"
+                        value={bpmValue}
+                        min="1"
+                        max="300"
+                        onChange={(e) => {
+                          const val = Math.max(1, Math.min(300, parseInt(e.target.value) || 60));
+                          setBpmValue(val);
+                          sessionStorage.setItem('last_counting_bpm', val.toString());
+                          setMediaUpload(`/assets/Activities/1,2,3,4_wheel.html?mode=bpm&bpm=${val}`, 'iframe');
+                          const iframe = document.querySelector('.central-stage-deck iframe');
+                          if (iframe && iframe.contentWindow) {
+                            iframe.contentWindow.postMessage({ type: 'SET_BPM', bpm: val }, '*');
+                          }
+                        }}
+                        style={{
+                          width: '55px',
+                          background: 'rgba(0,0,0,0.4)',
+                          border: '1px solid var(--glass-border)',
+                          borderRadius: '4px',
+                          color: '#fff',
+                          textAlign: 'center',
+                          padding: '2px 4px'
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {isMakeMusicDropdownOpen && (
+                  <div style={{ display: 'flex', gap: '10px', background: 'rgba(0,0,0,0.3)', padding: '6px 12px', borderRadius: '8px' }}>
+                    <button
+                      onClick={() => {
+                        setMediaUpload('/assets/class_1/household_Items.png', 'image');
+                        setActiveCdTab(null);
+                      }}
+                    >
+                      Household Items
+                    </button>
+                    <button
+                      onClick={() => {
+                        setMediaUpload('/assets/Activities/1,2,3,4_click.html', 'iframe');
+                        setActiveCdTab(null);
+                      }}
+                    >
+                      Interactive Game
+                    </button>
+                  </div>
+                )}
+              </div>
             ) : activeCdTab === 'upload' ? (
               <div className="controls-row middle-row" style={{ width: '100%', margin: '0.5rem 0' }}>
                 <button 

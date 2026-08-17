@@ -62,14 +62,7 @@ export default function GuestContainer({
     approveRequest, 
     denyRequest, 
     activeTheme,
-    isSidebarOpen,
-    setIsSidebarOpen,
-    activeGuestId,
-    setActiveGuestId,
-    activeToolbox,
-    setActiveToolbox,
-    activeItoSection,
-    setActiveItoSection
+    activeGuestId
   } = useAppContext();
 
   // Ensure safe participant object reference
@@ -368,13 +361,13 @@ export default function GuestContainer({
               setIsEditing(true);
             }}
           >
-            Upload Cover
+            Peo box = 8
           </button>
         )}
 
         {isEditing && (
           <div className="blank-peo-edit-form" style={{ zIndex: 10 }} onClick={(e) => e.stopPropagation()}>
-            <h4>Upload Cover & Link</h4>
+            <h4>Peo box = 8</h4>
             
             <div className="form-fields">
               <label className="file-input-label">
@@ -530,6 +523,18 @@ export default function GuestContainer({
         </div>
       )}
 
+      {/*
+        gc-sticker-zone clips stickers to this tile's own bounds so a sticker
+        can never bleed into a neighboring participant's box, and each sticker
+        is size-capped (see .gc-sticker max-width/max-height in index.css) so
+        it can't grow large enough to cover the person's face. This wrapper is
+        overflow:hidden on purpose; .video-cell itself stays overflow:visible
+        so glow/badge effects that intentionally hang off the edge are unaffected.
+      */}
+      <div
+        className="gc-sticker-zone"
+        style={{ position: 'absolute', inset: 0, overflow: 'visible', borderRadius: 'inherit', pointerEvents: 'none' }}
+      >
       {safeStickers.filter(s => s && s.name !== safeParticipant.selectedIcon && !(activeTheme === 'sor' && (s.position === 'confetti' || s.name === 'Confetti.svg'))).map((s) => {
         const nudge = (nudges && nudges[s.position]) || {};
         let style = {};
@@ -614,6 +619,7 @@ export default function GuestContainer({
           />
         );
       })}
+      </div>
     </div>
   );
 }

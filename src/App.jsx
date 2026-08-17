@@ -199,13 +199,6 @@ function App() {
         : [pSlot1, ...joinedGuests];
     }
   }
-  const instructorUser = participants.find(p => p.isInstructor) || { 
-    id: 'instructor-ic', 
-    name: 'Instructor', 
-    color: '#3b82f6', 
-    initial: 'I', 
-    isInstructor: true 
-  };
 
   const leftParticipants = participants.slice(0, 4);
   
@@ -338,12 +331,13 @@ function App() {
               </div>
 
               <img 
-                src="/assets/Logo_modern.png" 
+                src="/assets/logo-thr.png" 
                 alt="Music Fun Logo" 
                 style={{ 
-                  height: '100%', 
+                  height: '80%', 
                   width: 'auto', 
                   objectFit: 'contain',
+                  marginTop: '7px',
                   filter: 'drop-shadow(0px 3px 6px rgba(0, 0, 0, 0.3))'
                 }} 
               />
@@ -358,8 +352,8 @@ function App() {
                   transform: 'translateY(-50%)',
                   background: showExplanationGenerator 
                     ? 'linear-gradient(135deg, rgba(59, 130, 246, 0.3) 0%, rgba(37, 99, 235, 0.3) 100%)' 
-                    : 'linear-gradient(135deg, rgba(250, 204, 21, 0.25) 0%, rgba(255, 140, 0, 0.25) 100%)',
-                  border: showExplanationGenerator ? '1.5px solid #3b82f6' : '1.5px solid #facc15',
+                    : 'transparent',
+                  border: showExplanationGenerator ? '1.5px solid #3b82f6' : 'none',
                   color: '#fff',
                   borderRadius: '20px',
                   padding: '6px 16px',
@@ -372,26 +366,26 @@ function App() {
                   transition: 'all 0.2s ease',
                   boxShadow: showExplanationGenerator 
                     ? '0 0 10px rgba(59, 130, 246, 0.2)' 
-                    : '0 0 10px rgba(250, 204, 21, 0.2)',
+                    : 'none',
                   fontFamily: 'inherit',
                   zIndex: 200
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.background = showExplanationGenerator
                     ? 'linear-gradient(135deg, rgba(59, 130, 246, 0.45) 0%, rgba(37, 99, 235, 0.45) 100%)'
-                    : 'linear-gradient(135deg, rgba(250, 204, 21, 0.45) 0%, rgba(255, 140, 0, 0.45) 100%)';
+                    : 'transparent';
                   e.currentTarget.style.boxShadow = showExplanationGenerator
                     ? '0 0 15px rgba(59, 130, 246, 0.45)'
-                    : '0 0 15px rgba(250, 204, 21, 0.45)';
+                    : 'none';
                   e.currentTarget.style.transform = 'translateY(-50%) scale(1.03)';
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.background = showExplanationGenerator
                     ? 'linear-gradient(135deg, rgba(59, 130, 246, 0.3) 0%, rgba(37, 99, 235, 0.3) 100%)'
-                    : 'linear-gradient(135deg, rgba(250, 204, 21, 0.25) 0%, rgba(255, 140, 0, 0.25) 100%)';
+                    : 'transparent';
                   e.currentTarget.style.boxShadow = showExplanationGenerator
                     ? '0 0 10px rgba(59, 130, 246, 0.2)'
-                    : '0 0 10px rgba(250, 204, 21, 0.2)';
+                    : 'none';
                   e.currentTarget.style.transform = 'translateY(-50%) scale(1)';
                 }}
               >
@@ -427,8 +421,8 @@ function App() {
                   transform: 'translateY(-50%)',
                   background: showExplanationGenerator 
                     ? 'linear-gradient(135deg, rgba(59, 130, 246, 0.3) 0%, rgba(37, 99, 235, 0.3) 100%)' 
-                    : 'linear-gradient(135deg, rgba(239, 68, 68, 0.25) 0%, rgba(185, 28, 28, 0.25) 100%)',
-                  border: showExplanationGenerator ? '1.5px solid #3b82f6' : '1.5px solid #ef4444',
+                    : 'transparent',
+                  border: showExplanationGenerator ? '1.5px solid #3b82f6' : 'none',
                   color: '#fff',
                   borderRadius: '20px',
                   padding: '6px 16px',
@@ -441,26 +435,26 @@ function App() {
                   transition: 'all 0.2s ease',
                   boxShadow: showExplanationGenerator 
                     ? '0 0 10px rgba(59, 130, 246, 0.2)' 
-                    : '0 0 10px rgba(239, 68, 68, 0.2)',
+                    : 'none',
                   fontFamily: 'inherit',
                   zIndex: 200
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.background = showExplanationGenerator
                     ? 'linear-gradient(135deg, rgba(59, 130, 246, 0.45) 0%, rgba(37, 99, 235, 0.45) 100%)'
-                    : 'linear-gradient(135deg, rgba(239, 68, 68, 0.45) 0%, rgba(185, 28, 28, 0.45) 100%)';
+                    : 'transparent';
                   e.currentTarget.style.boxShadow = showExplanationGenerator
                     ? '0 0 15px rgba(59, 130, 246, 0.45)'
-                    : '0 0 15px rgba(239, 68, 68, 0.45)';
+                    : 'none';
                   e.currentTarget.style.transform = 'translateY(-50%) scale(1.03)';
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.background = showExplanationGenerator
                     ? 'linear-gradient(135deg, rgba(59, 130, 246, 0.3) 0%, rgba(37, 99, 235, 0.3) 100%)'
-                    : 'linear-gradient(135deg, rgba(239, 68, 68, 0.25) 0%, rgba(185, 28, 28, 0.25) 100%)';
+                    : 'transparent';
                   e.currentTarget.style.boxShadow = showExplanationGenerator
                     ? '0 0 10px rgba(59, 130, 246, 0.2)'
-                    : '0 0 10px rgba(239, 68, 68, 0.2)';
+                    : 'none';
                   e.currentTarget.style.transform = 'translateY(-50%) scale(1)';
                 }}
               >
@@ -528,12 +522,7 @@ function App() {
             <PersonalizedExplanationGenerator onClose={() => setShowExplanationGenerator(false)} />
           ) : (
             <>
-              {/* Left Sidebar containing both ITO and STO accordions */}
-              {isInstructorSidebarVisible && !isPortrait && (
-                <div className={`instructor-left-sidebar ${isSidebarOpen ? 'open' : 'closed'}`}>
-                  <LeftSidebar />
-                </div>
-              )}
+              {/* Left sidebar container removed */}
 
           {/* Center Grid */}
           {isPortrait ? (
@@ -716,7 +705,7 @@ function App() {
                     width: 'fit-content', 
                     alignItems: 'center', 
                     height: '100%', 
-                    justifyContent: ((isInstructorClient && showInstructorStickers) || showStudentStickers || showStudentFilters || isPeoStickersOpen || (isInstructorClient && activeItoSection === 'studio')) ? 'space-between' : 'center' 
+                    justifyContent: ((isInstructorClient && activeItoSection !== 'closed') || showStudentStickers || showStudentFilters || isPeoStickersOpen) ? 'space-between' : 'center' 
                   }}>
                    <div className={`pc-width-keeper ${isChatOpen ? 'pc-sidebar-open' : ''}`}>
                       <div 
@@ -730,6 +719,43 @@ function App() {
                          />
                      </div>
                    </div>
+
+                    {isInstructorClient && (
+                      <button
+                        onClick={() => setActiveItoSection(prev => prev === 'closed' ? null : 'closed')}
+                        className="studio-controls-toggle-btn"
+                        style={{
+                          margin: '6px 0',
+                          padding: '6px 18px',
+                          background: 'linear-gradient(135deg, rgba(58, 45, 187, 0.5), rgba(122, 79, 217, 0.5))',
+                          border: '1px solid rgba(255, 255, 255, 0.25)',
+                          borderRadius: '20px',
+                          color: '#ffffff',
+                          fontWeight: 'bold',
+                          fontSize: '0.85rem',
+                          cursor: 'pointer',
+                          backdropFilter: 'blur(8px)',
+                          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.25)',
+                          transition: 'all 0.2s ease',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          zIndex: 20
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background = 'linear-gradient(135deg, rgba(58, 45, 187, 0.75), rgba(122, 79, 217, 0.75))';
+                          e.currentTarget.style.transform = 'scale(1.04)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background = 'linear-gradient(135deg, rgba(58, 45, 187, 0.5), rgba(122, 79, 217, 0.5))';
+                          e.currentTarget.style.transform = 'scale(1)';
+                        }}
+                      >
+                        <span>Studio Controls</span>
+                        <span style={{ fontSize: '0.7rem' }}>{activeItoSection !== 'closed' ? '▲' : '▼'}</span>
+                      </button>
+                    )}
+
                    <ControlDeck />
                  </div>
                </div>
