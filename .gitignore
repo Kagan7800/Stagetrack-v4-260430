@@ -31,3 +31,8 @@ public/assets/SOR/1ui_sor logo-052826.png
 # Environment variables
 .env
 functions/.env
+
+# System / IDE / Temp files
+.gemini/
+.firebase/
+eslint_report.txt

@@ -475,17 +475,14 @@ export default function GuestContainer({
         />
       )}
 
-      {safeParticipant.name && safeParticipant.isInstructor && (
+      {safeParticipant.name && (
         <div 
-          className="gc-name-badge instructor-badge"
+          className={`gc-name-badge ${safeParticipant.isInstructor ? 'instructor-badge' : ''}`}
           style={{ 
             zIndex: 12, 
             display: 'flex', 
             alignItems: 'center', 
-            justifyContent: 'center',
-            gap: '8px',
-            padding: '2px 12px',
-            overflow: 'visible'
+            justifyContent: 'center'
           }}
         >
           <span

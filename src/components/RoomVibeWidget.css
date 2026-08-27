@@ -1,0 +1,393 @@
+/* src/components/RoomVibeWidget.css */
+/* Slide-out / Drawer Widget for Instructor Room Vibe Dashboard */
+
+.room-vibe-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(11, 15, 25, 0.65);
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: flex-end;
+  animation: vibe-fade-in 0.25s ease forwards;
+}
+
+@keyframes vibe-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.room-vibe-drawer {
+  width: 100%;
+  max-width: 480px;
+  min-width: 360px;
+  height: 100%;
+  background: rgba(8, 26, 68, 0.96);
+  border-left: 4px solid #002b66;
+  border: 4px solid #002b66;
+  border-radius: 20px 0 0 20px;
+  box-shadow: -10px 0 35px rgba(0, 43, 102, 0.8);
+  display: flex;
+  flex-direction: column;
+  color: #f1f5f9;
+  font-family: 'Outfit', 'Inter', system-ui, sans-serif;
+  animation: vibe-slide-left 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+@keyframes vibe-slide-left {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+/* Header */
+.vibe-drawer-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(30, 41, 59, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.vibe-header-title {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.vibe-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.vibe-title-row h2 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  margin: 0;
+  background: linear-gradient(135deg, #facc15 0%, #ff8c00 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.vibe-live-badge {
+  font-size: 0.65rem;
+  font-weight: 900;
+  color: #34d399;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 2px 8px;
+  border-radius: 50px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.vibe-live-pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #34d399;
+  box-shadow: 0 0 8px #34d399;
+  animation: vibe-dot-pulse 1.8s infinite;
+}
+
+@keyframes vibe-dot-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.5); opacity: 0.4; }
+}
+
+.vibe-subtitle {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  margin: 0;
+}
+
+.vibe-close-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #cbd5e1;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.vibe-close-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  transform: scale(1.05);
+}
+
+/* Scrollable Content */
+.vibe-drawer-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.vibe-drawer-body::-webkit-scrollbar { width: 5px; }
+.vibe-drawer-body::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.12); border-radius: 4px; }
+
+/* Main Room Presentation Container (PC) Energy Grid */
+.vibe-summary-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.vibe-section-label {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 0;
+}
+
+.vibe-pc-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  width: 100%;
+  box-sizing: border-box;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 14px;
+  border: 1.5px solid rgba(255, 230, 0, 0.35);
+  overflow: hidden;
+}
+
+.vibe-grid-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 15px 7.5px; /* 30px vertical buffer between rows (15px top & bottom), 25% reduced horizontal buffer */
+  background: transparent;
+  color: #ffe600;
+  font-family: 'Georgia', serif;
+  font-weight: bold;
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  border-right: 1.5px solid #ffe600;
+  border-bottom: 1.5px solid #ffe600; /* Thin line centered at 15px offset */
+  transition: background 0.2s;
+}
+
+.vibe-grid-cell:nth-child(2n) {
+  border-right: none;
+}
+
+.vibe-grid-cell:nth-child(5),
+.vibe-grid-cell:nth-child(6) {
+  border-bottom: none;
+}
+
+.vibe-grid-cell.active {
+  background: rgba(255, 230, 0, 0.12);
+}
+
+.vibe-cell-emoji {
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.vibe-cell-label,
+.vibe-cell-label span {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(12px, 2.2vw, 15px);
+  line-height: 1.15;
+  color: #ffe600 !important;
+  font-family: 'Georgia', serif;
+  font-weight: bold;
+  text-align: center;
+  word-break: keep-all;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.vibe-cell-count-badge {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  background: #facc15;
+  color: #0b0f19;
+  font-size: 0.72rem;
+  font-weight: 900;
+  padding: 2px 7px;
+  border-radius: 50px;
+  box-shadow: 0 0 8px rgba(250, 204, 21, 0.6);
+}
+
+/* Roster Cards */
+.vibe-roster-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.vibe-guest-card {
+  background: rgba(30, 41, 59, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.vibe-guest-card.pending {
+  background: rgba(250, 204, 21, 0.05);
+  border-color: rgba(250, 204, 21, 0.3);
+}
+
+.vibe-guest-card:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+.vibe-guest-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.vibe-guest-identity {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.vibe-guest-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 2px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  font-weight: 800;
+  background: rgba(15, 23, 42, 0.6);
+  flex-shrink: 0;
+}
+
+.vibe-guest-names {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.vibe-guest-child-name {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #f8fafc;
+}
+
+.vibe-guest-adult-name {
+  font-size: 0.78rem;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.vibe-status-tag {
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 3px 9px;
+  border-radius: 50px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.vibe-status-tag.waiting {
+  background: rgba(250, 204, 21, 0.15);
+  color: #facc15;
+  border: 1px solid rgba(250, 204, 21, 0.3);
+  animation: vibe-dot-pulse 2s infinite;
+}
+
+.vibe-status-tag.active {
+  background: rgba(16, 185, 129, 0.12);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+/* Guest Vibe Chips */
+.vibe-guest-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.vibe-guest-chip-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  border: 1px solid;
+}
+
+.vibe-admit-btn {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  color: white;
+  font-weight: 800;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.vibe-admit-btn:hover {
+  background: linear-gradient(135deg, #4ed882 0%, #15803d 100%);
+  transform: translateY(-1px);
+}
+
+.vibe-empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #64748b;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.vibe-empty-state p {
+  font-size: 0.85rem;
+  margin: 0;
+}

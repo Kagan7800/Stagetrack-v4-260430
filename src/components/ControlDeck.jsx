@@ -7,6 +7,7 @@ import html2canvas from 'html2canvas';
 export default function ControlDeck() {
   const {
     isDoodling, setIsDoodling,
+    drawingPaths,
     setMediaUpload, clearMedia, mediaType, mediaUrl,
     handleAddSticker,
     participants, activeGuestId,
@@ -345,7 +346,7 @@ export default function ControlDeck() {
               style={{
                 position: 'absolute',
                 right: '12px',
-                top: '4px',
+                top: '2px',
                 transform: 'rotate(-15deg)',
                 background: 'transparent',
                 border: 'none',
@@ -356,7 +357,7 @@ export default function ControlDeck() {
                 color: 'white',
                 transition: 'all 0.2s ease',
                 zIndex: 10,
-                fontFamily: '"Risque", serif',
+                fontFamily: "'Georgia', serif",
                 fontSize: '36px',
                 lineHeight: '1',
                 padding: '4px'
@@ -440,8 +441,6 @@ export default function ControlDeck() {
                     {isFirebaseUpdating ? 'Generating...' : 'Invite'}
                   </button>
 
-
-
                   {/* DOODLING */}
                   <button 
                     onClick={() => setIsDoodling(!isDoodling)}
@@ -457,17 +456,16 @@ export default function ControlDeck() {
                     Confetti
                   </button>
 
+                  {/* CURTAINS */}
+                  <button 
+                    onClick={() => setCurtainsOpen(!curtainsOpen)}
+                    className={`curtains-btn ${curtainsOpen ? 'open' : 'closed'}`}
+                  >
+                    Curtains
+                  </button>
                 </div>
 
                 <div className="controls-row middle-row">
-                  {/* 1ST SESSION */}
-                  <button 
-                    onClick={() => setActiveCdTab(activeCdTab === 'first_session' ? null : 'first_session')}
-                    className={activeCdTab === 'first_session' ? 'active' : ''}
-                  >
-                    1st Session
-                  </button>
-
                   {/* UPLOADS */}
                   <button 
                     onClick={() => setActiveCdTab(activeCdTab === 'upload' ? null : 'upload')}
@@ -488,6 +486,7 @@ export default function ControlDeck() {
                   <button 
                     onClick={() => setActiveCdTab(activeCdTab === 'whisper' ? null : 'whisper')}
                     className={activeCdTab === 'whisper' ? 'active' : ''}
+                    style={{ whiteSpace: 'nowrap' }}
                   >
                     Whisper
                   </button>
@@ -498,14 +497,6 @@ export default function ControlDeck() {
                     className={isChatOpen ? 'active' : ''}
                   >
                     Chat
-                  </button>
-
-                  {/* CURTAINS */}
-                  <button 
-                    onClick={() => setCurtainsOpen(!curtainsOpen)}
-                    className={`curtains-btn ${curtainsOpen ? 'open' : 'closed'}`}
-                  >
-                    {curtainsOpen ? '🎬 Close Curtains' : '🎭 Open Curtains'}
                   </button>
                 </div>
 

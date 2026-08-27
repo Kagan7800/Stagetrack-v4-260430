@@ -38,6 +38,11 @@ export function AppProvider({ children }) {
   const [guestButtons, setGuestButtons] = useState({});
   const [stickerNudges, setStickerNudges] = useState({});
   const [isDoodling, setIsDoodling] = useState(false);
+  const [doodleColor, setDoodleColor] = useState('#ec4899');
+  const [doodleBrushSize, setDoodleBrushSize] = useState(4);
+  const [doodleTriggerAction, setDoodleTriggerAction] = useState(null);
+  const [videoControlState, setVideoControlState] = useState({ isPlaying: true, isMuted: false, currentTime: 0, duration: 0 });
+  const [videoTriggerAction, setVideoTriggerAction] = useState(null);
   const [globalMute, setGlobalMute] = useState(false);
   const [globalPause, setGlobalPause] = useState(false);
   const [messages, setMessages] = useState([]);
@@ -350,7 +355,8 @@ export function AppProvider({ children }) {
         slotIndex: nextSlotIndex,
         color: pendingRequest.color || pendingRequest.selectedBorder || `hsl(${(nextSlotIndex * 137.5) % 360}, 70%, 60%)`,
         selectedBorder: pendingRequest.selectedBorder || '',
-        selectedIcon: pendingRequest.selectedIcon || null
+        selectedIcon: pendingRequest.selectedIcon || null,
+        vibeChips: pendingRequest.vibeChips || []
       };
 
       // Add guest to active users, send accepted response, and clear request
@@ -888,6 +894,11 @@ export function AppProvider({ children }) {
     guestButtons, setGuestButtons: handleSetGuestButtons,
     stickerNudges, setStickerNudges,
     isDoodling, setIsDoodling: handleSetIsDoodling,
+    doodleColor, setDoodleColor,
+    doodleBrushSize, setDoodleBrushSize,
+    doodleTriggerAction, setDoodleTriggerAction,
+    videoControlState, setVideoControlState,
+    videoTriggerAction, setVideoTriggerAction,
     globalMute, setGlobalMute,
     globalPause, setGlobalPause,
     messages, setMessages,

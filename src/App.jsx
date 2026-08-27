@@ -10,8 +10,10 @@ import { useAppContext } from './context/AppContext';
 import UnifiedToolbox from './components/UnifiedToolbox';
 import InstructorToolbox from './components/InstructorToolbox';
 import ControlDeck from './components/ControlDeck';
+import DoodleChoiceBar from './components/DoodleChoiceBar';
 import PersonalizedExplanationGenerator from './components/PersonalizedExplanationGenerator';
-import { Sparkles } from 'lucide-react';
+import RoomVibeWidget from './components/RoomVibeWidget';
+import { Sparkles, Flame } from 'lucide-react';
 
 function StageTimerDisplay({ stageTimer, setStageTimer, isInstructorClient }) {
   const [timeLeft, setTimeLeft] = useState(() => {
@@ -78,6 +80,8 @@ function StageTimerDisplay({ stageTimer, setStageTimer, isInstructorClient }) {
 
 function App() {
   const [showExplanationGenerator, setShowExplanationGenerator] = useState(false);
+  const [isRoomVibeOpen, setIsRoomVibeOpen] = useState(false);
+
   const {
     participants,
     activeGuestId, setActiveGuestId,
@@ -342,57 +346,6 @@ function App() {
                 }} 
               />
 
-              <button
-                onClick={() => setShowExplanationGenerator(prev => !prev)}
-                className="banner-action-btn animate-fade-in"
-                style={{
-                  position: 'absolute',
-                  right: (stageTimer && (stageTimer.isRunning || stageTimer.duration > 0)) ? '220px' : '20px',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  background: showExplanationGenerator 
-                    ? 'linear-gradient(135deg, rgba(59, 130, 246, 0.3) 0%, rgba(37, 99, 235, 0.3) 100%)' 
-                    : 'transparent',
-                  border: showExplanationGenerator ? '1.5px solid #3b82f6' : 'none',
-                  color: '#fff',
-                  borderRadius: '20px',
-                  padding: '6px 16px',
-                  cursor: 'pointer',
-                  fontSize: '0.85rem',
-                  fontWeight: 'bold',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  transition: 'all 0.2s ease',
-                  boxShadow: showExplanationGenerator 
-                    ? '0 0 10px rgba(59, 130, 246, 0.2)' 
-                    : 'none',
-                  fontFamily: 'inherit',
-                  zIndex: 200
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = showExplanationGenerator
-                    ? 'linear-gradient(135deg, rgba(59, 130, 246, 0.45) 0%, rgba(37, 99, 235, 0.45) 100%)'
-                    : 'transparent';
-                  e.currentTarget.style.boxShadow = showExplanationGenerator
-                    ? '0 0 15px rgba(59, 130, 246, 0.45)'
-                    : 'none';
-                  e.currentTarget.style.transform = 'translateY(-50%) scale(1.03)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = showExplanationGenerator
-                    ? 'linear-gradient(135deg, rgba(59, 130, 246, 0.3) 0%, rgba(37, 99, 235, 0.3) 100%)'
-                    : 'transparent';
-                  e.currentTarget.style.boxShadow = showExplanationGenerator
-                    ? '0 0 10px rgba(59, 130, 246, 0.2)'
-                    : 'none';
-                  e.currentTarget.style.transform = 'translateY(-50%) scale(1)';
-                }}
-              >
-                <Sparkles size={14} style={{ color: showExplanationGenerator ? '#60a5fa' : '#facc15' }} />
-                <span>{showExplanationGenerator ? 'Live Classroom' : 'About your Little One'}</span>
-              </button>
-
               {stageTimer && (stageTimer.isRunning || stageTimer.duration > 0) && (
                 <StageTimerDisplay stageTimer={stageTimer} setStageTimer={setStageTimer} isInstructorClient={isInstructorClient} />
               )}
@@ -411,57 +364,6 @@ function App() {
               />
               <div className="gradient-divider-bar" style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '6px' }}></div>
               
-              <button
-                onClick={() => setShowExplanationGenerator(prev => !prev)}
-                className="banner-action-btn animate-fade-in"
-                style={{
-                  position: 'absolute',
-                  right: (stageTimer && (stageTimer.isRunning || stageTimer.duration > 0)) ? '220px' : '20px',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  background: showExplanationGenerator 
-                    ? 'linear-gradient(135deg, rgba(59, 130, 246, 0.3) 0%, rgba(37, 99, 235, 0.3) 100%)' 
-                    : 'transparent',
-                  border: showExplanationGenerator ? '1.5px solid #3b82f6' : 'none',
-                  color: '#fff',
-                  borderRadius: '20px',
-                  padding: '6px 16px',
-                  cursor: 'pointer',
-                  fontSize: '0.85rem',
-                  fontWeight: 'bold',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  transition: 'all 0.2s ease',
-                  boxShadow: showExplanationGenerator 
-                    ? '0 0 10px rgba(59, 130, 246, 0.2)' 
-                    : 'none',
-                  fontFamily: 'inherit',
-                  zIndex: 200
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = showExplanationGenerator
-                    ? 'linear-gradient(135deg, rgba(59, 130, 246, 0.45) 0%, rgba(37, 99, 235, 0.45) 100%)'
-                    : 'transparent';
-                  e.currentTarget.style.boxShadow = showExplanationGenerator
-                    ? '0 0 15px rgba(59, 130, 246, 0.45)'
-                    : 'none';
-                  e.currentTarget.style.transform = 'translateY(-50%) scale(1.03)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = showExplanationGenerator
-                    ? 'linear-gradient(135deg, rgba(59, 130, 246, 0.3) 0%, rgba(37, 99, 235, 0.3) 100%)'
-                    : 'transparent';
-                  e.currentTarget.style.boxShadow = showExplanationGenerator
-                    ? '0 0 10px rgba(59, 130, 246, 0.2)'
-                    : 'none';
-                  e.currentTarget.style.transform = 'translateY(-50%) scale(1)';
-                }}
-              >
-                <Sparkles size={14} style={{ color: showExplanationGenerator ? '#60a5fa' : '#ef4444' }} />
-                <span>{showExplanationGenerator ? 'Live Classroom' : 'About your Little One'}</span>
-              </button>
-
               {stageTimer && (stageTimer.isRunning || stageTimer.duration > 0) && (
                 <StageTimerDisplay stageTimer={stageTimer} setStageTimer={setStageTimer} isInstructorClient={isInstructorClient} />
               )}
@@ -698,18 +600,26 @@ function App() {
                  })}
                </div>
 
-                <div className="center-wrapper" style={{ position: 'relative', alignSelf: 'flex-start' }}>
+                <div className="center-wrapper" style={{ 
+                  position: 'relative', 
+                  alignSelf: (isInstructorClient && activeItoSection !== 'closed') ? 'flex-start' : 'center', 
+                  height: '100%',
+                  transition: 'all 0.4s cubic-bezier(0.25, 1, 0.5, 1)'
+                }}>
                   <div style={{ 
                     display: 'flex', 
                     flexDirection: 'column', 
                     width: 'fit-content', 
                     alignItems: 'center', 
                     height: '100%', 
-                    justifyContent: ((isInstructorClient && activeItoSection !== 'closed') || showStudentStickers || showStudentFilters || isPeoStickersOpen) ? 'space-between' : 'center' 
+                    justifyContent: (isInstructorClient && activeItoSection !== 'closed') ? 'flex-start' : 'center',
+                    transition: 'all 0.4s cubic-bezier(0.25, 1, 0.5, 1)'
                   }}>
-                   <div className={`pc-width-keeper ${isChatOpen ? 'pc-sidebar-open' : ''}`}>
+                   <div className={`pc-width-keeper ${isChatOpen ? 'pc-sidebar-open' : ''}`} style={{ transition: 'all 0.4s cubic-bezier(0.25, 1, 0.5, 1)' }}>
                       <div 
+                        ref={pcBoxRef}
                         className={`pc-gt-unified ${mediaType === 'iframe' || mediaType === 'metronome' ? 'metronome-active' : ''} ${isRhythmWheel ? 'rhythm-wheel-container' : 'presentation-container-parent'}`}
+                        style={{ transition: 'all 0.4s cubic-bezier(0.25, 1, 0.5, 1)' }}
                       >
                          <PresentationContainer 
                            isDoodling={isDoodling}
@@ -720,9 +630,9 @@ function App() {
                      </div>
                    </div>
 
-                    {isInstructorClient && (
+                    {isInstructorClient && activeItoSection === 'closed' && (
                       <button
-                        onClick={() => setActiveItoSection(prev => prev === 'closed' ? null : 'closed')}
+                        onClick={() => setActiveItoSection(null)}
                         className="studio-controls-toggle-btn"
                         style={{
                           margin: '6px 0',
@@ -752,15 +662,40 @@ function App() {
                         }}
                       >
                         <span>Studio Controls</span>
-                        <span style={{ fontSize: '0.7rem' }}>{activeItoSection !== 'closed' ? '▲' : '▼'}</span>
+                        <span style={{ fontSize: '0.7rem' }}>▼</span>
                       </button>
                     )}
+                    {/* Doodling Controls — placed directly below the PC box with matching 10px spacing */}
+                    {isDoodling && (
+                      <div style={{
+                        marginTop: '10px',
+                        width: '100%',
+                        maxWidth: '100%',
+                        boxSizing: 'border-box',
+                        zIndex: 50,
+                        flexShrink: 0,
+                      }}>
+                        <DoodleChoiceBar />
+                      </div>
+                    )}
 
-                   <ControlDeck />
-                 </div>
-               </div>
-               
-               <div className="side-peos" data-columns={halfLength <= 3 ? "1" : "2"}>
+                    {/* Studio Controls (ControlDeck) — rendered under doodle controls with matching 10px spacing */}
+                    <div style={{ 
+                      marginTop: '10px',
+                      width: '100%',
+                      maxWidth: '100%',
+                      boxSizing: 'border-box',
+                      zIndex: 50,
+                      transition: 'all 0.4s cubic-bezier(0.25, 1, 0.5, 1)',
+                      opacity: (isInstructorClient && activeItoSection !== 'closed') ? 1 : 0,
+                      pointerEvents: (isInstructorClient && activeItoSection !== 'closed') ? 'auto' : 'none',
+                    }}>
+                      <ControlDeck />
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="side-peos" data-columns={halfLength <= 3 ? "1" : "2"}>
                  {rightParticipantsLandscape.map(p => {
                    return (
                      <GuestContainer 
@@ -808,6 +743,7 @@ function App() {
           )}
         </div>
       </div>
+      <RoomVibeWidget isOpen={isRoomVibeOpen} onClose={() => setIsRoomVibeOpen(false)} />
     </div>
   );
 }

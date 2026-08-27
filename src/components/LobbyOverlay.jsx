@@ -33,34 +33,50 @@ const STO_STICKERS = [
   'Xylophone.svg'
 ];
 
-function LobbyAIChat() {
-  const [chatInput, setChatInput] = useState('');
+const VIBE_CHIPS = [
+  { id: 'high_energy', emoji: '⚡', line1: 'High', line2: 'Energy', label: '⚡ High Energy', color: '#f97316', bg: 'rgba(249, 115, 22, 0.2)' },
+  { id: 'low_energy', emoji: '🔋', line1: 'Tired /', line2: 'Low', label: '🔋 Tired / Low', color: '#a855f7', bg: 'rgba(168, 85, 247, 0.2)' },
+  { id: 'gentle_warmup', emoji: '🥺', line1: 'Needing', line2: 'Warm-Up', label: '🥺 Needing Warm-Up', color: '#3b82f6', bg: 'rgba(59, 130, 246, 0.2)' },
+  { id: 'birthday', emoji: '🎉', line1: 'Birthday', line2: 'Today!', label: '🎉 Birthday Today!', color: '#facc15', bg: 'rgba(250, 204, 21, 0.2)' },
+  { id: 'under_weather', emoji: '🤒', line1: 'Not Feeling', line2: 'Well', label: '🤒 Not Feeling Well', color: '#06b6d4', bg: 'rgba(6, 182, 212, 0.2)' },
+  { id: 'focused', emoji: '🧩', line1: 'Deeply', line2: 'Focused', label: '🧩 Deeply Focused', color: '#10b981', bg: 'rgba(16, 185, 129, 0.2)' }
+];
 
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      if (!chatInput.trim()) return;
-      // Clear input on send
-      setChatInput('');
-    }
+function LobbyVibeChips({ selectedVibeChips, setSelectedVibeChips }) {
+  const toggleChip = (id) => {
+    setSelectedVibeChips(prev =>
+      prev.includes(id) ? prev.filter(c => c !== id) : [...prev, id]
+    );
   };
-  
-  return (
-    <div className="lobby-ai-chat-container">
-      <div className="lobby-ai-chat-welcome">
-        Welcome! Let me know if you prefer larger text, high-contrast colors, or a calmer focus layout...
-      </div>
 
-      <div className="lobby-ai-chat-input-row">
-        <textarea
-          rows={10}
-          value={chatInput}
-          onChange={(e) => setChatInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="e.g., make the buttons larger / use high contrast"
-          className="lobby-ai-chat-input"
-        />
-      </div>
+  return (
+    <div className="lobby-vibe-chips-grid">
+      {/* Inside divider lines with 60% opacity */}
+      <div className="vibe-v-line" />
+      <div className="vibe-h-line-1" />
+      <div className="vibe-h-line-2" />
+
+      {VIBE_CHIPS.map(chip => {
+        const isSelected = selectedVibeChips.includes(chip.id);
+        return (
+          <button
+            key={chip.id}
+            type="button"
+            className={`lobby-vibe-chip-button ${isSelected ? 'selected' : ''}`}
+            style={{
+              '--chip-color': chip.color,
+              '--chip-bg': chip.bg
+            }}
+            onClick={() => toggleChip(chip.id)}
+          >
+            <span className="vibe-chip-emoji">{chip.emoji}</span>
+            <span className="vibe-chip-label">
+              <span>{chip.line1}</span>
+              <span>{chip.line2}</span>
+            </span>
+          </button>
+        );
+      })}
     </div>
   );
 }
@@ -73,6 +89,8 @@ export default function LobbyOverlay() {
   const [myLittleOne, setMyLittleOne] = useState('');
   const [selectedBorder, setSelectedBorder] = useState(BORDERS[0].value);
   const [selectedIcon, setSelectedIcon] = useState(null);
+  const [selectedVibeChips, setSelectedVibeChips] = useState([]);
+  const [isStudioControlsOpen, setIsStudioControlsOpen] = useState(true);
   const [childPlaceholder, setChildPlaceholder] = useState("Child's 1st Name");
   const [adultPlaceholder, setAdultPlaceholder] = useState("Adult's 1st Name");
 
@@ -184,6 +202,7 @@ export default function LobbyOverlay() {
       selectedIcon: selectedIcon,
       selectedBorder: selectedBorder,
       color: selectedBorder,
+      vibeChips: selectedVibeChips,
       timestamp: Date.now()
     };
 
@@ -243,6 +262,13 @@ export default function LobbyOverlay() {
           className="lobby-svg-container" 
           style={{ '--lobby-scale': scale, color: 'white' }}
         >
+          {/* Logo at top center */}
+          <img
+            src="/assets/logo-thr.png"
+            className="lobby-top-logo"
+            alt="Music Fun Logo"
+          />
+          <div className="lobby-top-logo-divider" />
           {lobbyStatus === 'initial' && (
             <button 
               type="button" 
@@ -464,10 +490,10 @@ export default function LobbyOverlay() {
               </div>
             </div>
 
-            {/* Special Formats Card (Card 3) */}
-            <div className="lobby-special-formats-container">
-              <div className="lobby-card-title">Personalize your studio</div>
-              <LobbyAIChat />
+            {/* Card 3: How is your Little One today? */}
+            <div className="lobby-vibe-card-container">
+              <div className="lobby-card-title lobby-card-3-title">How is your Little One today?</div>
+              <LobbyVibeChips selectedVibeChips={selectedVibeChips} setSelectedVibeChips={setSelectedVibeChips} />
             </div>
 
             {/* Join Session Section */}
@@ -475,14 +501,8 @@ export default function LobbyOverlay() {
               type="submit" 
               className="lobby-join-container"
               disabled={!myName.trim() || !myLittleOne.trim() || !selectedIcon}
+              onClick={handleSubmit}
               title="Join Session"
-              style={{
-                background: 'transparent',
-                border: 'none',
-                cursor: 'pointer',
-                padding: 0,
-                outline: 'none'
-              }}
             >
               <img 
                 src="/assets/Lobby/Click to join session.svg" 
@@ -491,9 +511,9 @@ export default function LobbyOverlay() {
               />
               <div className="lobby-join-arrow-button-mock">
                 <img 
-                  src="/assets/Lobby/Arrow.svg?v=4" 
+                  src="/assets/Lobby/Arrow.svg" 
                   className="lobby-join-arrow-img" 
-                  alt="Join Arrow" 
+                  alt="Join Session Arrow" 
                 />
               </div>
             </button>
