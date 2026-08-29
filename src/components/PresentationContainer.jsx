@@ -37,14 +37,11 @@ export function CentralStageDeck({ mediaUrl, onClick }) {
 }
 
 export default function PresentationContainer({ 
-  isDoodling, 
   mediaUrl, 
   mediaType: propMediaType
 }) {
   const { 
-    drawingPaths, setDrawingPaths, 
     mediaType: globalMediaType, sessionId, rhythmBeat, curtainsOpen,
-    doodleColor, doodleBrushSize, doodleTriggerAction, setDoodleTriggerAction,
     videoControlState, setVideoControlState, videoTriggerAction, setVideoTriggerAction
   } = useAppContext();
   const mediaType = propMediaType || globalMediaType;
@@ -53,16 +50,6 @@ export default function PresentationContainer({
 
   const displayUrl = mediaUrl || '/assets/MF_images/Music_Fun_with_my_Little_One.jpg';
   const displayType = mediaUrl ? mediaType : (mediaType === 'metronome' ? 'metronome' : 'image');
-
-  const canvasRef = useRef(null);
-  const contextRef = useRef(null);
-  const [isDrawing, setIsDrawing] = useState(false);
-  const [redoStack, setRedoStack] = useState([]);
-  const [brushSize, setBrushSize] = useState(4);
-
-  const [selectedColor, setSelectedColor] = useState('#ec4899');
-  const selectedColorRef = useRef('#ec4899');
-  const currentPathRef = useRef(null);
 
   // SVG Curtain Transition States
   const [renderedUrl, setRenderedUrl] = useState(displayUrl);
@@ -159,67 +146,7 @@ export default function PresentationContainer({
     }
   };
 
-  const popularColors = [
-    { name: 'Pink', value: '#ec4899' },
-    { name: 'Red', value: '#ef4444' },
-    { name: 'Blue', value: '#3b82f6' },
-    { name: 'Green', value: '#22c55e' },
-    { name: 'Yellow', value: '#eab308' }
-  ];
 
-  const handleColorChange = (color) => {
-    setSelectedColor(color);
-    selectedColorRef.current = color;
-    if (contextRef.current) {
-      if (color === 'eraser') {
-        contextRef.current.globalCompositeOperation = 'destination-out';
-        contextRef.current.lineWidth = brushSize * 3;
-      } else {
-        contextRef.current.globalCompositeOperation = 'source-over';
-        contextRef.current.strokeStyle = color;
-        contextRef.current.lineWidth = brushSize;
-      }
-    }
-  };
-
-  useEffect(() => {
-    if (doodleColor) {
-      handleColorChange(doodleColor);
-    }
-  }, [doodleColor]);
-
-  useEffect(() => {
-    if (doodleBrushSize) {
-      setBrushSize(doodleBrushSize);
-      if (contextRef.current) {
-        contextRef.current.lineWidth = selectedColorRef.current === 'eraser' ? doodleBrushSize * 3 : doodleBrushSize;
-      }
-    }
-  }, [doodleBrushSize]);
-
-  useEffect(() => {
-    if (doodleTriggerAction === 'undo') {
-      if (drawingPaths && drawingPaths.length > 0) {
-        const newPaths = [...drawingPaths];
-        const popped = newPaths.pop();
-        setRedoStack(prev => [...prev, popped]);
-        setDrawingPaths(newPaths);
-      }
-      setDoodleTriggerAction(null);
-    } else if (doodleTriggerAction === 'redo') {
-      if (redoStack.length > 0) {
-        const newRedo = [...redoStack];
-        const restored = newRedo.pop();
-        setRedoStack(newRedo);
-        setDrawingPaths([...drawingPaths, restored]);
-      }
-      setDoodleTriggerAction(null);
-    } else if (doodleTriggerAction === 'clear') {
-      setRedoStack([]);
-      setDrawingPaths([]);
-      setDoodleTriggerAction(null);
-    }
-  }, [doodleTriggerAction, drawingPaths, redoStack]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -249,136 +176,7 @@ export default function PresentationContainer({
     }
   }, [videoTriggerAction, setVideoControlState, setVideoTriggerAction]);
 
-  const redrawCanvas = useCallback(() => {
-    if (!canvasRef.current || !contextRef.current) return;
-    const canvas = canvasRef.current;
-    const ctx = contextRef.current;
-    
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    (drawingPaths || []).forEach(path => {
-      if (!path.points || path.points.length === 0) return;
-      ctx.beginPath();
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-      
-      if (path.color === 'eraser') {
-        ctx.globalCompositeOperation = 'destination-out';
-        ctx.lineWidth = path.width || 12;
-      } else {
-        ctx.globalCompositeOperation = 'source-over';
-        ctx.strokeStyle = path.color;
-        ctx.lineWidth = path.width || 4;
-      }
-      
-      const start = path.points[0];
-      ctx.moveTo(start.x * canvas.width, start.y * canvas.height);
-      for (let i = 1; i < path.points.length; i++) {
-        const pt = path.points[i];
-        ctx.lineTo(pt.x * canvas.width, pt.y * canvas.height);
-      }
-      ctx.stroke();
-    });
-    
-    // Restore current settings
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    if (selectedColorRef.current === 'eraser') {
-      ctx.globalCompositeOperation = 'destination-out';
-      ctx.lineWidth = brushSize * 3;
-    } else {
-      ctx.globalCompositeOperation = 'source-over';
-      ctx.strokeStyle = selectedColorRef.current;
-      ctx.lineWidth = brushSize;
-    }
-  }, [drawingPaths, brushSize]);
 
-  useEffect(() => {
-    redrawCanvas();
-  }, [redrawCanvas]);
-
-  useEffect(() => {
-    if (!canvasRef.current) return;
-    
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    contextRef.current = ctx;
-
-    const resizeCanvas = () => {
-      canvas.width = canvas.offsetWidth;
-      canvas.height = canvas.offsetHeight;
-      redrawCanvas();
-    };
-
-    const observer = new ResizeObserver(() => {
-      resizeCanvas();
-    });
-
-    observer.observe(canvas.parentElement);
-    resizeCanvas(); // initial
-
-    return () => observer.disconnect();
-  }, [redrawCanvas]);
-
-  const startDrawing = (e) => {
-    if (!isDoodling || !contextRef.current || !canvasRef.current) return;
-    const { offsetX, offsetY } = e.nativeEvent;
-    const canvas = canvasRef.current;
-    
-    const ctx = contextRef.current;
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-    if (selectedColorRef.current === 'eraser') {
-      ctx.globalCompositeOperation = 'destination-out';
-      ctx.lineWidth = brushSize * 3;
-    } else {
-      ctx.globalCompositeOperation = 'source-over';
-      ctx.strokeStyle = selectedColorRef.current;
-      ctx.lineWidth = brushSize;
-    }
-    
-    ctx.beginPath();
-    ctx.moveTo(offsetX, offsetY);
-    
-    const xRatio = canvas.width > 0 ? offsetX / canvas.width : 0;
-    const yRatio = canvas.height > 0 ? offsetY / canvas.height : 0;
-    
-    currentPathRef.current = {
-      points: [{ x: xRatio, y: yRatio }],
-      color: selectedColorRef.current,
-      width: selectedColorRef.current === 'eraser' ? brushSize * 3 : brushSize
-    };
-    
-    setIsDrawing(true);
-    setRedoStack([]); // Clear redo stack on new drawing path
-  };
-
-  const draw = (e) => {
-    if (!isDrawing || !isDoodling || !contextRef.current || !canvasRef.current) return;
-    const { offsetX, offsetY } = e.nativeEvent;
-    const canvas = canvasRef.current;
-    
-    contextRef.current.lineTo(offsetX, offsetY);
-    contextRef.current.stroke();
-    
-    const xRatio = canvas.width > 0 ? offsetX / canvas.width : 0;
-    const yRatio = canvas.height > 0 ? offsetY / canvas.height : 0;
-    
-    if (currentPathRef.current) {
-      currentPathRef.current.points.push({ x: xRatio, y: yRatio });
-    }
-  };
-
-  const stopDrawing = () => {
-    if (!isDoodling || !contextRef.current) return;
-    contextRef.current.closePath();
-    setIsDrawing(false);
-    
-    if (currentPathRef.current && currentPathRef.current.points.length > 1) {
-      setDrawingPaths(prev => [...prev, currentPathRef.current]);
-    }
-    currentPathRef.current = null;
-  };
 
   return (
     <div 
@@ -481,16 +279,6 @@ export default function PresentationContainer({
               )}
             </div>
           )}
-
-          {/* Drawing Canvas Layer */}
-          <canvas
-            ref={canvasRef}
-            className={`doodle-canvas ${isDoodling ? 'active' : ''} ${selectedColor === 'eraser' ? 'eraser-active' : ''}`}
-            onMouseDown={startDrawing}
-            onMouseMove={draw}
-            onMouseUp={stopDrawing}
-            onMouseOut={stopDrawing}
-          />
         </div>
 
         {/* 3. Static Curtain Overlay */}

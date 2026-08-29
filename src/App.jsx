@@ -10,7 +10,6 @@ import { useAppContext } from './context/AppContext';
 import UnifiedToolbox from './components/UnifiedToolbox';
 import InstructorToolbox from './components/InstructorToolbox';
 import ControlDeck from './components/ControlDeck';
-import DoodleChoiceBar from './components/DoodleChoiceBar';
 import PersonalizedExplanationGenerator from './components/PersonalizedExplanationGenerator';
 import RoomVibeWidget from './components/RoomVibeWidget';
 import { Sparkles, Flame } from 'lucide-react';
@@ -617,7 +616,6 @@ function App() {
                   }}>
                    <div className={`pc-width-keeper ${isChatOpen ? 'pc-sidebar-open' : ''}`} style={{ transition: 'all 0.4s cubic-bezier(0.25, 1, 0.5, 1)' }}>
                       <div 
-                        ref={pcBoxRef}
                         className={`pc-gt-unified ${mediaType === 'iframe' || mediaType === 'metronome' ? 'metronome-active' : ''} ${isRhythmWheel ? 'rhythm-wheel-container' : 'presentation-container-parent'}`}
                         style={{ transition: 'all 0.4s cubic-bezier(0.25, 1, 0.5, 1)' }}
                       >
@@ -665,21 +663,8 @@ function App() {
                         <span style={{ fontSize: '0.7rem' }}>▼</span>
                       </button>
                     )}
-                    {/* Doodling Controls — placed directly below the PC box with matching 10px spacing */}
-                    {isDoodling && (
-                      <div style={{
-                        marginTop: '10px',
-                        width: '100%',
-                        maxWidth: '100%',
-                        boxSizing: 'border-box',
-                        zIndex: 50,
-                        flexShrink: 0,
-                      }}>
-                        <DoodleChoiceBar />
-                      </div>
-                    )}
 
-                    {/* Studio Controls (ControlDeck) — rendered under doodle controls with matching 10px spacing */}
+                    {/* Studio Controls (ControlDeck) — rendered under PC box with matching 10px spacing */}
                     <div style={{ 
                       marginTop: '10px',
                       width: '100%',

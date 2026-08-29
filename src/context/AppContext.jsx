@@ -150,25 +150,26 @@ export function AppProvider({ children }) {
           });
           console.log("Session document initialized successfully in Firestore.");
         } else {
-          // Document already exists, make sure instructor is in activeUsers if not already there
+          // Document already exists, make sure instructor is in activeUsers and reset any leftover drawing paths
           const data = docSnap.data();
           const hasInstructor = (data.activeUsers || []).some(u => u.uid === 'instructor-ic' || u.isInstructor);
-          if (!hasInstructor) {
-            const instructorUser = {
-              uid: 'instructor-ic',
-              role: 'ic',
-              isInstructor: true,
-              joinedAt: Date.now(),
-              slotIndex: 0,
-              name: 'Instructor'
-            };
-            await updateDoc(sessionRef, {
-              activeUsers: [instructorUser, ...(data.activeUsers || [])]
-            });
-            console.log("Instructor rejoined existing session document in Firestore.");
-          } else {
-            console.log("Instructor already present in existing session document.");
-          }
+          const instructorUser = {
+            uid: 'instructor-ic',
+            role: 'ic',
+            isInstructor: true,
+            joinedAt: Date.now(),
+            slotIndex: 0,
+            name: 'Instructor'
+          };
+          
+          await updateDoc(sessionRef, {
+            ...(!hasInstructor ? { activeUsers: [instructorUser, ...(data.activeUsers || [])] } : {}),
+            drawingPaths: [],
+            isDoodling: false
+          });
+          setDrawingPaths([]);
+          setIsDoodling(false);
+          console.log("Session document updated cleanly in Firestore (drawingPaths reset).");
         }
       } catch (err) {
         console.error("Failed to initialize session in Firestore:", err);

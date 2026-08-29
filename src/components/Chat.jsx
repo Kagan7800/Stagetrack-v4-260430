@@ -7,6 +7,7 @@ export default function Chat({ messages = [], onSendMessage, onModerate, onClose
   const themeTextColor = activeTheme === 'sor' ? '#ef4444' : '#3b82f6';
   const [input, setInput] = useState("");
   const timerRef = useRef(null);
+  const textareaRef = useRef(null);
 
   const resetInactivityTimer = useCallback(() => {
     if (timerRef.current) clearTimeout(timerRef.current);
@@ -22,12 +23,31 @@ export default function Chat({ messages = [], onSendMessage, onModerate, onClose
     };
   }, [resetInactivityTimer]);
 
+  // Auto-expand textarea upward as text is added
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 120)}px`;
+    }
+  }, [input]);
+
   const handleSend = (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     if (!input.trim()) return;
     onSendMessage(input);
     setInput("");
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+    }
     resetInactivityTimer();
+  };
+
+  const handleKeyDown = (e) => {
+    resetInactivityTimer();
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
   };
 
   return (
@@ -36,7 +56,7 @@ export default function Chat({ messages = [], onSendMessage, onModerate, onClose
       onMouseMove={resetInactivityTimer}
       onKeyDown={resetInactivityTimer}
       onClick={resetInactivityTimer}
-      style={{ position: 'relative' }}
+      style={{ position: 'relative', height: '100%', display: 'flex', flexDirection: 'column', background: 'transparent' }}
     >
       <div className="chat-header" style={{ position: 'relative', display: 'flex', alignItems: 'center', minHeight: '52px', boxSizing: 'border-box', borderBottom: '1px solid var(--glass-border)', padding: '12px 16px' }}>
         <button 
@@ -116,9 +136,10 @@ export default function Chat({ messages = [], onSendMessage, onModerate, onClose
           ))}
         </div>
         
-        <form className="chat-input-wrapper" onSubmit={handleSend}>
-          <input 
-            type="text" 
+        <form className="chat-input-wrapper" onSubmit={handleSend} style={{ marginBottom: '10px' }}>
+          <textarea 
+            ref={textareaRef}
+            rows={1}
             className="chat-input" 
             placeholder="Type..." 
             value={input}
@@ -126,6 +147,7 @@ export default function Chat({ messages = [], onSendMessage, onModerate, onClose
               setInput(e.target.value);
               resetInactivityTimer();
             }}
+            onKeyDown={handleKeyDown}
           />
           <button type="submit" className="icon-btn">
             <Send size={18} />
