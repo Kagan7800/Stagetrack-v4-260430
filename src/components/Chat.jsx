@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Send, Trash2 } from 'lucide-react';
+import PermissionHeader from './PermissionHeader';
 
 const COLORS = ['#F2994A', '#2FA6A0', '#5B3A8E', '#1E8ED2', '#E0546B', '#8E6BC4'];
 
@@ -79,19 +80,12 @@ export default function Chat({
   return (
     <div className={`chat-panel-inner ${isSor ? 'theme-sor' : ''}`} data-theme={activeTheme}>
       {/* Header: Purple-to-Blue gradient aesthetic or Red gradient in SOR mode */}
-      <div className="chat-header">
-        <h3>💬 Live Chat</h3>
-        {isInstructor && (
-          <button 
-            type="button"
-            className="chat-close" 
-            onClick={onClose} 
-            title="Close Chat (Instructor Only)"
-          >
-            ✕
-          </button>
-        )}
-      </div>
+      <PermissionHeader 
+        title="💬 Live Chat"
+        isInstructor={isInstructor}
+        onClose={onClose}
+        closeTitle="Close Chat (Instructor Only)"
+      />
 
       {/* Message list: reverse-chronological scroll with newest at bottom */}
       <div className="chat-messages" ref={messagesContainerRef}>
