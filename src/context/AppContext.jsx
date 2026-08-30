@@ -321,13 +321,14 @@ export function AppProvider({ children }) {
       if (data.stageTimer !== undefined) setStageTimer(data.stageTimer);
       if (data.guestStickers !== undefined) setGuestStickers(data.guestStickers);
       if (data.guestButtons !== undefined) setGuestButtons(data.guestButtons);
+      if (data.isChatOpen !== undefined) setIsChatOpen(Boolean(data.isChatOpen));
       if (data.messages !== undefined && Array.isArray(data.messages)) {
         setMessages(prev => {
           const firestoreMsgs = data.messages || [];
           const firestoreIds = new Set(firestoreMsgs.map(m => m.id));
           // Keep local recent messages not yet reflected in Firestore
           const localRecent = (prev || []).filter(m => m && m.id && !firestoreIds.has(m.id) && (Date.now() - (m.timestamp || 0) < 60000));
-          return [...firestoreMsgs, ...localRecent];
+          return [...firestoreMsgs, ...localRecent].sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
         });
       }
     });
@@ -628,23 +629,52 @@ export function AppProvider({ children }) {
     }
   };
 
+  const handleToggleChat = async (forceState) => {
+    const role = sessionStorage.getItem('stagetrack_role');
+    const isInstructor = role !== 'student';
+    if (!isInstructor) {
+      console.warn("Permission denied: Only instructors can open or close the chat.");
+      return;
+    }
+    const nextVal = forceState !== undefined ? forceState : !isChatOpen;
+    setIsChatOpen(nextVal);
+    if (sessionId) {
+      try {
+        const sessionRef = doc(db, "sessions", sessionId);
+        await updateDoc(sessionRef, { isChatOpen: nextVal });
+      } catch (err) {
+        console.error("Error syncing chat visibility:", err);
+      }
+    }
+  };
+
   const handleSendChatMessage = async (text) => {
     if (!text || !text.trim()) return;
-    const isInstructor = sessionStorage.getItem('stagetrack_role') === 'instructor';
-    const sender = isInstructor ? 'self' : 'other';
-    const senderRole = isInstructor ? 'instructor' : 'guest';
-    const senderName = isInstructor ? 'Instructor' : (participants.find(p => p.id === activeGuestId)?.name || 'Guest');
+    const role = sessionStorage.getItem('stagetrack_role');
+    const isInstructor = role !== 'student';
+    
+    let senderName = 'Guest';
+    if (isInstructor) {
+      senderName = 'Ms. Rivera';
+    } else {
+      const myName = sessionStorage.getItem('stagetrack_username');
+      const guestP = participants.find(p => p.id && String(p.id).startsWith('active-joined')) ||
+                     participants.find(p => !p.isInstructor && !p.isBlank);
+      senderName = myName || guestP?.name || 'Parent / Student';
+    }
+
+    const now = new Date();
+    const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     const newMsg = {
       id: `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+      name: senderName,
       text: text.trim(),
-      sender,
-      senderRole,
-      senderName,
-      status: 'public',
-      timestamp: Date.now()
+      time,
+      timestamp: Date.now(),
+      role: isInstructor ? 'instructor' : 'student'
     };
 
-    // 1. Immediately update local state so the message stays visible and does not disappear
+    // 1. Immediately update local state
     setMessages(prev => [...(prev || []), newMsg]);
 
     // 2. Persist to Firestore session with merge
@@ -660,41 +690,24 @@ export function AppProvider({ children }) {
     }
   };
 
-  const handleModerateMessage = async (msgId, action) => {
-    if (!sessionId) return;
-    try {
-      const sessionRef = doc(db, "sessions", sessionId);
-      const updatedMessages = messages.map(msg => {
-        if (msg.id === msgId) {
-          if (action === 'show') return { ...msg, status: 'public' };
-          if (action === 'ignore') return { ...msg, status: 'ignored' };
-          if (action === 'reply_private') return { ...msg, status: 'private' };
-        }
-        return msg;
-      });
-      await updateDoc(sessionRef, { messages: updatedMessages });
-      
-      if (action === 'show' || action === 'reply_private') {
-        setIsChatOpen(true);
+  const handleDeleteChatMessage = async (msgId) => {
+    const role = sessionStorage.getItem('stagetrack_role');
+    const isInstructor = role !== 'student';
+    if (!isInstructor) {
+      console.warn("Permission denied: Only instructors can delete messages.");
+      return;
+    }
+
+    const updated = (messages || []).filter(m => m && m.id !== msgId);
+    setMessages(updated);
+
+    if (sessionId) {
+      try {
+        const sessionRef = doc(db, "sessions", sessionId);
+        await updateDoc(sessionRef, { messages: updated });
+      } catch (err) {
+        console.error("Error deleting chat message:", err);
       }
-      
-      if (action === 'reply_private') {
-        setTimeout(async () => {
-          const replyMsg = {
-            id: `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
-            text: "I will answer that privately.",
-            sender: "self",
-            senderName: "Instructor",
-            status: "private",
-            timestamp: Date.now()
-          };
-          await updateDoc(sessionRef, {
-            messages: arrayUnion(replyMsg)
-          });
-        }, 500);
-      }
-    } catch (err) {
-      console.error("Error moderating message:", err);
     }
   };
 
@@ -943,8 +956,9 @@ export function AppProvider({ children }) {
     resetStudentState,
     handleAddSticker,
     handleToggleGuestButton,
+    handleToggleChat,
     handleSendChatMessage,
-    handleModerateMessage,
+    handleDeleteChatMessage,
     sendWhisper,
     setMediaUpload,
     handleToggleInvite,

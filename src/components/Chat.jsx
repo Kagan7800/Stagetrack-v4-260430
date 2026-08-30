@@ -1,15 +1,35 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { Send } from 'lucide-react';
-import { useAppContext } from '../context/AppContext';
+import { useState, useRef, useEffect } from 'react';
+import { Send, Trash2 } from 'lucide-react';
 
-export default function Chat({ messages = [], onSendMessage, onModerate, onClose }) {
-  const { activeTheme } = useAppContext();
-  const themeTextColor = activeTheme === 'sor' ? '#ef4444' : '#3b82f6';
-  const [input, setInput] = useState("");
+const COLORS = ['#F2994A', '#2FA6A0', '#5B3A8E', '#1E8ED2', '#E0546B', '#8E6BC4'];
+
+function colorFor(name = '') {
+  let sum = 0;
+  for (const ch of name) sum += ch.charCodeAt(0);
+  return COLORS[sum % COLORS.length];
+}
+
+function initials(name = '') {
+  return name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() || 'U';
+}
+
+const STICKERS = ['🎵', '🥁', '🦒', '⭐', '🎉', '🔔', '❤️', '👏', '😄', '🌈', '🎈', '✨'];
+
+export default function Chat({
+  isOpen,
+  isInstructor,
+  messages = [],
+  onSendMessage,
+  onDeleteMessage,
+  onClose
+}) {
+  const [input, setInput] = useState('');
+  const [showStickerPicker, setShowStickerPicker] = useState(false);
   const textareaRef = useRef(null);
   const messagesEndRef = useRef(null);
+  const messagesContainerRef = useRef(null);
 
-  // Auto-expand textarea upward as text is added
+  // Auto-expand textarea upward as message wraps to multiple lines (capped at 120px)
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
@@ -17,18 +37,23 @@ export default function Chat({ messages = [], onSendMessage, onModerate, onClose
     }
   }, [input]);
 
-  // Auto-scroll to newest message
+  // Reverse-chronological / newest at bottom auto-scroll on new message or open
   useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
     }
-  }, [messages]);
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    }
+  }, [messages, isOpen]);
 
   const handleSend = (e) => {
     if (e) e.preventDefault();
-    if (!input.trim()) return;
-    onSendMessage(input);
-    setInput("");
+    const textToSend = input.trim();
+    if (!textToSend) return;
+    onSendMessage(textToSend);
+    setInput('');
+    setShowStickerPicker(false);
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
     }
@@ -41,105 +66,106 @@ export default function Chat({ messages = [], onSendMessage, onModerate, onClose
     }
   };
 
+  const handleStickerClick = (sticker) => {
+    setInput(prev => prev + sticker);
+    if (textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  };
+
   return (
-    <div 
-      className="glass-panel sidebar chat-sidebar"
-      style={{ position: 'relative', height: '100%', minHeight: 0, maxHeight: '100%', display: 'flex', flexDirection: 'column', background: 'transparent', overflow: 'hidden' }}
-    >
-      <div className="chat-header" style={{ position: 'relative', display: 'flex', alignItems: 'center', minHeight: '52px', boxSizing: 'border-box', borderBottom: '1px solid var(--glass-border)', padding: '12px 16px' }}>
-        <button 
-          onClick={onClose} 
-          className="close-btn" 
-          title="Collapse Chat"
-          style={{ 
-            position: 'absolute', 
-            left: '16px', 
-            top: '50%', 
-            transform: 'translateY(-50%)', 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'center',
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            zIndex: 10
-          }}
-        >
-          <svg 
-            width="32" 
-            height="32" 
-            viewBox="0 0 328 259" 
-            style={{ 
-              transform: 'none',
-              objectFit: 'contain'
-            }}
+    <div className="chat-panel-inner">
+      {/* Header: Purple-to-Blue gradient aesthetic */}
+      <div className="chat-header">
+        <h3>💬 Live Chat</h3>
+        {isInstructor && (
+          <button 
+            type="button"
+            className="chat-close" 
+            onClick={onClose} 
+            title="Close Chat (Instructor Only)"
           >
-            <path 
-              d="M 154.88 17.14 L 163.26 21.57 L 301.25 123.09 L 311.60 133.94 L 309.63 138.86 L 162.28 241.86 L 158.83 240.88 L 157.35 235.95 L 152.91 234.96 L 150.94 231.51 L 162.28 174.35 L 31.18 188.15 L 24.78 187.65 L 22.81 182.72 L 18.86 181.74 L 16.40 178.29 L 16.89 77.26 L 23.79 75.29 L 163.75 90.07 L 150.94 22.56 L 151.93 18.62 L 154.39 17.63 Z" 
-              fill={themeTextColor} 
-              stroke="#fbbf24" 
-              strokeWidth="20" 
-              strokeLinejoin="round" 
-              strokeLinecap="round" 
-            />
-          </svg>
-        </button>
-        <h2 style={{ margin: '0 auto', fontFamily: "'Risque', serif", color: '#ffffff', fontSize: '1rem', fontWeight: 600, textAlign: 'center', width: '100%' }}>
-          Chat
-        </h2>
+            ✕
+          </button>
+        )}
       </div>
-      
-      <div className="chat-container">
-        <div className="chat-messages">
-          {messages.filter(m => m && m.status !== 'ignored').map((msg, idx) => (
-            <div key={msg.id || idx} className="chat-message-wrapper">
-              <div className={`chat-message ${msg.sender === 'system' ? 'system' : msg.sender === 'self' ? 'self' : 'other'} ${msg.status || ''}`}>
-                {msg.senderName && (
-                  <span className="chat-sender-name">
-                    {msg.senderName}
-                  </span>
-                )}
-                {msg.text}
-                {msg.status === 'private' && (
-                  <span className="chat-private-note">
-                    (Private Reply)
-                  </span>
-                )}
+
+      {/* Message list: reverse-chronological scroll with newest at bottom */}
+      <div className="chat-messages" ref={messagesContainerRef}>
+        {messages.map((m, idx) => {
+          const msgName = m.name || m.senderName || (m.role === 'instructor' || m.senderRole === 'instructor' ? 'Ms. Rivera' : 'Guest');
+          const msgTime = m.time || (m.timestamp ? new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '');
+          const msgId = m.id || idx;
+
+          return (
+            <div key={msgId} className="msg">
+              <div 
+                className="avatar-square" 
+                style={{ backgroundColor: colorFor(msgName) }}
+              >
+                {initials(msgName)}
               </div>
-              
-              {msg.status === 'pending' && (
-                <div className="chat-mod-actions">
-                  <button onClick={() => onModerate(msg.id, 'show')} className="mod-btn show">
-                    Show
-                  </button>
-                  <button onClick={() => onModerate(msg.id, 'ignore')} className="mod-btn ignore">
-                    Ignore
-                  </button>
-                  <button onClick={() => onModerate(msg.id, 'reply_private')} className="mod-btn reply">
-                    Private Reply
-                  </button>
+              <div className="msg-body">
+                <div className="msg-top">
+                  <span className="msg-name">{msgName}</span>
+                  {msgTime && <span className="msg-time">{msgTime}</span>}
                 </div>
+                <div className="msg-text">{m.text}</div>
+              </div>
+              {isInstructor && (
+                <button
+                  type="button"
+                  className="msg-delete"
+                  onClick={() => onDeleteMessage(m.id)}
+                  title="Delete message (instructor only)"
+                >
+                  <Trash2 size={13} />
+                </button>
               )}
             </div>
-          ))}
-          <div ref={messagesEndRef} />
-        </div>
-        
-        <form className="chat-input-wrapper" onSubmit={handleSend} style={{ marginBottom: '10px' }}>
-          <textarea 
+          );
+        })}
+        <div ref={messagesEndRef} style={{ height: '1px', flexShrink: 0 }} />
+      </div>
+
+      {/* Composer Area */}
+      <div className="chat-composer">
+        {showStickerPicker && (
+          <div className="sticker-picker show">
+            {STICKERS.map((s, idx) => (
+              <button 
+                type="button" 
+                key={idx} 
+                onClick={() => handleStickerClick(s)}
+              >
+                {s}
+              </button>
+            ))}
+          </div>
+        )}
+        <form className="composer-row" onSubmit={handleSend}>
+          <button 
+            type="button" 
+            className="icon-btn" 
+            onClick={() => setShowStickerPicker(!showStickerPicker)}
+            title="Add sticker / icon"
+          >
+            😊
+          </button>
+          <textarea
             ref={textareaRef}
             rows={1}
-            className="chat-input" 
-            placeholder="Type..." 
             value={input}
-            onChange={(e) => {
-              setInput(e.target.value);
-              resetInactivityTimer();
-            }}
+            placeholder="Say something nice..."
+            onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
           />
-          <button type="submit" className="icon-btn">
-            <Send size={18} />
+          <button 
+            type="submit" 
+            className="icon-btn send-btn"
+            title="Send message"
+          >
+            <Send size={15} />
           </button>
         </form>
       </div>

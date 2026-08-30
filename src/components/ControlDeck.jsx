@@ -22,7 +22,7 @@ export default function ControlDeck() {
     resetStudentState,
     spotlightGuestId, setSpotlightGuestId,
     handleToggleInvite, isFirebaseUpdating,
-    sendWhisper, isChatOpen, setIsChatOpen,
+    sendWhisper, isChatOpen, setIsChatOpen, handleToggleChat,
     setIsSidebarOpen,
     curtainsOpen, setCurtainsOpen
   } = useAppContext();
@@ -487,7 +487,7 @@ export default function ControlDeck() {
 
                   {/* CHAT */}
                   <button 
-                    onClick={() => setIsChatOpen(!isChatOpen)}
+                    onClick={() => handleToggleChat()}
                     className={isChatOpen ? 'active' : ''}
                   >
                     Chat

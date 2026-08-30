@@ -89,11 +89,11 @@ function App() {
     guestStickers, setGuestStickers, handleAddSticker, stickerNudges,
     isDoodling,
     mediaUrl, mediaType, clearMedia,
-    isChatOpen, setIsChatOpen,
+    isChatOpen, setIsChatOpen, handleToggleChat,
     isSidebarOpen, setIsSidebarOpen,
     globalMute,
     globalPause,
-    messages, handleModerateMessage, handleSendChatMessage,
+    messages, handleSendChatMessage, handleDeleteChatMessage,
     isJoined,
     activeTheme,
     activeItoSection, setActiveItoSection,
@@ -567,163 +567,167 @@ function App() {
               </div>
             </div>
           ) : (
-            <div className={`center-grid-area ${isChatOpen ? 'sidebars-open' : ''}`} data-columns={halfLength <= 3 ? "1" : "2"} data-left-open={false} data-right-open={isChatOpen}>
-               <div className="side-peos" data-columns={halfLength <= 3 ? "1" : "2"}>
-                 {leftParticipants.map(p => {
-                   return (
-                     <GuestContainer 
-                       key={p.id}
-                       participant={p}
-                       stream={p.stream || (typeof remoteStreams !== 'undefined' ? remoteStreams[p.id] : null) || (p.isInstructor ? localStream : null)}
-                       isActive={activeGuestId === p.id}
-                       onClick={() => {
-                         if (!isInstructorClient && p.id !== loggedInGc?.id) return;
-                         if (p.isBlank) return;
-                          if (activeGuestId === p.id && activeToolbox === "student" && isSidebarOpen) {
-                            setIsSidebarOpen(false);
-                          } else {
-                            setActiveGuestId(p.id);
-                            setActiveToolbox("student");
-                            setIsSidebarOpen(true);
-                          }
-                       }}
-                       onDoubleClick={() => handleDoubleClick(p)}
-                       stickers={guestStickers[p.id] || []}
-                       buttons={guestButtons[p.id] || {}}
-                       nudges={stickerNudges[p.id] || {}}
-                       isDoodling={isDoodling}
-                       globalMute={globalMute}
-                       globalPause={globalPause}
-                     />
-                   );
-                 })}
-               </div>
-
-                <div className="center-wrapper" style={{ 
-                  position: 'relative', 
-                  alignSelf: (isInstructorClient && activeItoSection !== 'closed') ? 'flex-start' : 'center', 
-                  height: '100%',
-                  transition: 'all 0.4s cubic-bezier(0.25, 1, 0.5, 1)'
-                }}>
-                  <div style={{ 
-                    display: 'flex', 
-                    flexDirection: 'column', 
-                    width: 'fit-content', 
-                    alignItems: 'center', 
-                    height: '100%', 
-                    justifyContent: (isInstructorClient && activeItoSection !== 'closed') ? 'flex-start' : 'center',
-                    transition: 'all 0.4s cubic-bezier(0.25, 1, 0.5, 1)'
-                  }}>
-                   <div className={`pc-width-keeper ${isChatOpen ? 'pc-sidebar-open' : ''}`} style={{ transition: 'all 0.4s cubic-bezier(0.25, 1, 0.5, 1)' }}>
-                      <div 
-                        className={`pc-gt-unified ${mediaType === 'iframe' || mediaType === 'metronome' ? 'metronome-active' : ''} ${isRhythmWheel ? 'rhythm-wheel-container' : 'presentation-container-parent'}`}
-                        style={{ transition: 'all 0.4s cubic-bezier(0.25, 1, 0.5, 1)' }}
-                      >
-                         <PresentationContainer 
+            <div className="main-content-layout" style={{ display: 'flex', flexDirection: 'row', flex: 1, width: '100%', height: '100%', minHeight: 0, overflow: 'hidden', position: 'relative' }}>
+              <div className="stage-column" style={{ flex: 1, display: 'flex', minWidth: 0, height: '100%', transition: 'all 0.32s ease' }}>
+                <div className={`center-grid-area ${isChatOpen ? 'sidebars-open' : ''}`} data-columns={halfLength <= 3 ? "1" : "2"} data-left-open={false} data-right-open={isChatOpen}>
+                   <div className="side-peos" data-columns={halfLength <= 3 ? "1" : "2"}>
+                     {leftParticipants.map(p => {
+                       return (
+                         <GuestContainer 
+                           key={p.id}
+                           participant={p}
+                           stream={p.stream || (typeof remoteStreams !== 'undefined' ? remoteStreams[p.id] : null) || (p.isInstructor ? localStream : null)}
+                           isActive={activeGuestId === p.id}
+                           onClick={() => {
+                             if (!isInstructorClient && p.id !== loggedInGc?.id) return;
+                             if (p.isBlank) return;
+                              if (activeGuestId === p.id && activeToolbox === "student" && isSidebarOpen) {
+                                setIsSidebarOpen(false);
+                              } else {
+                                setActiveGuestId(p.id);
+                                setActiveToolbox("student");
+                                setIsSidebarOpen(true);
+                              }
+                           }}
+                           onDoubleClick={() => handleDoubleClick(p)}
+                           stickers={guestStickers[p.id] || []}
+                           buttons={guestButtons[p.id] || {}}
+                           nudges={stickerNudges[p.id] || {}}
                            isDoodling={isDoodling}
-                           mediaUrl={mediaUrl}
-                           mediaType={mediaType}
-                           onClearMedia={clearMedia}
+                           globalMute={globalMute}
+                           globalPause={globalPause}
                          />
-                     </div>
+                       );
+                     })}
                    </div>
 
-                    {isInstructorClient && activeItoSection === 'closed' && (
-                      <button
-                        onClick={() => setActiveItoSection(null)}
-                        className="studio-controls-toggle-btn"
-                        style={{
-                          margin: '6px 0',
-                          padding: '6px 18px',
-                          background: 'linear-gradient(135deg, rgba(58, 45, 187, 0.5), rgba(122, 79, 217, 0.5))',
-                          border: '1px solid rgba(255, 255, 255, 0.25)',
-                          borderRadius: '20px',
-                          color: '#ffffff',
-                          fontWeight: 'bold',
-                          fontSize: '0.85rem',
-                          cursor: 'pointer',
-                          backdropFilter: 'blur(8px)',
-                          boxShadow: '0 4px 12px rgba(0, 0, 0, 0.25)',
-                          transition: 'all 0.2s ease',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '6px',
-                          zIndex: 20
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.background = 'linear-gradient(135deg, rgba(58, 45, 187, 0.75), rgba(122, 79, 217, 0.75))';
-                          e.currentTarget.style.transform = 'scale(1.04)';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.background = 'linear-gradient(135deg, rgba(58, 45, 187, 0.5), rgba(122, 79, 217, 0.5))';
-                          e.currentTarget.style.transform = 'scale(1)';
-                        }}
-                      >
-                        <span>Studio Controls</span>
-                        <span style={{ fontSize: '0.7rem' }}>▼</span>
-                      </button>
-                    )}
-
-                    {/* Studio Controls (ControlDeck) — rendered under PC box with matching 10px spacing */}
-                    <div style={{ 
-                      marginTop: '10px',
-                      width: '100%',
-                      maxWidth: '100%',
-                      boxSizing: 'border-box',
-                      zIndex: 50,
-                      transition: 'all 0.4s cubic-bezier(0.25, 1, 0.5, 1)',
-                      opacity: (isInstructorClient && activeItoSection !== 'closed') ? 1 : 0,
-                      pointerEvents: (isInstructorClient && activeItoSection !== 'closed') ? 'auto' : 'none',
+                    <div className="center-wrapper" style={{ 
+                      position: 'relative', 
+                      alignSelf: (isInstructorClient && activeItoSection !== 'closed') ? 'flex-start' : 'center', 
+                      height: '100%',
+                      transition: 'all 0.4s cubic-bezier(0.25, 1, 0.5, 1)'
                     }}>
-                      <ControlDeck />
+                      <div style={{ 
+                        display: 'flex', 
+                        flexDirection: 'column', 
+                        width: 'fit-content', 
+                        alignItems: 'center', 
+                        height: '100%', 
+                        justifyContent: (isInstructorClient && activeItoSection !== 'closed') ? 'flex-start' : 'center',
+                        transition: 'all 0.4s cubic-bezier(0.25, 1, 0.5, 1)'
+                      }}>
+                       <div className={`pc-width-keeper ${isChatOpen ? 'pc-sidebar-open' : ''}`} style={{ transition: 'all 0.4s cubic-bezier(0.25, 1, 0.5, 1)' }}>
+                          <div 
+                            className={`pc-gt-unified ${mediaType === 'iframe' || mediaType === 'metronome' ? 'metronome-active' : ''} ${isRhythmWheel ? 'rhythm-wheel-container' : 'presentation-container-parent'}`}
+                            style={{ transition: 'all 0.4s cubic-bezier(0.25, 1, 0.5, 1)' }}
+                          >
+                             <PresentationContainer 
+                               isDoodling={isDoodling}
+                               mediaUrl={mediaUrl}
+                               mediaType={mediaType}
+                               onClearMedia={clearMedia}
+                             />
+                         </div>
+                       </div>
+
+                        {isInstructorClient && activeItoSection === 'closed' && (
+                          <button
+                            onClick={() => setActiveItoSection(null)}
+                            className="studio-controls-toggle-btn"
+                            style={{
+                              margin: '6px 0',
+                              padding: '6px 18px',
+                              background: 'linear-gradient(135deg, rgba(58, 45, 187, 0.5), rgba(122, 79, 217, 0.5))',
+                              border: '1px solid rgba(255, 255, 255, 0.25)',
+                              borderRadius: '20px',
+                              color: '#ffffff',
+                              fontWeight: 'bold',
+                              fontSize: '0.85rem',
+                              cursor: 'pointer',
+                              backdropFilter: 'blur(8px)',
+                              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.25)',
+                              transition: 'all 0.2s ease',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '6px',
+                              zIndex: 20
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.background = 'linear-gradient(135deg, rgba(58, 45, 187, 0.75), rgba(122, 79, 217, 0.75))';
+                              e.currentTarget.style.transform = 'scale(1.04)';
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.background = 'linear-gradient(135deg, rgba(58, 45, 187, 0.5), rgba(122, 79, 217, 0.5))';
+                              e.currentTarget.style.transform = 'scale(1)';
+                            }}
+                          >
+                            <span>Studio Controls</span>
+                            <span style={{ fontSize: '0.7rem' }}>▼</span>
+                          </button>
+                        )}
+
+                        {/* Studio Controls (ControlDeck) — rendered under PC box with matching 10px spacing */}
+                        <div style={{ 
+                          marginTop: '10px',
+                          width: '100%',
+                          maxWidth: '100%',
+                          boxSizing: 'border-box',
+                          zIndex: 50,
+                          transition: 'all 0.4s cubic-bezier(0.25, 1, 0.5, 1)',
+                          opacity: (isInstructorClient && activeItoSection !== 'closed') ? 1 : 0,
+                          pointerEvents: (isInstructorClient && activeItoSection !== 'closed') ? 'auto' : 'none',
+                        }}>
+                          <ControlDeck />
+                        </div>
+                      </div>
                     </div>
-                  </div>
+                    
+                    <div className="side-peos" data-columns={halfLength <= 3 ? "1" : "2"}>
+                     {rightParticipantsLandscape.map(p => {
+                       return (
+                         <GuestContainer 
+                           key={p.id}
+                           participant={p}
+                           stream={p.stream || (typeof remoteStreams !== 'undefined' ? remoteStreams[p.id] : null) || (p.isInstructor ? localStream : null)}
+                           isActive={activeGuestId === p.id}
+                           onClick={() => {
+                             if (!isInstructorClient && p.id !== loggedInGc?.id) return;
+                             if (p.isBlank) return;
+                             if (activeGuestId === p.id && activeToolbox === "student" && isSidebarOpen) {
+                               setIsSidebarOpen(false);
+                             } else {
+                               setActiveGuestId(p.id);
+                               setActiveToolbox("student");
+                               setIsSidebarOpen(true);
+                             }
+                           }}
+                           onDoubleClick={() => handleDoubleClick(p)}
+                           stickers={guestStickers[p.id] || []}
+                           buttons={guestButtons[p.id] || {}}
+                           nudges={stickerNudges[p.id] || {}}
+                           isDoodling={isDoodling}
+                           globalMute={globalMute}
+                           globalPause={globalPause}
+                         />
+                       );
+                     })}
+                    </div>
                 </div>
-                
-                <div className="side-peos" data-columns={halfLength <= 3 ? "1" : "2"}>
-                 {rightParticipantsLandscape.map(p => {
-                   return (
-                     <GuestContainer 
-                       key={p.id}
-                       participant={p}
-                       stream={p.stream || (typeof remoteStreams !== 'undefined' ? remoteStreams[p.id] : null) || (p.isInstructor ? localStream : null)}
-                       isActive={activeGuestId === p.id}
-                       onClick={() => {
-                         if (!isInstructorClient && p.id !== loggedInGc?.id) return;
-                         if (p.isBlank) return;
-                         if (activeGuestId === p.id && activeToolbox === "student" && isSidebarOpen) {
-                           setIsSidebarOpen(false);
-                         } else {
-                           setActiveGuestId(p.id);
-                           setActiveToolbox("student");
-                           setIsSidebarOpen(true);
-                         }
-                       }}
-                       onDoubleClick={() => handleDoubleClick(p)}
-                       stickers={guestStickers[p.id] || []}
-                       buttons={guestButtons[p.id] || {}}
-                       nudges={stickerNudges[p.id] || {}}
-                       isDoodling={isDoodling}
-                       globalMute={globalMute}
-                       globalPause={globalPause}
-                     />
-                   );
-                 })}
-                </div>
+              </div>
+
+              {/* Dedicated Chat Panel docked to right of stage */}
+              <div className={`chat-panel ${isChatOpen && !isPortrait ? 'open' : ''}`}>
+                <Chat 
+                  isOpen={isChatOpen}
+                  isInstructor={isInstructorClient}
+                  messages={messages} 
+                  onSendMessage={handleSendChatMessage} 
+                  onDeleteMessage={handleDeleteChatMessage}
+                  onClose={() => handleToggleChat(false)} 
+                />
+              </div>
             </div>
           )}
-
-              {/* Right Sidebar */}
-              {isChatOpen && !isPortrait && (
-                <div className="right-sidebar">
-                    <Chat 
-                      messages={messages} 
-                      onSendMessage={handleSendChatMessage} 
-                      onModerate={handleModerateMessage}
-                      onClose={() => setIsChatOpen(false)} 
-                    />
-                </div>
-              )}
             </>
           )}
         </div>
