@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { Loader2, ShieldAlert, Camera } from 'lucide-react';
 import PeoBorder from './PeoBorder';
@@ -18,28 +18,29 @@ const BORDERS = [
 ];
 
 const STO_STICKERS = [
-  'Balloons.svg',
-  'Boat.svg',
-  'Dancer.svg',
-  'Drums.svg',
-  'Fish.svg',
-  'Flowers 6.svg',
-  'Guitar.svg',
-  'Kitten.svg',
-  'Piano.svg',
-  'Sun with sunglasses.svg',
-  'Truck.svg',
-  'Trumpet.svg',
-  'Xylophone.svg'
+  { id: 'Sun with sunglasses.svg', name: 'Sun with sunglasses' },
+  { id: 'Fish.svg', name: 'Fish' },
+  { id: 'Balloons.svg', name: 'Balloons' },
+  { id: 'Flowers 6.svg', name: 'Flowers' },
+  { id: 'Truck.svg', name: 'Truck' },
+  { id: 'Boat.svg', name: 'Boat' },
+  { id: 'Dancer.svg', name: 'Dancer' },
+  { id: 'Drums.svg', name: 'Drums' },
+  { id: 'Guitar.svg', name: 'Guitar' },
+  { id: 'Kitten.svg', name: 'Kitten' },
+  { id: 'Microphone.svg', name: 'Microphone' },
+  { id: 'Piano.svg', name: 'Piano' },
+  { id: 'Trumpet.svg', name: 'Trumpet' },
+  { id: 'Xylophone.svg', name: 'Xylophone' }
 ];
 
 const VIBE_CHIPS = [
-  { id: 'high_energy', emoji: '⚡', line1: 'High', line2: 'Energy', label: '⚡ High Energy', color: '#f97316', bg: 'rgba(249, 115, 22, 0.2)' },
-  { id: 'low_energy', emoji: '🔋', line1: 'Tired /', line2: 'Low', label: '🔋 Tired / Low', color: '#a855f7', bg: 'rgba(168, 85, 247, 0.2)' },
-  { id: 'gentle_warmup', emoji: '🥺', line1: 'Needing', line2: 'Warm-Up', label: '🥺 Needing Warm-Up', color: '#3b82f6', bg: 'rgba(59, 130, 246, 0.2)' },
-  { id: 'birthday', emoji: '🎉', line1: 'Birthday', line2: 'Today!', label: '🎉 Birthday Today!', color: '#facc15', bg: 'rgba(250, 204, 21, 0.2)' },
-  { id: 'under_weather', emoji: '🤒', line1: 'Not Feeling', line2: 'Well', label: '🤒 Not Feeling Well', color: '#06b6d4', bg: 'rgba(6, 182, 212, 0.2)' },
-  { id: 'focused', emoji: '🧩', line1: 'Deeply', line2: 'Focused', label: '🧩 Deeply Focused', color: '#10b981', bg: 'rgba(16, 185, 129, 0.2)' }
+  { id: 'high_energy', emoji: '⚡', label: 'High Energy', color: '#f97316' },
+  { id: 'low_energy', emoji: '🔋', label: 'Tired / Low', color: '#a855f7' },
+  { id: 'gentle_warmup', emoji: '🥺', label: 'Needing Warm-Up', color: '#3b82f6' },
+  { id: 'birthday', emoji: '🎉', label: 'Birthday Today!', color: '#facc15' },
+  { id: 'under_weather', emoji: '🤒', label: 'Not Feeling Well', color: '#06b6d4' },
+  { id: 'focused', emoji: '🧩', label: 'Deeply Focused', color: '#10b981' }
 ];
 
 function LobbyVibeChips({ selectedVibeChips, setSelectedVibeChips }) {
@@ -86,22 +87,13 @@ export default function LobbyOverlay() {
   const isInstructor = sessionStorage.getItem('stagetrack_role') === 'instructor';
 
   const [myName, setMyName] = useState('');
-  const [myLittleOne, setMyLittleOne] = useState('');
   const [selectedBorder, setSelectedBorder] = useState(BORDERS[0].value);
   const [selectedIcon, setSelectedIcon] = useState(null);
   const [selectedVibeChips, setSelectedVibeChips] = useState([]);
-  const [isStudioControlsOpen, setIsStudioControlsOpen] = useState(true);
-  const [childPlaceholder, setChildPlaceholder] = useState("Child's 1st Name");
-  const [adultPlaceholder, setAdultPlaceholder] = useState("Adult's 1st Name");
 
   const [children, setChildren] = useState(['']);
-  const [childFocusMap, setChildFocusMap] = useState({});
-  const [isAdultFocused, setIsAdultFocused] = useState(false);
 
-  useEffect(() => {
-    const joined = children.filter(c => c.trim()).join(' & ');
-    setMyLittleOne(joined);
-  }, [children]);
+  const myLittleOne = children.filter(c => c.trim()).join(' & ');
 
   const getChildInputStyle = (index, total) => {
     if (total === 1) {
@@ -127,12 +119,6 @@ export default function LobbyOverlay() {
         padding: 'calc(6px * var(--lobby-scale)) 0 0 0'
       };
     }
-  };
-
-  const getPlusBtnTop = (total) => {
-    if (total === 1) return '49.0%';
-    if (total === 2) return '45.8%';
-    return '43.5%';
   };
   
   const getScale = () => {
@@ -186,7 +172,7 @@ export default function LobbyOverlay() {
     }
   }, [stream, lobbyStatus]);
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = useCallback(async (e) => {
     if (e) e.preventDefault();
     if (!myName.trim() || !myLittleOne.trim() || !selectedIcon || !sessionId) return;
 
@@ -216,7 +202,7 @@ export default function LobbyOverlay() {
     } catch (err) {
       console.error("Error submitting join request:", err);
     }
-  };
+  }, [myName, myLittleOne, selectedIcon, sessionId, selectedBorder, selectedVibeChips, setLobbyStatus]);
 
   const handleRetry = () => {
     setLobbyStatus('initial');
@@ -315,12 +301,6 @@ export default function LobbyOverlay() {
               value={myName}
               onChange={(e) => setMyName(e.target.value.slice(0, 30))}
               maxLength={30}
-              onFocus={() => {
-                setIsAdultFocused(true);
-              }}
-              onBlur={() => {
-                setIsAdultFocused(false);
-              }}
             />
 
             {/* Plus sign button to the left of child's first name */}
@@ -358,7 +338,6 @@ export default function LobbyOverlay() {
             {/* Child inputs (1, 2, or 3) */}
             {children.map((childVal, i) => {
               const inputStyle = getChildInputStyle(i, children.length);
-              const isFocused = !!childFocusMap[i];
               const titleText = i === 0 
                 ? "Child's 1st Name" 
                 : i === 1 
@@ -399,12 +378,6 @@ export default function LobbyOverlay() {
                       setChildren(next);
                     }}
                     maxLength={30}
-                    onFocus={() => {
-                      setChildFocusMap(prev => ({ ...prev, [i]: true }));
-                    }}
-                    onBlur={() => {
-                      setChildFocusMap(prev => ({ ...prev, [i]: false }));
-                    }}
                     style={{
                       position: 'absolute',
                       left: '4.377%',

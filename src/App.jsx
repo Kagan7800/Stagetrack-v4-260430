@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from 'react';
 import PresentationContainer from './components/PresentationContainer';
 import Chat from './components/Chat';
 import GuestContainer from './components/GuestContainer';
-import LeftSidebar from './components/LeftSidebar';
 import LobbyOverlay from './components/LobbyOverlay';
 import { useAppContext } from './context/AppContext';
 import UnifiedToolbox from './components/UnifiedToolbox';
@@ -12,19 +11,12 @@ import InstructorToolbox from './components/InstructorToolbox';
 import ControlDeck from './components/ControlDeck';
 import PersonalizedExplanationGenerator from './components/PersonalizedExplanationGenerator';
 import RoomVibeWidget from './components/RoomVibeWidget';
-import { Sparkles, Flame } from 'lucide-react';
 
 function StageTimerDisplay({ stageTimer, setStageTimer, isInstructorClient }) {
-  const [timeLeft, setTimeLeft] = useState(() => {
-    if (!stageTimer) return 0;
-    if (!stageTimer.isRunning) return stageTimer.duration || 0;
-    return Math.max(0, Math.round((stageTimer.endTime - Date.now()) / 1000));
-  });
+  const [timeLeft, setTimeLeft] = useState(0);
 
   useEffect(() => {
-    if (!stageTimer) return;
-    if (!stageTimer.isRunning) {
-      setTimeLeft(stageTimer.duration || 0);
+    if (!stageTimer || !stageTimer.isRunning) {
       return;
     }
 
@@ -42,8 +34,12 @@ function StageTimerDisplay({ stageTimer, setStageTimer, isInstructorClient }) {
     return () => clearInterval(interval);
   }, [stageTimer, isInstructorClient, setStageTimer]);
 
-  const minutes = Math.floor(timeLeft / 60);
-  const seconds = timeLeft % 60;
+  const currentRemaining = (!stageTimer || !stageTimer.isRunning) 
+    ? (stageTimer?.duration || 0) 
+    : timeLeft;
+
+  const minutes = Math.floor(currentRemaining / 60);
+  const seconds = currentRemaining % 60;
   const timeStr = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
 
   return (
@@ -58,7 +54,7 @@ function StageTimerDisplay({ stageTimer, setStageTimer, isInstructorClient }) {
         border: 'none',
         borderRadius: '20px',
         padding: '6px 16px',
-        color: timeLeft <= 10 ? '#ef4444' : '#22c55e',
+        color: currentRemaining <= 10 ? '#ef4444' : '#22c55e',
         fontFamily: 'monospace',
         fontSize: '2.4rem',
         fontWeight: 'bold',
@@ -94,10 +90,6 @@ function App() {
     isJoined,
     activeTheme,
     activeItoSection, setActiveItoSection,
-    showInstructorStickers,
-    showStudentStickers,
-    showStudentFilters,
-    isPeoStickersOpen,
     stageTimer, setStageTimer,
     gcUsers,
     pendingRequest,
@@ -148,7 +140,6 @@ function App() {
   }, [participants, isSidebarOpen, isChatOpen, activeItoSection]);
 
   const isInstructorClient = sessionStorage.getItem('stagetrack_role') !== 'student';
-  const isInstructorSidebarVisible = isInstructorClient;
   const activeGuest = participants.find(p => p.id === activeGuestId);
 
   const ic = participants.find(p => p.isInstructor) || participants[0];
@@ -499,9 +490,12 @@ function App() {
                           <button className="close-panel-btn" onClick={() => setIsChatOpen(false)}>✕</button>
                         </div>
                         <Chat 
+                          isOpen={isChatOpen}
+                          isInstructor={isInstructorClient}
+                          activeTheme={activeTheme}
                           messages={messages} 
                           onSendMessage={handleSendChatMessage} 
-                          onModerate={handleModerateMessage}
+                          onDeleteMessage={handleDeleteChatMessage}
                           onClose={() => setIsChatOpen(false)} 
                         />
                       </div>

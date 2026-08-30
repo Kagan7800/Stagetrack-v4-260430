@@ -693,7 +693,7 @@ export function AppProvider({ children }) {
     const role = sessionStorage.getItem('stagetrack_role');
     const isInstructor = role !== 'student';
     
-    let senderName = 'Guest';
+    let senderName;
     if (isInstructor) {
       senderName = 'Ms. Rivera';
     } else {

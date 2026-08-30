@@ -7,7 +7,6 @@ import html2canvas from 'html2canvas';
 export default function ControlDeck() {
   const {
     isDoodling, setIsDoodling,
-    drawingPaths,
     setMediaUpload, clearMedia, mediaType, mediaUrl,
     handleAddSticker,
     participants, activeGuestId,
@@ -20,7 +19,6 @@ export default function ControlDeck() {
     stageTimer, setStageTimer,
     activeTheme, setActiveTheme,
     resetStudentState,
-    spotlightGuestId, setSpotlightGuestId,
     handleToggleInvite, isFirebaseUpdating,
     sendWhisper, isChatOpen, setIsChatOpen, handleToggleChat,
     setIsSidebarOpen,
