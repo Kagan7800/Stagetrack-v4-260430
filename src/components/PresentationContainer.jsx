@@ -51,47 +51,9 @@ export default function PresentationContainer({
   const displayUrl = mediaUrl || '/assets/MF_images/Music_Fun_with_my_Little_One.jpg';
   const displayType = mediaUrl ? mediaType : (mediaType === 'metronome' ? 'metronome' : 'image');
 
-  // SVG Curtain Transition States
-  const [renderedUrl, setRenderedUrl] = useState(displayUrl);
-  const [renderedType, setRenderedType] = useState(displayType);
-  const [localCurtainsOpen, setLocalCurtainsOpen] = useState(true);
-  const isCurtainOpen = curtainsOpen && localCurtainsOpen;
-
-  const firstRenderRef = useRef(true);
-
-  useEffect(() => {
-    if (firstRenderRef.current) {
-      firstRenderRef.current = false;
-      return;
-    }
-
-    let active = true;
-    let openTimer = null;
-    
-    // 1. Close local curtains
-    setLocalCurtainsOpen(false);
-
-    // 2. Wait for transition to close (1200ms matching transition timing)
-    const closeTimer = setTimeout(() => {
-      if (!active) return;
-      // 3. Switch media behind closed curtains
-      setRenderedUrl(displayUrl);
-      setRenderedType(displayType);
-
-      // 4. Wait a bit for layout, then open curtains
-      openTimer = setTimeout(() => {
-        if (!active) return;
-        setLocalCurtainsOpen(true);
-      }, 150);
-      
-    }, 1200);
-
-    return () => {
-      active = false;
-      clearTimeout(closeTimer);
-      if (openTimer) clearTimeout(openTimer);
-    };
-  }, [displayUrl, displayType]);
+  const renderedUrl = displayUrl;
+  const renderedType = displayType;
+  const isCurtainOpen = Boolean(curtainsOpen);
 
   useEffect(() => {
     const handleMessage = (event) => {
