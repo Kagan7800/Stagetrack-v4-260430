@@ -16,12 +16,11 @@ export default function DoodleStage() {
   const { 
     setIsDoodling, 
     doodleGallery, 
-    handleShareDoodleToClass 
+    handleShareDoodleToClass,
+    isInstructorVerified
   } = useAppContext();
 
-  const isInstructorClient = typeof sessionStorage !== 'undefined' 
-    ? sessionStorage.getItem('stagetrack_role') !== 'student' 
-    : true;
+  const isInstructorClient = isInstructorVerified;
 
   const canvasRef = useRef(null);
   const wrapRef = useRef(null);

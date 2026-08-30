@@ -62,7 +62,8 @@ export default function GuestContainer({
     approveRequest, 
     denyRequest, 
     activeTheme,
-    activeGuestId
+    activeGuestId,
+    isInstructorVerified
   } = useAppContext();
 
   // Ensure safe participant object reference
@@ -143,7 +144,7 @@ export default function GuestContainer({
     }, 450);
   };
 
-  const isInstructorClient = sessionStorage.getItem('stagetrack_role') !== 'student';
+  const isInstructorClient = isInstructorVerified;
   const isClosed = globalPause || (buttons && buttons.mute) || false;
 
   const firstBlankId = useMemo(() => {

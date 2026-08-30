@@ -7,10 +7,11 @@ export default function LeftSidebar() {
     isSidebarOpen,
     setIsSidebarOpen,
     setActiveToolbox,
-    setActiveItoSection
+    setActiveItoSection,
+    isInstructorVerified
   } = useAppContext();
 
-  const isInstructorClient = sessionStorage.getItem('stagetrack_role') !== 'student';
+  const isInstructorClient = isInstructorVerified;
 
   useEffect(() => {
     if (!isSidebarOpen || !isInstructorClient) return;

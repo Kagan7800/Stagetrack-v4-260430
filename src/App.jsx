@@ -94,7 +94,8 @@ function App() {
     gcUsers,
     pendingRequest,
     remoteStreams,
-    localStream
+    localStream,
+    isInstructorVerified
   } = useAppContext();
 
   const isRhythmWheel = mediaUrl && mediaUrl.includes('1,2,3,4');
@@ -139,7 +140,7 @@ function App() {
     };
   }, [participants, isSidebarOpen, isChatOpen, activeItoSection]);
 
-  const isInstructorClient = sessionStorage.getItem('stagetrack_role') !== 'student';
+  const isInstructorClient = isInstructorVerified;
   const activeGuest = participants.find(p => p.id === activeGuestId);
 
   const ic = participants.find(p => p.isInstructor) || participants[0];

@@ -83,8 +83,8 @@ function LobbyVibeChips({ selectedVibeChips, setSelectedVibeChips }) {
 }
 
 export default function LobbyOverlay() {
-  const { sessionId, lobbyStatus, setLobbyStatus, pendingRequest, approveRequest } = useAppContext();
-  const isInstructor = sessionStorage.getItem('stagetrack_role') === 'instructor';
+  const { sessionId, lobbyStatus, setLobbyStatus, pendingRequest, approveRequest, isInstructorVerified } = useAppContext();
+  const isInstructor = isInstructorVerified;
 
   const [myName, setMyName] = useState('');
   const [selectedBorder, setSelectedBorder] = useState(BORDERS[0].value);

@@ -9,10 +9,11 @@ export default function InstructorToolbox() {
     setShowStudentFilters,
     activeTheme,
     setActiveToolbox,
-    setIsPeoStickersOpen
+    setIsPeoStickersOpen,
+    isInstructorVerified
   } = useAppContext();
 
-  const isInstructorClient = sessionStorage.getItem('stagetrack_role') !== 'student';
+  const isInstructorClient = isInstructorVerified;
 
   const isSor = activeTheme === 'sor';
   const themeTextShadow = isSor ? '0 0 8px rgba(239, 68, 68, 0.18)' : '0 0 8px rgba(59, 130, 246, 0.18)';

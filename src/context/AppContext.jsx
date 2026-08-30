@@ -2,7 +2,7 @@
 // src/context/AppContext.jsx
 
 import { createContext, useContext, useState, useEffect, useRef, useMemo } from 'react';
-import { db } from '../firebase';
+import { db, auth, ensureAuthenticated } from '../firebase';
 import { doc, onSnapshot, updateDoc, arrayUnion, setDoc, getDoc } from 'firebase/firestore';
 
 export const AppContext = createContext(null);
@@ -110,6 +110,28 @@ export function AppProvider({ children }) {
   const lastTimerWriteTimeRef = useRef(0);
   const isTimerWritePendingRef = useRef(false);
 
+  const [currentUser, setCurrentUser] = useState(auth.currentUser);
+  const [instructorUid, setInstructorUid] = useState(null);
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      setCurrentUser(user);
+    });
+    ensureAuthenticated();
+    return () => unsubscribe();
+  }, []);
+
+  const isInstructorVerified = useMemo(() => {
+    if (!currentUser) {
+      return sessionStorage.getItem('stagetrack_role') === 'instructor';
+    }
+    if (instructorUid && currentUser.uid === instructorUid) {
+      return true;
+    }
+    const role = sessionStorage.getItem('stagetrack_role');
+    return role === 'instructor';
+  }, [currentUser, instructorUid]);
+
   // 1.5. INITIALIZE FIRESTORE SESSION DOCUMENT ON MOUNT FOR INSTRUCTOR (Preserves active session states on reload)
   useEffect(() => {
     if (!sessionId) return;
@@ -119,14 +141,17 @@ export function AppProvider({ children }) {
     const sessionRef = doc(db, "sessions", sessionId);
     const initDoc = async () => {
       try {
+        const authUser = await ensureAuthenticated();
+        const verifiedUid = authUser?.uid || 'instructor-ic';
         const docSnap = await getDoc(sessionRef);
         if (!docSnap.exists()) {
-          // Document does not exist, initialize it cleanly
+          // Document does not exist, initialize it cleanly with instructorUid
           await setDoc(sessionRef, {
             createdAt: Date.now(),
+            instructorUid: verifiedUid,
             activeUsers: [
               {
-                uid: 'instructor-ic',
+                uid: verifiedUid,
                 role: 'ic',
                 isInstructor: true,
                 joinedAt: Date.now(),
@@ -190,6 +215,10 @@ export function AppProvider({ children }) {
     const unsubscribe = onSnapshot(sessionRef, (snap) => {
       if (!snap.exists()) return;
       const data = snap.data();
+
+      if (data.instructorUid) {
+        setInstructorUid(data.instructorUid);
+      }
 
       // Instructor side: Catch incoming lobby requests
       const isInstructor = sessionStorage.getItem('stagetrack_role') === 'instructor';
@@ -667,10 +696,8 @@ export function AppProvider({ children }) {
   };
 
   const handleToggleChat = async (forceState) => {
-    const role = sessionStorage.getItem('stagetrack_role');
-    const isInstructor = role !== 'student';
-    if (!isInstructor) {
-      console.warn("Permission denied: Only instructors can open or close the chat.");
+    if (!isInstructorVerified) {
+      console.warn("Permission denied: Only the verified instructor can open or close the chat.");
       return;
     }
     const nextVal = forceState !== undefined ? forceState : !isChatOpen;
@@ -696,8 +723,7 @@ export function AppProvider({ children }) {
 
   const handleSendChatMessage = async (text) => {
     if (!text || !text.trim()) return;
-    const role = sessionStorage.getItem('stagetrack_role');
-    const isInstructor = role !== 'student';
+    const isInstructor = isInstructorVerified;
     
     let senderName;
     if (isInstructor) {
@@ -734,9 +760,10 @@ export function AppProvider({ children }) {
   };
 
   const handleDeleteChatMessage = async (messageId) => {
-    const role = sessionStorage.getItem('stagetrack_role');
-    const isInstructor = role !== 'student';
-    if (!isInstructor) return;
+    if (!isInstructorVerified) {
+      console.warn("Permission denied: Only the verified instructor can delete chat messages.");
+      return;
+    }
 
     const updated = (messages || []).filter(m => m.id !== messageId);
     setMessages(updated);
@@ -816,10 +843,8 @@ export function AppProvider({ children }) {
   };
 
   const handleSetIsDoodling = async (valOrFunc) => {
-    const role = sessionStorage.getItem('stagetrack_role');
-    const isInstructor = role !== 'student';
-    if (!isInstructor) {
-      console.warn("Permission denied: Only instructors can start or stop Doodle Time.");
+    if (!isInstructorVerified) {
+      console.warn("Permission denied: Only the verified instructor can start or stop Doodle Time.");
       return;
     }
 
@@ -851,8 +876,7 @@ export function AppProvider({ children }) {
 
   const handleShareDoodleToClass = async (dataUrl) => {
     if (!dataUrl) return;
-    const role = sessionStorage.getItem('stagetrack_role');
-    const isInstructor = role !== 'student';
+    const isInstructor = isInstructorVerified;
     
     let senderFirstName;
     if (isInstructor) {
@@ -906,10 +930,10 @@ export function AppProvider({ children }) {
 
     isFirebaseDrawingUpdatingRef.current = true;
 
-    const syncToFirebase = async (val) => {
+    const syncToFirebase = async (pathsToSync) => {
       try {
         const sessionRef = doc(db, "sessions", sessionId);
-        await updateDoc(sessionRef, { drawingPaths: val });
+        await updateDoc(sessionRef, { drawingPaths: pathsToSync });
       } catch (err) {
         console.error("Error syncing drawingPaths:", err);
       } finally {
@@ -927,6 +951,10 @@ export function AppProvider({ children }) {
   };
 
   const handleSetCurtainsOpen = async (val) => {
+    if (!isInstructorVerified) {
+      console.warn("Permission denied: Only the verified instructor can open or close curtains.");
+      return;
+    }
     lastCurtainsWriteTimeRef.current = Date.now();
     isCurtainsWritePendingRef.current = true;
     setCurtainsOpen(val);
@@ -948,6 +976,10 @@ export function AppProvider({ children }) {
   };
 
   const handleSetActiveTheme = async (val) => {
+    if (!isInstructorVerified) {
+      console.warn("Permission denied: Only the verified instructor can change themes.");
+      return;
+    }
     lastThemeWriteTimeRef.current = Date.now();
     isThemeWritePendingRef.current = true;
     setActiveTheme(val);
@@ -969,6 +1001,10 @@ export function AppProvider({ children }) {
   };
 
   const handleSetStageTimer = async (val) => {
+    if (!isInstructorVerified) {
+      console.warn("Permission denied: Only the verified instructor can set the timer.");
+      return;
+    }
     lastTimerWriteTimeRef.current = Date.now();
     isTimerWritePendingRef.current = true;
     setStageTimer(val);
@@ -1102,7 +1138,10 @@ export function AppProvider({ children }) {
     isCountingDropdownOpen, setIsCountingDropdownOpen,
     isMakeMusicDropdownOpen, setIsMakeMusicDropdownOpen,
     doodleGallery,
-    handleShareDoodleToClass
+    handleShareDoodleToClass,
+    isInstructorVerified,
+    currentUser,
+    instructorUid
   };
 
   return (

@@ -231,3 +231,39 @@ exports.personalizedExplanation = functions.https.onRequest(async (req, res) => 
     });
   }
 });
+
+exports.assignSessionInstructor = functions.https.onCall(async (data, context) => {
+  if (!context.auth) {
+    throw new functions.https.HttpsError('unauthenticated', 'User must be authenticated.');
+  }
+  const sessionId = data?.sessionId;
+  if (!sessionId) {
+    throw new functions.https.HttpsError('invalid-argument', 'Missing sessionId parameter.');
+  }
+
+  const sessionRef = db.collection('sessions').doc(sessionId);
+  const sessionSnap = await sessionRef.get();
+
+  if (!sessionSnap.exists) {
+    await sessionRef.set({
+      instructorUid: context.auth.uid,
+      createdAt: Date.now()
+    }, { merge: true });
+  } else {
+    const sessionData = sessionSnap.data();
+    if (!sessionData.instructorUid || sessionData.instructorUid === context.auth.uid) {
+      await sessionRef.update({
+        instructorUid: context.auth.uid
+      });
+    }
+  }
+
+  // Set custom claims on the instructor's auth token
+  await admin.auth().setCustomUserClaims(context.auth.uid, {
+    instructor: true,
+    sessionId
+  });
+
+  return { success: true, instructorUid: context.auth.uid };
+});
+

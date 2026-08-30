@@ -25,7 +25,8 @@ export default function ControlDeck() {
     curtainsOpen, setCurtainsOpen,
     activeCdTab, setActiveCdTab,
     isCountingDropdownOpen, setIsCountingDropdownOpen,
-    isMakeMusicDropdownOpen, setIsMakeMusicDropdownOpen
+    isMakeMusicDropdownOpen, setIsMakeMusicDropdownOpen,
+    isInstructorVerified
   } = useAppContext();
 
   useEffect(() => {
@@ -33,7 +34,7 @@ export default function ControlDeck() {
     return () => console.log('[ControlDeck] unmounted');
   }, []);
 
-  const isInstructorClient = sessionStorage.getItem('stagetrack_role') !== 'student';
+  const isInstructorClient = isInstructorVerified;
   const fileInputRef = useRef(null);
   const [whisperText, setWhisperText] = useState('');
   const [bpmValue, setBpmValue] = useState(() => {

@@ -3,7 +3,40 @@ service cloud.firestore {
   match /databases/{database}/documents {
     match /sessions/{sessionId} {
       allow read: if true;
-      allow write: if request.auth != null;
+      
+      // Helper function to check if the caller is the verified instructor for this session
+      function isInstructor() {
+        return request.auth != null && (
+          (resource.data.instructorUid != null && resource.data.instructorUid == request.auth.uid) ||
+          request.auth.token.instructor == true
+        );
+      }
+
+      // Allow creation if authenticated
+      allow create: if request.auth != null;
+
+      // Allow updates:
+      // 1. Verified instructor can update any field in the session
+      // 2. Students / Guests can ONLY update non-instructor fields (lobbyRequest, lobbyResponse, guestButtons, guestStickers, doodleGallery, messages append)
+      allow update: if request.auth != null && (
+        isInstructor() ||
+        (
+          !request.resource.data.diff(resource.data).affectedKeys().hasAny([
+            'curtainsOpen', 'curtainsUpdatedAt',
+            'isChatOpen', 'chatUpdatedAt',
+            'isDoodling', 'doodlingUpdatedAt',
+            'activeTheme', 'themeUpdatedAt',
+            'stageTimer', 'timerUpdatedAt',
+            'instructorUid', 'activeItoSection',
+            'globalMute', 'globalPause',
+            'mediaUrl', 'mediaType', 'mediaUpdatedAt'
+          ])
+        )
+      );
+
+      // Only instructor can delete a session
+      allow delete: if isInstructor();
     }
   }
 }
+

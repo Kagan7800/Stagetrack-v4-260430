@@ -45,7 +45,8 @@ export default function PresentationContainer({
   const { 
     isDoodling: globalIsDoodling,
     mediaType: globalMediaType, sessionId, rhythmBeat, curtainsOpen,
-    setVideoControlState, videoTriggerAction, setVideoTriggerAction
+    setVideoControlState, videoTriggerAction, setVideoTriggerAction,
+    isInstructorVerified
   } = useAppContext();
   const isDoodling = propIsDoodling !== undefined ? propIsDoodling : globalIsDoodling;
   const mediaType = propMediaType || globalMediaType;
@@ -63,26 +64,24 @@ export default function PresentationContainer({
     const handleMessage = (event) => {
       if (event.data && event.data.type === 'RHYTHM_UPDATE') {
         // Sync to Firebase if we are the instructor client
-        const isInstructorClient = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('stagetrack_role') !== 'student' : true;
-        if (isInstructorClient && sessionId) {
+        if (isInstructorVerified && sessionId) {
           syncWheelBeatToFirebase(event.data.currentStep, sessionId);
         }
       }
     };
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
-  }, [sessionId]);
+  }, [sessionId, isInstructorVerified]);
 
   // Student Sync: Snap iframe step when Firestore updates
   useEffect(() => {
-    const isStudent = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('stagetrack_role') === 'student' : false;
-    if (isStudent && rhythmBeat !== undefined) {
+    if (!isInstructorVerified && rhythmBeat !== undefined) {
       const iframe = document.querySelector('.media-container iframe');
       if (iframe && iframe.contentWindow) {
         iframe.contentWindow.postMessage({ type: 'SET_STEP', step: rhythmBeat }, '*');
       }
     }
-  }, [rhythmBeat]);
+  }, [rhythmBeat, isInstructorVerified]);
 
   useEffect(() => {
     const handleKeyDown = (e) => {
