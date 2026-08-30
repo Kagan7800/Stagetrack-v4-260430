@@ -846,21 +846,27 @@ body {
 }
 
 /* ==========================================================================
-   CHAT PANEL (Rebuilt from spec: 272px, Purple-Blue gradient, Live reflow)
+   CHAT PANEL (Isolated: 218px width [-20%], 0px flush top/bottom, Square corners)
    ========================================================================== */
 .chat-panel {
-  width: 272px;
+  width: 218px;
   flex-shrink: 0;
   background: #1B1530;
-  border: 1px solid #382C57;
-  border-radius: 18px;
+  border-left: 1px solid #382C57;
+  border-right: none;
+  border-top: none;
+  border-bottom: none;
+  border-radius: 0px !important;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   opacity: 1;
-  height: 100%;
-  box-sizing: border-box;
+  height: calc(100% + 20px) !important;
+  margin-top: -10px;
+  margin-bottom: -10px;
+  margin-right: -10px;
   margin-left: 10px;
+  box-sizing: border-box;
   transition: width 0.32s ease, opacity 0.25s ease, border-width 0.32s ease, margin 0.32s ease, padding 0.32s ease;
   position: relative;
   z-index: 50;
@@ -875,6 +881,8 @@ body {
   border-width: 0 !important;
   margin-left: 0 !important;
   margin-right: 0 !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
   margin: 0 !important;
   padding: 0 !important;
   pointer-events: none !important;
@@ -885,18 +893,20 @@ body {
   display: flex;
   flex-direction: column;
   height: 100%;
-  width: 272px;
-  min-width: 272px;
+  width: 218px;
+  min-width: 218px;
   overflow: hidden;
   box-sizing: border-box;
+  border-radius: 0px !important;
 }
 
 .chat-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 16px;
+  padding: 10px 14px;
   background: linear-gradient(90deg, #5B3A8E, #1E8ED2);
+  border-radius: 0px !important;
   flex-shrink: 0;
 }
 
