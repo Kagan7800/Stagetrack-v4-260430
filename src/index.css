@@ -851,7 +851,9 @@ body {
 .chat-panel {
   width: 218px;
   flex-shrink: 0;
-  background: #1B1530;
+  background: rgba(27, 21, 48, 0.8);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border-left: 1px solid #382C57;
   border-right: none;
   border-top: none;
@@ -1039,7 +1041,7 @@ body {
   border-top: 1px solid #382C57;
   padding: 10px 12px;
   position: relative;
-  background: #1B1530;
+  background: rgba(27, 21, 48, 0.8);
   flex-shrink: 0;
 }
 
