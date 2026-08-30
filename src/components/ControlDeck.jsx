@@ -904,7 +904,7 @@ export default function ControlDeck() {
               </div>
             ) : showInstructorStickers ? (
               <div className="controls-row middle-row" style={{ width: '100%', margin: '0', padding: '5px 36px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 0, flex: 1, boxSizing: 'border-box' }}>
-                <div style={{ display: 'flex', justifyContent: 'center', gap: '6px', marginTop: '2px', marginBottom: '2px', flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', gap: 'clamp(4px, 0.6vw, 8px)', marginTop: '2px', marginBottom: '2px', width: '100%', maxWidth: '100%' }}>
                   {instructorStickers.map((sticker) => (
                     <button 
                       key={sticker.id}
@@ -917,7 +917,7 @@ export default function ControlDeck() {
                         handleAddSticker(activeGuest.id, sticker.id, true);
                       }}
                       title={activeGuest ? `Reward ${activeGuest.name} with ${sticker.name}` : `Select student to reward with ${sticker.name}`}
-                      style={{ width: 'clamp(28px, 3.2vw, 38px)', height: 'clamp(28px, 3.2vw, 38px)', minWidth: '24px', minHeight: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1px', margin: '1px', border: 'none', background: 'transparent' }}
+                      style={{ width: 'clamp(26px, 3vw, 38px)', height: 'clamp(26px, 3vw, 38px)', minWidth: '22px', minHeight: '22px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1px', margin: '1px', border: 'none', background: 'transparent', flexShrink: 0 }}
                     >
                       <img src={`/assets/svg_stickers/${sticker.id}`} alt={sticker.name} style={{ width: '85%', height: '85%', objectFit: 'contain' }} />
                     </button>
@@ -931,14 +931,14 @@ export default function ControlDeck() {
               </div>
             ) : (showStudentStickers || isPeoStickersOpen) ? (
               <div className="controls-row middle-row" style={{ width: '100%', margin: '0', padding: '5px 36px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 0, flex: 1, boxSizing: 'border-box' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, auto)', gap: '4px', justifyContent: 'center', marginTop: '2px', marginBottom: '2px' }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', gap: 'clamp(4px, 0.6vw, 8px)', marginTop: '2px', marginBottom: '2px', width: '100%', maxWidth: '100%' }}>
                   {studentStickers.map((sticker) => (
                     <button 
                       key={sticker.id}
                       className="deck-sticker-btn"
                       onClick={() => handleStickerClick(sticker.id)}
                       title={`Place ${sticker.name} sticker`}
-                      style={{ width: 'clamp(28px, 3.2vw, 38px)', height: 'clamp(28px, 3.2vw, 38px)', minWidth: '24px', minHeight: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1px', margin: '1px', border: 'none', background: 'transparent' }}
+                      style={{ width: 'clamp(26px, 3vw, 38px)', height: 'clamp(26px, 3vw, 38px)', minWidth: '22px', minHeight: '22px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1px', margin: '1px', border: 'none', background: 'transparent', flexShrink: 0 }}
                     >
                       <img src={`/assets/svg_stickers/${sticker.id}`} alt={sticker.name} style={{ width: '85%', height: '85%', objectFit: 'contain' }} />
                     </button>
@@ -1016,16 +1016,16 @@ export default function ControlDeck() {
                       Stickers
                     </span>
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, auto)', gap: '8px', justifyContent: 'center' }}>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'clamp(4px, 0.6vw, 8px)', justifyContent: 'center', alignItems: 'center', width: '100%', maxWidth: '100%' }}>
                     {studentStickers.map((sticker) => (
                       <button 
                         key={sticker.id}
                         className="deck-sticker-btn"
                         onClick={() => handleStickerClick(sticker.id)}
                         title={`Place ${sticker.name} sticker`}
-                        style={{ width: 'calc(var(--peo-height) * 0.45)', height: 'calc(var(--peo-height) * 0.45)', maxWidth: '61px', maxHeight: '61px', minWidth: '36px', minHeight: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2px' }}
+                        style={{ width: 'clamp(28px, 3.2vw, 44px)', height: 'clamp(28px, 3.2vw, 44px)', minWidth: '24px', minHeight: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2px', border: 'none', background: 'transparent', flexShrink: 0 }}
                       >
-                        <img src={`/assets/svg_stickers/${sticker.id}`} alt={sticker.name} style={{ width: '80%', height: '80%', objectFit: 'contain' }} />
+                        <img src={`/assets/svg_stickers/${sticker.id}`} alt={sticker.name} style={{ width: '85%', height: '85%', objectFit: 'contain' }} />
                       </button>
                     ))}
                   </div>
