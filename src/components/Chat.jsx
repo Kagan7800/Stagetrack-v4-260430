@@ -6,23 +6,8 @@ export default function Chat({ messages = [], onSendMessage, onModerate, onClose
   const { activeTheme } = useAppContext();
   const themeTextColor = activeTheme === 'sor' ? '#ef4444' : '#3b82f6';
   const [input, setInput] = useState("");
-  const timerRef = useRef(null);
   const textareaRef = useRef(null);
   const messagesEndRef = useRef(null);
-
-  const resetInactivityTimer = useCallback(() => {
-    if (timerRef.current) clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(() => {
-      onClose();
-    }, 20000); // 20 seconds
-  }, [onClose]);
-
-  useEffect(() => {
-    resetInactivityTimer();
-    return () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
-    };
-  }, [resetInactivityTimer]);
 
   // Auto-expand textarea upward as text is added
   useEffect(() => {
@@ -47,11 +32,9 @@ export default function Chat({ messages = [], onSendMessage, onModerate, onClose
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
     }
-    resetInactivityTimer();
   };
 
   const handleKeyDown = (e) => {
-    resetInactivityTimer();
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSend();
@@ -61,9 +44,6 @@ export default function Chat({ messages = [], onSendMessage, onModerate, onClose
   return (
     <div 
       className="glass-panel sidebar chat-sidebar"
-      onMouseMove={resetInactivityTimer}
-      onKeyDown={resetInactivityTimer}
-      onClick={resetInactivityTimer}
       style={{ position: 'relative', height: '100%', minHeight: 0, maxHeight: '100%', display: 'flex', flexDirection: 'column', background: 'transparent', overflow: 'hidden' }}
     >
       <div className="chat-header" style={{ position: 'relative', display: 'flex', alignItems: 'center', minHeight: '52px', boxSizing: 'border-box', borderBottom: '1px solid var(--glass-border)', padding: '12px 16px' }}>

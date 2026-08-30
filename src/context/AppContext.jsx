@@ -461,14 +461,16 @@ export function AppProvider({ children }) {
     try {
       const sessionRef = doc(db, "sessions", sessionId);
       let current = [...(guestStickers[targetId] || [])];
+      const genId = () => `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
       if (stickerName === 'Confetti.svg') {
         const existingConfetti = current.findIndex(s => s.position === 'confetti');
         if (existingConfetti !== -1) {
           current.splice(existingConfetti, 1);
         } else {
-          current.push({ id: crypto.randomUUID(), name: stickerName, position: 'confetti' });
+          current.push({ id: genId(), name: stickerName, position: 'confetti' });
         }
+        setGuestStickers(prev => ({ ...prev, [targetId]: current }));
         await updateDoc(sessionRef, { [`guestStickers.${targetId}`]: current });
         return;
       }
@@ -478,6 +480,7 @@ export function AppProvider({ children }) {
         if (lastPeoIndex !== -1) {
           current.splice(lastPeoIndex, 1);
         }
+        setGuestStickers(prev => ({ ...prev, [targetId]: current }));
         await updateDoc(sessionRef, { [`guestStickers.${targetId}`]: current });
         return;
       }
@@ -487,6 +490,7 @@ export function AppProvider({ children }) {
           const icUndoSlots = ['tc', 'tl-c', 'tr-c', 'lc', 'rc-1', 'rc-2', 'birthday', 'crown'];
           const lastIcIndex = current.findLastIndex(s => icUndoSlots.includes(s.position));
           if (lastIcIndex !== -1) current.splice(lastIcIndex, 1);
+          setGuestStickers(prev => ({ ...prev, [targetId]: current }));
           await updateDoc(sessionRef, { [`guestStickers.${targetId}`]: current });
           return;
         }
@@ -494,6 +498,7 @@ export function AppProvider({ children }) {
         if (stickerName === 'UNDO_ALL_IC') {
           const icUndoSlots = ['tc', 'tl-c', 'tr-c', 'lc', 'rc-1', 'rc-2', 'birthday', 'crown'];
           current = current.filter(s => !icUndoSlots.includes(s.position));
+          setGuestStickers(prev => ({ ...prev, [targetId]: current }));
           await updateDoc(sessionRef, { [`guestStickers.${targetId}`]: current });
           return;
         }
@@ -504,9 +509,10 @@ export function AppProvider({ children }) {
             current = current.filter(s => s.position !== 'birthday' && s.position !== 'crown');
           } else {
             current = current.filter(s => s.position !== 2 && s.position !== 'tr-c' && s.position !== 'tc' && s.position !== 'birthday' && s.position !== 'crown');
-            current.push({ id: crypto.randomUUID(), name: 'Happy_Birthday.png', position: 'birthday' });
-            current.push({ id: crypto.randomUUID(), name: 'RealCrown.png', position: 'crown' });
+            current.push({ id: genId(), name: 'Happy_Birthday.png', position: 'birthday' });
+            current.push({ id: genId(), name: 'RealCrown.png', position: 'crown' });
           }
+          setGuestStickers(prev => ({ ...prev, [targetId]: current }));
           await updateDoc(sessionRef, { [`guestStickers.${targetId}`]: current });
           return;
         }
@@ -517,8 +523,9 @@ export function AppProvider({ children }) {
             current.splice(existingCrownIndex, 1);
           } else {
             current = current.filter(s => s.position !== 'tc' && s.position !== 'crown');
-            current.push({ id: crypto.randomUUID(), name: 'RealCrown.png', position: 'crown' });
+            current.push({ id: genId(), name: 'RealCrown.png', position: 'crown' });
           }
+          setGuestStickers(prev => ({ ...prev, [targetId]: current }));
           await updateDoc(sessionRef, { [`guestStickers.${targetId}`]: current });
           return;
         }
@@ -527,6 +534,7 @@ export function AppProvider({ children }) {
       const existingIndex = current.findIndex(s => s.name === stickerName);
       if (existingIndex !== -1) {
         current.splice(existingIndex, 1);
+        setGuestStickers(prev => ({ ...prev, [targetId]: current }));
         await updateDoc(sessionRef, { [`guestStickers.${targetId}`]: current });
         return;
       }
@@ -553,20 +561,20 @@ export function AppProvider({ children }) {
         const nextSlot = icSlots.find(slot => !occupiedSlots.includes(slot));
 
         if (nextSlot) {
-          current.push({ id: crypto.randomUUID(), name: stickerName, position: nextSlot, rotation, scale });
+          current.push({ id: genId(), name: stickerName, position: nextSlot, rotation, scale });
         } else {
           const oldestIcIndex = current.findIndex(s => icSlots.includes(s.position));
           if (oldestIcIndex !== -1) {
             const removed = current[oldestIcIndex];
             current.splice(oldestIcIndex, 1);
-            current.push({ id: crypto.randomUUID(), name: stickerName, position: removed.position, rotation, scale });
+            current.push({ id: genId(), name: stickerName, position: removed.position, rotation, scale });
           }
         }
       } else {
         const isSun = stickerName === 'Sun with sunglasses.svg';
         if (isSun) {
           current = current.filter(s => s.position !== 'rc-1' && s.position !== 'rc-2');
-          current.push({ id: crypto.randomUUID(), name: stickerName, position: 'sun' });
+          current.push({ id: genId(), name: stickerName, position: 'sun' });
         } else {
           const allowedPositions = [1, 2, 3, 4];
           const normalStickers = current.filter(s => typeof s.position === 'number');
@@ -580,10 +588,11 @@ export function AppProvider({ children }) {
 
           const occupiedPositions = current.map(s => s.position);
           const nextPos = allowedPositions.find(p => !occupiedPositions.includes(p));
-          current.push({ id: crypto.randomUUID(), name: stickerName, position: nextPos });
+          current.push({ id: genId(), name: stickerName, position: nextPos });
         }
       }
 
+      setGuestStickers(prev => ({ ...prev, [targetId]: current }));
       await updateDoc(sessionRef, { [`guestStickers.${targetId}`]: current });
     } catch (err) {
       console.error("Error adding sticker:", err);
@@ -672,7 +681,7 @@ export function AppProvider({ children }) {
       if (action === 'reply_private') {
         setTimeout(async () => {
           const replyMsg = {
-            id: crypto.randomUUID(),
+            id: `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
             text: "I will answer that privately.",
             sender: "self",
             senderName: "Instructor",
