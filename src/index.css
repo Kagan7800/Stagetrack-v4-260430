@@ -1039,7 +1039,7 @@ body {
 
 .chat-composer {
   border-top: 1px solid #382C57;
-  padding: 10px 12px;
+  padding: 8px 10px;
   position: relative;
   background: rgba(27, 21, 48, 0.9);
   flex-shrink: 0;
@@ -1047,7 +1047,7 @@ body {
 
 .composer-row {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   align-items: flex-end;
   margin: 0;
   width: 100%;
@@ -1057,20 +1057,20 @@ body {
   flex: 1;
   background: #241C3D;
   border: 1px solid #382C57;
-  border-radius: 18px;
-  padding: 8px 12px;
+  border-radius: 16px;
+  padding: 4px 8px 3px 8px;
   color: #F3F0FA;
   font-family: inherit;
-  font-size: 0.82rem;
+  font-size: 0.76rem;
   resize: none;
   max-height: 120px;
   overflow-y: auto;
   scrollbar-width: none !important; /* Firefox */
   -ms-overflow-style: none !important; /* IE/Edge */
-  line-height: 1.35;
+  line-height: 1.25;
   outline: none;
   box-sizing: border-box;
-  min-height: 54px;
+  min-height: 48px;
   transition: border-color 0.2s ease;
 }
 
@@ -1105,13 +1105,13 @@ body {
 }
 
 .chat-composer .icon-btn {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   background: #241C3D;
   border: 1px solid #382C57;
   color: #F3F0FA;
-  font-size: 1rem;
+  font-size: 0.95rem;
   cursor: pointer;
   flex-shrink: 0;
   display: flex;
