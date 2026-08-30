@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { X, Sparkles } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import { instructorStickers, studentStickers } from '../constants/stickers';
@@ -24,15 +24,20 @@ export default function ControlDeck() {
     handleToggleInvite, isFirebaseUpdating,
     sendWhisper, isChatOpen, setIsChatOpen, handleToggleChat,
     setIsSidebarOpen,
-    curtainsOpen, setCurtainsOpen
+    curtainsOpen, setCurtainsOpen,
+    activeCdTab, setActiveCdTab,
+    isCountingDropdownOpen, setIsCountingDropdownOpen,
+    isMakeMusicDropdownOpen, setIsMakeMusicDropdownOpen
   } = useAppContext();
+
+  useEffect(() => {
+    console.log('[ControlDeck] mounted');
+    return () => console.log('[ControlDeck] unmounted');
+  }, []);
 
   const isInstructorClient = sessionStorage.getItem('stagetrack_role') !== 'student';
   const fileInputRef = useRef(null);
-  const [activeCdTab, setActiveCdTab] = useState(null); // 'timer', 'system', 'upload', 'activities', 'whisper', or 'first_session'
   const [whisperText, setWhisperText] = useState('');
-  const [isCountingDropdownOpen, setIsCountingDropdownOpen] = useState(false);
-  const [isMakeMusicDropdownOpen, setIsMakeMusicDropdownOpen] = useState(false);
   const [bpmValue, setBpmValue] = useState(() => {
     const saved = sessionStorage.getItem('last_counting_bpm');
     return saved ? parseInt(saved) : 60;

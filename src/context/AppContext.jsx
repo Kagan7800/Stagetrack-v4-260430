@@ -55,6 +55,9 @@ export function AppProvider({ children }) {
   const [showStudentFilters, setShowStudentFilters] = useState(false);
   const [isPeoStickersOpen, setIsPeoStickersOpen] = useState(false);
   const [isFirebaseUpdating, setIsFirebaseUpdating] = useState(false);
+  const [activeCdTab, setActiveCdTab] = useState(null);
+  const [isCountingDropdownOpen, setIsCountingDropdownOpen] = useState(false);
+  const [isMakeMusicDropdownOpen, setIsMakeMusicDropdownOpen] = useState(false);
 
   // 1. EXTRACT SESSION ID & ENFORCE LOBBY STOPPER ON MOUNT
   useEffect(() => {
@@ -962,7 +965,10 @@ export function AppProvider({ children }) {
     sendWhisper,
     setMediaUpload,
     handleToggleInvite,
-    isFirebaseUpdating
+    isFirebaseUpdating,
+    activeCdTab, setActiveCdTab,
+    isCountingDropdownOpen, setIsCountingDropdownOpen,
+    isMakeMusicDropdownOpen, setIsMakeMusicDropdownOpen
   };
 
   return (
