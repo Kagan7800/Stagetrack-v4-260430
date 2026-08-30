@@ -598,25 +598,18 @@ function App() {
                      })}
                    </div>
 
-                    <div className="center-wrapper" style={{ 
-                      position: 'relative', 
-                      alignSelf: (isInstructorClient && activeItoSection !== 'closed') ? 'flex-start' : 'center', 
-                      height: '100%',
-                      transition: 'all 0.4s cubic-bezier(0.25, 1, 0.5, 1)'
-                    }}>
+                    <div className="center-wrapper" style={{ position: 'relative', alignSelf: 'flex-start' }}>
                       <div style={{ 
                         display: 'flex', 
                         flexDirection: 'column', 
                         width: 'fit-content', 
                         alignItems: 'center', 
                         height: '100%', 
-                        justifyContent: (isInstructorClient && activeItoSection !== 'closed') ? 'flex-start' : 'center',
-                        transition: 'all 0.4s cubic-bezier(0.25, 1, 0.5, 1)'
+                        justifyContent: 'space-between'
                       }}>
-                       <div className={`pc-width-keeper ${isChatOpen ? 'pc-sidebar-open' : ''}`} style={{ transition: 'all 0.4s cubic-bezier(0.25, 1, 0.5, 1)' }}>
+                       <div className={`pc-width-keeper ${isChatOpen ? 'pc-sidebar-open' : ''}`}>
                           <div 
                             className={`pc-gt-unified ${mediaType === 'iframe' || mediaType === 'metronome' ? 'metronome-active' : ''} ${isRhythmWheel ? 'rhythm-wheel-container' : 'presentation-container-parent'}`}
-                            style={{ transition: 'all 0.4s cubic-bezier(0.25, 1, 0.5, 1)' }}
                           >
                              <PresentationContainer 
                                isDoodling={isDoodling}
@@ -663,19 +656,7 @@ function App() {
                           </button>
                         )}
 
-                        {/* Studio Controls (ControlDeck) — rendered under PC box with matching 10px spacing */}
-                        <div style={{ 
-                          marginTop: '10px',
-                          width: '100%',
-                          maxWidth: '100%',
-                          boxSizing: 'border-box',
-                          zIndex: 50,
-                          transition: 'all 0.4s cubic-bezier(0.25, 1, 0.5, 1)',
-                          opacity: (isInstructorClient && activeItoSection !== 'closed') ? 1 : 0,
-                          pointerEvents: (isInstructorClient && activeItoSection !== 'closed') ? 'auto' : 'none',
-                        }}>
-                          <ControlDeck />
-                        </div>
+                        <ControlDeck />
                       </div>
                     </div>
                     
