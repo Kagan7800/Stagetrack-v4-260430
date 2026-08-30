@@ -446,12 +446,13 @@ export default function ControlDeck() {
                     {isFirebaseUpdating ? 'Generating...' : 'Invite'}
                   </button>
 
-                  {/* DOODLING */}
+                  {/* DOODLE TIME */}
                   <button 
                     onClick={() => setIsDoodling(!isDoodling)}
-                    className={isDoodling ? 'active' : ''}
+                    className={`doodle-toggle-btn ${isDoodling ? 'active' : ''}`}
+                    title="Toggle Doodle Time Activity (Instructor Only)"
                   >
-                    Doodling
+                    🎨 Doodle Time
                   </button>
 
                   {/* CONFETTI */}

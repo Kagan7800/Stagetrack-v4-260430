@@ -76,6 +76,7 @@ export function AppProvider({ children }) {
   const [guestButtons, setGuestButtons] = useState({});
   const [stickerNudges, setStickerNudges] = useState({});
   const [isDoodling, setIsDoodling] = useState(false);
+  const [doodleGallery, setDoodleGallery] = useState([]);
   const [doodleColor, setDoodleColor] = useState('#ec4899');
   const [doodleBrushSize, setDoodleBrushSize] = useState(4);
   const [doodleTriggerAction, setDoodleTriggerAction] = useState(null);
@@ -102,6 +103,8 @@ export function AppProvider({ children }) {
   const isChatWritePendingRef = useRef(false);
   const lastMediaWriteTimeRef = useRef(0);
   const isMediaWritePendingRef = useRef(false);
+  const lastDoodlingWriteTimeRef = useRef(0);
+  const isDoodlingWritePendingRef = useRef(false);
   const lastThemeWriteTimeRef = useRef(0);
   const isThemeWritePendingRef = useRef(false);
   const lastTimerWriteTimeRef = useRef(0);
@@ -319,10 +322,13 @@ export function AppProvider({ children }) {
         }
       }
       if (data.isDoodling !== undefined) {
-        const isRecentMediaWrite = isMediaWritePendingRef.current || (Date.now() - lastMediaWriteTimeRef.current < 2500);
-        if (!isRecentMediaWrite || (data.mediaUpdatedAt && data.mediaUpdatedAt >= lastMediaWriteTimeRef.current)) {
-          setIsDoodling(data.isDoodling);
+        const isRecentDoodlingWrite = isDoodlingWritePendingRef.current || (Date.now() - lastDoodlingWriteTimeRef.current < 2500);
+        if (!isRecentDoodlingWrite || (data.doodlingUpdatedAt && data.doodlingUpdatedAt >= lastDoodlingWriteTimeRef.current)) {
+          setIsDoodling(Boolean(data.isDoodling));
         }
+      }
+      if (data.doodleGallery !== undefined && Array.isArray(data.doodleGallery)) {
+        setDoodleGallery(data.doodleGallery);
       }
       if (data.drawingPaths !== undefined) setDrawingPaths(data.drawingPaths);
       if (data.curtainsOpen !== undefined) {
@@ -809,11 +815,19 @@ export function AppProvider({ children }) {
     }
   };
 
-  const handleSetIsDoodling = async (val) => {
-    lastMediaWriteTimeRef.current = Date.now();
-    isMediaWritePendingRef.current = true;
-    setIsDoodling(val);
-    if (val) {
+  const handleSetIsDoodling = async (valOrFunc) => {
+    const role = sessionStorage.getItem('stagetrack_role');
+    const isInstructor = role !== 'student';
+    if (!isInstructor) {
+      console.warn("Permission denied: Only instructors can start or stop Doodle Time.");
+      return;
+    }
+
+    const nextVal = typeof valOrFunc === 'function' ? valOrFunc(isDoodling) : Boolean(valOrFunc);
+    lastDoodlingWriteTimeRef.current = Date.now();
+    isDoodlingWritePendingRef.current = true;
+    setIsDoodling(nextVal);
+    if (nextVal) {
       setMediaUrl(null);
       setMediaType(null);
     }
@@ -821,17 +835,56 @@ export function AppProvider({ children }) {
       try {
         const sessionRef = doc(db, "sessions", sessionId);
         await updateDoc(sessionRef, {
-          isDoodling: val,
-          ...(val ? { mediaUrl: null, mediaType: null } : {}),
-          mediaUpdatedAt: Date.now()
+          isDoodling: nextVal,
+          ...(nextVal ? { mediaUrl: null, mediaType: null } : {}),
+          doodlingUpdatedAt: Date.now()
         });
       } catch (err) {
         console.error("Error setting isDoodling:", err);
       } finally {
-        isMediaWritePendingRef.current = false;
+        isDoodlingWritePendingRef.current = false;
       }
     } else {
-      isMediaWritePendingRef.current = false;
+      isDoodlingWritePendingRef.current = false;
+    }
+  };
+
+  const handleShareDoodleToClass = async (dataUrl) => {
+    if (!dataUrl) return;
+    const role = sessionStorage.getItem('stagetrack_role');
+    const isInstructor = role !== 'student';
+    
+    let senderFirstName;
+    if (isInstructor) {
+      senderFirstName = 'Ms. Rivera';
+    } else {
+      const myName = sessionStorage.getItem('stagetrack_username');
+      const guestP = participants.find(p => p.id && String(p.id).startsWith('active-joined')) ||
+                     participants.find(p => !p.isInstructor && !p.isBlank);
+      const rawName = myName || guestP?.name || 'Student';
+      // Strict privacy rule: Only the participant's first name, never full/last name or placeholder
+      senderFirstName = rawName.split(/[\s&,/]+/)[0].trim() || 'Student';
+    }
+
+    const newEntry = {
+      id: `doodle-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      name: senderFirstName,
+      dataUrl,
+      timestamp: Date.now(),
+      role: isInstructor ? 'instructor' : 'student'
+    };
+
+    setDoodleGallery(prev => [...(prev || []), newEntry]);
+
+    if (sessionId) {
+      try {
+        const sessionRef = doc(db, "sessions", sessionId);
+        await updateDoc(sessionRef, {
+          doodleGallery: arrayUnion(newEntry)
+        });
+      } catch (err) {
+        console.error("Error sharing doodle to class gallery:", err);
+      }
     }
   };
 
@@ -1047,7 +1100,9 @@ export function AppProvider({ children }) {
     isFirebaseUpdating,
     activeCdTab, setActiveCdTab,
     isCountingDropdownOpen, setIsCountingDropdownOpen,
-    isMakeMusicDropdownOpen, setIsMakeMusicDropdownOpen
+    isMakeMusicDropdownOpen, setIsMakeMusicDropdownOpen,
+    doodleGallery,
+    handleShareDoodleToClass
   };
 
   return (

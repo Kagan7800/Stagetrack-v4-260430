@@ -1,6 +1,7 @@
 import { useRef, useEffect } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { syncWheelBeatToFirebase } from '../firebase';
+import DoodleStage from './DoodleStage';
 
 const isRhythmWheelActivity = (url) => {
   return url && url.includes('1,2,3,4_wheel');
@@ -37,14 +38,16 @@ export function CentralStageDeck({ mediaUrl, onClick }) {
 }
 
 export default function PresentationContainer({ 
-  isDoodling,
+  isDoodling: propIsDoodling,
   mediaUrl, 
   mediaType: propMediaType
 }) {
   const { 
+    isDoodling: globalIsDoodling,
     mediaType: globalMediaType, sessionId, rhythmBeat, curtainsOpen,
     setVideoControlState, videoTriggerAction, setVideoTriggerAction
   } = useAppContext();
+  const isDoodling = propIsDoodling !== undefined ? propIsDoodling : globalIsDoodling;
   const mediaType = propMediaType || globalMediaType;
 
   const videoRef = useRef(null);
@@ -140,6 +143,26 @@ export default function PresentationContainer({
   }, [videoTriggerAction, setVideoControlState, setVideoTriggerAction]);
 
 
+
+  if (isDoodling) {
+    return (
+      <div 
+        className="pc-canvas-area"
+        style={{ 
+          position: 'relative', 
+          overflow: 'hidden', 
+          width: '100%', 
+          height: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 30
+        }}
+      >
+        <DoodleStage />
+      </div>
+    );
+  }
 
   return (
     <div 
