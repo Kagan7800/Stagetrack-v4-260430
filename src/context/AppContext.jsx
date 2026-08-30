@@ -160,14 +160,17 @@ export function AppProvider({ children }) {
             name: 'Instructor'
           };
           
+          const existingMessages = (data.messages || []).filter(m => m && m.text && m.text.trim() !== 'abc');
           await updateDoc(sessionRef, {
             ...(!hasInstructor ? { activeUsers: [instructorUser, ...(data.activeUsers || [])] } : {}),
             drawingPaths: [],
-            isDoodling: false
+            isDoodling: false,
+            messages: existingMessages
           });
           setDrawingPaths([]);
           setIsDoodling(false);
-          console.log("Session document updated cleanly in Firestore (drawingPaths reset).");
+          setMessages(existingMessages);
+          console.log("Session document updated cleanly in Firestore (drawingPaths reset, test messages cleaned).");
         }
       } catch (err) {
         console.error("Failed to initialize session in Firestore:", err);
@@ -352,10 +355,10 @@ export function AppProvider({ children }) {
       }
       if (data.messages !== undefined && Array.isArray(data.messages)) {
         setMessages(prev => {
-          const firestoreMsgs = data.messages || [];
+          const firestoreMsgs = (data.messages || []).filter(m => m && m.text && m.text.trim() !== 'abc');
           const firestoreIds = new Set(firestoreMsgs.map(m => m.id));
           // Keep local recent messages not yet reflected in Firestore
-          const localRecent = (prev || []).filter(m => m && m.id && !firestoreIds.has(m.id) && (Date.now() - (m.timestamp || 0) < 60000));
+          const localRecent = (prev || []).filter(m => m && m.id && m.text !== 'abc' && !firestoreIds.has(m.id) && (Date.now() - (m.timestamp || 0) < 60000));
           return [...firestoreMsgs, ...localRecent].sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
         });
       }
