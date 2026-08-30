@@ -98,6 +98,12 @@ export function AppProvider({ children }) {
   const [isMakeMusicDropdownOpen, setIsMakeMusicDropdownOpen] = useState(false);
   const lastCurtainsWriteTimeRef = useRef(0);
   const isCurtainsWritePendingRef = useRef(false);
+  const lastChatWriteTimeRef = useRef(0);
+  const isChatWritePendingRef = useRef(false);
+  const lastMediaWriteTimeRef = useRef(0);
+  const isMediaWritePendingRef = useRef(false);
+  const lastThemeWriteTimeRef = useRef(0);
+  const isThemeWritePendingRef = useRef(false);
 
   // 1.5. INITIALIZE FIRESTORE SESSION DOCUMENT ON MOUNT FOR INSTRUCTOR (Preserves active session states on reload)
   useEffect(() => {
@@ -299,24 +305,44 @@ export function AppProvider({ children }) {
         setParticipants([instructorUser, ...guestSlots]);
       }
 
-      // Synchronize other states
-      if (data.mediaUrl !== undefined) setMediaUrl(data.mediaUrl);
-      if (data.mediaType !== undefined) setMediaType(data.mediaType);
-      if (data.isDoodling !== undefined) setIsDoodling(data.isDoodling);
+      // Synchronize other states with pending-write and timestamp guards
+      if (data.mediaUrl !== undefined || data.mediaType !== undefined) {
+        const isRecentMediaWrite = isMediaWritePendingRef.current || (Date.now() - lastMediaWriteTimeRef.current < 2500);
+        if (!isRecentMediaWrite || (data.mediaUpdatedAt && data.mediaUpdatedAt >= lastMediaWriteTimeRef.current)) {
+          if (data.mediaUrl !== undefined) setMediaUrl(data.mediaUrl);
+          if (data.mediaType !== undefined) setMediaType(data.mediaType);
+        }
+      }
+      if (data.isDoodling !== undefined) {
+        const isRecentMediaWrite = isMediaWritePendingRef.current || (Date.now() - lastMediaWriteTimeRef.current < 2500);
+        if (!isRecentMediaWrite || (data.mediaUpdatedAt && data.mediaUpdatedAt >= lastMediaWriteTimeRef.current)) {
+          setIsDoodling(data.isDoodling);
+        }
+      }
       if (data.drawingPaths !== undefined) setDrawingPaths(data.drawingPaths);
       if (data.curtainsOpen !== undefined) {
-        const isRecentLocalWrite = isCurtainsWritePendingRef.current || (Date.now() - lastCurtainsWriteTimeRef.current < 2500);
-        if (!isRecentLocalWrite || (data.curtainsUpdatedAt && data.curtainsUpdatedAt >= lastCurtainsWriteTimeRef.current)) {
+        const isRecentCurtainsWrite = isCurtainsWritePendingRef.current || (Date.now() - lastCurtainsWriteTimeRef.current < 2500);
+        if (!isRecentCurtainsWrite || (data.curtainsUpdatedAt && data.curtainsUpdatedAt >= lastCurtainsWriteTimeRef.current)) {
           setCurtainsOpen(data.curtainsOpen);
         }
       }
       if (data.globalMute !== undefined) setGlobalMute(data.globalMute);
       if (data.globalPause !== undefined) setGlobalPause(data.globalPause);
-      if (data.activeTheme !== undefined) setActiveTheme(data.activeTheme);
+      if (data.activeTheme !== undefined) {
+        const isRecentThemeWrite = isThemeWritePendingRef.current || (Date.now() - lastThemeWriteTimeRef.current < 2500);
+        if (!isRecentThemeWrite || (data.themeUpdatedAt && data.themeUpdatedAt >= lastThemeWriteTimeRef.current)) {
+          setActiveTheme(data.activeTheme);
+        }
+      }
       if (data.stageTimer !== undefined) setStageTimer(data.stageTimer);
       if (data.guestStickers !== undefined) setGuestStickers(data.guestStickers);
       if (data.guestButtons !== undefined) setGuestButtons(data.guestButtons);
-      if (data.isChatOpen !== undefined) setIsChatOpen(Boolean(data.isChatOpen));
+      if (data.isChatOpen !== undefined) {
+        const isRecentChatWrite = isChatWritePendingRef.current || (Date.now() - lastChatWriteTimeRef.current < 2500);
+        if (!isRecentChatWrite || (data.chatUpdatedAt && data.chatUpdatedAt >= lastChatWriteTimeRef.current)) {
+          setIsChatOpen(Boolean(data.isChatOpen));
+        }
+      }
       if (data.messages !== undefined && Array.isArray(data.messages)) {
         setMessages(prev => {
           const firestoreMsgs = data.messages || [];
@@ -632,14 +658,23 @@ export function AppProvider({ children }) {
       return;
     }
     const nextVal = forceState !== undefined ? forceState : !isChatOpen;
+    lastChatWriteTimeRef.current = Date.now();
+    isChatWritePendingRef.current = true;
     setIsChatOpen(nextVal);
     if (sessionId) {
       try {
         const sessionRef = doc(db, "sessions", sessionId);
-        await updateDoc(sessionRef, { isChatOpen: nextVal });
+        await updateDoc(sessionRef, { 
+          isChatOpen: nextVal,
+          chatUpdatedAt: Date.now()
+        });
       } catch (err) {
         console.error("Error syncing chat visibility:", err);
+      } finally {
+        isChatWritePendingRef.current = false;
       }
+    } else {
+      isChatWritePendingRef.current = false;
     }
   };
 
@@ -658,42 +693,36 @@ export function AppProvider({ children }) {
       senderName = myName || guestP?.name || 'Parent / Student';
     }
 
-    const now = new Date();
-    const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    const newMsg = {
-      id: `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
-      name: senderName,
+    const newMessage = {
+      id: `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      sender: senderName,
       text: text.trim(),
-      time,
       timestamp: Date.now(),
-      role: isInstructor ? 'instructor' : 'student'
+      isInstructor
     };
 
     // 1. Immediately update local state
-    setMessages(prev => [...(prev || []), newMsg]);
+    setMessages(prev => [...(prev || []), newMessage]);
 
     // 2. Persist to Firestore session with merge
     if (sessionId) {
       try {
         const sessionRef = doc(db, "sessions", sessionId);
-        await setDoc(sessionRef, {
-          messages: arrayUnion(newMsg)
-        }, { merge: true });
+        await updateDoc(sessionRef, {
+          messages: arrayUnion(newMessage)
+        });
       } catch (err) {
         console.error("Error sending chat message:", err);
       }
     }
   };
 
-  const handleDeleteChatMessage = async (msgId) => {
+  const handleDeleteChatMessage = async (messageId) => {
     const role = sessionStorage.getItem('stagetrack_role');
     const isInstructor = role !== 'student';
-    if (!isInstructor) {
-      console.warn("Permission denied: Only instructors can delete messages.");
-      return;
-    }
+    if (!isInstructor) return;
 
-    const updated = (messages || []).filter(m => m && m.id !== msgId);
+    const updated = (messages || []).filter(m => m.id !== messageId);
     setMessages(updated);
 
     if (sessionId) {
@@ -707,10 +736,10 @@ export function AppProvider({ children }) {
   };
 
   const sendWhisper = async (guestId, message) => {
-    if (!sessionId) return;
+    if (!guestId || !sessionId) return;
     try {
       const sessionRef = doc(db, "sessions", sessionId);
-      const current = guestButtons[guestId] || { raiseHand: false, mute: false, chat: false };
+      const current = guestButtons[guestId] || {};
       const updated = {
         ...current,
         whisper: message,
@@ -723,6 +752,8 @@ export function AppProvider({ children }) {
   };
 
   const setMediaUpload = async (url, type) => {
+    lastMediaWriteTimeRef.current = Date.now();
+    isMediaWritePendingRef.current = true;
     setIsDoodling(false);
     setMediaUrl(url);
     setMediaType(type);
@@ -732,15 +763,22 @@ export function AppProvider({ children }) {
         await updateDoc(sessionRef, {
           mediaUrl: url,
           mediaType: type,
-          isDoodling: false
+          isDoodling: false,
+          mediaUpdatedAt: Date.now()
         });
       } catch (err) {
         console.error("Error setting media upload:", err);
+      } finally {
+        isMediaWritePendingRef.current = false;
       }
+    } else {
+      isMediaWritePendingRef.current = false;
     }
   };
 
   const clearMedia = async () => {
+    lastMediaWriteTimeRef.current = Date.now();
+    isMediaWritePendingRef.current = true;
     setMediaUrl(null);
     setMediaType(null);
     if (sessionId) {
@@ -748,15 +786,22 @@ export function AppProvider({ children }) {
         const sessionRef = doc(db, "sessions", sessionId);
         await updateDoc(sessionRef, {
           mediaUrl: null,
-          mediaType: null
+          mediaType: null,
+          mediaUpdatedAt: Date.now()
         });
       } catch (err) {
         console.error("Error clearing media:", err);
+      } finally {
+        isMediaWritePendingRef.current = false;
       }
+    } else {
+      isMediaWritePendingRef.current = false;
     }
   };
 
   const handleSetIsDoodling = async (val) => {
+    lastMediaWriteTimeRef.current = Date.now();
+    isMediaWritePendingRef.current = true;
     setIsDoodling(val);
     if (val) {
       setMediaUrl(null);
@@ -767,11 +812,16 @@ export function AppProvider({ children }) {
         const sessionRef = doc(db, "sessions", sessionId);
         await updateDoc(sessionRef, {
           isDoodling: val,
-          ...(val ? { mediaUrl: null, mediaType: null } : {})
+          ...(val ? { mediaUrl: null, mediaType: null } : {}),
+          mediaUpdatedAt: Date.now()
         });
       } catch (err) {
         console.error("Error setting isDoodling:", err);
+      } finally {
+        isMediaWritePendingRef.current = false;
       }
+    } else {
+      isMediaWritePendingRef.current = false;
     }
   };
 
@@ -835,14 +885,23 @@ export function AppProvider({ children }) {
   };
 
   const handleSetActiveTheme = async (val) => {
+    lastThemeWriteTimeRef.current = Date.now();
+    isThemeWritePendingRef.current = true;
     setActiveTheme(val);
     if (sessionId) {
       try {
         const sessionRef = doc(db, "sessions", sessionId);
-        await updateDoc(sessionRef, { activeTheme: val });
+        await updateDoc(sessionRef, { 
+          activeTheme: val,
+          themeUpdatedAt: Date.now()
+        });
       } catch (err) {
         console.error("Error syncing activeTheme:", err);
+      } finally {
+        isThemeWritePendingRef.current = false;
       }
+    } else {
+      isThemeWritePendingRef.current = false;
     }
   };
 
