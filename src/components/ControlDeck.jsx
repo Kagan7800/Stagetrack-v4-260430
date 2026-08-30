@@ -441,7 +441,13 @@ export default function ControlDeck() {
                     {isFirebaseUpdating ? 'Generating...' : 'Invite'}
                   </button>
 
-
+                  {/* DOODLING */}
+                  <button 
+                    onClick={() => setIsDoodling(!isDoodling)}
+                    className={isDoodling ? 'active' : ''}
+                  >
+                    Doodling
+                  </button>
 
                   {/* CONFETTI */}
                   <button 

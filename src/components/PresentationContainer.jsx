@@ -42,14 +42,140 @@ export default function PresentationContainer({
 }) {
   const { 
     mediaType: globalMediaType, sessionId, rhythmBeat, curtainsOpen,
-    videoControlState, setVideoControlState, videoTriggerAction, setVideoTriggerAction
+    videoControlState, setVideoControlState, videoTriggerAction, setVideoTriggerAction,
+    isDoodling, drawingPaths, setDrawingPaths, doodleColor, doodleBrushSize
   } = useAppContext();
   const mediaType = propMediaType || globalMediaType;
 
   const videoRef = useRef(null);
+  const canvasRef = useRef(null);
+  const contextRef = useRef(null);
+  const [isDrawing, setIsDrawing] = useState(false);
+  const currentPathRef = useRef(null);
 
   const displayUrl = mediaUrl || '/assets/MF_images/Music_Fun_with_my_Little_One.jpg';
   const displayType = mediaUrl ? mediaType : (mediaType === 'metronome' ? 'metronome' : 'image');
+
+  // Redraw canvas from drawingPaths
+  const redrawCanvas = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    contextRef.current = ctx;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    (drawingPaths || []).forEach(path => {
+      if (!path.points || path.points.length === 0) return;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      if (path.color === 'eraser') {
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.lineWidth = (path.width || 4) * 3;
+      } else {
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.strokeStyle = path.color || '#ff0055';
+        ctx.lineWidth = path.width || 4;
+      }
+      ctx.beginPath();
+      const firstX = path.points[0].x * canvas.width;
+      const firstY = path.points[0].y * canvas.height;
+      ctx.moveTo(firstX, firstY);
+
+      for (let i = 1; i < path.points.length; i++) {
+        const x = path.points[i].x * canvas.width;
+        const y = path.points[i].y * canvas.height;
+        ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      ctx.closePath();
+    });
+  }, [drawingPaths]);
+
+  useEffect(() => {
+    redrawCanvas();
+  }, [drawingPaths, redrawCanvas]);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || !canvas.parentElement) return;
+
+    const resizeCanvas = () => {
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+      redrawCanvas();
+    };
+
+    const observer = new ResizeObserver(() => {
+      resizeCanvas();
+    });
+
+    observer.observe(canvas.parentElement);
+    resizeCanvas();
+
+    return () => observer.disconnect();
+  }, [redrawCanvas]);
+
+  const startDrawing = (e) => {
+    if (!isDoodling || !contextRef.current || !canvasRef.current) return;
+    const { offsetX, offsetY } = e.nativeEvent;
+    const canvas = canvasRef.current;
+    const ctx = contextRef.current;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    const color = doodleColor || '#ff0055';
+    const width = doodleBrushSize || 4;
+
+    if (color === 'eraser') {
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.lineWidth = width * 3;
+    } else {
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.strokeStyle = color;
+      ctx.lineWidth = width;
+    }
+    
+    ctx.beginPath();
+    ctx.moveTo(offsetX, offsetY);
+    
+    const xRatio = canvas.width > 0 ? offsetX / canvas.width : 0;
+    const yRatio = canvas.height > 0 ? offsetY / canvas.height : 0;
+    
+    currentPathRef.current = {
+      points: [{ x: xRatio, y: yRatio }],
+      color,
+      width
+    };
+    
+    setIsDrawing(true);
+  };
+
+  const draw = (e) => {
+    if (!isDrawing || !isDoodling || !contextRef.current || !canvasRef.current) return;
+    const { offsetX, offsetY } = e.nativeEvent;
+    const canvas = canvasRef.current;
+    
+    contextRef.current.lineTo(offsetX, offsetY);
+    contextRef.current.stroke();
+    
+    const xRatio = canvas.width > 0 ? offsetX / canvas.width : 0;
+    const yRatio = canvas.height > 0 ? offsetY / canvas.height : 0;
+    
+    if (currentPathRef.current) {
+      currentPathRef.current.points.push({ x: xRatio, y: yRatio });
+    }
+  };
+
+  const stopDrawing = () => {
+    if (!isDoodling || !contextRef.current) return;
+    contextRef.current.closePath();
+    setIsDrawing(false);
+    
+    if (currentPathRef.current && currentPathRef.current.points.length > 1) {
+      setDrawingPaths(prev => [...(prev || []), currentPathRef.current]);
+    }
+    currentPathRef.current = null;
+  };
 
   // SVG Curtain Transition States
   const [renderedUrl, setRenderedUrl] = useState(displayUrl);
@@ -279,6 +405,25 @@ export default function PresentationContainer({
               )}
             </div>
           )}
+
+          {/* Drawing Canvas Layer */}
+          <canvas
+            ref={canvasRef}
+            className={`doodle-canvas ${isDoodling ? 'active' : ''}`}
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              zIndex: isDoodling ? 30 : 5,
+              pointerEvents: isDoodling ? 'auto' : 'none'
+            }}
+            onMouseDown={startDrawing}
+            onMouseMove={draw}
+            onMouseUp={stopDrawing}
+            onMouseLeave={stopDrawing}
+          />
         </div>
 
         {/* 3. Static Curtain Overlay */}
