@@ -1070,7 +1070,7 @@ body {
   line-height: 1.35;
   outline: none;
   box-sizing: border-box;
-  min-height: 38px;
+  min-height: 54px;
   transition: border-color 0.2s ease;
 }
 

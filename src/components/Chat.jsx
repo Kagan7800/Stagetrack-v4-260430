@@ -30,11 +30,11 @@ export default function Chat({
   const messagesEndRef = useRef(null);
   const messagesContainerRef = useRef(null);
 
-  // Auto-expand textarea upward as message wraps to multiple lines (capped at 120px)
+  // Auto-expand textarea upward as message wraps to multiple lines (min 54px for 2 rows, capped at 120px)
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 120)}px`;
+      textareaRef.current.style.height = `${Math.max(54, Math.min(textareaRef.current.scrollHeight, 120))}px`;
     }
   }, [input]);
 
@@ -157,7 +157,7 @@ export default function Chat({
           </button>
           <textarea
             ref={textareaRef}
-            rows={1}
+            rows={2}
             value={input}
             placeholder="Say something nice..."
             onChange={(e) => setInput(e.target.value)}
