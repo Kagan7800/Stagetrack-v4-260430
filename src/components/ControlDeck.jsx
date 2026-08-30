@@ -350,8 +350,8 @@ export default function ControlDeck() {
               className="cd-close-btn"
               style={{
                 position: 'absolute',
-                right: '12px',
-                top: '2px',
+                right: '6px',
+                top: '5px',
                 transform: 'rotate(-15deg)',
                 background: 'transparent',
                 border: 'none',
@@ -363,9 +363,10 @@ export default function ControlDeck() {
                 transition: 'all 0.2s ease',
                 zIndex: 10,
                 fontFamily: "'Georgia', serif",
-                fontSize: '36px',
+                fontSize: '24px',
                 lineHeight: '1',
-                padding: '4px'
+                padding: '1px',
+                margin: '1px'
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.color = '#ef4444';
@@ -397,8 +398,8 @@ export default function ControlDeck() {
                 className="cd-back-btn"
                 style={{
                   position: 'absolute',
-                  left: '12px',
-                  top: '4px',
+                  left: '6px',
+                  top: '5px',
                   background: 'transparent',
                   border: 'none',
                   display: 'flex',
@@ -407,7 +408,8 @@ export default function ControlDeck() {
                   cursor: 'pointer',
                   transition: 'all 0.2s ease',
                   zIndex: 10,
-                  padding: '4px'
+                  padding: '1px',
+                  margin: '1px'
                 }}
                 onMouseEnter={(e) => {
                   const img = e.currentTarget.querySelector('img');
@@ -424,8 +426,8 @@ export default function ControlDeck() {
                   src="/assets/Lobby/Arrow_no_stroke.svg" 
                   alt="Back" 
                   style={{ 
-                    width: '40px', 
-                    height: '32px', 
+                    width: '26px', 
+                    height: '22px', 
                     transform: 'scaleX(-1)', 
                     transition: 'filter 0.2s ease',
                     objectFit: 'contain'
@@ -901,8 +903,8 @@ export default function ControlDeck() {
                 </button>
               </div>
             ) : showInstructorStickers ? (
-              <div className="controls-row middle-row" style={{ width: '100%', margin: '0', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 0, flex: 1 }}>
-                <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '10px', marginBottom: '5px' }}>
+              <div className="controls-row middle-row" style={{ width: '100%', margin: '0', padding: '5px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 0, flex: 1, boxSizing: 'border-box' }}>
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '6px', marginTop: '2px', marginBottom: '2px', flexWrap: 'wrap' }}>
                   {instructorStickers.map((sticker) => (
                     <button 
                       key={sticker.id}
@@ -915,35 +917,35 @@ export default function ControlDeck() {
                         handleAddSticker(activeGuest.id, sticker.id, true);
                       }}
                       title={activeGuest ? `Reward ${activeGuest.name} with ${sticker.name}` : `Select student to reward with ${sticker.name}`}
-                      style={{ width: 'min(61px, calc(var(--peo-height) - 90px))', height: 'min(61px, calc(var(--peo-height) - 90px))', minWidth: '30px', minHeight: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2px', border: 'none', background: 'transparent' }}
+                      style={{ width: 'clamp(32px, 3.8vw, 44px)', height: 'clamp(32px, 3.8vw, 44px)', minWidth: '28px', minHeight: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1px', margin: '1px', border: 'none', background: 'transparent' }}
                     >
-                      <img src={`/assets/svg_stickers/${sticker.id}`} alt={sticker.name} style={{ width: '80%', height: '80%', objectFit: 'contain' }} />
+                      <img src={`/assets/svg_stickers/${sticker.id}`} alt={sticker.name} style={{ width: '85%', height: '85%', objectFit: 'contain' }} />
                     </button>
                   ))}
                 </div>
                 {activeGuest && (
-                  <span style={{ fontSize: '0.8rem', color: '#10b981', fontWeight: 'bold', marginBottom: '5px' }}>
+                  <span style={{ fontSize: '0.78rem', color: '#10b981', fontWeight: 'bold', margin: '2px 0' }}>
                     Target: {activeGuest.name}
                   </span>
                 )}
               </div>
             ) : (showStudentStickers || isPeoStickersOpen) ? (
-              <div className="controls-row middle-row" style={{ width: '100%', margin: '0', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 0, flex: 1 }}>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, auto)', gap: '8px', justifyContent: 'center', marginTop: '10px', marginBottom: '5px' }}>
+              <div className="controls-row middle-row" style={{ width: '100%', margin: '0', padding: '5px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 0, flex: 1, boxSizing: 'border-box' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(8, auto)', gap: '6px', justifyContent: 'center', marginTop: '2px', marginBottom: '2px' }}>
                   {studentStickers.map((sticker) => (
                     <button 
                       key={sticker.id}
                       className="deck-sticker-btn"
                       onClick={() => handleStickerClick(sticker.id)}
                       title={`Place ${sticker.name} sticker`}
-                      style={{ width: 'min(61px, calc(var(--peo-height) - 90px))', height: 'min(61px, calc(var(--peo-height) - 90px))', minWidth: '30px', minHeight: '30px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2px', border: 'none', background: 'transparent' }}
+                      style={{ width: 'clamp(32px, 3.8vw, 44px)', height: 'clamp(32px, 3.8vw, 44px)', minWidth: '28px', minHeight: '28px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1px', margin: '1px', border: 'none', background: 'transparent' }}
                     >
-                      <img src={`/assets/svg_stickers/${sticker.id}`} alt={sticker.name} style={{ width: '80%', height: '80%', objectFit: 'contain' }} />
+                      <img src={`/assets/svg_stickers/${sticker.id}`} alt={sticker.name} style={{ width: '85%', height: '85%', objectFit: 'contain' }} />
                     </button>
                   ))}
                 </div>
                 {activeGuest && (
-                  <span style={{ fontSize: '0.8rem', color: '#10b981', fontWeight: 'bold', marginBottom: '5px' }}>
+                  <span style={{ fontSize: '0.78rem', color: '#10b981', fontWeight: 'bold', margin: '2px 0' }}>
                     Target: {activeGuest.name}
                   </span>
                 )}

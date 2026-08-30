@@ -5569,7 +5569,7 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.15) !important;
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3) !important;
   color: white;
-  padding: 6px clamp(1rem, 2vw, 2rem) 6px !important;
+  padding: 5px !important;
   border-radius: 12px;
   width: 100%;
   height: auto !important;
@@ -5578,25 +5578,64 @@ body {
   overflow: visible;
   margin-bottom: 0 !important;
   transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1) !important;
+  position: relative;
 }
 
 .studio-controls h2 {
-  margin-bottom: calc(clamp(0.2rem, 0.4vw, 0.35rem) + 2px);
-  letter-spacing: 2px;
+  margin-bottom: 4px;
+  letter-spacing: 1.5px;
   margin-top: 0;
-  font-size: clamp(1rem, 2.5vw, 1.25rem); /* slightly smaller to fit single row height */
+  font-size: clamp(0.9rem, 2vw, 1.15rem);
   text-align: center;
+}
+
+.cd-close-btn {
+  position: absolute;
+  right: 6px;
+  top: 5px;
+  transform: rotate(-15deg);
+  background: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: white;
+  transition: all 0.2s ease;
+  z-index: 10;
+  font-family: 'Georgia', serif !important;
+  font-size: 26px;
+  line-height: 1;
+  padding: 1px !important;
+  margin: 1px !important;
+}
+
+.cd-back-btn {
+  position: absolute;
+  left: 6px;
+  top: 5px;
+  background: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 10;
+  padding: 1px !important;
+  margin: 1px !important;
 }
 
 .controls-row {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: clamp(0.2rem, 0.5vw, 0.5rem);
-  margin: clamp(0.05rem, 0.15vw, 0.1rem) 0;
+  gap: clamp(4px, 0.6vw, 8px);
+  margin: 2px 0;
   flex-wrap: nowrap;
   width: 100%;
-  padding-right: 20px;
+  padding-left: 32px;
+  padding-right: 32px;
   box-sizing: border-box;
 }
 
@@ -5606,14 +5645,15 @@ body {
   font-weight: bold;
   font-family: 'Georgia', serif !important;
   border: none;
-  border-radius: 8px;
-  padding: clamp(0.2rem, 0.35vw, 0.35rem) clamp(0.2rem, 0.45vw, 0.5rem);
+  border-radius: 6px;
+  padding: clamp(3px, 0.4vw, 5px) clamp(5px, 0.7vw, 10px);
   cursor: pointer;
   transition: all 0.25s ease;
-  font-size: clamp(0.6rem, 0.82vw, 0.76rem);
+  font-size: clamp(0.68rem, 0.8vw, 0.78rem);
   letter-spacing: 0.02em;
-  word-spacing: 0.05em;
-  flex: 1 1 auto;
+  word-spacing: 0.04em;
+  flex: 0 1 auto;
+  min-width: 0;
   display: flex;
   align-items: center;
   justify-content: center;
