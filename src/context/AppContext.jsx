@@ -96,6 +96,8 @@ export function AppProvider({ children }) {
   const [activeCdTab, setActiveCdTab] = useState(null);
   const [isCountingDropdownOpen, setIsCountingDropdownOpen] = useState(false);
   const [isMakeMusicDropdownOpen, setIsMakeMusicDropdownOpen] = useState(false);
+  const lastCurtainsWriteTimeRef = useRef(0);
+  const isCurtainsWritePendingRef = useRef(false);
 
   // 1.5. INITIALIZE FIRESTORE SESSION DOCUMENT ON MOUNT FOR INSTRUCTOR (Preserves active session states on reload)
   useEffect(() => {
@@ -302,7 +304,12 @@ export function AppProvider({ children }) {
       if (data.mediaType !== undefined) setMediaType(data.mediaType);
       if (data.isDoodling !== undefined) setIsDoodling(data.isDoodling);
       if (data.drawingPaths !== undefined) setDrawingPaths(data.drawingPaths);
-      if (data.curtainsOpen !== undefined) setCurtainsOpen(data.curtainsOpen);
+      if (data.curtainsOpen !== undefined) {
+        const isRecentLocalWrite = isCurtainsWritePendingRef.current || (Date.now() - lastCurtainsWriteTimeRef.current < 2500);
+        if (!isRecentLocalWrite || (data.curtainsUpdatedAt && data.curtainsUpdatedAt >= lastCurtainsWriteTimeRef.current)) {
+          setCurtainsOpen(data.curtainsOpen);
+        }
+      }
       if (data.globalMute !== undefined) setGlobalMute(data.globalMute);
       if (data.globalPause !== undefined) setGlobalPause(data.globalPause);
       if (data.activeTheme !== undefined) setActiveTheme(data.activeTheme);
@@ -807,14 +814,23 @@ export function AppProvider({ children }) {
   };
 
   const handleSetCurtainsOpen = async (val) => {
+    lastCurtainsWriteTimeRef.current = Date.now();
+    isCurtainsWritePendingRef.current = true;
     setCurtainsOpen(val);
     if (sessionId) {
       try {
         const sessionRef = doc(db, "sessions", sessionId);
-        await updateDoc(sessionRef, { curtainsOpen: val });
+        await updateDoc(sessionRef, { 
+          curtainsOpen: val,
+          curtainsUpdatedAt: Date.now()
+        });
       } catch (err) {
         console.error("Error syncing curtainsOpen:", err);
+      } finally {
+        isCurtainsWritePendingRef.current = false;
       }
+    } else {
+      isCurtainsWritePendingRef.current = false;
     }
   };
 
