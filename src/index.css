@@ -193,7 +193,7 @@ body {
 }
 
 .center-grid-area[data-right-open="true"] {
-  padding-right: 188px;
+  padding-right: 0px;
 }
 
 .center-grid-area.sidebars-open .side-peos {
@@ -5577,11 +5577,12 @@ body {
 .controls-row {
   display: flex;
   justify-content: center;
-  gap: clamp(0.4rem, 0.95vw, 0.8rem);
+  align-items: center;
+  gap: clamp(0.2rem, 0.5vw, 0.5rem);
   margin: clamp(0.05rem, 0.15vw, 0.1rem) 0;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   width: 100%;
-  padding-right: 16px;
+  padding-right: 20px;
   box-sizing: border-box;
 }
 
@@ -5592,10 +5593,10 @@ body {
   font-family: 'Georgia', serif !important;
   border: none;
   border-radius: 8px;
-  padding: clamp(0.35rem, 0.5vw, 0.55rem) clamp(0.3rem, 0.8vw, 0.8rem);
+  padding: clamp(0.2rem, 0.35vw, 0.35rem) clamp(0.2rem, 0.45vw, 0.5rem);
   cursor: pointer;
   transition: all 0.25s ease;
-  font-size: clamp(0.65rem, 1.15vw, 0.85rem);
+  font-size: clamp(0.6rem, 0.82vw, 0.76rem);
   letter-spacing: 0.02em;
   word-spacing: 0.05em;
   flex: 1 1 auto;
