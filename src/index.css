@@ -860,6 +860,7 @@ body {
   opacity: 1;
   height: 100%;
   box-sizing: border-box;
+  margin-left: 10px;
   transition: width 0.32s ease, opacity 0.25s ease, border-width 0.32s ease, margin 0.32s ease, padding 0.32s ease;
   position: relative;
   z-index: 50;
@@ -872,6 +873,8 @@ body {
   max-width: 0 !important;
   opacity: 0 !important;
   border-width: 0 !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
   margin: 0 !important;
   padding: 0 !important;
   pointer-events: none !important;

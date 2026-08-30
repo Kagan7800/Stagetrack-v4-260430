@@ -546,7 +546,6 @@ export default function ControlDeck() {
                   <button
                     onClick={() => {
                       setMediaUpload('/assets/MF_images/Music_Fun_with_my_Little_One.jpg', 'image');
-                      setActiveCdTab(null);
                     }}
                     style={{ background: mediaUrl === '/assets/MF_images/Music_Fun_with_my_Little_One.jpg' ? 'rgba(255, 230, 0, 0.25)' : undefined }}
                   >
@@ -555,7 +554,6 @@ export default function ControlDeck() {
                   <button
                     onClick={() => {
                       setMediaUpload('/assets/MF_images/banjo.mp4', 'video');
-                      setActiveCdTab(null);
                     }}
                     style={{ background: mediaUrl === '/assets/MF_images/banjo.mp4' ? 'rgba(255, 230, 0, 0.25)' : undefined }}
                   >
@@ -576,7 +574,6 @@ export default function ControlDeck() {
                   <button
                     onClick={() => {
                       setMediaUpload('/assets/Activities/Class_all/goodbye.jpg', 'image');
-                      setActiveCdTab(null);
                     }}
                     style={{ background: mediaUrl === '/assets/Activities/Class_all/goodbye.jpg' ? 'rgba(255, 230, 0, 0.25)' : undefined }}
                   >
@@ -589,7 +586,6 @@ export default function ControlDeck() {
                     <button
                       onClick={() => {
                         setMediaUpload('/assets/Activities/1,2,3,4_wheel.html?mode=spacebar', 'iframe');
-                        setActiveCdTab(null);
                       }}
                     >
                       Spacebar Mode
@@ -597,7 +593,6 @@ export default function ControlDeck() {
                     <button
                       onClick={() => {
                         setMediaUpload(`/assets/Activities/1,2,3,4_wheel.html?mode=bpm&bpm=${bpmValue}`, 'iframe');
-                        setActiveCdTab(null);
                       }}
                     >
                       BPM Mode
@@ -638,7 +633,6 @@ export default function ControlDeck() {
                     <button
                       onClick={() => {
                         setMediaUpload('/assets/class_1/household_Items.png', 'image');
-                        setActiveCdTab(null);
                       }}
                     >
                       Household Items
@@ -646,7 +640,6 @@ export default function ControlDeck() {
                     <button
                       onClick={() => {
                         setMediaUpload('/assets/Activities/1,2,3,4_click.html', 'iframe');
-                        setActiveCdTab(null);
                       }}
                     >
                       Interactive Game
@@ -659,7 +652,6 @@ export default function ControlDeck() {
                 <button 
                   onClick={() => {
                     fileInputRef.current?.click();
-                    setActiveCdTab(null);
                   }}
                 >
                   Local Computer
@@ -674,7 +666,6 @@ export default function ControlDeck() {
                 <button 
                   onClick={() => {
                     handleDriveUpload();
-                    setActiveCdTab(null);
                   }}
                 >
                   Google Drive
@@ -683,7 +674,6 @@ export default function ControlDeck() {
                   <button 
                     onClick={() => {
                       clearMedia();
-                      setActiveCdTab(null);
                     }}
                     style={{ background: 'rgba(239, 68, 68, 0.2)', border: '1px solid rgba(239, 68, 68, 0.4)', color: 'white' }}
                   >
@@ -698,7 +688,6 @@ export default function ControlDeck() {
                     key={act.filename}
                     onClick={() => {
                       setMediaUpload(`/assets/Activities/${act.filename}?v=${Date.now()}`, 'iframe');
-                      setActiveCdTab(null);
                     }}
                   >
                     {act.name}
