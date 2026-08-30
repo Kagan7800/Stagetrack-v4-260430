@@ -1,18 +1,56 @@
 /* eslint-disable react-refresh/only-export-components */
 // src/context/AppContext.jsx
 
-import { createContext, useContext, useState, useEffect, useRef } from 'react';
+import { createContext, useContext, useState, useEffect, useRef, useMemo } from 'react';
 import { db } from '../firebase';
 import { doc, onSnapshot, updateDoc, arrayUnion, setDoc, getDoc } from 'firebase/firestore';
 
 export const AppContext = createContext(null);
 
+const getInitialAuth = () => {
+  if (typeof window === 'undefined') {
+    return { sessionId: 'session-hm898y4nq', isJoined: true, lobbyStatus: 'approved', role: 'instructor', activeGuestId: null };
+  }
+  const urlParams = new URLSearchParams(window.location.search);
+  const paramSession = urlParams.get('session') || 'session-hm898y4nq';
+  const roleParam = urlParams.get('role');
+  const savedRole = sessionStorage.getItem('stagetrack_role');
+  const isStudent = savedRole === 'student' || 
+                    roleParam === 'guest' || 
+                    roleParam === 'student' || 
+                    (!savedRole && roleParam !== 'instructor');
+
+  if (isStudent) {
+    sessionStorage.setItem('stagetrack_role', 'student');
+    const savedSession = sessionStorage.getItem('stagetrack_session_id');
+    if (paramSession !== savedSession) {
+      sessionStorage.removeItem('stagetrack_lobby_response');
+      sessionStorage.removeItem('stagetrack_active_guest_id');
+      sessionStorage.setItem('stagetrack_session_id', paramSession);
+    }
+    const savedRes = sessionStorage.getItem('stagetrack_lobby_response');
+    if (savedRes) {
+      try {
+        const parsed = JSON.parse(savedRes);
+        if ((parsed.status === 'approved' || parsed.status === 'accepted') && parsed.joinedUser) {
+          return { sessionId: paramSession, isJoined: true, lobbyStatus: 'approved', role: 'student', activeGuestId: parsed.joinedUser.id };
+        }
+      } catch { /* ignore parse error */ }
+    }
+    return { sessionId: paramSession, isJoined: false, lobbyStatus: 'initial', role: 'student', activeGuestId: null };
+  } else {
+    sessionStorage.setItem('stagetrack_role', 'instructor');
+    return { sessionId: paramSession, isJoined: true, lobbyStatus: 'approved', role: 'instructor', activeGuestId: null };
+  }
+};
+
 export function AppProvider({ children }) {
-  // Session & User Identifiers
-  const [sessionId, setSessionId] = useState(null);
-  const [isJoined, setIsJoined] = useState(false);
-  const [lobbyStatus, setLobbyStatus] = useState('initial'); // 'initial' | 'pending' | 'approved' | 'rejected'
-  const [activeGuestId, setActiveGuestId] = useState(null);
+  // Session & User Identifiers (Synchronous initialization to prevent blue lobby screen flash)
+  const initialAuth = useMemo(() => getInitialAuth(), []);
+  const [sessionId, setSessionId] = useState(initialAuth.sessionId);
+  const [isJoined, setIsJoined] = useState(initialAuth.isJoined);
+  const [lobbyStatus, setLobbyStatus] = useState(initialAuth.lobbyStatus);
+  const [activeGuestId, setActiveGuestId] = useState(initialAuth.activeGuestId);
   const [pendingRequest, setPendingRequest] = useState(null);
   const [gcUsers, setGcUsers] = useState([]);
 
@@ -58,59 +96,6 @@ export function AppProvider({ children }) {
   const [activeCdTab, setActiveCdTab] = useState(null);
   const [isCountingDropdownOpen, setIsCountingDropdownOpen] = useState(false);
   const [isMakeMusicDropdownOpen, setIsMakeMusicDropdownOpen] = useState(false);
-
-  // 1. EXTRACT SESSION ID & ENFORCE LOBBY STOPPER ON MOUNT
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const paramSession = urlParams.get('session') || 'session-hm898y4nq';
-    const roleParam = urlParams.get('role');
-
-    const savedRole = sessionStorage.getItem('stagetrack_role');
-    const isStudent = savedRole === 'student' || 
-                      roleParam === 'guest' || 
-                      roleParam === 'student' ||
-                      (!savedRole && roleParam !== 'instructor');
-    
-    const timer = setTimeout(() => {
-      setSessionId(paramSession);
-
-      if (isStudent) {
-        sessionStorage.setItem('stagetrack_role', 'student');
-
-        // Check if session changed from saved session
-        const savedSession = sessionStorage.getItem('stagetrack_session_id');
-        if (paramSession !== savedSession) {
-          sessionStorage.removeItem('stagetrack_lobby_response');
-          sessionStorage.removeItem('stagetrack_active_guest_id');
-          sessionStorage.setItem('stagetrack_session_id', paramSession);
-        }
-
-        // STRICT CHECK: Guest ONLY enters if explicitly approved in sessionStorage
-        const savedRes = sessionStorage.getItem('stagetrack_lobby_response');
-        if (savedRes) {
-          try {
-            const parsed = JSON.parse(savedRes);
-            if ((parsed.status === 'approved' || parsed.status === 'accepted') && parsed.joinedUser) {
-              setIsJoined(true);
-              setLobbyStatus('approved');
-              setActiveGuestId(parsed.joinedUser.id);
-              return;
-            }
-          } catch { /* ignore parse error */ }
-        }
-
-        // IF NOT APPROVED -> FORCE GUEST TO STAY IN LOBBY OVERLAY
-        setIsJoined(false);
-        setLobbyStatus('initial');
-      } else {
-        // Instructor client is joined automatically
-        setIsJoined(true);
-        sessionStorage.setItem('stagetrack_role', 'instructor');
-      }
-    }, 0);
-
-    return () => clearTimeout(timer);
-  }, []);
 
   // 1.5. INITIALIZE FIRESTORE SESSION DOCUMENT ON MOUNT FOR INSTRUCTOR (Preserves active session states on reload)
   useEffect(() => {
