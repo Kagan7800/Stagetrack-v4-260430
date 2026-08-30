@@ -748,14 +748,14 @@ export default function ControlDeck() {
 
                 <div style={{ width: '1px', height: '18px', background: 'var(--glass-border)' }} />
 
-                <span style={{ fontSize: '0.85rem', color: stageTimer.isRunning ? '#22c55e' : stageTimer.duration > 0 ? '#fbbf24' : '#94a3b8', fontWeight: 'bold', whiteSpace: 'nowrap' }}>
-                  {stageTimer.isRunning ? 'Running' : stageTimer.duration > 0 ? 'Paused' : 'Off'}
+                <span style={{ fontSize: '0.85rem', color: stageTimer?.isRunning ? '#22c55e' : (stageTimer?.duration > 0) ? '#fbbf24' : '#94a3b8', fontWeight: 'bold', whiteSpace: 'nowrap' }}>
+                  {stageTimer?.isRunning ? 'Running' : (stageTimer?.duration > 0) ? 'Paused' : 'Off'}
                 </span>
 
-                {stageTimer.isRunning ? (
+                {stageTimer?.isRunning ? (
                   <button
                     onClick={() => {
-                      const remaining = Math.max(0, Math.round((stageTimer.endTime - Date.now()) / 1000));
+                      const remaining = Math.max(0, Math.round(((stageTimer?.endTime || Date.now()) - Date.now()) / 1000));
                       setStageTimer({ ...stageTimer, duration: remaining, isRunning: false });
                     }}
                     style={{ background: '#fbbf24', color: '#000000' }}
@@ -763,10 +763,10 @@ export default function ControlDeck() {
                     Pause
                   </button>
                 ) : (
-                  stageTimer.duration > 0 && (
+                  (stageTimer?.duration > 0) && (
                     <button
                       onClick={() => {
-                        const endTime = Date.now() + stageTimer.duration * 1000;
+                        const endTime = Date.now() + (stageTimer?.duration || 0) * 1000;
                         setStageTimer({ ...stageTimer, endTime, isRunning: true });
                       }}
                       style={{ background: '#22c55e', color: 'white' }}
@@ -776,7 +776,7 @@ export default function ControlDeck() {
                   )
                 )}
 
-                {(stageTimer.isRunning || stageTimer.duration > 0) && (
+                {(stageTimer?.isRunning || (stageTimer?.duration > 0)) && (
                   <button
                     onClick={() => {
                       setStageTimer({ endTime: null, duration: 0, isRunning: false });
