@@ -15,10 +15,9 @@ const getInitialAuth = () => {
   const paramSession = urlParams.get('session') || 'session-hm898y4nq';
   const roleParam = urlParams.get('role');
   const savedRole = sessionStorage.getItem('stagetrack_role');
-  const isStudent = savedRole === 'student' || 
+  const isStudent = (savedRole === 'student' && roleParam !== 'instructor') || 
                     roleParam === 'guest' || 
-                    roleParam === 'student' || 
-                    (!savedRole && roleParam !== 'instructor');
+                    roleParam === 'student';
 
   if (isStudent) {
     sessionStorage.setItem('stagetrack_role', 'student');

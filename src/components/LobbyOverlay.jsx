@@ -424,16 +424,16 @@ export default function LobbyOverlay() {
               <div className="lobby-stickers-container">
                 {STO_STICKERS.map((sticker) => (
                   <button
-                    key={sticker}
+                    key={sticker.id}
                     type="button"
-                    className={`lobby-sticker-swatch ${selectedIcon === sticker ? 'selected' : ''}`}
-                    onClick={() => setSelectedIcon(sticker)}
-                    title={`Select ${sticker.replace('.svg', '')}`}
+                    className={`lobby-sticker-swatch ${selectedIcon === sticker.id ? 'selected' : ''}`}
+                    onClick={() => setSelectedIcon(sticker.id)}
+                    title={`Select ${sticker.name}`}
                   >
                     <img 
-                      src={`/assets/svg_stickers/${sticker}`} 
+                      src={`/assets/svg_stickers/${sticker.id}`} 
                       className="lobby-sticker-swatch-img" 
-                      alt={sticker} 
+                      alt={sticker.name} 
                     />
                   </button>
                 ))}
