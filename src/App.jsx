@@ -24,11 +24,8 @@ function StageTimerDisplay({ stageTimer, setStageTimer, isInstructorClient }) {
   useEffect(() => {
     if (!stageTimer) return;
     if (!stageTimer.isRunning) {
-      const duration = stageTimer.duration || 0;
-      const timer = setTimeout(() => {
-        setTimeLeft(prev => prev === duration ? prev : duration);
-      }, 0);
-      return () => clearTimeout(timer);
+      setTimeLeft(stageTimer.duration || 0);
+      return;
     }
 
     const updateTimer = () => {

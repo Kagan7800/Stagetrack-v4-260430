@@ -104,6 +104,8 @@ export function AppProvider({ children }) {
   const isMediaWritePendingRef = useRef(false);
   const lastThemeWriteTimeRef = useRef(0);
   const isThemeWritePendingRef = useRef(false);
+  const lastTimerWriteTimeRef = useRef(0);
+  const isTimerWritePendingRef = useRef(false);
 
   // 1.5. INITIALIZE FIRESTORE SESSION DOCUMENT ON MOUNT FOR INSTRUCTOR (Preserves active session states on reload)
   useEffect(() => {
@@ -334,7 +336,12 @@ export function AppProvider({ children }) {
           setActiveTheme(data.activeTheme);
         }
       }
-      if (data.stageTimer !== undefined) setStageTimer(data.stageTimer);
+      if (data.stageTimer !== undefined) {
+        const isRecentTimerWrite = isTimerWritePendingRef.current || (Date.now() - lastTimerWriteTimeRef.current < 2500);
+        if (!isRecentTimerWrite || (data.timerUpdatedAt && data.timerUpdatedAt >= lastTimerWriteTimeRef.current)) {
+          setStageTimer(data.stageTimer);
+        }
+      }
       if (data.guestStickers !== undefined) setGuestStickers(data.guestStickers);
       if (data.guestButtons !== undefined) setGuestButtons(data.guestButtons);
       if (data.isChatOpen !== undefined) {
@@ -906,14 +913,23 @@ export function AppProvider({ children }) {
   };
 
   const handleSetStageTimer = async (val) => {
+    lastTimerWriteTimeRef.current = Date.now();
+    isTimerWritePendingRef.current = true;
     setStageTimer(val);
     if (sessionId) {
       try {
         const sessionRef = doc(db, "sessions", sessionId);
-        await updateDoc(sessionRef, { stageTimer: val });
+        await updateDoc(sessionRef, { 
+          stageTimer: val,
+          timerUpdatedAt: Date.now()
+        });
       } catch (err) {
         console.error("Error syncing stageTimer:", err);
+      } finally {
+        isTimerWritePendingRef.current = false;
       }
+    } else {
+      isTimerWritePendingRef.current = false;
     }
   };
 
