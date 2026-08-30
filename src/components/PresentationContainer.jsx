@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, useCallback } from 'react';
+import { useRef, useEffect } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { syncWheelBeatToFirebase } from '../firebase';
 
@@ -37,12 +37,13 @@ export function CentralStageDeck({ mediaUrl, onClick }) {
 }
 
 export default function PresentationContainer({ 
+  isDoodling,
   mediaUrl, 
   mediaType: propMediaType
 }) {
   const { 
     mediaType: globalMediaType, sessionId, rhythmBeat, curtainsOpen,
-    videoControlState, setVideoControlState, videoTriggerAction, setVideoTriggerAction
+    setVideoControlState, videoTriggerAction, setVideoTriggerAction
   } = useAppContext();
   const mediaType = propMediaType || globalMediaType;
 

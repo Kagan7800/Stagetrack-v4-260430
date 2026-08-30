@@ -4,10 +4,10 @@
 
 import { useMemo } from 'react';
 import { useAppContext } from '../context/AppContext';
-import { X, UserCheck, Sparkles, Smile } from 'lucide-react';
+import { X, UserCheck, Smile } from 'lucide-react';
 import './RoomVibeWidget.css';
 
-export const VIBE_DEFINITIONS = [
+const VIBE_DEFINITIONS = [
   { id: 'high_energy', emoji: '⚡', line1: 'High', line2: 'Energy', label: '⚡ High Energy', color: '#f97316', bg: 'rgba(249, 115, 22, 0.15)', border: 'rgba(249, 115, 22, 0.35)' },
   { id: 'low_energy', emoji: '🔋', line1: 'Tired /', line2: 'Low', label: '🔋 Tired / Low', color: '#a855f7', bg: 'rgba(168, 85, 247, 0.15)', border: 'rgba(168, 85, 247, 0.35)' },
   { id: 'gentle_warmup', emoji: '🥺', line1: 'Needing', line2: 'Warm-Up', label: '🥺 Needing Warm-Up', color: '#3b82f6', bg: 'rgba(59, 130, 246, 0.15)', border: 'rgba(59, 130, 246, 0.35)' },

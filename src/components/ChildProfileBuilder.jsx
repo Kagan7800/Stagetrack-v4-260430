@@ -3,12 +3,11 @@
 // Single-column mobile-first form → Gemini AI generates profile →
 // delivered by Email + SMS (no on-screen output) → Success screen.
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback } from 'react';
 import {
   Sparkles, ArrowLeft, Heart, Flame, ShieldAlert,
   Users, Smile, Award, Check, ShieldCheck
 } from 'lucide-react';
-import { useAppContext } from '../context/AppContext';
 import './ChildProfileBuilder.css';
 
 // ─────────────────────────────────────────────────────────────
@@ -140,13 +139,6 @@ function validate(state) {
 // MAIN COMPONENT
 // ─────────────────────────────────────────────────────────────
 export default function ChildProfileBuilder({ onClose, standalone = false }) {
-  // Try to use AppContext — gracefully degrade if used standalone without provider
-  let handleSendChatMessage = () => {};
-  try {
-    const ctx = useAppContext();
-    handleSendChatMessage = ctx.handleSendChatMessage || (() => {});
-  } catch (_) { /* running standalone without AppProvider */ }
-
   // ── Form state ─────────────────────────────────────────────
   const [childName, setChildName]     = useState('');
   const [age, setAge]                 = useState('');
@@ -306,7 +298,6 @@ export default function ChildProfileBuilder({ onClose, standalone = false }) {
   // ─────────────────────────────────────────────────────────
   // RENDER HELPERS
   // ─────────────────────────────────────────────────────────
-  const Wrapper = standalone ? 'div' : 'div';
   const wrapperClass = standalone ? 'cpb-page' : 'cpb-container';
 
   // ─────────────────────────────────────────────────────────

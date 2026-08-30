@@ -1,6 +1,4 @@
-import { useState } from 'react';
 import { useAppContext } from '../context/AppContext';
-import { ChevronDown, ChevronUp } from 'lucide-react';
 
 export default function InstructorToolbox() {
   const {
@@ -11,9 +9,7 @@ export default function InstructorToolbox() {
     setShowStudentFilters,
     activeTheme,
     setActiveToolbox,
-    setIsPeoStickersOpen,
-    setMediaUpload,
-    mediaUrl
+    setIsPeoStickersOpen
   } = useAppContext();
 
   const isInstructorClient = sessionStorage.getItem('stagetrack_role') !== 'student';
@@ -31,51 +27,6 @@ export default function InstructorToolbox() {
     setShowStudentFilters(false);
     setShowInstructorStickers(false);
     setIsPeoStickersOpen(false);
-  };
-
-  const [isClassDropdownOpen, setIsClassDropdownOpen] = useState(false);
-  const [isMakeMusicDropdownOpen, setIsMakeMusicDropdownOpen] = useState(false);
-  const [isCountingDropdownOpen, setIsCountingDropdownOpen] = useState(false);
-  const [bpmValue, setBpmValue] = useState(() => {
-    const saved = sessionStorage.getItem('last_counting_bpm');
-    return saved ? parseInt(saved) : 60;
-  });
-
-  const dropdownItemStyle = {
-    background: 'transparent',
-    border: 'none',
-    color: 'rgba(255, 255, 255, 0.8)',
-    fontSize: '0.85rem',
-    textAlign: 'left',
-    padding: '6px 8px',
-    cursor: 'pointer',
-    borderRadius: '4px',
-    transition: 'all 0.2s ease',
-    width: '100%',
-    fontFamily: 'inherit',
-    boxSizing: 'border-box'
-  };
-
-  const getDropdownItemStyle = (isActive) => {
-    return {
-      ...dropdownItemStyle,
-      color: isActive ? '#ffe600' : 'rgba(255, 255, 255, 0.8)',
-      fontWeight: isActive ? 'bold' : 'normal'
-    };
-  };
-
-  const handleItemMouseEnter = (e) => {
-    const isActive = e.currentTarget.getAttribute('data-active') === 'true';
-    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
-    e.currentTarget.style.color = isActive ? '#ffe600' : '#ffffff';
-    e.currentTarget.style.paddingLeft = '12px';
-  };
-
-  const handleItemMouseLeave = (e) => {
-    const isActive = e.currentTarget.getAttribute('data-active') === 'true';
-    e.currentTarget.style.background = 'transparent';
-    e.currentTarget.style.color = isActive ? '#ffe600' : 'rgba(255, 255, 255, 0.8)';
-    e.currentTarget.style.paddingLeft = '8px';
   };
 
   if (!isInstructorClient) return null;
