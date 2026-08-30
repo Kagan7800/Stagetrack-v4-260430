@@ -321,7 +321,15 @@ export function AppProvider({ children }) {
       if (data.stageTimer !== undefined) setStageTimer(data.stageTimer);
       if (data.guestStickers !== undefined) setGuestStickers(data.guestStickers);
       if (data.guestButtons !== undefined) setGuestButtons(data.guestButtons);
-      if (data.messages !== undefined) setMessages(data.messages);
+      if (data.messages !== undefined && Array.isArray(data.messages)) {
+        setMessages(prev => {
+          const firestoreMsgs = data.messages || [];
+          const firestoreIds = new Set(firestoreMsgs.map(m => m.id));
+          // Keep local recent messages not yet reflected in Firestore
+          const localRecent = (prev || []).filter(m => m && m.id && !firestoreIds.has(m.id) && (Date.now() - (m.timestamp || 0) < 60000));
+          return [...firestoreMsgs, ...localRecent];
+        });
+      }
     });
 
     return () => unsubscribe();
@@ -612,25 +620,34 @@ export function AppProvider({ children }) {
   };
 
   const handleSendChatMessage = async (text) => {
-    if (!sessionId) return;
-    try {
-      const sessionRef = doc(db, "sessions", sessionId);
-      const isInstructor = sessionStorage.getItem('stagetrack_role') === 'instructor';
-      const sender = isInstructor ? 'self' : 'other';
-      const senderName = isInstructor ? 'Instructor' : (participants.find(p => p.id === activeGuestId)?.name || 'Guest');
-      const newMsg = {
-        id: crypto.randomUUID(),
-        text,
-        sender,
-        senderName,
-        status: 'public',
-        timestamp: Date.now()
-      };
-      await updateDoc(sessionRef, {
-        messages: arrayUnion(newMsg)
-      });
-    } catch (err) {
-      console.error("Error sending chat message:", err);
+    if (!text || !text.trim()) return;
+    const isInstructor = sessionStorage.getItem('stagetrack_role') === 'instructor';
+    const sender = isInstructor ? 'self' : 'other';
+    const senderRole = isInstructor ? 'instructor' : 'guest';
+    const senderName = isInstructor ? 'Instructor' : (participants.find(p => p.id === activeGuestId)?.name || 'Guest');
+    const newMsg = {
+      id: `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+      text: text.trim(),
+      sender,
+      senderRole,
+      senderName,
+      status: 'public',
+      timestamp: Date.now()
+    };
+
+    // 1. Immediately update local state so the message stays visible and does not disappear
+    setMessages(prev => [...(prev || []), newMsg]);
+
+    // 2. Persist to Firestore session with merge
+    if (sessionId) {
+      try {
+        const sessionRef = doc(db, "sessions", sessionId);
+        await setDoc(sessionRef, {
+          messages: arrayUnion(newMsg)
+        }, { merge: true });
+      } catch (err) {
+        console.error("Error sending chat message:", err);
+      }
     }
   };
 

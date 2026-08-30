@@ -169,6 +169,7 @@ body {
   flex-direction: column;
   flex-shrink: 0; /* Prevent squishing and layout cutoff */
   height: calc(100% + 20px) !important;
+  max-height: calc(100% + 20px) !important;
   margin-top: -10px;
   margin-bottom: -10px;
   margin-right: -10px; /* Sit flush with right screen edge */
@@ -176,6 +177,7 @@ body {
   position: absolute;
   right: 0;
   z-index: 100;
+  overflow: hidden;
 }
 
 .right-sidebar::before {
@@ -868,24 +870,61 @@ body {
   display: flex;
   flex-direction: column;
   height: 100%;
+  max-height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.chat-sidebar {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-height: 100%;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .chat-container {
   flex: 1;
   display: flex;
   flex-direction: column;
+  min-height: 0;
+  max-height: 100%;
+  overflow: hidden;
   padding: 12px 12px 28px 12px !important;
   box-sizing: border-box;
 }
 
 .chat-messages {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
+  overflow-x: hidden;
   margin-bottom: 12px;
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding-right: 4px;
+  padding-right: 6px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.3) rgba(255, 255, 255, 0.05);
+}
+
+.chat-messages::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chat-messages::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+}
+
+.chat-messages::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
 }
 
 .chat-input-wrapper {

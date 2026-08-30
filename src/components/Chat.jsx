@@ -8,6 +8,7 @@ export default function Chat({ messages = [], onSendMessage, onModerate, onClose
   const [input, setInput] = useState("");
   const timerRef = useRef(null);
   const textareaRef = useRef(null);
+  const messagesEndRef = useRef(null);
 
   const resetInactivityTimer = useCallback(() => {
     if (timerRef.current) clearTimeout(timerRef.current);
@@ -30,6 +31,13 @@ export default function Chat({ messages = [], onSendMessage, onModerate, onClose
       textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 120)}px`;
     }
   }, [input]);
+
+  // Auto-scroll to newest message
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages]);
 
   const handleSend = (e) => {
     if (e) e.preventDefault();
@@ -56,7 +64,7 @@ export default function Chat({ messages = [], onSendMessage, onModerate, onClose
       onMouseMove={resetInactivityTimer}
       onKeyDown={resetInactivityTimer}
       onClick={resetInactivityTimer}
-      style={{ position: 'relative', height: '100%', display: 'flex', flexDirection: 'column', background: 'transparent' }}
+      style={{ position: 'relative', height: '100%', minHeight: 0, maxHeight: '100%', display: 'flex', flexDirection: 'column', background: 'transparent', overflow: 'hidden' }}
     >
       <div className="chat-header" style={{ position: 'relative', display: 'flex', alignItems: 'center', minHeight: '52px', boxSizing: 'border-box', borderBottom: '1px solid var(--glass-border)', padding: '12px 16px' }}>
         <button 
@@ -103,8 +111,8 @@ export default function Chat({ messages = [], onSendMessage, onModerate, onClose
       
       <div className="chat-container">
         <div className="chat-messages">
-          {messages.filter(m => m.status !== 'ignored').map(msg => (
-            <div key={msg.id} className="chat-message-wrapper">
+          {messages.filter(m => m && m.status !== 'ignored').map((msg, idx) => (
+            <div key={msg.id || idx} className="chat-message-wrapper">
               <div className={`chat-message ${msg.sender === 'system' ? 'system' : msg.sender === 'self' ? 'self' : 'other'} ${msg.status || ''}`}>
                 {msg.senderName && (
                   <span className="chat-sender-name">
@@ -134,6 +142,7 @@ export default function Chat({ messages = [], onSendMessage, onModerate, onClose
               )}
             </div>
           ))}
+          <div ref={messagesEndRef} />
         </div>
         
         <form className="chat-input-wrapper" onSubmit={handleSend} style={{ marginBottom: '10px' }}>
