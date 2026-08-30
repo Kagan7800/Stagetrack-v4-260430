@@ -598,14 +598,14 @@ function App() {
                      })}
                    </div>
 
-                    <div className="center-wrapper" style={{ position: 'relative', alignSelf: 'flex-start' }}>
+                    <div className="center-wrapper" style={{ position: 'relative', alignSelf: 'center', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                       <div style={{ 
                         display: 'flex', 
                         flexDirection: 'column', 
                         width: 'fit-content', 
                         alignItems: 'center', 
-                        height: '100%', 
-                        justifyContent: 'space-between'
+                        justifyContent: 'center',
+                        gap: '10px'
                       }}>
                        <div className={`pc-width-keeper ${isChatOpen ? 'pc-sidebar-open' : ''}`}>
                           <div 
