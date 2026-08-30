@@ -1111,6 +1111,25 @@ body {
   color: #fff;
 }
 
+/* SOR Theme: Replace all blue with red in Live Chat */
+.theme-sor .chat-header,
+.chat-panel-inner.theme-sor .chat-header,
+.chat-panel-inner[data-theme="sor"] .chat-header {
+  background: linear-gradient(90deg, #7f1d1d, #dc2626) !important;
+}
+
+.theme-sor .chat-composer .send-btn,
+.chat-panel-inner.theme-sor .chat-composer .send-btn,
+.chat-panel-inner[data-theme="sor"] .chat-composer .send-btn {
+  background: linear-gradient(90deg, #7f1d1d, #dc2626) !important;
+}
+
+.theme-sor .composer-row textarea:focus,
+.chat-panel-inner.theme-sor .composer-row textarea:focus,
+.chat-panel-inner[data-theme="sor"] .composer-row textarea:focus {
+  border-color: #dc2626 !important;
+}
+
 .sticker-picker {
   position: absolute;
   bottom: 56px;

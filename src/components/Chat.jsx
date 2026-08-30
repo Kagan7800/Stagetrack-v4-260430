@@ -18,6 +18,7 @@ const STICKERS = ['🎵', '🥁', '🦒', '⭐', '🎉', '🔔', '❤️', '👏
 export default function Chat({
   isOpen,
   isInstructor,
+  activeTheme,
   messages = [],
   onSendMessage,
   onDeleteMessage,
@@ -43,7 +44,7 @@ export default function Chat({
       messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
     }
     if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages, isOpen]);
 
@@ -73,9 +74,11 @@ export default function Chat({
     }
   };
 
+  const isSor = activeTheme === 'sor';
+
   return (
-    <div className="chat-panel-inner">
-      {/* Header: Purple-to-Blue gradient aesthetic */}
+    <div className={`chat-panel-inner ${isSor ? 'theme-sor' : ''}`} data-theme={activeTheme}>
+      {/* Header: Purple-to-Blue gradient aesthetic or Red gradient in SOR mode */}
       <div className="chat-header">
         <h3>💬 Live Chat</h3>
         {isInstructor && (

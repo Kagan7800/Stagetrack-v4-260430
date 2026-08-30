@@ -270,7 +270,7 @@ function App() {
   );
 
   return (
-    <div className="app-container" style={{ position: 'relative', overflow: 'hidden' }}>
+    <div className={`app-container ${activeTheme === 'sor' ? 'theme-sor' : ''}`} style={{ position: 'relative', overflow: 'hidden' }}>
       {!isJoined && <LobbyOverlay />}
 
       {/* LAYER 0: BASE MUSIC FUN BACKGROUND */}
@@ -717,6 +717,7 @@ function App() {
                 <Chat 
                   isOpen={isChatOpen}
                   isInstructor={isInstructorClient}
+                  activeTheme={activeTheme}
                   messages={messages} 
                   onSendMessage={handleSendChatMessage} 
                   onDeleteMessage={handleDeleteChatMessage}
