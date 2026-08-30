@@ -861,10 +861,10 @@ body {
   flex-direction: column;
   overflow: hidden;
   opacity: 1;
-  height: calc(100% + 20px) !important;
-  margin-top: -10px;
-  margin-bottom: -10px;
-  margin-right: -10px;
+  height: 100% !important;
+  margin-top: 0;
+  margin-bottom: 0;
+  margin-right: 0;
   margin-left: 10px;
   box-sizing: border-box;
   transition: width 0.32s ease, opacity 0.25s ease, border-width 0.32s ease, margin 0.32s ease, padding 0.32s ease;
@@ -882,7 +882,6 @@ body {
   margin-left: 0 !important;
   margin-right: 0 !important;
   margin-top: 0 !important;
-  margin-bottom: 0 !important;
   margin: 0 !important;
   padding: 0 !important;
   pointer-events: none !important;
