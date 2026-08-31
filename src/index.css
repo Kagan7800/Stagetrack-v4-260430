@@ -5208,7 +5208,7 @@ body {
 }
 
 .control-deck-outer {
-  width: calc(((var(--peo-height, 31.25vh) * 2 + 20px) * 16 / 9) * 0.7) !important;
+  width: 100% !important;
   max-width: 100%;
   box-sizing: border-box;
 }
