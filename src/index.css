@@ -55,11 +55,10 @@ body {
 .main-content {
   display: flex;
   flex: 1;
-  padding: 0;
+  padding: 10px;
   overflow: hidden;
   background: transparent;
   position: relative;
-  box-sizing: border-box;
 }
 
 /* Top Banner */
