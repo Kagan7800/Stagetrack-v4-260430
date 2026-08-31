@@ -55,10 +55,11 @@ body {
 .main-content {
   display: flex;
   flex: 1;
-  padding: 10px;
+  padding: 0;
   overflow: hidden;
   background: transparent;
   position: relative;
+  box-sizing: border-box;
 }
 
 /* Top Banner */
@@ -853,8 +854,11 @@ body {
   flex-shrink: 0;
   background: #281E46;
   background-color: rgb(40, 30, 70);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 12px !important;
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
+  border-right: none;
+  border-top: none;
+  border-bottom: none;
+  border-radius: 0px !important;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -863,7 +867,7 @@ body {
   margin-top: 0;
   margin-bottom: 0;
   margin-right: 0;
-  margin-left: 10px;
+  margin-left: 0;
   box-sizing: border-box;
   transition: width 0.32s ease, opacity 0.25s ease, border-width 0.32s ease, margin 0.32s ease, padding 0.32s ease;
   position: relative;
@@ -880,6 +884,7 @@ body {
   margin-left: 0 !important;
   margin-right: 0 !important;
   margin-top: 0 !important;
+  margin-bottom: 0 !important;
   margin: 0 !important;
   padding: 0 !important;
   pointer-events: none !important;
@@ -895,7 +900,7 @@ body {
   background: #281E46;
   overflow: hidden;
   box-sizing: border-box;
-  border-radius: 12px !important;
+  border-radius: 0px !important;
 }
 
 .chat-header {

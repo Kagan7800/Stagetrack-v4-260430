@@ -560,7 +560,7 @@ function App() {
             </div>
           ) : (
             <div className="main-content-layout" style={{ display: 'flex', flexDirection: 'row', flex: 1, width: '100%', height: '100%', margin: 0, minHeight: 0, overflow: 'hidden', position: 'relative' }}>
-              <div className="stage-column" style={{ flex: 1, display: 'flex', minWidth: 0, height: '100%', padding: 0, boxSizing: 'border-box', transition: 'all 0.32s ease' }}>
+              <div className="stage-column" style={{ flex: 1, display: 'flex', minWidth: 0, height: '100%', padding: '10px', boxSizing: 'border-box', transition: 'all 0.32s ease' }}>
                 <div className={`center-grid-area ${isChatOpen ? 'sidebars-open' : ''}`} data-columns={halfLength <= 3 ? "1" : "2"} data-left-open={false} data-right-open={isChatOpen}>
                    <div className="side-peos" data-columns={halfLength <= 3 ? "1" : "2"}>
                      {leftParticipants.map(p => {
