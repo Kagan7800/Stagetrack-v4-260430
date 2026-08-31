@@ -1043,11 +1043,12 @@ body {
 }
 
 .chat-composer {
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  border-top: 1px solid #B4A0FF;
+  border-top-color: rgb(180, 160, 255);
   padding: 8px 14px 8px 10px;
   position: relative;
-  background: #281E46;
-  background-color: rgb(40, 30, 70);
+  background: #19142D;
+  background-color: rgb(25, 20, 45);
   flex-shrink: 0;
 }
 
@@ -1061,8 +1062,9 @@ body {
 
 .composer-row textarea {
   flex: 1;
-  background: #241C3D;
-  border: 1px solid #382C57;
+  background: #281E46;
+  background-color: rgb(40, 30, 70);
+  border: 1px solid rgba(180, 160, 255, 0.25);
   border-radius: 16px;
   padding: 4px 8px 3px 8px;
   color: #F3F0FA;
