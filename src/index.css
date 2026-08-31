@@ -862,7 +862,7 @@ body {
   height: 100% !important;
   margin-top: 0;
   margin-bottom: 0;
-  margin-right: 10px;
+  margin-right: 0;
   margin-left: 10px;
   box-sizing: border-box;
   transition: width 0.32s ease, opacity 0.25s ease, border-width 0.32s ease, margin 0.32s ease, padding 0.32s ease;
