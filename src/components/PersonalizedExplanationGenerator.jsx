@@ -1,718 +1,478 @@
 // src/components/PersonalizedExplanationGenerator.jsx
+// MFLO Profile Builder — Identity 2-Col + Full-Width Delivery + 3x3 Trait Grid (Deep Indigo)
 
 import { useState } from 'react';
-import { useAppContext } from '../context/AppContext';
 import { 
-  Sparkles, ArrowLeft, Copy, Check, Send, Printer, FileText, Heart, Flame, ShieldAlert, Users, Focus, Smile, Award, Plus, ShieldCheck
+  Sparkles, CheckCircle2, RotateCcw, Copy, Check
 } from 'lucide-react';
 import './PersonalizedExplanationGenerator.css';
 
-// Predefined option definitions to make form-building robust and beautiful
-const TRAIT_DEFINITIONS = {
-  curious: {
-    label: 'Curious & Inquisitive',
-    icon: Smile,
-    color: '#3b82f6',
-    aboutKey: 'curiousAbout',
-    refKey: 'curiousRefinements',
-    aboutLabel: 'What are they curious about?',
-    aboutOptions: ['Instrument Sounds', 'Tapping Rhythms', 'Banjo the Giraffe', 'Singing & Vocals'],
-    refLabel: 'Sub-refinements',
-    refPresets: {
-      'Instrument Sounds': ['Piano notes', 'Drum kicks', 'Shaker sounds', 'Triangle rings'],
-      'Tapping Rhythms': ['Steady marching beats', 'Clapping tempos', 'Syncopated sync-ups'],
-      'Banjo the Giraffe': ['Banjo mascot smiles', 'Giraffe hoof taps', 'Banjo reactions'],
-      'Singing & Vocals': ['Nursery song lyrics', 'Pitch matching games', 'Singing along out loud']
-    }
+// 3-Column Trait Grid Schema with Right-Side Info Texts
+const TRAIT_SECTIONS = [
+  { 
+    id: 'sound', 
+    title: 'Sound', 
+    chips: ['Brave', 'Sensitive', 'Rhythm'], 
+    infoText: 'How your child responds to music and sound — whether bold, gentle, or rhythm‑driven.' 
   },
-  energetic: {
-    label: 'High Energy & Active',
-    icon: Flame,
-    color: '#ff8c00',
-    aboutKey: 'energeticAbout',
-    refKey: 'energeticRefinements',
-    aboutLabel: 'In what ways are they energetic?',
-    aboutOptions: ['Tapping & Drumming', 'Gross Motor Play', 'Loud Vocals', 'Fast tempos'],
-    refLabel: 'Sub-refinements',
-    refPresets: {
-      'Tapping & Drumming': ['Table tapping', 'Clapping hands', 'Stomping feet'],
-      'Gross Motor Play': ['Dancing in circles', 'Jumping up and down', 'Waving arms in tempo'],
-      'Loud Vocals': ['Shouting count numbers', 'Joyful shouting', 'Loud counting along'],
-      'Fast tempos': ['Speed tapping', 'Faster dancing']
-    }
+  { 
+    id: 'energy', 
+    title: 'Energy', 
+    chips: ['High', 'Balanced', 'Calm'], 
+    infoText: 'Your child’s natural activity level and how they express movement through music.' 
   },
-  shy: {
-    label: 'Shy & Observation-focused',
-    icon: Heart,
-    color: '#ba55d3',
-    aboutKey: 'shyAbout',
-    refKey: 'shyRefinements',
-    aboutLabel: 'When do they show hesitation?',
-    aboutOptions: ['New Environments', 'Singing Solo', 'Speaking on Microphone', 'Group Turn-taking'],
-    refLabel: 'Sub-refinements',
-    refPresets: {
-      'New Environments': ['First class screen warming', 'Seeing new child grids'],
-      'Singing Solo': ['Singing alone on mic', 'Vocal responses'],
-      'Speaking on Microphone': ['Responding to direct questions', 'Telling name to instructor'],
-      'Group Turn-taking': ['Waiting for visual spotlight', 'Showing drawings to others']
-    }
+  { 
+    id: 'social', 
+    title: 'Social', 
+    chips: ['Parallel', '1‑on‑1', 'Group'], 
+    infoText: 'Preferred interaction style — solo, small group, or parallel play alongside others.' 
   },
-  sensitive: {
-    label: 'Sensory Sensitive',
-    icon: ShieldAlert,
-    color: '#ef4444',
-    aboutKey: 'sensitiveTo',
-    refKey: 'sensitiveRefinements',
-    aboutLabel: 'What are they sensitive to?',
-    aboutOptions: ['Sudden Loud Sounds', 'Overwhelming Visuals', 'Fast Flashing Colors', 'High Frequencies'],
-    refLabel: 'Sub-refinements',
-    refPresets: {
-      'Sudden Loud Sounds': ['Surprise cymbal crashes', 'Sudden sound effects'],
-      'Overwhelming Visuals': ['Multiple moving overlays', 'Too many sticker additions'],
-      'Fast Flashing Colors': ['Blinking webcam borders', 'Fast visual flashes'],
-      'High Frequencies': ['Squeaky drum sounds', 'Sharp synthesizers']
-    }
+  { 
+    id: 'movement', 
+    title: 'Movement', 
+    chips: ['Free', 'Precise', 'Still'], 
+    infoText: 'How your child uses their body in musical play — free, precise, or still.' 
   },
-  social: {
-    label: 'Social & Collaborative',
-    icon: Users,
-    color: '#10b981',
-    aboutKey: 'socialIn',
-    refKey: 'socialRefinements',
-    aboutLabel: 'How do they enjoy socializing?',
-    aboutOptions: ['One-on-One Work', 'Group Activities', 'Collaborative Play', 'Imitating Peers'],
-    refLabel: 'Sub-refinements',
-    refPresets: {
-      'One-on-One Work': ['Direct instructor conversation', 'Solo game challenges'],
-      'Group Activities': ['Playing counts together', 'Mascot dance alongs'],
-      'Collaborative Play': ['Sharing drawings on board', 'Duet percussion clicks'],
-      'Imitating Peers': ['Copying classmates clapping', 'Following teacher body language']
-    }
+  { 
+    id: 'transitions', 
+    title: 'Transitions', 
+    chips: ['Flow', 'Routine', 'Gradual'], 
+    infoText: 'How easily your child moves between activities or songs — flowing, routine, or gradual.' 
   },
-  distracted: {
-    label: 'Focus Challenges',
-    icon: Focus,
-    color: '#f59e0b',
-    aboutKey: 'distractedBy',
-    refKey: 'focusRefinements',
-    aboutLabel: 'What distracts them? What helps focus?',
-    aboutOptions: ['Background Noise', 'Visual Movement', 'Self-made Sounds', 'Room Toys'],
-    refLabel: 'Focus Helpers (focusHelpers)',
-    refPresets: {
-      'Background Noise': ['Color highlights', 'Metronome cues', 'Direct prompts'],
-      'Visual Movement': ['Steady audio ticks', 'Minimal overlays', 'One-action focus'],
-      'Self-made Sounds': ['Rhythmic clap counters', 'Whiteboard draws', 'Mascot spotlight'],
-      'Room Toys': ['Scheduled sticker rewards', 'Shorter segments', 'Interactive clicking']
-    }
+  { 
+    id: 'attention', 
+    title: 'Attention', 
+    chips: ['Rapid', 'Deep', 'Flex'], 
+    infoText: 'Your child’s focus style — quick bursts, deep engagement, or flexible shifting.' 
   },
-  enjoys: {
-    label: 'Enjoys Activities',
-    icon: Award,
-    color: '#06b6d4',
-    aboutKey: 'enjoys',
-    refKey: 'enjoysRefinements',
-    aboutLabel: 'What parts do they enjoy the most?',
-    aboutOptions: ['Sticker Rewards', 'Whiteboard Doodling', 'Interactive Tapping', 'Banjo Mascot Animations'],
-    refLabel: 'Sub-refinements',
-    refPresets: {
-      'Sticker Rewards': ['Star placements', 'Crown overlays', 'Confetti blasts'],
-      'Whiteboard Doodling': ['Drawing lines on media', 'Eraser tools', 'Color changes'],
-      'Interactive Tapping': ['Spacebar count tapping', 'BPM wheel speed clicks'],
-      'Banjo Mascot Animations': ['Watching Banjo dance', 'Hoof tap synchronized sounds']
-    }
+  { 
+    id: 'emotional', 
+    title: 'Emotional', 
+    chips: ['Big Feel', 'Calm', 'Warm Slow'], 
+    infoText: 'How your child expresses feelings through music — big emotions, calm moods, or gentle warmth.' 
   },
-  growth: {
-    label: 'Growth Goals',
-    icon: Sparkles,
-    color: '#f43f5e',
-    aboutKey: 'growthGoals',
-    refKey: 'growthRefinements',
-    aboutLabel: 'What are their developmental targets?',
-    aboutOptions: ['Vocal Confidence', 'Rhythm Coordination', 'Focus & Attention', 'Social turn-taking'],
-    refLabel: 'Sub-refinements',
-    refPresets: {
-      'Vocal Confidence': ['Singing on mic', 'Saying numbers out loud'],
-      'Rhythm Coordination': ['Tapping exactly to tempo', 'Clapping 1-2-3-4 in time'],
-      'Focus & Attention': ['Following counting wheels', 'Watching instructor screen'],
-      'Social turn-taking': ['Waiting for guest spotlight', 'Cheering classmates']
-    }
+  { 
+    id: 'favorites', 
+    title: 'Favorites', 
+    chips: ['Bluey', 'Daniel', 'Elmo', 'Mickey', 'Cocomelon', 'Sesame'], 
+    infoText: 'Shows what characters or shows your child connects with — helps personalize song choices.' 
+  },
+  { 
+    id: 'notes', 
+    title: 'Notes', 
+    placeholder: 'Any special considerations...', 
+    infoText: 'Space for any special considerations, sensitivities, or unique preferences.' 
   }
-};
+];
 
 export default function PersonalizedExplanationGenerator({ onClose }) {
-  const { handleSendChatMessage } = useAppContext();
-
-  // Basic Details States
-  const [childName, setChildName] = useState('Danny');
-  const [childAge, setChildAge] = useState('4 years old');
+  // Child & Parent Contact Info (Empty / no default selections)
+  const [childName, setChildName] = useState('');
+  const [childAge, setChildAge] = useState('');
+  const [parentName, setParentName] = useState('');
   const [parentEmail, setParentEmail] = useState('');
-  const [traitsSelected, setTraitsSelected] = useState(['curious', 'energetic']);
-  const [notes, setNotes] = useState('');
+  const [parentPhone, setParentPhone] = useState('');
+  const [deliveryEmail, setDeliveryEmail] = useState(true);
+  const [deliverySMS, setDeliverySMS] = useState(true);
 
-  // Structured Trait Values
-  const [curiousAbout, setCuriousAbout] = useState(['Instrument Sounds']);
-  const [curiousRefinements, setCuriousRefinements] = useState({ 'Instrument Sounds': ['Piano notes', 'Drum kicks'] });
+  // Selected State for all trait sections (Default to NO button selections)
+  const [selections, setSelections] = useState({
+    sound: null,
+    energy: null,
+    social: null,
+    movement: null,
+    transitions: null,
+    attention: null,
+    emotional: null,
+    favorites: null,
+    notes: ''
+  });
 
-  const [energeticAbout, setEnergeticAbout] = useState(['Tapping & Drumming']);
-  const [energeticRefinements, setEnergeticRefinements] = useState({ 'Tapping & Drumming': ['Table tapping', 'Clapping hands'] });
-
-  const [shyAbout, setShyAbout] = useState([]);
-  const [shyRefinements, setShyRefinements] = useState({});
-
-  const [sensitiveTo, setSensitiveTo] = useState([]);
-  const [sensitiveRefinements, setSensitiveRefinements] = useState({});
-
-  const [socialIn, setSocialIn] = useState([]);
-  const [socialRefinements, setSocialRefinements] = useState({});
-
-  const [distractedBy, setDistractedBy] = useState([]);
-  const [focusHelpers, setFocusHelpers] = useState([]);
-  const [focusRefinements, setFocusRefinements] = useState({});
-
-  const [enjoys, setEnjoys] = useState([]);
-  const [enjoysRefinements, setEnjoysRefinements] = useState({});
-
-  const [growthGoals, setGrowthGoals] = useState([]);
-  const [growthRefinements, setGrowthRefinements] = useState({});
-
-  // Dynamic input fields for adding custom refinements
-  const [customInput, setCustomInput] = useState({});
-
-  // Generation status
+  // UI States
   const [isGenerating, setIsGenerating] = useState(false);
   const [loadingStep, setLoadingStep] = useState('');
-  const [generatedResult, setGeneratedResult] = useState(null);
+  const [generatedProfile, setGeneratedProfile] = useState(null);
   const [copyStatus, setCopyStatus] = useState(false);
-  const [shareStatus, setShareStatus] = useState(false);
 
-  // Map state hooks dynamically to make form modifications generalizable
-  const getTraitState = (traitKey) => {
-    switch (traitKey) {
-      case 'curious':
-        return {
-          about: curiousAbout,
-          setAbout: setCuriousAbout,
-          refinements: curiousRefinements,
-          setRefinements: setCuriousRefinements
-        };
-      case 'energetic':
-        return {
-          about: energeticAbout,
-          setAbout: setEnergeticAbout,
-          refinements: energeticRefinements,
-          setRefinements: setEnergeticRefinements
-        };
-      case 'shy':
-        return {
-          about: shyAbout,
-          setAbout: setShyAbout,
-          refinements: shyRefinements,
-          setRefinements: setShyRefinements
-        };
-      case 'sensitive':
-        return {
-          about: sensitiveTo,
-          setAbout: setSensitiveTo,
-          refinements: sensitiveRefinements,
-          setRefinements: setSensitiveRefinements
-        };
-      case 'social':
-        return {
-          about: socialIn,
-          setAbout: setSocialIn,
-          refinements: socialRefinements,
-          setRefinements: setSocialRefinements
-        };
-      case 'distracted':
-        return {
-          about: distractedBy,
-          setAbout: setDistractedBy,
-          refinements: focusRefinements,
-          setRefinements: setFocusRefinements,
-          extraAbout: focusHelpers,
-          setExtraAbout: setFocusHelpers
-        };
-      case 'enjoys':
-        return {
-          about: enjoys,
-          setAbout: setEnjoys,
-          refinements: enjoysRefinements,
-          setRefinements: setEnjoysRefinements
-        };
-      case 'growth':
-        return {
-          about: growthGoals,
-          setAbout: setGrowthGoals,
-          refinements: growthRefinements,
-          setRefinements: setGrowthRefinements
-        };
-      default:
-        return null;
-    }
-  };
-
-  const handleToggleTrait = (traitKey) => {
-    setTraitsSelected(prev => {
-      if (prev.includes(traitKey)) {
-        return prev.filter(t => t !== traitKey);
-      } else {
-        return [...prev, traitKey];
-      }
-    });
-  };
-
-  const handleToggleAbout = (traitKey, option) => {
-    const { setAbout, refinements, setRefinements } = getTraitState(traitKey);
-    setAbout(prev => {
-      let next;
-      if (prev.includes(option)) {
-        next = prev.filter(o => o !== option);
-        // Clean up refinements for this removed item
-        const nextRefs = { ...refinements };
-        delete nextRefs[option];
-        setRefinements(nextRefs);
-      } else {
-        next = [...prev, option];
-      }
-      return next;
-    });
-  };
-
-  const handleToggleRefinement = (traitKey, aboutItem, refinement) => {
-    const { refinements, setRefinements } = getTraitState(traitKey);
-    const itemRefs = refinements[aboutItem] || [];
-    let nextRefs;
-    if (itemRefs.includes(refinement)) {
-      nextRefs = itemRefs.filter(r => r !== refinement);
-    } else {
-      nextRefs = [...itemRefs, refinement];
-    }
-
-    setRefinements(prev => ({
+  // Toggle or select chip (allows unselecting)
+  const handleSelectChip = (sectionId, chipValue) => {
+    setSelections(prev => ({
       ...prev,
-      [aboutItem]: nextRefs
+      [sectionId]: prev[sectionId] === chipValue ? null : chipValue
     }));
   };
 
-  const handleAddCustomRefinement = (traitKey, aboutItem) => {
-    const text = customInput[`${traitKey}-${aboutItem}`] || '';
-    if (!text.trim()) return;
-
-    const { refinements, setRefinements } = getTraitState(traitKey);
-    const itemRefs = refinements[aboutItem] || [];
-    if (!itemRefs.includes(text.trim())) {
-      setRefinements(prev => ({
-        ...prev,
-        [aboutItem]: [...itemRefs, text.trim()]
-      }));
-    }
-
-    setCustomInput(prev => ({
-      ...prev,
-      [`${traitKey}-${aboutItem}`]: ''
-    }));
-  };
-
-  // Generate via Google Gemini AI Cloud Function
+  // Generate Profile Handler
   const handleGenerate = async () => {
-    if (!parentEmail.trim()) {
-      alert("Please enter a parent's email address to receive the report.");
+    if (!childName.trim()) {
+      alert("Please enter child's name.");
+      return;
+    }
+
+    if (deliveryEmail && !parentEmail.trim()) {
+      alert("Please enter parent email address to receive the profile.");
+      return;
+    }
+
+    if (deliverySMS && !parentPhone.trim()) {
+      alert("Please enter mobile phone number for text delivery.");
+      return;
+    }
+
+    if (!deliveryEmail && !deliverySMS) {
+      alert("Please select at least one delivery method (Email or SMS Text).");
       return;
     }
 
     setIsGenerating(true);
-    setLoadingStep("Preparing child profile...");
-    setGeneratedResult(null);
-    setShareStatus(false);
+    setLoadingStep("Connecting to Gemini AI… 🎵");
 
-    const traitPayload = {
-      childAge,
-      traitsSelected,
-      parentEmail,
-      childName,
-      curiousAbout,
-      curiousRefinements,
-      energeticAbout,
-      energeticRefinements,
-      shyAbout,
-      shyRefinements,
-      sensitiveTo,
-      sensitiveRefinements,
-      socialIn,
-      socialRefinements,
-      distractedBy,
-      focusHelpers,
-      focusRefinements,
-      enjoys,
-      enjoysRefinements,
-      growthGoals,
-      growthRefinements,
-      notes: notes || ""
+    const effectiveShow = selections.favorites || "music activities";
+    const STEPS = [
+      "Analyzing developmental traits…",
+      `Weaving in ${effectiveShow} milestones…`,
+      "Creating Bluey-inspired warm teacher profile…",
+      "Preparing delivery confirmation… 📬"
+    ];
+
+    let stepIdx = 0;
+    const stepInterval = setInterval(() => {
+      stepIdx = Math.min(stepIdx + 1, STEPS.length - 1);
+      setLoadingStep(STEPS[stepIdx]);
+    }, 1700);
+
+    const effectiveName = childName.trim() || 'Your Child';
+    const effectiveAge = childAge || 'toddler';
+    const effectiveParent = parentName.trim() || 'Parent';
+
+    const prompt = `Create a warm, specific musical profile for ${effectiveAge}-year-old ${effectiveName} with these developmental traits:
+
+Sound Sensitivity: ${selections.sound || 'Observant and responsive to rhythms'}
+Movement Style: ${selections.movement || 'Natural expressive motion'}
+Social Engagement: ${selections.social || 'Joyful learner'}
+Attention & Pacing: ${selections.attention || 'Engaged with melodic cues'}
+Emotional Expression: ${selections.emotional || 'Warm expressive connection'}
+Transitions & Routines: ${selections.transitions || 'Guided musical flow'}
+Energy Level: ${selections.energy || 'Playful and balanced'}
+
+Favorite Show/Character: ${effectiveShow}
+
+Write a 220-270 word personalized musical profile that:
+1. Opens warmly, celebrating ${effectiveName} as a person AND young musician
+2. Weaves in all developmental traits naturally—show HOW each trait shows up in music learning
+3. Reference their love of ${effectiveShow} and explain how teachers can use this to engage them
+4. Explains what a typical lesson might look like for ${effectiveName}
+5. Includes 2-3 specific teaching suggestions tied to their favorite show and personality
+6. Ends with encouragement about their unique musical journey
+
+Write for music teachers and parents. Be specific, warm, observational, and actionable—like Bluey's style.`;
+
+    const payload = {
+      childName: effectiveName,
+      childAge: childAge ? `${childAge} years old` : 'Toddler',
+      parentName: effectiveParent,
+      parentEmail: parentEmail.trim(),
+      parentPhone: parentPhone.trim(),
+      sendEmail: deliveryEmail,
+      sendSMS: deliverySMS,
+      action: 'generate_and_deliver',
+      prompt: prompt,
+      traits: selections,
+      favorites: { shows: selections.favorites || '' },
+      notes: selections.notes || ""
     };
 
     try {
-      setLoadingStep("Connecting to secure server...");
-      
       const endpoint = "https://us-central1-stagetrack-v4-260430-461-92681.cloudfunctions.net/personalizedExplanation";
       
       const response = await fetch(endpoint, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(traitPayload)
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
       });
+
+      clearInterval(stepInterval);
 
       if (!response.ok) {
         const errText = await response.text();
         throw new Error(errText || `Server returned status ${response.status}`);
       }
 
-      setLoadingStep("Formatting alignment report...");
       const data = await response.json();
-      
-      if (!data || !data.explanation) {
-        throw new Error("No explanation returned from the server.");
+      const profileText = data.explanation || data.text || (data.candidates && data.candidates[0]?.content?.parts[0]?.text);
+
+      if (!profileText) {
+        throw new Error("No profile text generated.");
       }
 
-      setGeneratedResult({
-        explanationMarkdown: data.explanation,
-        summary: `✨ Personalized Music Fun explanation generated for ${childName}!`,
-        recommendedActivities: ['Counting Wheel (Interactive Tapping)', 'Make Music Household Jam', 'Mascot Spotlights & Sticker Sharing']
+      setGeneratedProfile({
+        name: effectiveName,
+        age: childAge || 'Toddler',
+        parentName: effectiveParent,
+        email: deliveryEmail ? parentEmail.trim() : null,
+        phone: deliverySMS ? parentPhone.trim() : null,
+        text: profileText,
+        date: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
       });
+
       setIsGenerating(false);
 
     } catch (err) {
+      clearInterval(stepInterval);
       console.error(err);
-      alert(err.message || "An error occurred during generation. Please verify your internet connection.");
+      alert(err.message || "An error occurred generating the profile. Please try again.");
       setIsGenerating(false);
     }
   };
 
-  const handleCopyToClipboard = () => {
-    if (!generatedResult) return;
-    navigator.clipboard.writeText(generatedResult.explanationMarkdown);
+  const handleCopy = () => {
+    if (!generatedProfile) return;
+    navigator.clipboard.writeText(generatedProfile.text);
     setCopyStatus(true);
     setTimeout(() => setCopyStatus(false), 2000);
   };
 
-  const handleShareToChat = () => {
-    if (!generatedResult) return;
-    handleSendChatMessage(generatedResult.summary);
-    setShareStatus(true);
-    setTimeout(() => setShareStatus(false), 2000);
-  };
-
-  const handlePrint = () => {
-    window.print();
-  };
-
   return (
-    <div className="explanation-generator-container glass-panel animate-fade-in">
-      {/* HEADER ROW */}
-      <div className="generator-header">
-        <button className="back-btn" onClick={onClose}>
-          <ArrowLeft size={18} />
-          <span>Back to Class</span>
-        </button>
-        <div className="header-title">
-          <Sparkles className="sparkle-icon animate-pulse" size={22} />
-          <h2>Music Fun Personalized Profile Builder</h2>
+    <div className="mf-profile-builder-page">
+      {/* HEADER WITH CHARACTERS SURROUNDING SUBTITLE */}
+      <header className="mf-builder-header">
+        {onClose && (
+          <button className="mf-back-btn" onClick={onClose}>
+            <span>Back</span>
+          </button>
+        )}
+        {/* HEADER WITH CHARACTERS FLANKING VERTICALLY CENTERED TITLE & SUBTITLE */}
+        <div className="mf-header-characters-banner">
+          {/* Left Character Mascot Group: png-1, 2, 3 (where 3 is closest to text) */}
+          <div className="mf-char-group mf-char-left">
+            <img src="/assets/header_characters/char1_bear.png" alt="Bear (png-1)" className="mf-char-banner-img img-1" />
+            <img src="/assets/header_characters/char2_giraffe.png" alt="Giraffe (png-2)" className="mf-char-banner-img img-2 buffered" />
+            <img src="/assets/header_characters/char3_bird.png" alt="Bird (png-3)" className="mf-char-banner-img img-3" />
+          </div>
+
+          {/* Centered Title & Subtitle Stack */}
+          <div className="mf-title-group">
+            <h1 className="mf-main-heading">
+              Music Fun Profile Builder
+            </h1>
+            <p className="mf-sub-heading">
+              Create a focused response why Music Fun is right for your child
+            </p>
+          </div>
+
+          {/* Right Character Mascot Group: png-4, 5, 6 (where 4 is closest to text) */}
+          <div className="mf-char-group mf-char-right">
+            <img src="/assets/header_characters/char4_elephant.png" alt="Elephant (png-4)" className="mf-char-banner-img img-4" />
+            <img src="/assets/header_characters/char5_fox.png" alt="Fox (png-5)" className="mf-char-banner-img img-5 buffered" />
+            <img src="/assets/header_characters/char6_rabbit.png" alt="Rabbit (png-6)" className="mf-char-banner-img img-6" />
+          </div>
         </div>
-        <div style={{ width: '120px' }}></div> {/* Spacer */}
-      </div>
+      </header>
 
-      <div className="generator-content-split">
-        {/* LEFT COLUMN: FORM */}
-        <div className="generator-form-pane">
-          {/* STEP 1: BASIC INFO */}
-          <div className="form-card-section">
-            <h3 className="section-label">
-              <span className="step-num">1</span>
-              Child Information
-            </h3>
-            <div className="form-grid-2">
-              <div className="input-group">
-                <label>Child's First Name</label>
-                <input 
-                  type="text" 
-                  value={childName}
-                  onChange={(e) => setChildName(e.target.value)}
-                  placeholder="Enter name..."
-                />
-              </div>
-              <div className="input-group">
-                <label>Child's Age (childAge)</label>
-                <select 
-                  value={childAge} 
-                  onChange={(e) => setChildAge(e.target.value)}
-                >
-                  <option value="1 year old">1 year old</option>
-                  <option value="2 years old">2 years old</option>
-                  <option value="3 years old">3 years old</option>
-                  <option value="4 years old">4 years old</option>
-                  <option value="5 years old">5 years old</option>
-                </select>
+      {/* RESULTS VIEW */}
+      {generatedProfile ? (
+        <div className="mf-results-overlay animate-fade-in">
+          <div className="mf-results-card">
+            <div className="results-header-banner">
+              <CheckCircle2 size={44} className="success-icon" />
+              <h2>{generatedProfile.name}'s Musical Profile</h2>
+              <p className="results-meta">
+                Parent: {generatedProfile.parentName} • Age: {generatedProfile.age} • Dispatched via: {generatedProfile.email ? 'Email' : ''} {generatedProfile.email && generatedProfile.phone ? '& ' : ''} {generatedProfile.phone ? 'SMS' : ''}
+              </p>
+            </div>
+
+            <div className="results-body-text">
+              {typeof generatedProfile.text === 'string'
+                ? generatedProfile.text.split('\n\n').map((paragraph, idx) => (
+                    <p key={idx}>{paragraph}</p>
+                  ))
+                : <p>{String(generatedProfile.text || '')}</p>
+              }
+            </div>
+
+            <div className="results-actions-row">
+              <button className="mf-action-btn copy" onClick={handleCopy}>
+                {copyStatus ? <Check size={16} /> : <Copy size={16} />}
+                <span>{copyStatus ? 'Copied!' : 'Copy Profile'}</span>
+              </button>
+              <button className="mf-action-btn reset" onClick={() => setGeneratedProfile(null)}>
+                <RotateCcw size={16} />
+                <span>Create Another</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="mf-main-content-scroll">
+          {/* TOP BAND: IDENTITY ROW (2 COLUMNS) */}
+          <div className="mf-identity-grid">
+            {/* Column 1: Child Info */}
+            <div className="mf-card mf-identity-card">
+              <h2 className="mf-card-title">Child Info</h2>
+              <div className="mf-card-fields-row">
+                <div className="mf-field-group flex-1">
+                  <label className="mf-label">1st Name</label>
+                  <input 
+                    type="text" 
+                    value={childName}
+                    onChange={(e) => setChildName(e.target.value)}
+                    placeholder="e.g. Emma"
+                    className="mf-input"
+                  />
+                </div>
+                <div className="mf-field-group">
+                  <label className="mf-label">Age</label>
+                  <div className="mf-age-pill-group">
+                    {['2', '3', '4'].map(age => (
+                      <button 
+                        key={age}
+                        type="button"
+                        className={`mf-age-pill ${childAge === age ? 'active' : ''}`}
+                        onClick={() => setChildAge(prev => prev === age ? '' : age)}
+                      >
+                        {age}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
-            <div className="input-group" style={{ marginTop: '16px' }}>
-              <label>Parent's Email Address</label>
-              <input 
-                type="email" 
-                value={parentEmail}
-                onChange={(e) => setParentEmail(e.target.value)}
-                placeholder="E.g., parent@example.com (Required for SendGrid dispatch)"
-                required
-              />
+
+            {/* Column 2: Parent Contact */}
+            <div className="mf-card mf-identity-card">
+              <h2 className="mf-card-title">Parent Contact</h2>
+              <div className="mf-card-fields-row">
+                <div className="mf-field-group flex-1">
+                  <label className="mf-label">Parent 1st Name</label>
+                  <input 
+                    type="text" 
+                    value={parentName}
+                    onChange={(e) => setParentName(e.target.value)}
+                    placeholder="e.g. Sarah"
+                    className="mf-input"
+                  />
+                </div>
+                <div className="mf-field-group flex-1">
+                  <label className="mf-label">Email</label>
+                  <input 
+                    type="email" 
+                    value={parentEmail}
+                    onChange={(e) => setParentEmail(e.target.value)}
+                    placeholder="parent@email.com"
+                    className="mf-input"
+                  />
+                </div>
+                <div className="mf-field-group flex-1">
+                  <label className="mf-label">Mobile (SMS)</label>
+                  <input 
+                    type="tel" 
+                    value={parentPhone}
+                    onChange={(e) => setParentPhone(e.target.value)}
+                    placeholder="(555) 000-0000"
+                    className="mf-input"
+                  />
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* STEP 2: SELECT CORE TRAITS */}
-          <div className="form-card-section">
-            <h3 className="section-label">
-              <span className="step-num">2</span>
-              Core Traits Selection (traitsSelected)
-            </h3>
-            <p className="section-sub">Select the core behaviors that define how this child engages with the class.</p>
-            <div className="traits-select-grid">
-              {Object.entries(TRAIT_DEFINITIONS).map(([key, def]) => {
-                const isSelected = traitsSelected.includes(key);
-                const Icon = def.icon;
-                return (
-                  <button 
-                    key={key} 
-                    className={`trait-select-card ${isSelected ? 'active' : ''}`}
-                    onClick={() => handleToggleTrait(key)}
-                    style={{ '--hover-color': def.color }}
-                  >
-                    <Icon size={20} className="trait-icon" />
-                    <span>{def.label}</span>
-                  </button>
-                );
-              })}
+          {/* FULL-WIDTH DELIVERY OPTIONS & ACTION BAND */}
+          <div className="mf-delivery-fullwidth-card">
+            <div className="mf-delivery-left">
+              <h2 className="mf-card-title inline-title">Delivery Options</h2>
+              <div className="mf-delivery-checkboxes">
+                <label className="mf-checkbox-label">
+                  <input 
+                    type="checkbox"
+                    checked={deliveryEmail}
+                    onChange={(e) => setDeliveryEmail(e.target.checked)}
+                  />
+                  <span>Email Confirmation</span>
+                </label>
+                <label className="mf-checkbox-label">
+                  <input 
+                    type="checkbox"
+                    checked={deliverySMS}
+                    onChange={(e) => setDeliverySMS(e.target.checked)}
+                  />
+                  <span>SMS Text Summary</span>
+                </label>
+              </div>
+            </div>
+
+            <div className="mf-delivery-right">
+              <button 
+                type="button"
+                className="mf-generate-btn"
+                onClick={handleGenerate}
+                disabled={isGenerating}
+              >
+                <span>{isGenerating ? loadingStep : "Generate Profile"}</span>
+              </button>
             </div>
           </div>
 
-          {/* STEP 3: REFINEMENTS */}
-          {traitsSelected.length > 0 && (
-            <div className="form-card-section">
-              <h3 className="section-label">
-                <span className="step-num">3</span>
-                Refinement Details & Sub-Items
-              </h3>
-              <div className="refinements-acc-container">
-                {traitsSelected.map(traitKey => {
-                  const def = TRAIT_DEFINITIONS[traitKey];
-                  const { about, refinements } = getTraitState(traitKey);
-                  return (
-                    <div key={traitKey} className="refinement-section-box">
-                      <div className="ref-box-header" style={{ borderLeftColor: def.color }}>
-                        <span className="ref-box-title" style={{ color: def.color }}>{def.label} Details</span>
-                      </div>
-                      
-                      {/* About Selection */}
-                      <div className="ref-group">
-                        <label>{def.aboutLabel}</label>
-                        <div className="badge-chips-row">
-                          {def.aboutOptions.map(option => {
-                            const active = about.includes(option);
+          {/* MIDDLE BAND: 3-COLUMN TRAIT GRID */}
+          <div className="mf-trait-grid">
+            {TRAIT_SECTIONS.map((sec) => {
+              const isNotes = sec.id === 'notes';
+
+              return (
+                <div key={sec.id} className={`mf-card mf-trait-card ${isNotes ? 'mf-notes-card' : ''}`}>
+                  <h2 className="mf-section-title">{sec.title}</h2>
+
+                  <div className="mf-trait-body-layout">
+                    {/* Left: Options / Chips / Textarea */}
+                    <div className="mf-trait-options">
+                      {isNotes ? (
+                        <textarea 
+                          value={selections.notes}
+                          onChange={(e) => setSelections({ ...selections, notes: e.target.value })}
+                          placeholder={sec.placeholder}
+                          className="mf-notes-textarea"
+                          rows={2}
+                        />
+                      ) : (
+                        <div className={`mf-chip-grid ${sec.id === 'favorites' ? 'mf-fav-grid' : ''}`}>
+                          {sec.chips.map((chip) => {
+                            const isSelected = selections[sec.id] === chip;
                             return (
                               <button
-                                key={option}
-                                className={`badge-chip ${active ? 'active' : ''}`}
-                                onClick={() => handleToggleAbout(traitKey, option)}
-                                style={{ '--badge-active-color': def.color }}
+                                key={chip}
+                                type="button"
+                                className={`mf-chip ${isSelected ? 'mf-chip-selected' : ''}`}
+                                onClick={() => handleSelectChip(sec.id, chip)}
                               >
-                                {option}
+                                {chip}
                               </button>
                             );
                           })}
                         </div>
-                      </div>
-
-                      {/* Nested Refinements */}
-                      {about.map(aboutItem => {
-                        const presets = def.refPresets[aboutItem] || [];
-                        const itemRefs = refinements[aboutItem] || [];
-                        return (
-                          <div key={aboutItem} className="nested-refinement-box">
-                            <span className="nested-header">{aboutItem} Sub-refinements</span>
-                            <div className="presets-chips-row">
-                              {presets.map(preset => {
-                                const active = itemRefs.includes(preset);
-                                return (
-                                  <button
-                                    key={preset}
-                                    className={`preset-chip ${active ? 'active' : ''}`}
-                                    onClick={() => handleToggleRefinement(traitKey, aboutItem, preset)}
-                                  >
-                                    {preset}
-                                  </button>
-                                );
-                              })}
-                            </div>
-
-                            {/* Custom Write-in input */}
-                            <div className="custom-input-inline">
-                              <input 
-                                type="text"
-                                placeholder={`Add custom to ${aboutItem}...`}
-                                value={customInput[`${traitKey}-${aboutItem}`] || ''}
-                                onChange={(e) => setCustomInput(prev => ({
-                                  ...prev,
-                                  [`${traitKey}-${aboutItem}`]: e.target.value
-                                }))}
-                                onKeyDown={(e) => {
-                                  if (e.key === 'Enter') {
-                                    e.preventDefault();
-                                    handleAddCustomRefinement(traitKey, aboutItem);
-                                  }
-                                }}
-                              />
-                              <button onClick={() => handleAddCustomRefinement(traitKey, aboutItem)}>
-                                <Plus size={16} />
-                              </button>
-                            </div>
-
-                            {/* Show active items */}
-                            {itemRefs.length > 0 && (
-                              <div className="active-refs-list">
-                                {itemRefs.map(ref => (
-                                  <span key={ref} className="ref-tag">
-                                    {ref}
-                                    <button onClick={() => handleToggleRefinement(traitKey, aboutItem, ref)}>✕</button>
-                                  </span>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })}
+                      )}
                     </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
 
-          {/* STEP 4: ADDITIONAL NOTES */}
-          <div className="form-card-section">
-            <h3 className="section-label">
-              <span className="step-num">4</span>
-              Additional Notes
-            </h3>
-            <div className="input-group">
-              <label>Special Instructions / Custom Notes (optional)</label>
-              <textarea
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                placeholder="E.g., Child loves the color blue, responds well to slow transitions..."
-                rows={3}
-              />
-            </div>
-
-            {/* Secure server processing indicator */}
-            <div className="api-config-box" style={{ padding: '16px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#f8fafc', margin: '16px 0 20px 0' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#475569' }}>
-                <ShieldCheck size={18} style={{ color: '#10b981', flexShrink: 0 }} />
-                <span>Profile alignments are compiled securely on our servers via <strong>Gemini AI</strong>. No API keys are held in your browser.</span>
-              </div>
-            </div>
-
-            {/* Submit button */}
-            <button 
-              className="generate-submit-btn" 
-              onClick={handleGenerate} 
-              disabled={isGenerating || childAge.trim() === ''}
-            >
-              <Sparkles size={18} />
-              <span>Generate Personalized Explanation</span>
-            </button>
-          </div>
-        </div>
-
-        {/* RIGHT COLUMN: PREVIEW */}
-        <div className="generator-preview-pane">
-          {isGenerating ? (
-            <div className="preview-loading-state">
-              <div className="loader-orbit">
-                <div className="loader-planet primary"></div>
-                <div className="loader-planet secondary"></div>
-              </div>
-              <p className="loading-step-text">{loadingStep}</p>
-              <span className="loading-sub">Building pediatric curriculum map...</span>
-            </div>
-          ) : generatedResult ? (
-            <div className="report-output-box animate-scale-up">
-              {/* REPORT CONTROL HEADERS */}
-              <div className="report-actions-row">
-                <button className="action-pill-btn copy" onClick={handleCopyToClipboard}>
-                  {copyStatus ? <Check size={16} /> : <Copy size={16} />}
-                  <span>{copyStatus ? 'Copied' : 'Copy'}</span>
-                </button>
-                <button className="action-pill-btn share" onClick={handleShareToChat}>
-                  {shareStatus ? <Check size={16} /> : <Send size={16} />}
-                  <span>{shareStatus ? 'Shared' : 'Share to Chat'}</span>
-                </button>
-                <button className="action-pill-btn print" onClick={handlePrint}>
-                  <Printer size={16} />
-                  <span>Print</span>
-                </button>
-              </div>
-
-              {/* RENDERED LETTER */}
-              <div className="report-printable-letter">
-                <div className="letter-decor-stripe"></div>
-                <div className="letter-header">
-                  <img src="/assets/Logo_modern.png" alt="Music Fun" className="letter-logo" />
-                  <div className="letter-meta">
-                    <span className="date-field">{new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
-                    <span className="subject-field">Subject: Personalized Profile Alignment</span>
+                    {/* Right: Trait Info Text */}
+                    <div className="mf-trait-info">
+                      <p>{sec.infoText}</p>
+                    </div>
                   </div>
                 </div>
-
-                <div className="letter-body-markdown">
-                  {generatedResult.explanationMarkdown.split('\n').map((line, idx) => {
-                    if (line.startsWith('# ')) {
-                      return <h1 key={idx} className="md-h1">{line.replace('# ', '')}</h1>;
-                    }
-                    if (line.startsWith('**') && line.endsWith('**')) {
-                      return <p key={idx} className="md-lead"><strong>{line.replaceAll('**', '')}</strong></p>;
-                    }
-                    if (line.startsWith('## ')) {
-                      return <h2 key={idx} className="md-h2">{line.replace('## ', '')}</h2>;
-                    }
-                    if (line.startsWith('### ')) {
-                      return <h3 key={idx} className="md-h3">{line.replace('### ', '')}</h3>;
-                    }
-                    if (line.startsWith('1. ') || line.startsWith('2. ') || line.startsWith('3. ')) {
-                      return <li key={idx} className="md-li">{line}</li>;
-                    }
-                    if (line.startsWith('*') && line.endsWith('*')) {
-                      return <p key={idx} className="md-italic"><em>{line.replaceAll('*', '')}</em></p>;
-                    }
-                    if (line.trim() === '---') {
-                      return <hr key={idx} className="md-hr" />;
-                    }
-                    if (line.trim() === '') {
-                      return <div key={idx} style={{ height: '10px' }} />;
-                    }
-                    return <p key={idx} className="md-p">{line}</p>;
-                  })}
-                </div>
-              </div>
-            </div>
-          ) : (
-            <div className="preview-empty-state">
-              <div className="empty-state-card glass-panel">
-                <FileText size={48} className="empty-icon animate-pulse" />
-                <h4>No Report Generated</h4>
-                <p>Select traits on the left questionnaire and click the "Generate" button. A detailed, warm program explanation will be crafted here.</p>
-              </div>
-            </div>
-          )}
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* LOADING OVERLAY */}
+      {isGenerating && (
+        <div className="mf-loading-overlay">
+          <div className="mf-loading-spinner"></div>
+          <p className="loading-step-text">{loadingStep}</p>
+          <span className="loading-sub">Powered securely by Google Gemini AI</span>
+        </div>
+      )}
     </div>
   );
 }
+
+

@@ -1,31 +1,29 @@
-// src/main.jsx
-// Entry point with lightweight path-based routing:
-//   /profile-builder  → standalone lead-capture page (no AppProvider needed)
-//   everything else   → full Music Fun classroom app
-
-import { StrictMode } from 'react'
+import React, { StrictMode, Suspense, lazy } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
-import App from './App.jsx'
-import { AppProvider } from './context/AppContext.jsx'
-import ProfileBuilderPage from './pages/ProfileBuilderPage.jsx'
+import ExplanationGeneratorPage from './pages/ExplanationGeneratorPage.jsx'
 
-const path = window.location.pathname;
-const isProfileBuilder =
-  path === '/profile-builder' ||
-  path === '/profile-builder/' ||
-  path.startsWith('/profile-builder/');
+const LazyApp = lazy(() => import('./App.jsx'));
+const LazyAppProvider = lazy(() => import('./context/AppContext.jsx').then(m => ({ default: m.AppProvider })));
+
+const path = typeof window !== 'undefined' ? window.location.pathname.toLowerCase().replace(/\/$/, '') : '';
+const isClassroomApp = 
+  path === '/classroom' || 
+  path.startsWith('/classroom/') || 
+  path === '/stage' || 
+  path.startsWith('/stage/') ||
+  path === '/live';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    {isProfileBuilder ? (
-      // Standalone marketing page — no AppProvider required
-      <ProfileBuilderPage />
+    {isClassroomApp ? (
+      <Suspense fallback={<div style={{ minHeight: '100vh', background: '#F7F7F8' }}></div>}>
+        <LazyAppProvider>
+          <LazyApp />
+        </LazyAppProvider>
+      </Suspense>
     ) : (
-      // Full classroom app
-      <AppProvider>
-        <App />
-      </AppProvider>
+      <ExplanationGeneratorPage />
     )}
-  </StrictMode>,
-)
+  </StrictMode>
+);

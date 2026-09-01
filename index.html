@@ -29,15 +29,33 @@
     <link rel="preload" as="image" href="/assets/svg_stickers/Truck.svg" />
     <link rel="preload" as="image" href="/assets/svg_stickers/Trumpet.svg" />
     <link rel="preload" as="image" href="/assets/svg_stickers/Xylophone.svg" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     <style>
       html, body, #root {
-        background-color: #1745b9;
+        background-color: #F7F7F8;
         margin: 0;
         padding: 0;
         width: 100%;
         height: 100%;
       }
     </style>
+    <script>
+      // Automatic reload on chunk load error / stale deployment
+      window.addEventListener('error', function(e) {
+        var msg = e.message || '';
+        if (msg.indexOf('dynamically imported module') > -1 || msg.indexOf('Loading chunk') > -1 || msg.indexOf('Failed to fetch') > -1) {
+          if (!sessionStorage.getItem('reloaded_for_chunk')) {
+            sessionStorage.setItem('reloaded_for_chunk', 'true');
+            window.location.reload();
+          }
+        }
+      });
+      window.addEventListener('vite:preloadError', function(event) {
+        window.location.reload();
+      });
+    </script>
   </head>
   <body>
     <div id="root"></div>
