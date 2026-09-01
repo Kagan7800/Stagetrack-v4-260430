@@ -296,10 +296,11 @@ function App() {
         }}
       />
 
-      {/* LAYER 1.5: GLOBAL CONFETTI OVERLAY FOR SOR THEME */}
-      {activeTheme === 'sor' && isConfettiActive && (
+      {/* LAYER 1.5: GLOBAL CONFETTI OVERLAY FOR ALL THEMES */}
+      {isConfettiActive && (
         <div className="global-confetti-container">
-          <div className="confetti-mover" />
+          <div className="confetti-mover layer-1" />
+          <div className="confetti-mover layer-2" />
         </div>
       )}
 

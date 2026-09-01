@@ -447,13 +447,14 @@ export default function ControlDeck() {
                     {isFirebaseUpdating ? 'Generating...' : 'Invite'}
                   </button>
 
-                  {/* DOODLE TIME */}
+                  {/* DOODLE (Inactive) */}
                   <button 
-                    onClick={() => setIsDoodling(!isDoodling)}
-                    className={`doodle-toggle-btn ${isDoodling ? 'active' : ''}`}
-                    title="Toggle Doodle Time Activity (Instructor Only)"
+                    disabled
+                    className="doodle-toggle-btn disabled"
+                    title="Doodle (Inactive)"
+                    style={{ color: '#9ca3af', cursor: 'not-allowed', opacity: 0.65 }}
                   >
-                    🎨 Doodle Time
+                    Doodle
                   </button>
 
                   {/* CONFETTI */}
@@ -604,7 +605,7 @@ export default function ControlDeck() {
                     >
                       BPM Mode
                     </button>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#fff', fontSize: '0.85rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#fff', fontSize: '1.06rem' }}>
                       <label>BPM:</label>
                       <input
                         type="number"
@@ -722,16 +723,16 @@ export default function ControlDeck() {
                   placeholder="Min"
                   min="0"
                   id="cd-timer-min"
-                  style={{ width: '55px', padding: '6px', borderRadius: '4px', border: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.4)', color: 'white', fontSize: '0.85rem', textAlign: 'center', fontFamily: 'inherit' }}
+                  style={{ width: '55px', padding: '6px', borderRadius: '4px', border: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.4)', color: 'white', fontSize: '1.06rem', textAlign: 'center', fontFamily: 'inherit' }}
                 />
-                <span style={{ color: 'white', fontSize: '0.85rem' }}>:</span>
+                <span style={{ color: 'white', fontSize: '1.06rem' }}>:</span>
                 <input
                   type="number"
                   placeholder="Sec"
                   min="0"
                   max="59"
                   id="cd-timer-sec"
-                  style={{ width: '55px', padding: '6px', borderRadius: '4px', border: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.4)', color: 'white', fontSize: '0.85rem', textAlign: 'center', fontFamily: 'inherit' }}
+                  style={{ width: '55px', padding: '6px', borderRadius: '4px', border: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.4)', color: 'white', fontSize: '1.06rem', textAlign: 'center', fontFamily: 'inherit' }}
                 />
                 <button
                   onClick={() => {
@@ -750,7 +751,7 @@ export default function ControlDeck() {
 
                 <div style={{ width: '1px', height: '18px', background: 'var(--glass-border)' }} />
 
-                <span style={{ fontSize: '0.85rem', color: stageTimer?.isRunning ? '#22c55e' : (stageTimer?.duration > 0) ? '#fbbf24' : '#94a3b8', fontWeight: 'bold', whiteSpace: 'nowrap' }}>
+                <span style={{ fontSize: '1.06rem', color: stageTimer?.isRunning ? '#22c55e' : (stageTimer?.duration > 0) ? '#fbbf24' : '#94a3b8', fontWeight: 'bold', whiteSpace: 'nowrap' }}>
                   {stageTimer?.isRunning ? 'Running' : (stageTimer?.duration > 0) ? 'Paused' : 'Off'}
                 </span>
 
@@ -812,7 +813,7 @@ export default function ControlDeck() {
                         border: '1px solid var(--glass-border)', 
                         background: 'rgba(0,0,0,0.4)', 
                         color: 'white', 
-                        fontSize: '0.85rem',
+                        fontSize: '1.06rem',
                         fontFamily: 'inherit'
                       }}
                     />
@@ -824,7 +825,7 @@ export default function ControlDeck() {
                     </button>
                   </>
                 ) : (
-                  <span style={{ color: '#ef4444', fontSize: '0.85rem', fontWeight: 'bold' }}>
+                  <span style={{ color: '#ef4444', fontSize: '1.06rem', fontWeight: 'bold' }}>
                     Please select a student in the grid first to whisper!
                   </span>
                 )}
@@ -874,7 +875,7 @@ export default function ControlDeck() {
                     </button>
                   </>
                 ) : (
-                  <span style={{ color: '#ef4444', fontSize: '0.85rem', fontWeight: 'bold' }}>
+                  <span style={{ color: '#ef4444', fontSize: '1.06rem', fontWeight: 'bold' }}>
                     Please select a student in the grid first to view student tools!
                   </span>
                 )}
@@ -924,7 +925,7 @@ export default function ControlDeck() {
                   ))}
                 </div>
                 {activeGuest && (
-                  <span style={{ fontSize: '0.78rem', color: '#10b981', fontWeight: 'bold', margin: '2px 0' }}>
+                  <span style={{ fontSize: '0.98rem', color: '#10b981', fontWeight: 'bold', margin: '2px 0' }}>
                     Target: {activeGuest.name}
                   </span>
                 )}
@@ -945,7 +946,7 @@ export default function ControlDeck() {
                   ))}
                 </div>
                 {activeGuest && (
-                  <span style={{ fontSize: '0.78rem', color: '#10b981', fontWeight: 'bold', margin: '2px 0' }}>
+                  <span style={{ fontSize: '0.98rem', color: '#10b981', fontWeight: 'bold', margin: '2px 0' }}>
                     Target: {activeGuest.name}
                   </span>
                 )}

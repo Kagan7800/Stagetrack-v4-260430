@@ -533,7 +533,7 @@ export default function GuestContainer({
         className="gc-sticker-zone"
         style={{ position: 'absolute', inset: 0, overflow: 'visible', borderRadius: 'inherit', pointerEvents: 'none' }}
       >
-      {safeStickers.filter(s => s && s.name !== safeParticipant.selectedIcon && !(activeTheme === 'sor' && (s.position === 'confetti' || s.name === 'Confetti.svg'))).map((s) => {
+      {safeStickers.filter(s => s && s.name !== safeParticipant.selectedIcon && !(s.position === 'confetti' || s.name === 'Confetti.svg')).map((s) => {
         const nudge = (nudges && nudges[s.position]) || {};
         let style = {};
         

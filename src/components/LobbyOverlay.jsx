@@ -35,12 +35,12 @@ const STO_STICKERS = [
 ];
 
 const VIBE_CHIPS = [
-  { id: 'high_energy', emoji: '⚡', label: 'High Energy', color: '#f97316' },
-  { id: 'low_energy', emoji: '🔋', label: 'Tired / Low', color: '#a855f7' },
-  { id: 'gentle_warmup', emoji: '🥺', label: 'Needing Warm-Up', color: '#3b82f6' },
-  { id: 'birthday', emoji: '🎉', label: 'Birthday Today!', color: '#facc15' },
-  { id: 'under_weather', emoji: '🤒', label: 'Not Feeling Well', color: '#06b6d4' },
-  { id: 'focused', emoji: '🧩', label: 'Deeply Focused', color: '#10b981' }
+  { id: 'high_energy', emoji: '⚡', line1: 'High', line2: 'Energy', label: '⚡ High Energy', color: '#f97316', bg: 'rgba(249, 115, 22, 0.2)' },
+  { id: 'low_energy', emoji: '🔋', line1: 'Tired /', line2: 'Low', label: '🔋 Tired / Low', color: '#a855f7', bg: 'rgba(168, 85, 247, 0.2)' },
+  { id: 'gentle_warmup', emoji: '🥺', line1: 'Needing', line2: 'Warm-Up', label: '🥺 Needing Warm-Up', color: '#3b82f6', bg: 'rgba(59, 130, 246, 0.2)' },
+  { id: 'birthday', emoji: '🎉', line1: 'Birthday', line2: 'Today!', label: '🎉 Birthday Today!', color: '#facc15', bg: 'rgba(250, 204, 21, 0.2)' },
+  { id: 'under_weather', emoji: '🤒', line1: 'Not Feeling', line2: 'Well', label: '🤒 Not Feeling Well', color: '#06b6d4', bg: 'rgba(6, 182, 212, 0.2)' },
+  { id: 'focused', emoji: '🧩', line1: 'Deeply', line2: 'Focused', label: '🧩 Deeply Focused', color: '#10b981', bg: 'rgba(16, 185, 129, 0.2)' }
 ];
 
 function LobbyVibeChips({ selectedVibeChips, setSelectedVibeChips }) {
