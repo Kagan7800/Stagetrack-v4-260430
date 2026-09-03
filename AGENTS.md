@@ -64,6 +64,9 @@ The most expensive failure mode is a confident report of work that did not happe
 
 ## 5. Diagnosis Discipline
 
+- **No Surface-Level CSS Tweaks**: Never make iterative guesswork edits to padding, margins, or random `clamp()` values. Layout issues must be solved via deterministic architectural contracts (e.g., proportional flex/grid fractions within `100dvh`, container queries, or component isolation).
+- **Full-Stack Root Cause**: Visual or transition bugs (e.g. flashes, freezes, clipping) must be audited across the full stack (HTML base styles, React Suspense/router fallbacks, and CDN/Firebase cache headers) before theorizing styling fixes.
+- **Stop & Propose Options First**: Whenever a visual layout conflict or ambiguity arises, stop guessing, diagnose the structural cause, present 2–3 clear architectural alternatives, and obtain explicit user approval before modifying code.
 - **Root cause must be mechanically consistent with the fix.** If the proposed change would not address the stated cause, one of the two is wrong. Resolve that before writing code.
 - **Read the actual DOM ancestry and computed styles before theorizing.** Verify, don't infer.
 - **Prefer the simplest sufficient cause.** Check ancestor `overflow`, existing stacking contexts, and layout mode before inventing new layers or properties.
