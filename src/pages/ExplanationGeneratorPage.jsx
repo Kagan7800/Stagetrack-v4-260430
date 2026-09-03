@@ -6,11 +6,11 @@ import PersonalizedExplanationGenerator from '../components/PersonalizedExplanat
 
 export default function ExplanationGeneratorPage() {
   useEffect(() => {
-    document.title = 'Personalized Profile Builder | Music Fun With Your Little One';
+    document.title = 'About Your Little One - Survey';
   }, []);
 
   return (
-    <div style={{ minHeight: '100vh', width: '100vw', background: '#F7F7F8', margin: 0, padding: 0, boxSizing: 'border-box' }}>
+    <div style={{ minHeight: '100vh', width: '100%', background: '#D9EFFF', margin: 0, padding: 0, boxSizing: 'border-box' }}>
       <PersonalizedExplanationGenerator onClose={null} standalone={true} />
     </div>
   );
