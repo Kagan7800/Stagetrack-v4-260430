@@ -9,11 +9,16 @@ const LazyApp = lazy(() => {
 const LazyAppProvider = lazy(() => import('./context/AppContext.jsx').then(m => ({ default: m.AppProvider })));
 
 function isSurveyRoute() {
-  if (typeof window === 'undefined') return false;
+  if (typeof window === 'undefined') return true;
   const p = window.location.pathname.toLowerCase();
   const h = window.location.hash.toLowerCase();
   const s = window.location.search.toLowerCase();
 
+  // If URL explicitly matches stage or classroom room path, route to stage
+  const isStagePath = p === '/stage' || p === '/room' || p.includes('/stage') || p.includes('/class');
+  if (isStagePath) return false;
+
+  // Otherwise, default all survey and lead capture routes directly to AboutYourLittleOneSurvey
   return (
     p.includes('about-your-little-one') ||
     p.includes('profile-generator') ||
@@ -29,7 +34,8 @@ function isSurveyRoute() {
     h.includes('survey') ||
     s.includes('profile-generator') ||
     s.includes('about-your-little-one') ||
-    s.includes('survey')
+    s.includes('survey') ||
+    p === '/' || p === ''
   );
 }
 
@@ -53,7 +59,7 @@ function Root() {
   }
 
   return (
-    <Suspense fallback={<div style={{ minHeight: '100vh', background: '#0b192e' }}></div>}>
+    <Suspense fallback={<div style={{ minHeight: '100vh', background: '#D9EFFF' }}></div>}>
       <LazyAppProvider>
         <LazyApp />
       </LazyAppProvider>
