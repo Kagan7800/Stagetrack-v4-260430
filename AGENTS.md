@@ -28,6 +28,7 @@ Auto-continue is on. These require explicit human approval, every time. Approval
 - Installing or upgrading dependencies
 - Any command against a production or shared environment
 - Writes to a metered or paid API beyond a single test call
+- **Modifying any file related to the locked 'About Your Little One' Survey (`src/components/PersonalizedExplanationGenerator.*`, `src/pages/AboutYourLittleOneSurvey.jsx`, `src/pages/ExplanationGeneratorPage.jsx`, survey routes in `src/main.jsx`, `index.html`, and `firebase.json`) — requires explicit user permission every time.**
 
 **Never, under any framing:** commit secrets or credentials — including in tests, fixtures, or comments; fabricate git history to look more incremental than the work was; disable, skip, or weaken a test to make a build pass; delete code you cannot prove is unused.
 
