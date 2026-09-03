@@ -13,6 +13,14 @@
 
   --text-main: #f8fafc;
   --text-muted: #cbd5e1;
+
+  /* Spec v3 Sticker Design Tokens */
+  --sticker-protrusion: 10px;  /* how far a sticker hangs past the tile border */
+  --sticker-buffer: 5px;       /* min clear space around each sticker */
+  --sticker-min: 48px;
+  --sticker-max: 84px;
+  --sticker-ideal: 26cqw;      /* target size, relative to tile width */
+  --tile-gutter: 32px;         /* grid gap — clears two facing protrusions plus buffers */
 }
 
 /* Top control bar was removed */
@@ -214,11 +222,12 @@ body {
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: repeat(auto-fit, minmax(0, 1fr));
-  column-gap: 8.5%;
-  row-gap: 20px;
+  column-gap: var(--tile-gutter, 32px);
+  row-gap: var(--tile-gutter, 32px);
   height: auto;
   max-height: 100%;
   transition: flex 0.3s ease;
+  overflow: visible !important;
 }
 
 .side-peos[data-columns="1"] {
@@ -575,176 +584,120 @@ body {
 }
 
 
-.gc-sticker {
+/* Spec v3 Sticker Placement Implementation */
+.video-cell,
+.tile {
+  container-type: size;
+  position: relative;
+  overflow: visible !important; /* required — clipping kills the protrusion */
+}
+
+.sticker-layer {
   position: absolute;
-  width: 112px;
-  height: 112px;
-  z-index: 10;
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  inset: 0;
+  z-index: 2;
+  pointer-events: none; /* stickers overhang neighbors; never intercept clicks */
+  overflow: visible !important;
 }
 
-.gc-sticker.ic-placed {
-  width: 88px !important;
-  height: 88px !important;
-  z-index: 10000 !important;
+.sticker-layer .sticker-item,
+.sl-placed,
+.sticker {
+  --s: clamp(var(--sticker-min), min(var(--sticker-ideal), 33cqmin), var(--sticker-max));
+  --p: var(--sticker-protrusion);
+  position: absolute !important;
+  width: var(--s) !important;
+  height: var(--s) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
+  pointer-events: none !important;
+  aspect-ratio: 1 / 1 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
 }
 
-.gc-sticker.large-sticker {
-  width: 175px !important;
-  height: 175px !important;
+.sticker-visual {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: scale(var(--sticker-scale, 1));
+  transform-origin: center center;
+  transition: transform 0.15s ease-out;
 }
 
-.gc-sticker.large-sticker.ic-placed {
-  width: 143px !important;
-  height: 143px !important;
+.sticker-visual img,
+.sticker img,
+img.sticker,
+.sticker-layer .sticker-item img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgb(0 0 0 / 0.4));
 }
 
-.gc-sticker.giraffe-special {
-  width: 105px !important;
-  height: 105px !important;
+/* Corners */
+.sticker-layer .sticker-item[data-slot="NW"], .sticker[data-slot="NW"] { top: calc(-1 * var(--p)) !important; left:  calc(-1 * var(--p)) !important; right: auto !important; bottom: auto !important; translate: 0 0 !important; }
+.sticker-layer .sticker-item[data-slot="NE"], .sticker[data-slot="NE"] { top: calc(-1 * var(--p)) !important; right: calc(-1 * var(--p)) !important; left: auto !important; bottom: auto !important; translate: 0 0 !important; }
+.sticker-layer .sticker-item[data-slot="SE"], .sticker[data-slot="SE"] { bottom: calc(-1 * var(--p)) !important; right: calc(-1 * var(--p)) !important; top: auto !important; left: auto !important; translate: 0 0 !important; }
+.sticker-layer .sticker-item[data-slot="SW"], .sticker[data-slot="SW"] { bottom: calc(-1 * var(--p)) !important; left:  calc(-1 * var(--p)) !important; top: auto !important; right: auto !important; translate: 0 0 !important; }
+
+/* Side midpoints */
+.sticker-layer .sticker-item[data-slot="W"], .sticker[data-slot="W"] { left: calc(-1 * var(--p)) !important; top: 50% !important; translate: 0 -50% !important; right: auto !important; bottom: auto !important; }
+/* Sun in slot E: straight vertical right edge sits directly flush (0px) on the inner edge of the border line */
+.sticker-layer .sticker-item[data-slot="E"], .sticker[data-slot="E"] {
+  right: 0px !important;
+  top: 50% !important;
+  translate: 0 -50% !important;
+  left: auto !important;
+  bottom: auto !important;
+  display: flex !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
 }
 
-.gc-sticker.giraffe-special.ic-placed {
-  width: 86px !important;
-  height: 86px !important;
-}
-
-.gc-sticker.ic-star-special {
-  z-index: 10000 !important;
-}
-
-.gc-sticker.ic-star-special.ic-placed {
-  width: 104px !important;
-  height: 104px !important;
-}
-
-.gc-sticker.ic-star-special:not(.ic-placed) {
-  width: 135px !important;
-  height: 135px !important;
-}
-
-/* Antigravity Spatial Map & Priority Stack */
-.gc-sticker.pos-sun {
-  top: 50%;
-  right: -14px;
-  margin-top: -36px; /* Vertically centers the 71px sticker without transform */
-  transform: none !important; /* Never moves */
-  transition: none !important; /* Never moves */
-  z-index: 9999 !important; /* Always top priority */
-}
-
-.gc-sticker.pos-crown {
-  top: 0;
-  left: 50%;
-  width: 106px;
-  height: 106px;
-  transform: perspective(250px) translate(-50%, calc(-50% + 20px)) rotateX(-35deg);
-  z-index: 10000 !important; /* Always wins/overlaps STO */
-}
-
-.gc-sticker.pos-star {
-  top: 0;
-  left: 53px; /* Safe distance from the top-left sticker */
-  width: 38px;
-  height: 38px;
-  transform: translate(-50%, -50%);
-  z-index: 40;
-}
-
-.gc-sticker.pos-star2 {
-  top: 0;
-  right: 62px; /* Moved left another 3px */
-  width: 33px;
-  height: 33px;
-  transform: translate(50%, 0); /* Show full image */
-  z-index: 40;
-}
-
-.gc-sticker.pos-heart {
-  bottom: 0;
-  left: 75%;
-  width: 53px;
-  height: 53px;
-  transform: translate(-50%, 50%);
-  z-index: 40;
-}
-
-.gc-sticker.pos-birthday {
-  top: 10px;
-  right: 15px;
-  width: 100px;
-  height: 100px;
-  transform: translate(50%, -50%);
-  z-index: 10000 !important; /* Always wins/overlaps STO */
-  padding: 1px;
-}
-
-.gc-sticker.pos-balloons {
-  top: 50%;
-  left: 0;
-  transform: translate(-50%, -50%);
-  z-index: 30;
-}
-
-.gc-sticker.pos-confetti {
-  top: 0;
-  left: 0;
+.sticker-layer .sticker-item[data-slot="E"] .sticker-visual {
   width: 100% !important;
   height: 100% !important;
-  transform: none;
-  z-index: 50;
-  pointer-events: none;
+  display: flex !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  transform-origin: right center !important;
 }
 
-.gc-sticker.pos-1 {
-  top: 0px;
-  left: 0px;
-  transform: translate(-65%, -65%);
-  z-index: 9999 !important;
+.sticker-layer .sticker-item[data-slot="E"] .sticker-visual img {
+  height: 100% !important;
+  width: auto !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
+  object-position: right center !important;
+  margin-left: auto !important;
+  margin-right: 0px !important;
 }
 
-.gc-sticker.pos-2 {
-  top: 0px;
-  right: 0px;
-  transform: translate(65%, -65%);
-  z-index: 9999 !important;
-  padding: 1px;
-}
+/* Top Center Positions (Crown - lowered 5px to align seamlessly on top border) */
+.sticker-layer .sticker-item[data-slot="TC"], .sticker-layer .sticker-item[data-slot="crown"], .sticker[data-slot="TC"] { top: calc(-1 * var(--p)) !important; left: 50% !important; translate: -50% 0 !important; right: auto !important; bottom: auto !important; z-index: 15 !important; }
 
-.gc-sticker.pos-3 {
-  bottom: 1px;
-  left: 0px;
-  transform: translate(-65%, 0%);
-  z-index: 9999 !important;
-}
-
-.gc-sticker.pos-4 {
-  bottom: 1px;
-  right: 0px;
-  transform: translate(65%, 0%);
-  z-index: 9999 !important;
-}
-
-.gc-sticker.pos-5 {
-  top: 50%;
-  right: 0;
-  transform: translate(50%, -50%);
-  z-index: 9999 !important;
-}
-
-.gc-sticker.sun-special {
-  bottom: auto !important;
-  top: 50% !important;
-  left: auto !important;
-  right: 0 !important;
-  transform: translateY(-50%) !important;
+.sticker-layer .sticker-item[data-slot="TC"] .sticker-visual,
+.sticker-layer .sticker-item[data-slot="crown"] .sticker-visual {
+  transform-origin: center bottom;
 }
 
 /* Diagonal Xylophone when placed on borders/badge */
 .lobby-camera-icon-badge[src*="Xylophone" i],
 .video-cell > img[src*="Xylophone" i],
-.gc-sticker[src*="Xylophone" i] {
-  transform: rotate(-45deg) !important;
+.sticker-visual img[src*="Xylophone" i],
+.sticker[src*="Xylophone" i] {
+  rotate: -45deg;
 }
 
 /* Hand Raise Glow Layer */
@@ -755,7 +708,7 @@ body {
   border-radius: 12px;
   box-shadow: 0 0 20px rgba(250, 204, 21, 0.95), inset 0 0 12px rgba(250, 204, 21, 0.5) !important;
   pointer-events: none;
-  z-index: 15; /* Above theme, below mute/magic */
+  z-index: 15;
 }
 
 /* Status Icons (Mute/Hand) */
@@ -768,47 +721,50 @@ body {
   padding: 2px 4px;
   display: flex;
   gap: 4px;
-  z-index: 20; /* Above glow, below magic/sun */
+  z-index: 20;
 }
 
-/* GC Sticker Positions for Instructor-Added Slots */
+/* GC Sticker Positions for Instructor Top Row — Inward Placement */
+.gc-sticker.pos-tl-c {
+  top: 0;
+  left: 6%;
+}
+
+.gc-sticker.pos-lc {
+  top: 0;
+  left: 23%;
+}
+
 .gc-sticker.pos-tc {
   top: 0;
-  left: 40%;
+  left: 41%;
+}
+
+.gc-sticker.pos-tr-c {
+  top: 0;
+  left: 59%;
 }
 
 .gc-sticker.pos-rc-1 {
   top: 0;
   right: auto;
-  left: 80%;
+  left: 76%;
 }
 
 .gc-sticker.pos-rc-2 {
   top: 0;
   right: auto;
-  left: 100%;
-}
-
-.gc-sticker.pos-tl-c {
-  top: 0;
-  left: 0%;
-}
-
-.gc-sticker.pos-tr-c {
-  top: 0;
-  right: auto;
-  left: 60%;
-}
-
-.gc-sticker.pos-lc {
-  top: 0;
-  left: 20%;
+  left: 90%;
 }
 
 /* right center */
 
 /* Sticker Tray / Palette */
-.sticker-item {
+.sticker-picker .sticker-item,
+.peo-sticker-grid .sticker-item,
+.ito-sticker-grid .sticker-item,
+.sticker-tray .sticker-item,
+.controls-row .sticker-item {
   width: 100%;
   aspect-ratio: 1;
   background: transparent;
@@ -823,12 +779,20 @@ body {
   overflow: hidden;
 }
 
-.sticker-item:hover {
+.sticker-picker .sticker-item:hover,
+.peo-sticker-grid .sticker-item:hover,
+.ito-sticker-grid .sticker-item:hover,
+.sticker-tray .sticker-item:hover,
+.controls-row .sticker-item:hover {
   background: rgba(255, 255, 255, 0.15);
   transform: scale(1.1);
 }
 
-.sticker-item img {
+.sticker-picker .sticker-item img,
+.peo-sticker-grid .sticker-item img,
+.ito-sticker-grid .sticker-item img,
+.sticker-tray .sticker-item img,
+.controls-row .sticker-item img {
   width: 100%;
   height: 100%;
   object-fit: contain;
@@ -2531,7 +2495,7 @@ body {
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: #F7F7F8;
+  background: #1745B9;
   z-index: 9999;
   display: flex;
   align-items: center;
@@ -5784,8 +5748,16 @@ body {
   display: flex !important;
   flex-direction: column !important;
   align-items: center !important;
-  width: fit-content !important;
+  width: 100% !important;
   max-width: 100% !important;
+}
+
+.studio-controls,
+.control-deck-outer,
+.control-deck {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
 }
 
 .pc-gt-unified {

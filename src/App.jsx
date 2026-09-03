@@ -79,7 +79,7 @@ function App() {
     activeGuestId, setActiveGuestId,
     activeToolbox, setActiveToolbox,
     guestButtons, setGuestButtons, handleToggleGuestButton,
-    guestStickers, setGuestStickers, handleAddSticker, stickerNudges,
+    guestStickers, setGuestStickers, handleAddSticker,
     isDoodling,
     mediaUrl, mediaType, clearMedia,
     isChatOpen, setIsChatOpen, handleToggleChat,
@@ -475,7 +475,6 @@ function App() {
                           onDoubleClick={() => handleDoubleClick(p)}
                           stickers={guestStickers[p.id] || []}
                           buttons={guestButtons[p.id] || {}}
-                          nudges={stickerNudges[p.id] || {}}
                           isDoodling={isDoodling}
                           globalMute={globalMute}
                           globalPause={globalPause}
@@ -585,7 +584,6 @@ function App() {
                            onDoubleClick={() => handleDoubleClick(p)}
                            stickers={guestStickers[p.id] || []}
                            buttons={guestButtons[p.id] || {}}
-                           nudges={stickerNudges[p.id] || {}}
                            isDoodling={isDoodling}
                            globalMute={globalMute}
                            globalPause={globalPause}
@@ -594,11 +592,12 @@ function App() {
                      })}
                    </div>
 
-                    <div className="center-wrapper" style={{ position: 'relative', alignSelf: 'center', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                    <div className="center-wrapper" style={{ position: 'relative', alignSelf: 'center', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
                       <div style={{ 
                         display: 'flex', 
                         flexDirection: 'column', 
-                        width: 'fit-content', 
+                        width: 'calc(((var(--peo-height, 31.25vh) * 2 + 20px) * 0.7) * (16 / 9))',
+                        maxWidth: '100%',
                         alignItems: 'center', 
                         justifyContent: 'center',
                         gap: '10px'
@@ -616,43 +615,45 @@ function App() {
                          </div>
                        </div>
 
-                        {isInstructorClient && activeItoSection === 'closed' && (
-                          <button
-                            onClick={() => setActiveItoSection(null)}
-                            className="studio-controls-toggle-btn"
-                            style={{
-                              margin: '6px 0',
-                              padding: '6px 18px',
-                              background: 'linear-gradient(135deg, rgba(58, 45, 187, 0.5), rgba(122, 79, 217, 0.5))',
-                              border: '1px solid rgba(255, 255, 255, 0.25)',
-                              borderRadius: '20px',
-                              color: '#ffffff',
-                              fontWeight: 'bold',
-                              fontSize: '0.85rem',
-                              cursor: 'pointer',
-                              backdropFilter: 'blur(8px)',
-                              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.25)',
-                              transition: 'all 0.2s ease',
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '6px',
-                              zIndex: 20
-                            }}
-                            onMouseEnter={(e) => {
-                              e.currentTarget.style.background = 'linear-gradient(135deg, rgba(58, 45, 187, 0.75), rgba(122, 79, 217, 0.75))';
-                              e.currentTarget.style.transform = 'scale(1.04)';
-                            }}
-                            onMouseLeave={(e) => {
-                              e.currentTarget.style.background = 'linear-gradient(135deg, rgba(58, 45, 187, 0.5), rgba(122, 79, 217, 0.5))';
-                              e.currentTarget.style.transform = 'scale(1)';
-                            }}
-                          >
-                            <span>Studio Controls</span>
-                            <span style={{ fontSize: '0.7rem' }}>▼</span>
-                          </button>
-                        )}
+                       <div style={{ width: '100%', maxWidth: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                         {activeItoSection === 'closed' && (
+                           <button
+                             onClick={() => setActiveItoSection(null)}
+                             className="studio-controls-toggle-btn"
+                             style={{
+                               margin: '6px 0',
+                               padding: '6px 18px',
+                               background: 'linear-gradient(135deg, rgba(58, 45, 187, 0.5), rgba(122, 79, 217, 0.5))',
+                               border: '1px solid rgba(255, 255, 255, 0.25)',
+                               borderRadius: '20px',
+                               color: '#ffffff',
+                               fontWeight: 'bold',
+                               fontSize: '0.85rem',
+                               cursor: 'pointer',
+                               backdropFilter: 'blur(8px)',
+                               boxShadow: '0 4px 12px rgba(0, 0, 0, 0.25)',
+                               transition: 'all 0.2s ease',
+                               display: 'flex',
+                               alignItems: 'center',
+                               gap: '6px',
+                               zIndex: 20
+                             }}
+                             onMouseEnter={(e) => {
+                               e.currentTarget.style.background = 'linear-gradient(135deg, rgba(58, 45, 187, 0.75), rgba(122, 79, 217, 0.75))';
+                               e.currentTarget.style.transform = 'scale(1.04)';
+                             }}
+                             onMouseLeave={(e) => {
+                               e.currentTarget.style.background = 'linear-gradient(135deg, rgba(58, 45, 187, 0.5), rgba(122, 79, 217, 0.5))';
+                               e.currentTarget.style.transform = 'scale(1)';
+                             }}
+                           >
+                             <span>Studio Controls</span>
+                             <span style={{ fontSize: '0.7rem' }}>▼</span>
+                           </button>
+                         )}
 
-                        <ControlDeck />
+                         <ControlDeck />
+                       </div>
                       </div>
                     </div>
                     
@@ -678,7 +679,6 @@ function App() {
                            onDoubleClick={() => handleDoubleClick(p)}
                            stickers={guestStickers[p.id] || []}
                            buttons={guestButtons[p.id] || {}}
-                           nudges={stickerNudges[p.id] || {}}
                            isDoodling={isDoodling}
                            globalMute={globalMute}
                            globalPause={globalPause}

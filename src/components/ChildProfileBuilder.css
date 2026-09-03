@@ -8,7 +8,7 @@
 .cpb-page {
   min-height: 100vh;
   width: 100%;
-  background: linear-gradient(160deg, #FFF0DC 0%, #FFEAA7 50%, #FFD8B1 100%);
+  background: #D9EFFF;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -28,7 +28,7 @@
   width: 340px;
   height: 340px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 200, 100, 0.35) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(180, 220, 255, 0.45) 0%, transparent 70%);
   pointer-events: none;
   z-index: 0;
 }
@@ -41,7 +41,7 @@
   width: 280px;
   height: 280px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 140, 66, 0.25) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(160, 210, 255, 0.35) 0%, transparent 70%);
   pointer-events: none;
   z-index: 0;
 }
@@ -54,7 +54,7 @@
   flex-direction: column;
   height: 100%;
   width: 100%;
-  background: linear-gradient(160deg, #FFF5E4 0%, #FFEAA7 60%, #FFD8B1 100%);
+  background: #D9EFFF;
   border-radius: 16px;
   overflow: hidden;
   overflow-y: auto;

@@ -153,12 +153,23 @@ exports.personalizedExplanation = functions.https.onRequest(async (req, res) => 
   }
 
   try {
-    const payload = req.body;
+    const payload = req.body || {};
 
-    if (!payload.childAge || !payload.traitsSelected) {
-      return res.status(400).json({
-        error: "Missing required fields: childAge, traitsSelected"
-      });
+    if (!payload.childAge && payload.age) {
+      payload.childAge = `${payload.age} years old`;
+    }
+    if (!payload.childAge) {
+      payload.childAge = "2-3 years old";
+    }
+
+    if (!payload.traitsSelected && payload.traits && typeof payload.traits === 'object') {
+      payload.traitsSelected = Object.entries(payload.traits)
+        .filter(([k, v]) => v && k !== 'notes')
+        .map(([_, v]) => String(v));
+    }
+
+    if (!payload.traitsSelected || !Array.isArray(payload.traitsSelected) || payload.traitsSelected.length === 0) {
+      payload.traitsSelected = ["Music Exploration"];
     }
 
     if (!payload.parentEmail) {

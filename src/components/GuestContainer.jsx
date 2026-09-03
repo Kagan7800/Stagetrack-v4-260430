@@ -3,6 +3,7 @@
 import { Pause } from 'lucide-react';
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useAppContext } from '../context/AppContext';
+import { allocate } from '../utils/stickerAllocator';
 const getBorderStyle = (borderValue, innerBg = 'rgba(11, 25, 46, 0.7)') => {
   if (!borderValue) return {};
   
@@ -50,7 +51,6 @@ export default function GuestContainer({
   onDoubleClick,
   stickers = [],
   buttons = { raiseHand: false, mute: false },
-  nudges = {},
   globalPause = false,
   stream = null
 }) {
@@ -441,9 +441,18 @@ export default function GuestContainer({
 
   const safeStickers = Array.isArray(stickers) ? stickers : [];
 
+  const { placed, removed } = useMemo(() => {
+    return allocate(
+      safeStickers.filter(s => s && !(s.position === 'confetti' || s.name === 'Confetti.svg')),
+      safeParticipant.selectedIcon || null
+    );
+  }, [safeStickers, safeParticipant.selectedIcon]);
+
+  const hasConfetti = safeStickers.some(s => s && (s.position === 'confetti' || s.name === 'Confetti.svg'));
+
   return (
     <div 
-      className={`video-cell ${showActiveGlow ? 'active-gc' : ''} ${showGrayscale ? 'grayscale-sharp' : ''} ${isNonInteractive ? 'non-interactive' : ''}`} 
+      className={`video-cell tile ${showActiveGlow ? 'active-gc' : ''} ${showGrayscale ? 'grayscale-sharp' : ''} ${isNonInteractive ? 'non-interactive' : ''}`} 
       onClick={handleCellClick}
       style={borderStyle}
     >
@@ -458,23 +467,6 @@ export default function GuestContainer({
           />
         )}
       </div>
-
-      {safeParticipant.selectedIcon && (
-        <img 
-          src={`/assets/svg_stickers/${safeParticipant.selectedIcon}`}
-          alt="Selected Icon"
-          style={{
-            position: 'absolute',
-            top: '-22.5%',
-            left: '-22.5%',
-            width: '45%',
-            height: '45%',
-            zIndex: 10,
-            pointerEvents: 'none',
-            filter: 'drop-shadow(0px 4px 8px rgba(0, 0, 0, 0.3))'
-          }}
-        />
-      )}
 
       {safeParticipant.name && (
         <div 
@@ -521,103 +513,74 @@ export default function GuestContainer({
         </div>
       )}
 
-      {/*
-        gc-sticker-zone clips stickers to this tile's own bounds so a sticker
-        can never bleed into a neighboring participant's box, and each sticker
-        is size-capped (see .gc-sticker max-width/max-height in index.css) so
-        it can't grow large enough to cover the person's face. This wrapper is
-        overflow:hidden on purpose; .video-cell itself stays overflow:visible
-        so glow/badge effects that intentionally hang off the edge are unaffected.
-      */}
-      <div
-        className="gc-sticker-zone"
-        style={{ position: 'absolute', inset: 0, overflow: 'visible', borderRadius: 'inherit', pointerEvents: 'none' }}
-      >
-      {safeStickers.filter(s => s && s.name !== safeParticipant.selectedIcon && !(s.position === 'confetti' || s.name === 'Confetti.svg')).map((s) => {
-        const nudge = (nudges && nudges[s.position]) || {};
-        let style = {};
-        
-        if (s.position === 1) {
-           style.marginTop = nudge.y ? `${nudge.y}px` : undefined;
-           style.marginLeft = nudge.x ? `${nudge.x}px` : undefined;
-        } else if (s.position === 2) {
-           style.marginTop = nudge.y ? `${nudge.y}px` : undefined;
-           style.marginRight = nudge.x ? `${-nudge.x}px` : undefined;
-        } else if (s.position === 3) {
-           style.marginBottom = nudge.y ? `${-nudge.y}px` : undefined;
-           style.marginLeft = nudge.x ? `${nudge.x}px` : undefined;
-        } else if (s.position === 4) {
-           style.marginBottom = nudge.y ? `${-nudge.y}px` : undefined;
-           style.marginRight = nudge.x ? `${-nudge.x}px` : undefined;
-        }
+      {/* Spec v3 Derived 8-Slot Placement Scalable Sticker Layer */}
+      <div className="sticker-layer">
+        {placed.map(({ slot, sticker }) => {
+          const isCrown = sticker.kind === 'crown' || (sticker.name && sticker.name.toLowerCase().includes('crown')) || slot === 'TC';
+          const isBirthday = sticker.kind === 'birthday' || (sticker.name && sticker.name.toLowerCase().includes('birthday')) || slot === 'NE';
+          const isXylophone = sticker.name && sticker.name.toLowerCase().includes('xylophone');
+          const isTrumpet = sticker.name && sticker.name.toLowerCase().includes('trumpet');
+          const isFlower = sticker.name && sticker.name.toLowerCase().includes('flower');
+          const isStar = sticker.name && sticker.name.toLowerCase().includes('star');
 
-        const isIcSticker = typeof s.position === 'string' && s.position !== 'confetti' && s.position !== 'sun' && s.position !== 'birthday' && s.position !== 'crown';
-
-        if (isIcSticker) {
-          let xTrans = '-50%';
-          if (s.position === 'tl-c') xTrans = '0%';
-          if (s.position === 'rc-2') xTrans = '-100%';
-          const yTrans = '-50%';
-          style.transform = `translate(${xTrans}, ${yTrans})`;
-          style.width = '70px';
-          style.height = '70px';
-        }
-
-        if (s.name === 'Drums.svg') {
-          style.width = isIcSticker ? '72px' : '93px';
-          style.height = isIcSticker ? '72px' : '93px';
-        }
-
-        if (s.name === 'Trumpet.svg') {
-          let xT = 0;
-          let yT = 0;
-          let hasCustomTransform = false;
-
-          if (s.position === 1) { xT = -65; yT = -65; hasCustomTransform = true; }
-          else if (s.position === 2) { xT = 65; yT = -65; hasCustomTransform = true; }
-          else if (s.position === 3) { xT = -65; yT = 0; hasCustomTransform = true; }
-          else if (s.position === 4) { xT = 65; yT = 0; hasCustomTransform = true; }
-          else if (s.position === 5) { xT = 50; yT = -50; hasCustomTransform = true; }
-          else if (s.position === 'crown') {
-            style.top = '13px';
-          }
-          else if (s.position === 'star') { xT = -50; yT = -50; hasCustomTransform = true; }
-          else if (s.position === 'star2') { xT = 50; yT = 0; hasCustomTransform = true; }
-          else if (s.position === 'heart') { xT = -50; yT = 50; hasCustomTransform = true; }
-          else if (s.position === 'birthday') { xT = 50; yT = -50; hasCustomTransform = true; }
-          else if (s.position === 'balloons') { xT = -50; yT = -50; hasCustomTransform = true; }
-          else if (isIcSticker) {
-            xT = (s.position.includes('tr-c') || s.position.startsWith('rc-')) ? 50 : -50;
-            yT = -50;
-            hasCustomTransform = true;
+          let scale = sticker.scale || 1;
+          if (isCrown) {
+            scale = scale * 1.25;
+          } else if (isBirthday) {
+            scale = scale * 1.25;
+          } else if (isXylophone) {
+            scale = scale * 1.25;
+          } else if (isTrumpet) {
+            scale = scale * 1.20;
+          } else if (isFlower) {
+            scale = scale * 0.85;
+          } else if (isStar) {
+            scale = scale * 1.15;
           }
 
-          if (hasCustomTransform) {
-            const xTInward = xT * 0.85;
-            const yTInward = yT * 0.85;
-            const rot = s.rotation || 0;
-            const sc = s.scale || 1;
-            style.transform = `translate(${xTInward}%, ${yTInward}%) rotate(${rot}deg) scale(${sc})`;
-          }
-        }
+          const isSun = sticker.kind === 'sun' || (sticker.name && sticker.name.toLowerCase().includes('sun')) || slot === 'E';
 
-        const isLargeSticker = s.name === 'Guitar.svg' || s.name === 'Giraffe.png' || s.name === 'Trumpet.svg';
-        const isTrumpet = s.name === 'Trumpet.svg';
-        const isSpecialStar = s.name === 'ic star1.png' || s.name === 'ic star1_red.png' || s.name === 'ic_gold_star.png';
-        const isItoSticker = isIcSticker || s.position === 'crown' || s.position === 'birthday';
-        const isGiraffe = s.name === 'Giraffe.png';
+          let origin = 'center center';
+          if (isCrown) origin = 'center bottom';
+          else if (isSun) origin = 'right center';
 
-        return (
-          <img 
-            key={s.id || `${s.name}-${s.position}`} 
-            src={`/assets/svg_stickers/${s.name}`} 
-            alt={s.name} 
-            className={`gc-sticker pos-${s.position} ${isIcSticker ? 'ic-placed' : ''} ${(s.name === 'Sun with sunglasses.svg' && typeof s.position === 'number') ? 'sun-special' : ''} ${isLargeSticker ? 'large-sticker' : ''} ${isTrumpet ? 'trumpet-special' : ''} ${isSpecialStar ? 'ic-star-special' : ''} ${isGiraffe ? 'giraffe-special' : ''}`} 
-            style={{ ...style, zIndex: (isSpecialStar || isItoSticker) ? 10000 : 11 }}
-          />
-        );
-      })}
+          return (
+            <div 
+              key={sticker.id || `${sticker.name}-${slot}`}
+              className="sticker-item sl-placed"
+              data-slot={slot}
+            >
+              <div 
+                className="sticker-visual"
+                style={{
+                  transform: `scale(${scale})`,
+                  transformOrigin: origin
+                }}
+              >
+                <img 
+                  src={`/assets/svg_stickers/${sticker.name}`} 
+                  alt={sticker.name} 
+                />
+              </div>
+            </div>
+          );
+        })}
       </div>
+
+      {hasConfetti && (
+        <img 
+          src="/assets/svg_stickers/Confetti.svg" 
+          alt="Confetti"
+          style={{
+            position: 'absolute',
+            inset: 0,
+            width: '100%',
+            height: '100%',
+            zIndex: 50,
+            pointerEvents: 'none'
+          }}
+        />
+      )}
     </div>
   );
 }

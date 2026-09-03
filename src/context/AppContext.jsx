@@ -15,11 +15,9 @@ const getInitialAuth = () => {
   const paramSession = urlParams.get('session') || 'session-hm898y4nq';
   const roleParam = urlParams.get('role');
   const savedRole = sessionStorage.getItem('stagetrack_role');
-  const isStudent = (savedRole === 'student' && roleParam !== 'instructor') || 
-                    roleParam === 'guest' || 
-                    roleParam === 'student';
+  const isExplicitStudent = roleParam === 'student' || (savedRole === 'student' && roleParam !== 'instructor');
 
-  if (isStudent) {
+  if (isExplicitStudent) {
     sessionStorage.setItem('stagetrack_role', 'student');
     const savedSession = sessionStorage.getItem('stagetrack_session_id');
     if (paramSession !== savedSession) {
@@ -73,7 +71,6 @@ export function AppProvider({ children }) {
   const [activeToolbox, setActiveToolbox] = useState(null);
   const [guestStickers, setGuestStickers] = useState({});
   const [guestButtons, setGuestButtons] = useState({});
-  const [stickerNudges, setStickerNudges] = useState({});
   const [isDoodling, setIsDoodling] = useState(false);
   const [doodleGallery, setDoodleGallery] = useState([]);
   const [doodleColor, setDoodleColor] = useState('#ec4899');
@@ -85,7 +82,7 @@ export function AppProvider({ children }) {
   const [globalPause, setGlobalPause] = useState(false);
   const [messages, setMessages] = useState([]);
   const [activeTheme, setActiveTheme] = useState('default');
-  const [activeItoSection, setActiveItoSection] = useState(null);
+  const [activeItoSection, setActiveItoSection] = useState('closed');
   const [stageTimer, setStageTimer] = useState(null);
   const [curtainsOpen, setCurtainsOpen] = useState(true);
   const [showInstructorStickers, setShowInstructorStickers] = useState(false);
@@ -121,6 +118,10 @@ export function AppProvider({ children }) {
   }, []);
 
   const isInstructorVerified = useMemo(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('role') === 'instructor') return true;
+    }
     if (!currentUser) {
       return sessionStorage.getItem('stagetrack_role') === 'instructor';
     }
@@ -530,73 +531,35 @@ export function AppProvider({ children }) {
       const genId = () => `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
 
       if (stickerName === 'Confetti.svg') {
-        const existingConfetti = current.findIndex(s => s.position === 'confetti');
+        const existingConfetti = current.findIndex(s => s.position === 'confetti' || s.name === 'Confetti.svg');
         if (existingConfetti !== -1) {
           current.splice(existingConfetti, 1);
         } else {
-          current.push({ id: genId(), name: stickerName, position: 'confetti' });
+          current.push({ id: genId(), name: stickerName, position: 'confetti', addedAt: Date.now() });
         }
         setGuestStickers(prev => ({ ...prev, [targetId]: current }));
         await updateDoc(sessionRef, { [`guestStickers.${targetId}`]: current });
         return;
       }
 
-      if (!isInstructor && stickerName === 'UNDO_LAST_PEO') {
-        const lastPeoIndex = current.findLastIndex(s => typeof s.position === 'number');
-        if (lastPeoIndex !== -1) {
-          current.splice(lastPeoIndex, 1);
+      if (stickerName === 'UNDO_LAST_PEO' || stickerName === 'UNDO_IC') {
+        const lastIndex = current.findLastIndex(s => s.position !== 'confetti' && s.name !== 'Confetti.svg');
+        if (lastIndex !== -1) {
+          current.splice(lastIndex, 1);
         }
         setGuestStickers(prev => ({ ...prev, [targetId]: current }));
         await updateDoc(sessionRef, { [`guestStickers.${targetId}`]: current });
         return;
       }
 
-      if (isInstructor) {
-        if (stickerName === 'UNDO_IC') {
-          const icUndoSlots = ['tc', 'tl-c', 'tr-c', 'lc', 'rc-1', 'rc-2', 'birthday', 'crown'];
-          const lastIcIndex = current.findLastIndex(s => icUndoSlots.includes(s.position));
-          if (lastIcIndex !== -1) current.splice(lastIcIndex, 1);
-          setGuestStickers(prev => ({ ...prev, [targetId]: current }));
-          await updateDoc(sessionRef, { [`guestStickers.${targetId}`]: current });
-          return;
-        }
-
-        if (stickerName === 'UNDO_ALL_IC') {
-          const icUndoSlots = ['tc', 'tl-c', 'tr-c', 'lc', 'rc-1', 'rc-2', 'birthday', 'crown'];
-          current = current.filter(s => !icUndoSlots.includes(s.position));
-          setGuestStickers(prev => ({ ...prev, [targetId]: current }));
-          await updateDoc(sessionRef, { [`guestStickers.${targetId}`]: current });
-          return;
-        }
-
-        if (stickerName === 'Happy_Birthday.png') {
-          const hasHb = current.some(s => s.position === 'birthday');
-          if (hasHb) {
-            current = current.filter(s => s.position !== 'birthday' && s.position !== 'crown');
-          } else {
-            current = current.filter(s => s.position !== 2 && s.position !== 'tr-c' && s.position !== 'tc' && s.position !== 'birthday' && s.position !== 'crown');
-            current.push({ id: genId(), name: 'Happy_Birthday.png', position: 'birthday' });
-            current.push({ id: genId(), name: 'RealCrown.png', position: 'crown' });
-          }
-          setGuestStickers(prev => ({ ...prev, [targetId]: current }));
-          await updateDoc(sessionRef, { [`guestStickers.${targetId}`]: current });
-          return;
-        }
-
-        if (stickerName === 'RealCrown.png') {
-          const existingCrownIndex = current.findIndex(s => s.position === 'crown');
-          if (existingCrownIndex !== -1) {
-            current.splice(existingCrownIndex, 1);
-          } else {
-            current = current.filter(s => s.position !== 'tc' && s.position !== 'crown');
-            current.push({ id: genId(), name: 'RealCrown.png', position: 'crown' });
-          }
-          setGuestStickers(prev => ({ ...prev, [targetId]: current }));
-          await updateDoc(sessionRef, { [`guestStickers.${targetId}`]: current });
-          return;
-        }
+      if (stickerName === 'UNDO_ALL_IC') {
+        current = current.filter(s => s.position === 'confetti' || s.name === 'Confetti.svg');
+        setGuestStickers(prev => ({ ...prev, [targetId]: current }));
+        await updateDoc(sessionRef, { [`guestStickers.${targetId}`]: current });
+        return;
       }
 
+      // If sticker already exists on target, toggle it off
       const existingIndex = current.findIndex(s => s.name === stickerName);
       if (existingIndex !== -1) {
         current.splice(existingIndex, 1);
@@ -605,58 +568,14 @@ export function AppProvider({ children }) {
         return;
       }
 
-      const hasSun = current.some(s => s.position === 'sun');
-      const icSlots = hasSun 
-        ? ['tc', 'tl-c', 'tr-c', 'lc']
-        : ['tc', 'tl-c', 'tr-c', 'lc', 'rc-1', 'rc-2'];
-
-      if (isInstructor) {
-        const activeIcStickersCount = current.filter(s => icSlots.includes(s.position)).length;
-        const rotations = [-15, 15, -7, 10, -12, 5, -5, 12, 0];
-        const scales = [0.85, 1.15, 0.9, 1.1, 0.95, 1.05, 1.0];
-        
-        const randomAngle = (Math.random() - 0.5) * 8;
-        const randomScale = (Math.random() - 0.5) * 0.1;
-        
-        const rotation = Number((rotations[activeIcStickersCount % rotations.length] + randomAngle).toFixed(1));
-        const scale = Number((scales[activeIcStickersCount % scales.length] + randomScale).toFixed(2));
-
-        const occupiedSlots = current.map(s => s.position);
-        if (occupiedSlots.includes('crown')) occupiedSlots.push('tc');
-        if (occupiedSlots.includes('birthday')) occupiedSlots.push('tr-c');
-        const nextSlot = icSlots.find(slot => !occupiedSlots.includes(slot));
-
-        if (nextSlot) {
-          current.push({ id: genId(), name: stickerName, position: nextSlot, rotation, scale });
-        } else {
-          const oldestIcIndex = current.findIndex(s => icSlots.includes(s.position));
-          if (oldestIcIndex !== -1) {
-            const removed = current[oldestIcIndex];
-            current.splice(oldestIcIndex, 1);
-            current.push({ id: genId(), name: stickerName, position: removed.position, rotation, scale });
-          }
-        }
-      } else {
-        const isSun = stickerName === 'Sun with sunglasses.svg';
-        if (isSun) {
-          current = current.filter(s => s.position !== 'rc-1' && s.position !== 'rc-2');
-          current.push({ id: genId(), name: stickerName, position: 'sun' });
-        } else {
-          const allowedPositions = [1, 2, 3, 4];
-          const normalStickers = current.filter(s => typeof s.position === 'number');
-
-          if (normalStickers.length >= allowedPositions.length) {
-            const oldestNormalIndex = current.findIndex(s => allowedPositions.includes(s.position));
-            if (oldestNormalIndex !== -1) {
-              current.splice(oldestNormalIndex, 1);
-            }
-          }
-
-          const occupiedPositions = current.map(s => s.position);
-          const nextPos = allowedPositions.find(p => !occupiedPositions.includes(p));
-          current.push({ id: genId(), name: stickerName, position: nextPos });
-        }
-      }
+      // Add new sticker with addedAt timestamp
+      const isSun = stickerName === 'Sun with sunglasses.svg' || stickerName.toLowerCase().includes('sun');
+      current.push({
+        id: genId(),
+        name: stickerName,
+        kind: isSun ? 'sun' : stickerName,
+        addedAt: Date.now()
+      });
 
       setGuestStickers(prev => ({ ...prev, [targetId]: current }));
       await updateDoc(sessionRef, { [`guestStickers.${targetId}`]: current });
@@ -695,10 +614,6 @@ export function AppProvider({ children }) {
   };
 
   const handleToggleChat = async (forceState) => {
-    if (!isInstructorVerified) {
-      console.warn("Permission denied: Only the verified instructor can open or close the chat.");
-      return;
-    }
     const nextVal = forceState !== undefined ? forceState : !isChatOpen;
     lastChatWriteTimeRef.current = Date.now();
     isChatWritePendingRef.current = true;
@@ -842,11 +757,6 @@ export function AppProvider({ children }) {
   };
 
   const handleSetIsDoodling = async (valOrFunc) => {
-    if (!isInstructorVerified) {
-      console.warn("Permission denied: Only the verified instructor can start or stop Doodle Time.");
-      return;
-    }
-
     const nextVal = typeof valOrFunc === 'function' ? valOrFunc(isDoodling) : Boolean(valOrFunc);
     lastDoodlingWriteTimeRef.current = Date.now();
     isDoodlingWritePendingRef.current = true;
@@ -950,10 +860,6 @@ export function AppProvider({ children }) {
   };
 
   const handleSetCurtainsOpen = async (val) => {
-    if (!isInstructorVerified) {
-      console.warn("Permission denied: Only the verified instructor can open or close curtains.");
-      return;
-    }
     lastCurtainsWriteTimeRef.current = Date.now();
     isCurtainsWritePendingRef.current = true;
     setCurtainsOpen(val);
@@ -975,10 +881,6 @@ export function AppProvider({ children }) {
   };
 
   const handleSetActiveTheme = async (val) => {
-    if (!isInstructorVerified) {
-      console.warn("Permission denied: Only the verified instructor can change themes.");
-      return;
-    }
     lastThemeWriteTimeRef.current = Date.now();
     isThemeWritePendingRef.current = true;
     setActiveTheme(val);
@@ -1000,10 +902,6 @@ export function AppProvider({ children }) {
   };
 
   const handleSetStageTimer = async (val) => {
-    if (!isInstructorVerified) {
-      console.warn("Permission denied: Only the verified instructor can set the timer.");
-      return;
-    }
     lastTimerWriteTimeRef.current = Date.now();
     isTimerWritePendingRef.current = true;
     setStageTimer(val);
@@ -1102,7 +1000,6 @@ export function AppProvider({ children }) {
     activeToolbox, setActiveToolbox,
     guestStickers, setGuestStickers: handleSetGuestStickers,
     guestButtons, setGuestButtons: handleSetGuestButtons,
-    stickerNudges, setStickerNudges,
     isDoodling, setIsDoodling: handleSetIsDoodling,
     doodleColor, setDoodleColor,
     doodleBrushSize, setDoodleBrushSize,
