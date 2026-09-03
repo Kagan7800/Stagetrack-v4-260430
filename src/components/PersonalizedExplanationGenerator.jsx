@@ -253,7 +253,7 @@ Write for music teachers and parents. Be specific, warm, observational, and acti
           {/* Centered Title & Subtitle Stack */}
           <div className="mf-title-group">
             <h1 className="mf-main-heading">
-              Music Fun Profile Builder
+              About your Little One
             </h1>
             <p className="mf-sub-heading">
               Create a focused response why Music Fun is right for your child

@@ -1,5 +1,6 @@
 /* src/components/PersonalizedExplanationGenerator.css */
 /* Alternative 1: 100% Native Viewport Architecture (Zero Zoom / Zero Transform / Pure 1.0 Scale) */
+@import url('https://fonts.googleapis.com/css2?family=Risque&display=swap');
 
 .mf-profile-builder-page {
   display: flex;
@@ -89,8 +90,9 @@
 }
 
 .mf-main-heading {
+  font-family: 'Risque', cursive, serif;
   font-size: clamp(1.40rem, 2.2vw, 1.95rem);
-  font-weight: 800;
+  font-weight: 400;
   color: #1E293B;
   margin: 0;
   letter-spacing: -0.01em;
