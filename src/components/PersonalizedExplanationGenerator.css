@@ -1,41 +1,44 @@
 /* src/components/PersonalizedExplanationGenerator.css */
-/* MFLO Profile Builder — 25px Top Screen Buffer + 15% Taller Header + 25% Larger Animal Images */
+/* MFLO Profile Builder — Locked 67% Fit with Expanded Top Banner & Mascots */
 
 .mf-profile-builder-page {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 100vh;
-  height: 100dvh;
-  max-height: 100dvh;
   width: 100%;
+  height: calc(100vh / 0.67);
+  max-height: calc(100vh / 0.67);
   background-color: #D9EFFF;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #1E293B;
   box-sizing: border-box;
-  padding: 25px clamp(8px, 1.2vw, 18px) clamp(3px, 0.6vh, 6px) clamp(8px, 1.2vw, 18px);
+  padding: 25px 24px 12px 24px;
   position: relative;
   overflow: hidden;
+  zoom: 0.67;
+  -webkit-zoom: 0.67;
 }
 
-@media (max-width: 900px), (max-height: 560px) {
+@media (max-width: 900px) {
   .mf-profile-builder-page {
     height: auto;
     max-height: none;
     overflow-y: auto;
-    padding: 25px 12px 16px 12px;
+    padding: 20px 14px 16px 14px;
+    zoom: 1;
+    -webkit-zoom: 1;
   }
 }
 
-/* ════════════ 1. TOP HEADER (MAX FILL MASCOTS & 100% BASE SCALE) ════════════ */
+/* ════════════ 1. TOP HEADER (EXPANDED BANNER WITH LARGE MASCOTS) ════════════ */
 .mf-builder-header {
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
-  padding: 0 0 4px 0;
+  padding: 6px 0 16px 0;
   min-height: auto;
   flex-shrink: 0;
   box-sizing: border-box;
@@ -44,16 +47,16 @@
 
 .mf-back-btn {
   position: absolute;
-  top: 0;
+  top: 4px;
   left: 0;
   display: flex;
   align-items: center;
   background: #FFFFFF;
   border: 1.5px solid #CBD5E1;
   border-radius: 8px;
-  padding: 3px 12px;
+  padding: 6px 16px;
   color: #1E293B;
-  font-size: 0.94rem;
+  font-size: 1.1rem;
   font-weight: 700;
   cursor: pointer;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
@@ -70,9 +73,9 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: clamp(8px, 1.5vw, 24px);
+  gap: 24px;
   width: 100%;
-  max-width: 1780px;
+  max-width: 1680px;
 }
 
 .mf-title-group {
@@ -83,11 +86,11 @@
   text-align: center;
   flex-shrink: 0;
   z-index: 2;
-  padding: 0 clamp(6px, 1vw, 16px);
+  padding: 0 20px;
 }
 
 .mf-main-heading {
-  font-size: clamp(1.65rem, 2.5vw, 2.30rem);
+  font-size: 2.5rem;
   font-weight: 800;
   color: #1E293B;
   margin: 0;
@@ -96,15 +99,15 @@
 }
 
 .mf-sub-heading {
-  font-size: clamp(0.96rem, 1.25vw, 1.18rem);
+  font-size: 1.35rem;
   color: #334155;
-  opacity: 0.9;
-  margin: 2px 0 0 0;
+  opacity: 0.95;
+  margin: 4px 0 0 0;
   font-weight: 600;
   text-align: center;
-  line-height: 1.2;
+  line-height: 1.25;
   white-space: normal;
-  max-width: 680px;
+  max-width: 750px;
 }
 
 /* Character mascot groups — Fill Maximum Available Space */
@@ -118,58 +121,58 @@
 }
 
 .mf-char-banner-img {
-  height: clamp(52px, 7.8vh, 84px);
-  max-height: 90px;
+  height: 110px;
+  max-height: 125px;
   width: auto;
   max-width: 100%;
   object-fit: contain;
-  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.08));
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
   transition: transform 0.2s ease;
   display: inline-block;
   flex-shrink: 1;
 }
 
 .mf-char-banner-img:hover {
-  transform: translateY(-2px) scale(1.08);
+  transform: translateY(-3px) scale(1.08);
 }
 
 .mf-char-banner-img.buffered {
-  margin-left: clamp(4px, 0.8vw, 12px);
-  margin-right: clamp(4px, 0.8vw, 12px);
+  margin-left: 14px;
+  margin-right: 14px;
 }
 
 /* Giraffe */
 .mf-char-banner-img.img-2 {
-  height: clamp(62px, 9.4vh, 102px);
-  max-height: 110px;
+  height: 135px;
+  max-height: 145px;
 }
 
 /* Fox */
 .mf-char-banner-img.img-5 {
-  height: clamp(54px, 8.2vh, 88px);
-  max-height: 94px;
-  margin-left: clamp(4px, 0.8vw, 12px);
-  margin-right: clamp(4px, 0.8vw, 12px);
+  height: 118px;
+  max-height: 130px;
+  margin-left: 14px;
+  margin-right: 14px;
 }
 
-/* ════════════ 2. MAIN EXPANDED CONTENT CONTAINER ════════════ */
+/* ════════════ 2. MAIN CONTENT CONTAINER ════════════ */
 .mf-main-content-scroll {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: clamp(3px, 0.6vh, 6px);
+  gap: 12px;
   flex: 1;
   min-height: 0;
-  max-width: 1780px;
+  max-width: 1680px;
   width: 100%;
   margin: 0 auto;
   box-sizing: border-box;
 }
 
-@media (max-width: 900px), (max-height: 560px) {
+@media (max-width: 900px) {
   .mf-main-content-scroll {
     flex: none;
-    gap: 12px;
+    gap: 14px;
   }
 }
 
@@ -177,17 +180,17 @@
 .mf-card {
   background: #FFFFFF;
   border: 1.5px solid #CBD5E1;
-  border-radius: 12px;
-  padding: clamp(3px, 0.6vh, 6px) clamp(10px, 1.2vw, 16px);
+  border-radius: 14px;
+  padding: 10px 18px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   box-sizing: border-box;
 }
 
 .mf-card-title {
-  font-size: clamp(1.08rem, 1.35vw, 1.28rem);
+  font-size: 1.25rem;
   font-weight: 800;
   color: #1E293B;
-  margin: 0 0 2px 0;
+  margin: 0 0 6px 0;
 }
 
 .mf-card-title.inline-title {
@@ -195,7 +198,7 @@
 }
 
 .mf-label {
-  font-size: clamp(0.90rem, 1.08vw, 1.02rem);
+  font-size: 1.05rem;
   font-weight: 700;
   color: #1E293B;
 }
@@ -203,7 +206,7 @@
 .mf-field-group {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
 }
 
 .mf-field-group.flex-1 {
@@ -213,9 +216,9 @@
 .mf-input {
   background: #FFFFFF;
   border: 1.5px solid #CBD5E1;
-  border-radius: 6px;
-  padding: 2px 8px;
-  font-size: clamp(1.00rem, 1.20vw, 1.12rem);
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 1.15rem;
   font-weight: 500;
   font-family: inherit;
   color: #1E293B;
@@ -223,7 +226,7 @@
   box-sizing: border-box;
   transition: all 0.15s ease;
   width: 100%;
-  height: clamp(28px, 3.5vh, 34px);
+  height: 42px;
 }
 
 .mf-input:focus {
@@ -236,7 +239,7 @@
 .mf-identity-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: clamp(6px, 1.1vw, 14px);
+  gap: 16px;
   width: 100%;
   flex-shrink: 0;
   box-sizing: border-box;
@@ -251,25 +254,25 @@
 .mf-card-fields-row {
   display: flex;
   align-items: center;
-  gap: clamp(6px, 1vw, 12px);
+  gap: 14px;
 }
 
 .mf-age-pill-group {
   display: flex;
-  gap: 4px;
+  gap: 8px;
 }
 
 .mf-age-pill {
   background: #FFFFFF;
   border: 1.5px solid #94A3B8;
-  border-radius: 6px;
-  padding: 0 clamp(10px, 1.2vw, 16px);
-  font-size: clamp(1.02rem, 1.24vw, 1.15rem);
+  border-radius: 8px;
+  padding: 0 18px;
+  font-size: 1.25rem;
   font-weight: 800;
   color: #334155;
   cursor: pointer;
   transition: all 0.15s ease;
-  height: clamp(28px, 3.5vh, 34px);
+  height: 42px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -285,20 +288,20 @@
   background: #312E81;
   border-color: #3730A3;
   color: #FFFFFF;
-  box-shadow: 0 0 4px rgba(49, 46, 129, 0.35);
+  box-shadow: 0 0 6px rgba(49, 46, 129, 0.35);
 }
 
 /* ════════════ 4. FULL-WIDTH DELIVERY OPTIONS & ACTION BAND ════════════ */
 .mf-delivery-fullwidth-card {
   background: #FFFFFF;
   border: 1.5px solid #CBD5E1;
-  border-radius: 12px;
-  padding: clamp(3px, 0.5vh, 6px) clamp(10px, 1.4vw, 18px);
+  border-radius: 14px;
+  padding: 8px 22px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: 16px;
   flex-shrink: 0;
   flex-wrap: wrap;
   box-sizing: border-box;
@@ -307,21 +310,21 @@
 .mf-delivery-left {
   display: flex;
   align-items: center;
-  gap: clamp(10px, 1.5vw, 20px);
+  gap: 22px;
   flex-wrap: wrap;
 }
 
 .mf-delivery-checkboxes {
   display: flex;
   align-items: center;
-  gap: clamp(10px, 1.3vw, 16px);
+  gap: 18px;
 }
 
 .mf-checkbox-label {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: clamp(0.95rem, 1.18vw, 1.08rem);
+  gap: 8px;
+  font-size: 1.15rem;
   font-weight: 700;
   color: #1E293B;
   cursor: pointer;
@@ -330,13 +333,13 @@
 
 .mf-checkbox-label input[type="checkbox"] {
   accent-color: #312E81;
-  width: 16px;
-  height: 16px;
+  width: 20px;
+  height: 20px;
   cursor: pointer;
 }
 
 .mf-delivery-note {
-  font-size: clamp(0.84rem, 0.98vw, 0.94rem);
+  font-size: 0.98rem;
   font-weight: 500;
   color: #475569;
   line-height: 1.2;
@@ -352,25 +355,25 @@
   background: linear-gradient(135deg, #312E81 0%, #3730A3 100%);
   color: #FFFFFF;
   border: none;
-  border-radius: 8px;
-  padding: 0 clamp(16px, 2.0vw, 28px);
-  font-size: clamp(1.00rem, 1.25vw, 1.15rem);
+  border-radius: 10px;
+  padding: 0 32px;
+  font-size: 1.22rem;
   font-weight: 800;
   font-family: inherit;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 6px rgba(49, 46, 129, 0.25);
+  box-shadow: 0 3px 8px rgba(49, 46, 129, 0.3);
   transition: all 0.2s ease;
   white-space: nowrap;
-  height: clamp(30px, 3.6vh, 36px);
+  height: 44px;
 }
 
 .mf-generate-btn:hover:not(:disabled) {
   background: linear-gradient(135deg, #3730A3 0%, #4338CA 100%);
   transform: translateY(-1px);
-  box-shadow: 0 4px 10px rgba(49, 46, 129, 0.35);
+  box-shadow: 0 5px 12px rgba(49, 46, 129, 0.4);
 }
 
 .mf-generate-btn:disabled {
@@ -379,24 +382,24 @@
   transform: none;
 }
 
-/* ════════════ 5. 3-COLUMN TRAIT GRID (EVEN VERTICAL EXPANSION) ════════════ */
+/* ════════════ 5. 3-COLUMN TRAIT GRID ════════════ */
 .mf-trait-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   grid-template-rows: repeat(3, 1fr);
-  gap: clamp(3px, 0.6vh, 6px);
+  gap: 10px;
   width: 100%;
   flex: 1;
   min-height: 0;
   box-sizing: border-box;
 }
 
-@media (max-width: 900px), (max-height: 560px) {
+@media (max-width: 900px) {
   .mf-trait-grid {
     grid-template-columns: 1fr;
     grid-template-rows: auto;
     flex: none;
-    gap: 10px;
+    gap: 12px;
   }
 }
 
@@ -407,8 +410,8 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: clamp(3px, 0.6vh, 6px) clamp(10px, 1.2vw, 16px);
-  border-radius: 12px;
+  padding: 8px 16px;
+  border-radius: 14px;
   box-sizing: border-box;
   min-height: 0;
   height: 100%;
@@ -419,10 +422,10 @@
 }
 
 .mf-section-title {
-  font-size: clamp(1.06rem, 1.38vw, 1.26rem);
+  font-size: 1.25rem;
   font-weight: 800;
   color: #1E293B;
-  margin: 0 0 2px 0;
+  margin: 0 0 4px 0;
   line-height: 1.15;
 }
 
@@ -432,7 +435,7 @@
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  gap: clamp(6px, 1vw, 12px);
+  gap: 14px;
   width: 100%;
   flex: 1;
   min-height: 0;
@@ -452,10 +455,10 @@
   flex: 1;
   min-width: 0;
   border-left: 1.5px solid #CBD5E1;
-  padding-left: clamp(8px, 1vw, 14px);
-  font-size: clamp(0.80rem, 0.98vw, 0.94rem);
+  padding-left: 14px;
+  font-size: 0.94rem;
   color: #334155;
-  line-height: 1.24;
+  line-height: 1.3;
   font-weight: 600;
   display: flex;
   align-items: center;
@@ -470,7 +473,7 @@
 .mf-chip-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: clamp(3px, 0.5vw, 6px);
+  gap: 6px;
   width: 100%;
   height: 100%;
   align-items: center;
@@ -480,21 +483,21 @@
 .mf-chip-grid.mf-fav-grid {
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(2, 1fr);
-  gap: clamp(2px, 0.4vw, 4px);
+  gap: 5px;
 }
 
 /* UNSELECTED CHIP ITEM (.mf-chip) */
 .mf-chip {
   width: 100%;
   height: 100%;
-  min-height: clamp(24px, 3.0vh, 32px);
-  max-height: clamp(32px, 4.0vh, 38px);
-  padding: 1px 4px;
-  border-radius: 6px;
+  min-height: 38px;
+  max-height: 48px;
+  padding: 4px 6px;
+  border-radius: 8px;
   border: 1.5px solid #94A3B8;
   background: #FFFFFF;
   color: #0F172A;
-  font-size: clamp(0.90rem, 1.10vw, 1.02rem);
+  font-size: 1.08rem;
   font-weight: 700;
   font-family: inherit;
   cursor: pointer;
@@ -509,9 +512,9 @@
 }
 
 .mf-fav-grid .mf-chip {
-  min-height: clamp(18px, 2.4vh, 24px);
-  max-height: clamp(22px, 2.8vh, 26px);
-  font-size: clamp(0.80rem, 0.94vw, 0.90rem);
+  min-height: 28px;
+  max-height: 34px;
+  font-size: 0.94rem;
 }
 
 .mf-chip:hover {
@@ -521,10 +524,10 @@
 
 /* SELECTED CHIP (Option B — Deep Indigo) */
 .mf-chip-selected {
-  border: 1.5px solid #3730A3 !important;
+  border: 2px solid #3730A3 !important;
   background: #312E81 !important;
   color: #FFFFFF !important;
-  box-shadow: 0 0 4px rgba(255, 255, 255, 0.25), 0 2px 6px rgba(49, 46, 129, 0.3) !important;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.25), 0 2px 8px rgba(49, 46, 129, 0.35) !important;
   font-weight: 700 !important;
 }
 
@@ -533,13 +536,13 @@
   width: 100%;
   flex: 1;
   height: 100%;
-  min-height: clamp(28px, 3.6vh, 40px);
+  min-height: 48px;
   max-height: 100%;
   background: #FFFFFF;
   border: 1.5px solid #CBD5E1;
-  border-radius: 6px;
-  padding: 2px 8px;
-  font-size: clamp(0.90rem, 1.08vw, 1.00rem);
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 1.05rem;
   font-family: inherit;
   color: #1E293B;
   outline: none;
