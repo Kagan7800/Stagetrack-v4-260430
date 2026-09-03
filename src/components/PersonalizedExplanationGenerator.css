@@ -52,7 +52,7 @@
   display: flex;
   align-items: center;
   background: #FFFFFF;
-  border: 1.5px solid #CBD5E1;
+  border: 2.25px solid #64748B;
   border-radius: 8px;
   padding: 2px 8px;
   color: #1E293B;
@@ -174,7 +174,7 @@
 /* UNIVERSAL CARD STYLING */
 .mf-card {
   background: #FFFFFF;
-  border: 1.5px solid #CBD5E1;
+  border: 2.25px solid #64748B;
   border-radius: 10px;
   padding: clamp(2px, 0.4vh, 5px) clamp(8px, 1vw, 14px);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
@@ -210,7 +210,7 @@
 
 .mf-input {
   background: #FFFFFF;
-  border: 1.5px solid #CBD5E1;
+  border: 2.25px solid #64748B;
   border-radius: 5px;
   padding: 2px 6px;
   font-size: clamp(0.84rem, 0.98vw, 0.92rem);
@@ -259,7 +259,7 @@
 
 .mf-age-pill {
   background: #FFFFFF;
-  border: 1.5px solid #94A3B8;
+  border: 2.25px solid #64748B;
   border-radius: 5px;
   padding: 0 clamp(8px, 1vw, 12px);
   font-size: clamp(0.84rem, 1.0vw, 0.94rem);
@@ -289,7 +289,7 @@
 /* ════════════ 4. FULL-WIDTH DELIVERY OPTIONS & ACTION BAND ════════════ */
 .mf-delivery-fullwidth-card {
   background: #FFFFFF;
-  border: 1.5px solid #CBD5E1;
+  border: 2.25px solid #64748B;
   border-radius: 10px;
   padding: clamp(2px, 0.4vh, 4px) clamp(8px, 1.2vw, 14px);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
@@ -400,7 +400,7 @@
 
 .mf-trait-card {
   background: #FFFFFF;
-  border: 1.5px solid #CBD5E1;
+  border: 2.25px solid #64748B;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
@@ -449,7 +449,7 @@
 .mf-trait-info {
   flex: 1;
   min-width: 0;
-  border-left: 1.5px solid #CBD5E1;
+  border-left: 2.25px solid #64748B;
   padding-left: clamp(6px, 0.8vw, 10px);
   font-size: clamp(0.68rem, 0.78vw, 0.76rem);
   color: #334155;
@@ -495,7 +495,7 @@
   max-height: clamp(26px, 3.2vh, 30px);
   padding: 1px 3px;
   border-radius: 5px;
-  border: 1.5px solid #94A3B8;
+  border: 2.25px solid #64748B;
   background: #FFFFFF;
   color: #0F172A;
   font-size: clamp(0.74rem, 0.86vw, 0.82rem);
@@ -520,12 +520,12 @@
 
 .mf-chip:hover {
   background: #F8FAFC;
-  border-color: #64748B;
+  border-color: #334155;
 }
 
 /* SELECTED CHIP (Option B — Deep Indigo) */
 .mf-chip-selected {
-  border: 1.5px solid #3730A3 !important;
+  border: 2.25px solid #3730A3 !important;
   background: #312E81 !important;
   color: #FFFFFF !important;
   box-shadow: 0 0 4px rgba(255, 255, 255, 0.25), 0 2px 4px rgba(49, 46, 129, 0.3) !important;
@@ -540,7 +540,7 @@
   min-height: clamp(22px, 2.8vh, 32px);
   max-height: 100%;
   background: #FFFFFF;
-  border: 1.5px solid #CBD5E1;
+  border: 2.25px solid #64748B;
   border-radius: 5px;
   padding: 2px 6px;
   font-size: clamp(0.74rem, 0.86vw, 0.82rem);
