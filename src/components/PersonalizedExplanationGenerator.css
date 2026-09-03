@@ -476,9 +476,15 @@
 }
 
 .mf-chip-grid.mf-fav-grid {
+  display: grid;
   grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(2, 1fr);
-  gap: clamp(2px, 0.3vw, 3px);
+  grid-template-rows: repeat(2, auto);
+  row-gap: 15px;
+  column-gap: clamp(3px, 0.5vw, 6px);
+  align-content: center;
+  justify-content: center;
+  height: auto;
+  width: 100%;
 }
 
 /* UNSELECTED CHIP ITEM (.mf-chip) */
