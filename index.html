@@ -4,27 +4,55 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#D9EFFF" />
     <title>About Your Little One - Survey</title>
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    
+    <!-- Cache-Busting HTTP Directives -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
+
+    <!-- Google Font Preload & Preconnect -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Risque&display=swap" rel="stylesheet" />
+
+    <!-- Header Mascot Asset Preloads -->
+    <link rel="preload" as="image" href="/assets/header_characters/char1_bear.png" />
+    <link rel="preload" as="image" href="/assets/header_characters/char2_giraffe.png" />
+    <link rel="preload" as="image" href="/assets/header_characters/char3_bird.png" />
+    <link rel="preload" as="image" href="/assets/header_characters/char4_elephant.png" />
+    <link rel="preload" as="image" href="/assets/header_characters/char5_fox.png" />
+    <link rel="preload" as="image" href="/assets/header_characters/char6_rabbit.png" />
+
+    <!-- Critical Instant-Paint CSS -->
     <style>
-      html, body, #root {
+      html, body {
         margin: 0;
         padding: 0;
         width: 100%;
         height: 100%;
         background-color: #D9EFFF !important;
         background: #D9EFFF !important;
+        overflow: hidden;
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      }
+      #root {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #D9EFFF !important;
+        background: #D9EFFF !important;
+        display: flex;
+        flex-direction: column;
       }
     </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div style="min-height: 100vh; width: 100%; background: #D9EFFF; margin: 0; padding: 0;"></div>
+    </div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
