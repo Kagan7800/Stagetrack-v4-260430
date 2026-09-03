@@ -1,5 +1,5 @@
 /* src/components/PersonalizedExplanationGenerator.css */
-/* Alternative 1: 100% Native Viewport Architecture (Zero Zoom / Zero Transform / Pure 1.0 Scale) */
+/* Alternative 1: 100% Native Viewport Architecture (50% Larger Mascots + Dynamically Resized Containers) */
 @import url('https://fonts.googleapis.com/css2?family=Risque&display=swap');
 
 .mf-profile-builder-page {
@@ -16,7 +16,7 @@
   -moz-osx-font-smoothing: grayscale;
   color: #1E293B;
   box-sizing: border-box;
-  padding: 25px clamp(8px, 1.2vw, 18px) clamp(4px, 0.8vh, 8px) clamp(8px, 1.2vw, 18px);
+  padding: 25px clamp(8px, 1.2vw, 18px) clamp(3px, 0.5vh, 6px) clamp(8px, 1.2vw, 18px);
   position: relative;
   overflow: hidden;
   zoom: 1;
@@ -32,7 +32,7 @@
   }
 }
 
-/* ════════════ 1. TOP HEADER WITH MASCOTS (~12-14% VIEWPORT HEIGHT) ════════════ */
+/* ════════════ 1. TOP HEADER WITH 50% LARGER MASCOTS ════════════ */
 .mf-builder-header {
   display: flex;
   align-items: center;
@@ -54,9 +54,9 @@
   background: #FFFFFF;
   border: 1.5px solid #CBD5E1;
   border-radius: 8px;
-  padding: 3px 10px;
+  padding: 2px 8px;
   color: #1E293B;
-  font-size: 0.88rem;
+  font-size: 0.82rem;
   font-weight: 700;
   cursor: pointer;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
@@ -73,9 +73,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: clamp(12px, 1.8vw, 24px);
+  gap: clamp(10px, 1.5vw, 24px);
   width: 100%;
-  max-width: 1300px;
+  max-width: 1400px;
 }
 
 .mf-title-group {
@@ -97,22 +97,22 @@
   color: #1E293B;
   margin: 0;
   letter-spacing: -0.01em;
-  line-height: 1.12;
+  line-height: 1.1;
 }
 
 .mf-sub-heading {
-  font-size: clamp(0.82rem, 1.1vw, 1.00rem);
+  font-size: clamp(0.78rem, 1.0vw, 0.92rem);
   color: #334155;
   opacity: 0.9;
-  margin: 2px 0 0 0;
+  margin: 1px 0 0 0;
   font-weight: 600;
   text-align: center;
-  line-height: 1.18;
+  line-height: 1.15;
   white-space: normal;
   max-width: 680px;
 }
 
-/* Character mascot groups — Grouped together closely */
+/* Character mascot groups — 50% Larger Animals */
 .mf-char-group {
   display: flex;
   align-items: center;
@@ -121,8 +121,8 @@
 }
 
 .mf-char-banner-img {
-  height: clamp(44px, 6.0vh, 66px);
-  max-height: 72px;
+  height: clamp(66px, 9.0vh, 98px);
+  max-height: 108px;
   width: auto;
   object-fit: contain;
   filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.08));
@@ -134,28 +134,28 @@
   transform: translateY(-2px) scale(1.08);
 }
 
-/* 15px buffer around 2.png (Giraffe) */
+/* 15px buffer around 2.png (Giraffe — 50% Larger) */
 .mf-char-banner-img.img-2 {
-  height: clamp(52px, 7.4vh, 82px);
-  max-height: 88px;
+  height: clamp(78px, 11.0vh, 122px);
+  max-height: 132px;
   margin-left: 15px;
   margin-right: 15px;
 }
 
-/* 15px buffer around 5.png (Fox) */
+/* 15px buffer around 5.png (Fox — 50% Larger) */
 .mf-char-banner-img.img-5 {
-  height: clamp(46px, 6.4vh, 72px);
-  max-height: 78px;
+  height: clamp(68px, 9.5vh, 106px);
+  max-height: 116px;
   margin-left: 15px;
   margin-right: 15px;
 }
 
-/* ════════════ 2. MAIN CONTENT CONTAINER (~86-88% VIEWPORT HEIGHT) ════════════ */
+/* ════════════ 2. MAIN CONTENT CONTAINER (DYNAMICALLY COMPACTED) ════════════ */
 .mf-main-content-scroll {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: clamp(4px, 0.8vh, 8px);
+  gap: clamp(2px, 0.4vh, 5px);
   flex: 1;
   min-height: 0;
   max-width: 1780px;
@@ -167,7 +167,7 @@
 @media (max-width: 900px), (max-height: 560px) {
   .mf-main-content-scroll {
     flex: none;
-    gap: 12px;
+    gap: 10px;
   }
 }
 
@@ -175,17 +175,17 @@
 .mf-card {
   background: #FFFFFF;
   border: 1.5px solid #CBD5E1;
-  border-radius: 12px;
-  padding: clamp(4px, 0.7vh, 7px) clamp(10px, 1.2vw, 16px);
+  border-radius: 10px;
+  padding: clamp(2px, 0.4vh, 5px) clamp(8px, 1vw, 14px);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   box-sizing: border-box;
 }
 
 .mf-card-title {
-  font-size: clamp(0.96rem, 1.2vw, 1.12rem);
+  font-size: clamp(0.88rem, 1.05vw, 1.00rem);
   font-weight: 800;
   color: #1E293B;
-  margin: 0 0 2px 0;
+  margin: 0 0 1px 0;
 }
 
 .mf-card-title.inline-title {
@@ -193,7 +193,7 @@
 }
 
 .mf-label {
-  font-size: clamp(0.80rem, 0.95vw, 0.90rem);
+  font-size: clamp(0.74rem, 0.86vw, 0.82rem);
   font-weight: 700;
   color: #1E293B;
 }
@@ -201,7 +201,7 @@
 .mf-field-group {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 1px;
 }
 
 .mf-field-group.flex-1 {
@@ -211,9 +211,9 @@
 .mf-input {
   background: #FFFFFF;
   border: 1.5px solid #CBD5E1;
-  border-radius: 6px;
-  padding: 3px 8px;
-  font-size: clamp(0.90rem, 1.1vw, 1.02rem);
+  border-radius: 5px;
+  padding: 2px 6px;
+  font-size: clamp(0.84rem, 0.98vw, 0.92rem);
   font-weight: 500;
   font-family: inherit;
   color: #1E293B;
@@ -221,7 +221,7 @@
   box-sizing: border-box;
   transition: all 0.15s ease;
   width: 100%;
-  height: clamp(28px, 3.6vh, 34px);
+  height: clamp(24px, 3.0vh, 28px);
 }
 
 .mf-input:focus {
@@ -234,7 +234,7 @@
 .mf-identity-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: clamp(6px, 1.1vw, 14px);
+  gap: clamp(4px, 0.8vw, 10px);
   width: 100%;
   flex-shrink: 0;
   box-sizing: border-box;
@@ -249,25 +249,25 @@
 .mf-card-fields-row {
   display: flex;
   align-items: center;
-  gap: clamp(6px, 1vw, 12px);
+  gap: clamp(4px, 0.8vw, 8px);
 }
 
 .mf-age-pill-group {
   display: flex;
-  gap: 4px;
+  gap: 3px;
 }
 
 .mf-age-pill {
   background: #FFFFFF;
   border: 1.5px solid #94A3B8;
-  border-radius: 6px;
-  padding: 0 clamp(10px, 1.2vw, 16px);
-  font-size: clamp(0.92rem, 1.12vw, 1.05rem);
+  border-radius: 5px;
+  padding: 0 clamp(8px, 1vw, 12px);
+  font-size: clamp(0.84rem, 1.0vw, 0.94rem);
   font-weight: 800;
   color: #334155;
   cursor: pointer;
   transition: all 0.15s ease;
-  height: clamp(28px, 3.6vh, 34px);
+  height: clamp(24px, 3.0vh, 28px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -290,13 +290,13 @@
 .mf-delivery-fullwidth-card {
   background: #FFFFFF;
   border: 1.5px solid #CBD5E1;
-  border-radius: 12px;
-  padding: clamp(3px, 0.5vh, 6px) clamp(10px, 1.4vw, 18px);
+  border-radius: 10px;
+  padding: clamp(2px, 0.4vh, 4px) clamp(8px, 1.2vw, 14px);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: 6px;
   flex-shrink: 0;
   flex-wrap: wrap;
   box-sizing: border-box;
@@ -305,21 +305,21 @@
 .mf-delivery-left {
   display: flex;
   align-items: center;
-  gap: clamp(10px, 1.5vw, 20px);
+  gap: clamp(8px, 1.2vw, 16px);
   flex-wrap: wrap;
 }
 
 .mf-delivery-checkboxes {
   display: flex;
   align-items: center;
-  gap: clamp(10px, 1.3vw, 16px);
+  gap: clamp(8px, 1.0vw, 14px);
 }
 
 .mf-checkbox-label {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: clamp(0.88rem, 1.1vw, 1.00rem);
+  gap: 5px;
+  font-size: clamp(0.80rem, 0.96vw, 0.88rem);
   font-weight: 700;
   color: #1E293B;
   cursor: pointer;
@@ -328,16 +328,16 @@
 
 .mf-checkbox-label input[type="checkbox"] {
   accent-color: #312E81;
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   cursor: pointer;
 }
 
 .mf-delivery-note {
-  font-size: clamp(0.76rem, 0.90vw, 0.86rem);
+  font-size: clamp(0.70rem, 0.82vw, 0.78rem);
   font-weight: 500;
   color: #475569;
-  line-height: 1.2;
+  line-height: 1.15;
   margin: 0;
 }
 
@@ -350,9 +350,9 @@
   background: linear-gradient(135deg, #312E81 0%, #3730A3 100%);
   color: #FFFFFF;
   border: none;
-  border-radius: 8px;
-  padding: 0 clamp(16px, 2.0vw, 28px);
-  font-size: clamp(0.92rem, 1.14vw, 1.05rem);
+  border-radius: 6px;
+  padding: 0 clamp(12px, 1.6vw, 22px);
+  font-size: clamp(0.85rem, 1.0vw, 0.94rem);
   font-weight: 800;
   font-family: inherit;
   cursor: pointer;
@@ -362,7 +362,7 @@
   box-shadow: 0 2px 6px rgba(49, 46, 129, 0.25);
   transition: all 0.2s ease;
   white-space: nowrap;
-  height: clamp(30px, 3.8vh, 36px);
+  height: clamp(26px, 3.2vh, 30px);
 }
 
 .mf-generate-btn:hover:not(:disabled) {
@@ -377,12 +377,12 @@
   transform: none;
 }
 
-/* ════════════ 5. 3-COLUMN TRAIT GRID (~68-72% VIEWPORT HEIGHT) ════════════ */
+/* ════════════ 5. 3-COLUMN TRAIT GRID (COMPACTED TO ACCOMMODATE 50% LARGER MASCOTS) ════════════ */
 .mf-trait-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   grid-template-rows: repeat(3, 1fr);
-  gap: clamp(4px, 0.8vh, 8px);
+  gap: clamp(2px, 0.5vh, 5px);
   width: 100%;
   flex: 1;
   min-height: 0;
@@ -394,7 +394,7 @@
     grid-template-columns: 1fr;
     grid-template-rows: auto;
     flex: none;
-    gap: 10px;
+    gap: 8px;
   }
 }
 
@@ -405,8 +405,8 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: clamp(4px, 0.7vh, 8px) clamp(10px, 1.2vw, 16px);
-  border-radius: 12px;
+  padding: clamp(2px, 0.4vh, 5px) clamp(8px, 1vw, 12px);
+  border-radius: 10px;
   box-sizing: border-box;
   min-height: 0;
   height: 100%;
@@ -417,11 +417,11 @@
 }
 
 .mf-section-title {
-  font-size: clamp(0.96rem, 1.25vw, 1.14rem);
+  font-size: clamp(0.88rem, 1.05vw, 1.00rem);
   font-weight: 800;
   color: #1E293B;
-  margin: 0 0 2px 0;
-  line-height: 1.15;
+  margin: 0 0 1px 0;
+  line-height: 1.1;
 }
 
 /* Side-by-side flex layout for options + info text */
@@ -430,7 +430,7 @@
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  gap: clamp(6px, 1vw, 12px);
+  gap: clamp(4px, 0.8vw, 10px);
   width: 100%;
   flex: 1;
   min-height: 0;
@@ -450,10 +450,10 @@
   flex: 1;
   min-width: 0;
   border-left: 1.5px solid #CBD5E1;
-  padding-left: clamp(8px, 1vw, 14px);
-  font-size: clamp(0.74rem, 0.90vw, 0.86rem);
+  padding-left: clamp(6px, 0.8vw, 10px);
+  font-size: clamp(0.68rem, 0.78vw, 0.76rem);
   color: #334155;
-  line-height: 1.24;
+  line-height: 1.2;
   font-weight: 600;
   display: flex;
   align-items: center;
@@ -468,7 +468,7 @@
 .mf-chip-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: clamp(3px, 0.5vw, 6px);
+  gap: clamp(2px, 0.4vw, 4px);
   width: 100%;
   height: 100%;
   align-items: center;
@@ -478,21 +478,21 @@
 .mf-chip-grid.mf-fav-grid {
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(2, 1fr);
-  gap: clamp(2px, 0.4vw, 4px);
+  gap: clamp(2px, 0.3vw, 3px);
 }
 
 /* UNSELECTED CHIP ITEM (.mf-chip) */
 .mf-chip {
   width: 100%;
   height: 100%;
-  min-height: clamp(26px, 3.2vh, 32px);
-  max-height: clamp(32px, 4.0vh, 38px);
-  padding: 1px 4px;
-  border-radius: 6px;
+  min-height: clamp(20px, 2.5vh, 26px);
+  max-height: clamp(26px, 3.2vh, 30px);
+  padding: 1px 3px;
+  border-radius: 5px;
   border: 1.5px solid #94A3B8;
   background: #FFFFFF;
   color: #0F172A;
-  font-size: clamp(0.82rem, 1.0vw, 0.94rem);
+  font-size: clamp(0.74rem, 0.86vw, 0.82rem);
   font-weight: 700;
   font-family: inherit;
   cursor: pointer;
@@ -503,13 +503,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  line-height: 1.15;
+  line-height: 1.1;
 }
 
 .mf-fav-grid .mf-chip {
-  min-height: clamp(18px, 2.4vh, 24px);
-  max-height: clamp(22px, 2.8vh, 26px);
-  font-size: clamp(0.74rem, 0.88vw, 0.84rem);
+  min-height: clamp(15px, 2.0vh, 18px);
+  max-height: clamp(18px, 2.4vh, 22px);
+  font-size: clamp(0.68rem, 0.76vw, 0.74rem);
 }
 
 .mf-chip:hover {
@@ -522,7 +522,7 @@
   border: 1.5px solid #3730A3 !important;
   background: #312E81 !important;
   color: #FFFFFF !important;
-  box-shadow: 0 0 4px rgba(255, 255, 255, 0.25), 0 2px 6px rgba(49, 46, 129, 0.3) !important;
+  box-shadow: 0 0 4px rgba(255, 255, 255, 0.25), 0 2px 4px rgba(49, 46, 129, 0.3) !important;
   font-weight: 700 !important;
 }
 
@@ -531,13 +531,13 @@
   width: 100%;
   flex: 1;
   height: 100%;
-  min-height: clamp(28px, 3.6vh, 40px);
+  min-height: clamp(22px, 2.8vh, 32px);
   max-height: 100%;
   background: #FFFFFF;
   border: 1.5px solid #CBD5E1;
-  border-radius: 6px;
-  padding: 2px 8px;
-  font-size: clamp(0.82rem, 0.98vw, 0.92rem);
+  border-radius: 5px;
+  padding: 2px 6px;
+  font-size: clamp(0.74rem, 0.86vw, 0.82rem);
   font-family: inherit;
   color: #1E293B;
   outline: none;
