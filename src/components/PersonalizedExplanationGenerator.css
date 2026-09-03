@@ -71,10 +71,10 @@
 .mf-header-characters-banner {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: clamp(8px, 1.5vw, 24px);
+  justify-content: center;
+  gap: clamp(12px, 1.8vw, 24px);
   width: 100%;
-  max-width: 1780px;
+  max-width: 1300px;
 }
 
 .mf-title-group {
@@ -85,7 +85,7 @@
   text-align: center;
   flex-shrink: 0;
   z-index: 2;
-  padding: 0 clamp(6px, 1vw, 16px);
+  padding: 0 clamp(4px, 0.8vw, 12px);
 }
 
 .mf-main-heading {
@@ -109,49 +109,42 @@
   max-width: 680px;
 }
 
-/* Character mascot groups — Proportional and responsive */
+/* Character mascot groups — Grouped together closely */
 .mf-char-group {
   display: flex;
   align-items: center;
-  justify-content: space-around;
-  flex: 1;
-  min-width: 0;
-  height: 100%;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
 .mf-char-banner-img {
-  height: clamp(42px, 5.8vh, 64px);
-  max-height: 70px;
+  height: clamp(44px, 6.0vh, 66px);
+  max-height: 72px;
   width: auto;
-  max-width: 100%;
   object-fit: contain;
   filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.08));
   transition: transform 0.2s ease;
   display: inline-block;
-  flex-shrink: 1;
 }
 
 .mf-char-banner-img:hover {
   transform: translateY(-2px) scale(1.08);
 }
 
-.mf-char-banner-img.buffered {
-  margin-left: clamp(4px, 0.8vw, 12px);
-  margin-right: clamp(4px, 0.8vw, 12px);
-}
-
-/* Giraffe */
+/* 15px buffer around 2.png (Giraffe) */
 .mf-char-banner-img.img-2 {
-  height: clamp(50px, 7.2vh, 80px);
-  max-height: 86px;
+  height: clamp(52px, 7.4vh, 82px);
+  max-height: 88px;
+  margin-left: 15px;
+  margin-right: 15px;
 }
 
-/* Fox */
+/* 15px buffer around 5.png (Fox) */
 .mf-char-banner-img.img-5 {
-  height: clamp(44px, 6.2vh, 70px);
-  max-height: 76px;
-  margin-left: clamp(4px, 0.8vw, 12px);
-  margin-right: clamp(4px, 0.8vw, 12px);
+  height: clamp(46px, 6.4vh, 72px);
+  max-height: 78px;
+  margin-left: 15px;
+  margin-right: 15px;
 }
 
 /* ════════════ 2. MAIN CONTENT CONTAINER (~86-88% VIEWPORT HEIGHT) ════════════ */
