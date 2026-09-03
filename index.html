@@ -14,6 +14,7 @@
         padding: 0;
         width: 100%;
         height: 100%;
+        background-color: #D9EFFF;
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       }
     </style>
@@ -21,13 +22,12 @@
       (function() {
         var p = (window.location.pathname || '').toLowerCase();
         var h = (window.location.hash || '').toLowerCase();
-        var s = (window.location.search || '').toLowerCase();
-        var isSurvey = p.includes('about-your-little-one') || p.includes('profile-generator') || p.includes('profile-builder') || p.includes('survey') || p.includes('profile') || p.includes('explanation') || h.includes('profile') || h.includes('survey') || s.includes('profile') || s.includes('survey');
-        if (isSurvey) {
+        var isStage = p === '/' || p === '' || p.includes('/stage') || p.includes('/room') || (!p.includes('about-your-little-one') && !p.includes('profile-generator') && !p.includes('profile-builder') && !p.includes('survey') && !p.includes('profile') && !p.includes('explanation'));
+        if (isStage && !h.includes('survey') && !h.includes('profile')) {
+          document.documentElement.style.backgroundColor = '#1745B9';
+        } else {
           document.documentElement.style.backgroundColor = '#D9EFFF';
           document.documentElement.style.background = '#D9EFFF';
-        } else {
-          document.documentElement.style.backgroundColor = '#1745B9';
         }
       })();
     </script>
