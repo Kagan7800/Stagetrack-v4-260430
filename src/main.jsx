@@ -1,9 +1,11 @@
 import React, { StrictMode, Suspense, lazy, useState, useEffect } from 'react'
 import { createRoot } from 'react-dom/client'
-import './index.css'
 import AboutYourLittleOneSurvey from './pages/AboutYourLittleOneSurvey.jsx'
 
-const LazyApp = lazy(() => import('./App.jsx'));
+const LazyApp = lazy(() => {
+  import('./index.css');
+  return import('./App.jsx');
+});
 const LazyAppProvider = lazy(() => import('./context/AppContext.jsx').then(m => ({ default: m.AppProvider })));
 
 function isSurveyRoute() {
@@ -64,4 +66,3 @@ createRoot(document.getElementById('root')).render(
     <Root />
   </StrictMode>
 );
-
