@@ -1,5 +1,5 @@
 /* src/components/PersonalizedExplanationGenerator.css */
-/* MFLO Profile Builder — Proportional Full Viewport Engineering (20% Expanded Text + Extra Lateral Width) */
+/* MFLO Profile Builder — 25px Top Screen Buffer + Full Dynamic Viewport Fit */
 
 .mf-profile-builder-page {
   display: flex;
@@ -15,7 +15,7 @@
   -moz-osx-font-smoothing: grayscale;
   color: #1E293B;
   box-sizing: border-box;
-  padding: clamp(4px, 0.9vh, 10px) clamp(8px, 1.2vw, 18px);
+  padding: 25px clamp(8px, 1.2vw, 18px) clamp(4px, 0.8vh, 8px) clamp(8px, 1.2vw, 18px);
   position: relative;
   overflow: hidden;
 }
@@ -25,7 +25,7 @@
     height: auto;
     max-height: none;
     overflow-y: auto;
-    padding: 10px 12px 16px 12px;
+    padding: 25px 12px 16px 12px;
   }
 }
 
@@ -51,9 +51,9 @@
   background: #FFFFFF;
   border: 1.5px solid #CBD5E1;
   border-radius: 8px;
-  padding: 4px 12px;
+  padding: 3px 12px;
   color: #1E293B;
-  font-size: 0.98rem;
+  font-size: 0.94rem;
   font-weight: 700;
   cursor: pointer;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
@@ -70,7 +70,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: clamp(10px, 1.5vw, 24px);
+  gap: clamp(8px, 1.4vw, 22px);
   width: 100%;
   max-width: 1780px;
 }
@@ -85,7 +85,7 @@
 }
 
 .mf-main-heading {
-  font-size: clamp(1.60rem, 2.5vw, 2.22rem);
+  font-size: clamp(1.50rem, 2.3vw, 2.15rem);
   font-weight: 800;
   color: #1E293B;
   margin: 0;
@@ -94,10 +94,10 @@
 }
 
 .mf-sub-heading {
-  font-size: clamp(0.96rem, 1.25vw, 1.18rem);
+  font-size: clamp(0.92rem, 1.2vw, 1.14rem);
   color: #334155;
   opacity: 0.9;
-  margin: 2px 0 0 0;
+  margin: 1px 0 0 0;
   font-weight: 600;
   text-align: center;
   line-height: 1.2;
@@ -113,8 +113,8 @@
 }
 
 .mf-char-banner-img {
-  height: clamp(44px, 5.8vh, 62px);
-  max-height: 66px;
+  height: clamp(38px, 5.2vh, 56px);
+  max-height: 60px;
   width: auto;
   object-fit: contain;
   filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.08));
@@ -127,30 +127,30 @@
 }
 
 .mf-char-banner-img.buffered {
-  margin-left: clamp(8px, 1vw, 14px);
-  margin-right: clamp(8px, 1vw, 14px);
+  margin-left: clamp(6px, 0.9vw, 12px);
+  margin-right: clamp(6px, 0.9vw, 12px);
 }
 
 /* Giraffe */
 .mf-char-banner-img.img-2 {
-  height: clamp(52px, 7.2vh, 74px);
-  max-height: 78px;
+  height: clamp(46px, 6.4vh, 66px);
+  max-height: 70px;
 }
 
 /* Fox */
 .mf-char-banner-img.img-5 {
-  height: clamp(46px, 6.2vh, 64px);
-  max-height: 68px;
-  margin-left: clamp(8px, 1vw, 14px);
-  margin-right: clamp(8px, 1vw, 14px);
+  height: clamp(40px, 5.5vh, 58px);
+  max-height: 62px;
+  margin-left: clamp(6px, 0.9vw, 12px);
+  margin-right: clamp(6px, 0.9vw, 12px);
 }
 
-/* ════════════ 2. MAIN EXPANDED CONTENT CONTAINER (WIDENED TO 1780px) ════════════ */
+/* ════════════ 2. MAIN EXPANDED CONTENT CONTAINER ════════════ */
 .mf-main-content-scroll {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: clamp(5px, 0.9vh, 10px);
+  gap: clamp(4px, 0.8vh, 8px);
   flex: 1;
   min-height: 0;
   max-width: 1780px;
@@ -171,16 +171,16 @@
   background: #FFFFFF;
   border: 1.5px solid #CBD5E1;
   border-radius: 12px;
-  padding: clamp(5px, 0.9vh, 9px) clamp(10px, 1.2vw, 16px);
+  padding: clamp(4px, 0.8vh, 8px) clamp(10px, 1.2vw, 16px);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   box-sizing: border-box;
 }
 
 .mf-card-title {
-  font-size: clamp(1.14rem, 1.44vw, 1.34rem);
+  font-size: clamp(1.10rem, 1.40vw, 1.30rem);
   font-weight: 800;
   color: #1E293B;
-  margin: 0 0 3px 0;
+  margin: 0 0 2px 0;
 }
 
 .mf-card-title.inline-title {
@@ -188,7 +188,7 @@
 }
 
 .mf-label {
-  font-size: clamp(0.96rem, 1.14vw, 1.08rem);
+  font-size: clamp(0.92rem, 1.1vw, 1.05rem);
   font-weight: 700;
   color: #1E293B;
 }
@@ -207,8 +207,8 @@
   background: #FFFFFF;
   border: 1.5px solid #CBD5E1;
   border-radius: 6px;
-  padding: 4px 8px;
-  font-size: clamp(1.05rem, 1.26vw, 1.18rem);
+  padding: 3px 8px;
+  font-size: clamp(1.02rem, 1.22vw, 1.15rem);
   font-weight: 500;
   font-family: inherit;
   color: #1E293B;
@@ -216,7 +216,7 @@
   box-sizing: border-box;
   transition: all 0.15s ease;
   width: 100%;
-  height: clamp(32px, 4.0vh, 38px);
+  height: clamp(30px, 3.8vh, 36px);
 }
 
 .mf-input:focus {
@@ -229,7 +229,7 @@
 .mf-identity-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: clamp(8px, 1.2vw, 16px);
+  gap: clamp(6px, 1.1vw, 14px);
   width: 100%;
   flex-shrink: 0;
   box-sizing: border-box;
@@ -257,12 +257,12 @@
   border: 1.5px solid #94A3B8;
   border-radius: 6px;
   padding: 0 clamp(10px, 1.2vw, 16px);
-  font-size: clamp(1.08rem, 1.30vw, 1.22rem);
+  font-size: clamp(1.04rem, 1.26vw, 1.18rem);
   font-weight: 800;
   color: #334155;
   cursor: pointer;
   transition: all 0.15s ease;
-  height: clamp(32px, 4.0vh, 38px);
+  height: clamp(30px, 3.8vh, 36px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -286,12 +286,12 @@
   background: #FFFFFF;
   border: 1.5px solid #CBD5E1;
   border-radius: 12px;
-  padding: clamp(5px, 0.8vh, 8px) clamp(10px, 1.4vw, 18px);
+  padding: clamp(4px, 0.7vh, 7px) clamp(10px, 1.4vw, 18px);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 10px;
   flex-shrink: 0;
   flex-wrap: wrap;
   box-sizing: border-box;
@@ -300,21 +300,21 @@
 .mf-delivery-left {
   display: flex;
   align-items: center;
-  gap: clamp(12px, 1.6vw, 22px);
+  gap: clamp(10px, 1.5vw, 20px);
   flex-wrap: wrap;
 }
 
 .mf-delivery-checkboxes {
   display: flex;
   align-items: center;
-  gap: clamp(12px, 1.4vw, 18px);
+  gap: clamp(10px, 1.3vw, 16px);
 }
 
 .mf-checkbox-label {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: clamp(1.02rem, 1.26vw, 1.15rem);
+  font-size: clamp(0.98rem, 1.22vw, 1.12rem);
   font-weight: 700;
   color: #1E293B;
   cursor: pointer;
@@ -323,13 +323,13 @@
 
 .mf-checkbox-label input[type="checkbox"] {
   accent-color: #312E81;
-  width: 18px;
-  height: 18px;
+  width: 17px;
+  height: 17px;
   cursor: pointer;
 }
 
 .mf-delivery-note {
-  font-size: clamp(0.90rem, 1.05vw, 1.00rem);
+  font-size: clamp(0.86rem, 1.0vw, 0.96rem);
   font-weight: 500;
   color: #475569;
   line-height: 1.2;
@@ -346,8 +346,8 @@
   color: #FFFFFF;
   border: none;
   border-radius: 8px;
-  padding: 0 clamp(18px, 2.2vw, 32px);
-  font-size: clamp(1.05rem, 1.32vw, 1.22rem);
+  padding: 0 clamp(16px, 2.0vw, 30px);
+  font-size: clamp(1.02rem, 1.28vw, 1.18rem);
   font-weight: 800;
   font-family: inherit;
   cursor: pointer;
@@ -357,7 +357,7 @@
   box-shadow: 0 2px 6px rgba(49, 46, 129, 0.25);
   transition: all 0.2s ease;
   white-space: nowrap;
-  height: clamp(34px, 4.2vh, 40px);
+  height: clamp(32px, 3.8vh, 38px);
 }
 
 .mf-generate-btn:hover:not(:disabled) {
@@ -372,12 +372,12 @@
   transform: none;
 }
 
-/* ════════════ 5. 3-COLUMN TRAIT GRID (EVEN VERTICAL EXPANSION + 20% LARGER TEXT) ════════════ */
+/* ════════════ 5. 3-COLUMN TRAIT GRID (EVEN VERTICAL EXPANSION) ════════════ */
 .mf-trait-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   grid-template-rows: repeat(3, 1fr);
-  gap: clamp(5px, 0.9vh, 10px);
+  gap: clamp(4px, 0.8vh, 8px);
   width: 100%;
   flex: 1;
   min-height: 0;
@@ -400,7 +400,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: clamp(5px, 0.9vh, 9px) clamp(10px, 1.2vw, 16px);
+  padding: clamp(4px, 0.8vh, 8px) clamp(10px, 1.2vw, 16px);
   border-radius: 12px;
   box-sizing: border-box;
   min-height: 0;
@@ -412,7 +412,7 @@
 }
 
 .mf-section-title {
-  font-size: clamp(1.15rem, 1.50vw, 1.35rem);
+  font-size: clamp(1.10rem, 1.44vw, 1.30rem);
   font-weight: 800;
   color: #1E293B;
   margin: 0 0 2px 0;
@@ -425,7 +425,7 @@
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  gap: clamp(8px, 1vw, 14px);
+  gap: clamp(6px, 1vw, 12px);
   width: 100%;
   flex: 1;
   min-height: 0;
@@ -446,7 +446,7 @@
   min-width: 0;
   border-left: 1.5px solid #CBD5E1;
   padding-left: clamp(8px, 1vw, 14px);
-  font-size: clamp(0.86rem, 1.05vw, 1.00rem);
+  font-size: clamp(0.82rem, 1.0vw, 0.96rem);
   color: #334155;
   line-height: 1.26;
   font-weight: 600;
@@ -473,21 +473,21 @@
 .mf-chip-grid.mf-fav-grid {
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(2, 1fr);
-  gap: clamp(3px, 0.4vw, 5px);
+  gap: clamp(2px, 0.4vw, 4px);
 }
 
 /* UNSELECTED CHIP ITEM (.mf-chip) */
 .mf-chip {
   width: 100%;
   height: 100%;
-  min-height: clamp(28px, 3.6vh, 36px);
-  max-height: clamp(36px, 4.6vh, 44px);
+  min-height: clamp(26px, 3.3vh, 34px);
+  max-height: clamp(34px, 4.3vh, 40px);
   padding: 2px 4px;
   border-radius: 6px;
   border: 1.5px solid #94A3B8;
   background: #FFFFFF;
   color: #0F172A;
-  font-size: clamp(0.96rem, 1.18vw, 1.10rem);
+  font-size: clamp(0.92rem, 1.14vw, 1.06rem);
   font-weight: 700;
   font-family: inherit;
   cursor: pointer;
@@ -502,9 +502,9 @@
 }
 
 .mf-fav-grid .mf-chip {
-  min-height: clamp(22px, 2.8vh, 28px);
-  max-height: clamp(26px, 3.2vh, 32px);
-  font-size: clamp(0.86rem, 1.02vw, 0.98rem);
+  min-height: clamp(20px, 2.6vh, 26px);
+  max-height: clamp(24px, 3.0vh, 28px);
+  font-size: clamp(0.82rem, 0.98vw, 0.94rem);
 }
 
 .mf-chip:hover {
@@ -526,13 +526,13 @@
   width: 100%;
   flex: 1;
   height: 100%;
-  min-height: clamp(34px, 4.5vh, 48px);
+  min-height: clamp(30px, 4.0vh, 44px);
   max-height: 100%;
   background: #FFFFFF;
   border: 1.5px solid #CBD5E1;
   border-radius: 6px;
-  padding: 4px 8px;
-  font-size: clamp(0.96rem, 1.14vw, 1.05rem);
+  padding: 3px 8px;
+  font-size: clamp(0.92rem, 1.1vw, 1.02rem);
   font-family: inherit;
   color: #1E293B;
   outline: none;
