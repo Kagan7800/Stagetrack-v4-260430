@@ -91,8 +91,9 @@
 
 .mf-main-heading {
   font-family: 'Risque', cursive, serif;
-  font-size: clamp(1.40rem, 2.2vw, 1.95rem);
-  font-weight: 400;
+  font-size: clamp(1.45rem, 2.3vw, 2.05rem);
+  font-weight: 700;
+  -webkit-text-stroke: 0.5px #1E293B;
   color: #1E293B;
   margin: 0;
   letter-spacing: -0.01em;
