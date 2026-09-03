@@ -513,9 +513,9 @@
 }
 
 .mf-fav-grid .mf-chip {
-  min-height: clamp(15px, 2.0vh, 18px);
-  max-height: clamp(18px, 2.4vh, 22px);
-  font-size: clamp(0.68rem, 0.76vw, 0.74rem);
+  min-height: clamp(20px, 2.5vh, 26px);
+  max-height: clamp(26px, 3.2vh, 30px);
+  font-size: clamp(0.74rem, 0.86vw, 0.82rem);
 }
 
 .mf-chip:hover {
