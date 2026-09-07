@@ -98,6 +98,18 @@ test('selectedIcon exclusively claims NW and prevents other stickers from taking
   assert.ok(!otherSlots.includes('NW'));
 });
 
+test('sun as selectedIcon claims SUN_SLOT (E) rather than NW', () => {
+  const stickers = [
+    { id: '1', name: 'Guitar.svg', addedAt: 100 },
+    { id: '2', name: 'Truck.svg', addedAt: 200 }
+  ];
+  const { placed } = allocate(stickers, 'Sun with sunglasses.svg');
+  const sunItem = placed.find(p => p.slot === SUN_SLOT);
+  assert.ok(sunItem);
+  assert.equal(sunItem.sticker.name, 'Sun with sunglasses.svg');
+  assert.equal(sunItem.slot, 'E');
+});
+
 test('gutter clears two facing protrusions plus buffers', () => {
   const clearanceNeeded = TOKENS.protrusion * 2 + TOKENS.buffer * 2;
   assert.ok(TOKENS.gutter >= clearanceNeeded, `Gutter ${TOKENS.gutter}px must be >= ${clearanceNeeded}px`);

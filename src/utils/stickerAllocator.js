@@ -38,12 +38,14 @@ export function allocate(stickers = [], selectedIcon = null) {
   const occupied = new Map();
   const removed = [];
 
-  // 1. If selectedIcon is present, it claims NW exclusively
+  // 1. If selectedIcon is present, it claims its designated slot (E for Sun, NW for others)
   if (selectedIcon) {
-    occupied.set('NW', {
+    const isSunIcon = selectedIcon === 'Sun with sunglasses.svg' || (typeof selectedIcon === 'string' && selectedIcon.toLowerCase().includes('sun'));
+    const iconSlot = isSunIcon ? SUN_SLOT : 'NW';
+    occupied.set(iconSlot, {
       id: `selected-icon-${selectedIcon}`,
       name: selectedIcon,
-      kind: 'selectedIcon',
+      kind: isSunIcon ? 'sun' : 'selectedIcon',
       isIcon: true
     });
   }

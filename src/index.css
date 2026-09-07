@@ -586,7 +586,8 @@ body {
 
 /* Spec v3 Sticker Placement Implementation */
 .video-cell,
-.tile {
+.tile,
+.lobby-camera-preview-container {
   container-type: size;
   position: relative;
   overflow: visible !important; /* required — clipping kills the protrusion */

@@ -433,16 +433,52 @@ export default function LobbyOverlay() {
                   {myName}
                 </div>
               )}
-              {/* Selected Sticker Badge */}
-              {selectedIcon && (
-                <img 
-                  src={`/assets/svg_stickers/${selectedIcon}`}
-                  className={`lobby-camera-icon-badge ${selectedIcon.toLowerCase().includes('sun') ? 'is-sun' : ''}`}
-                  alt="Selected Icon Badge" 
-                />
-              )}
               {/* SVG-based PEO Border component */}
               <PeoBorder color={selectedBorder} />
+
+              {/* Selected Sticker Badge using standard session sticker-layer & slot rules */}
+              {selectedIcon && (() => {
+                const isSun = selectedIcon === 'Sun with sunglasses.svg' || selectedIcon.toLowerCase().includes('sun');
+                const slot = isSun ? 'E' : 'NW';
+                const isCrown = selectedIcon.toLowerCase().includes('crown') || slot === 'TC';
+                const isBirthday = selectedIcon.toLowerCase().includes('birthday') || slot === 'NE';
+                const isXylophone = selectedIcon.toLowerCase().includes('xylophone');
+                const isTrumpet = selectedIcon.toLowerCase().includes('trumpet');
+                const isFlower = selectedIcon.toLowerCase().includes('flower');
+                const isStar = selectedIcon.toLowerCase().includes('star');
+
+                let scale = 1;
+                if (isCrown || isBirthday || isXylophone) scale = 1.25;
+                else if (isTrumpet) scale = 1.20;
+                else if (isFlower) scale = 0.85;
+                else if (isStar) scale = 1.15;
+
+                let origin = 'center center';
+                if (isCrown) origin = 'center bottom';
+                else if (isSun) origin = 'right center';
+
+                return (
+                  <div className="sticker-layer" style={{ zIndex: 12 }}>
+                    <div 
+                      className="sticker-item sl-placed" 
+                      data-slot={slot}
+                    >
+                      <div 
+                        className="sticker-visual"
+                        style={{
+                          transform: `scale(${scale})`,
+                          transformOrigin: origin
+                        }}
+                      >
+                        <img 
+                          src={`/assets/svg_stickers/${selectedIcon}`} 
+                          alt={selectedIcon} 
+                        />
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
 
             {/* STO Stickers selection grid mapped over Card 1 (Left Side Box) */}
