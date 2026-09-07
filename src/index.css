@@ -3697,6 +3697,18 @@ img.sticker,
   filter: drop-shadow(0 calc(12px * var(--lobby-scale)) calc(24px * var(--lobby-scale)) rgba(0, 0, 0, 0.45));
 }
 
+/* Sun sticker hugs the right center border line flush, matching session Slot E behavior */
+.lobby-camera-icon-badge[src*="Sun" i],
+.lobby-camera-icon-badge.is-sun {
+  top: 50%;
+  right: 0px;
+  left: auto;
+  bottom: auto;
+  translate: 0 -50%;
+  object-fit: contain;
+  object-position: right center;
+}
+
 .ito-theme-selector-container {
   margin-top: 0px;
   padding-top: 1px;

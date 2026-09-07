@@ -437,7 +437,7 @@ export default function LobbyOverlay() {
               {selectedIcon && (
                 <img 
                   src={`/assets/svg_stickers/${selectedIcon}`}
-                  className="lobby-camera-icon-badge" 
+                  className={`lobby-camera-icon-badge ${selectedIcon.toLowerCase().includes('sun') ? 'is-sun' : ''}`}
                   alt="Selected Icon Badge" 
                 />
               )}
