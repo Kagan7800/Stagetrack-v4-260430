@@ -5,7 +5,9 @@
     "serve": "firebase emulators:start --only functions",
     "shell": "firebase functions:shell",
     "start": "npm run shell",
-    "deploy": "firebase deploy --only functions"
+    "deploy": "firebase deploy --only functions",
+    "test": "node --test test/tokens.test.js test/guestPasses.test.js test/redeem.test.js test/sessionRouter.test.js test/admitQueue.test.js test/occupancy.test.js test/e2e.test.js",
+    "test:rules": "firebase emulators:exec --only firestore \"node --test test/firestoreRules.test.js\""
   },
   "engines": {
     "node": "22"
@@ -17,6 +19,7 @@
     "firebase-functions": "^5.0.0"
   },
   "devDependencies": {
+    "@firebase/rules-unit-testing": "^5.0.2",
     "firebase-functions-test": "^3.1.0"
   },
   "private": true

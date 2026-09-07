@@ -9,7 +9,7 @@ const LazyApp = lazy(() => {
 const LazyAppProvider = lazy(() => import('./context/AppContext.jsx').then(m => ({ default: m.AppProvider })));
 
 function isSurveyRoute() {
-  if (typeof window === 'undefined') return true;
+  if (typeof window === 'undefined') return false;
   const p = window.location.pathname.toLowerCase();
   const h = window.location.hash.toLowerCase();
   const s = window.location.search.toLowerCase();
@@ -34,8 +34,7 @@ function isSurveyRoute() {
     h.includes('survey') ||
     s.includes('profile-generator') ||
     s.includes('about-your-little-one') ||
-    s.includes('survey') ||
-    p === '/' || p === ''
+    s.includes('survey')
   );
 }
 

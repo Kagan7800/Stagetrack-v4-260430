@@ -278,3 +278,55 @@ exports.assignSessionInstructor = functions.https.onCall(async (data, context) =
   return { success: true, instructorUid: context.auth.uid };
 });
 
+const { createGuestPassHandler, getMyGuestPassHandler } = require('./guestPasses');
+const { redeemPassHandler } = require('./redeem');
+const { getRecordingSignedUrlHandler } = require('./recordings');
+const { submitJoinRequestHandler, admitAllPendingHandler } = require('./admitQueue');
+const {
+  mintJoinTokenHandler,
+  claimOccupancySlotHandler,
+  heartbeatOccupancyHandler,
+  releaseOccupancySlotHandler,
+} = require('./occupancy');
+
+exports.createGuestPass = functions.https.onCall(async (data, context) => {
+  return createGuestPassHandler(data, context);
+});
+
+exports.getMyGuestPass = functions.https.onCall(async (data, context) => {
+  return getMyGuestPassHandler(data, context);
+});
+
+exports.submitJoinRequest = functions.https.onCall(async (data, context) => {
+  return submitJoinRequestHandler(data, context);
+});
+
+exports.admitAllPending = functions.https.onCall(async (data, context) => {
+  return admitAllPendingHandler(data, context);
+});
+
+exports.mintJoinToken = functions.https.onCall(async (data, context) => {
+  return mintJoinTokenHandler(data, context);
+});
+
+exports.claimOccupancySlot = functions.https.onCall(async (data, context) => {
+  return claimOccupancySlotHandler(data, context);
+});
+
+exports.heartbeatOccupancy = functions.https.onCall(async (data, context) => {
+  return heartbeatOccupancyHandler(data, context);
+});
+
+exports.releaseOccupancySlot = functions.https.onCall(async (data, context) => {
+  return releaseOccupancySlotHandler(data, context);
+});
+
+exports.redeemPass = functions.https.onRequest(async (req, res) => {
+  return redeemPassHandler(req, res);
+});
+
+exports.getRecordingSignedUrl = functions.https.onCall(async (data, context) => {
+  return getRecordingSignedUrlHandler(data, context);
+});
+
+

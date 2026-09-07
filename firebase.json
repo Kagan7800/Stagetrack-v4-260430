@@ -95,6 +95,10 @@
     ],
     "rewrites": [
       {
+        "source": "/my/**",
+        "function": "redeemPass"
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }

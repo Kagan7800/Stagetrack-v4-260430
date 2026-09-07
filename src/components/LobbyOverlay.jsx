@@ -2,9 +2,11 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { Loader2, ShieldAlert, Camera } from 'lucide-react';
 import PeoBorder from './PeoBorder';
-
+import InstructorAdmitQueue from './InstructorAdmitQueue';
+import { getFunctions, httpsCallable } from 'firebase/functions';
+import { getAuth } from 'firebase/auth';
+import { doc, setDoc, deleteDoc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase';
-import { doc, updateDoc } from 'firebase/firestore';
 
 const BORDERS = [
   { name: 'Cyan Line', value: '#00FCFC', file: 'Line 180.svg', color: '#00FCFC' },
@@ -172,37 +174,77 @@ export default function LobbyOverlay() {
     }
   }, [stream, lobbyStatus]);
 
+  // Presence heartbeat for parents in lobby (Count Only tracking)
+  useEffect(() => {
+    if (isInstructor || lobbyStatus !== 'initial' || !sessionId) return;
+    const auth = getAuth();
+    const currentUser = auth.currentUser;
+    if (!currentUser) return;
+
+    const presenceRef = doc(db, 'lobbyPresence', sessionId, 'active', currentUser.uid);
+
+    const sendHeartbeat = async () => {
+      try {
+        await setDoc(presenceRef, { heartbeatAt: Date.now() }, { merge: true });
+      } catch (err) {
+        // Ignored presence errors
+      }
+    };
+
+    sendHeartbeat();
+    const interval = setInterval(sendHeartbeat, 15000);
+
+    return () => {
+      clearInterval(interval);
+      deleteDoc(presenceRef).catch(() => {});
+    };
+  }, [isInstructor, lobbyStatus, sessionId]);
+
   const handleSubmit = useCallback(async (e) => {
     if (e) e.preventDefault();
     if (!myName.trim() || !myLittleOne.trim() || !selectedIcon || !sessionId) return;
 
-    const guestId = `active-joined-${Date.now()}`;
-    sessionStorage.setItem('stagetrack_active_guest_id', guestId);
-    sessionStorage.setItem('stagetrack_role', 'student');
+    const auth = getAuth();
+    const currentUser = auth.currentUser;
+    const passId = sessionStorage.getItem('__mf_pass_id') || currentUser?.uid;
 
-    const reqData = {
-      id: guestId,
-      name: `${myName.trim()} & ${myLittleOne.trim()}`,
-      myName: myName.trim(),
-      myLittleOne: myLittleOne.trim(),
-      selectedIcon: selectedIcon,
-      selectedBorder: selectedBorder,
-      color: selectedBorder,
-      vibeChips: selectedVibeChips,
-      timestamp: Date.now()
-    };
+    // Strict §4.7: Store mood/vibe in React memory only for live stage, never in Firestore payload
+    sessionStorage.setItem('__mf_vibe_memory', JSON.stringify(selectedVibeChips));
 
     try {
-      const sessionRef = doc(db, "sessions", sessionId);
-      await updateDoc(sessionRef, {
-        lobbyRequest: reqData,
-        lobbyResponse: { status: 'pending' }
+      const functions = getFunctions();
+      const submitJoinRequest = httpsCallable(functions, 'submitJoinRequest');
+
+      const response = await submitJoinRequest({
+        sessionId,
+        adultName: myName.trim(),
+        childNames: children.filter(c => c.trim()),
+        sticker: selectedIcon,
+        borderColor: selectedBorder,
+        birthdayThisWeek: selectedVibeChips.includes('birthday'),
       });
+
       setLobbyStatus('pending');
+
+      // Listen to the deterministic joinRequest doc for real-time admission
+      const requestId = response?.data?.requestId || `${sessionId}_${passId}`;
+      const reqRef = doc(db, 'joinRequests', requestId);
+
+      const unsubscribe = onSnapshot(reqRef, (snapshot) => {
+        if (snapshot.exists()) {
+          const data = snapshot.data();
+          if (data.status === 'admitted') {
+            setLobbyStatus('admitted');
+            unsubscribe();
+          } else if (data.status === 'denied') {
+            setLobbyStatus('denied');
+          }
+        }
+      });
     } catch (err) {
       console.error("Error submitting join request:", err);
     }
-  }, [myName, myLittleOne, selectedIcon, sessionId, selectedBorder, selectedVibeChips, setLobbyStatus]);
+  }, [myName, myLittleOne, children, selectedIcon, sessionId, selectedBorder, selectedVibeChips, setLobbyStatus]);
 
   const handleRetry = () => {
     setLobbyStatus('initial');
@@ -216,27 +258,10 @@ export default function LobbyOverlay() {
     window.location.href = window.location.origin + window.location.pathname + (searchStr ? '?' + searchStr : '');
   };
 
-  // --- INSTRUCTOR HANDLER ---
-  const handleAcceptGuest = async () => {
-    if (!pendingRequest || !sessionId) return;
-    await approveRequest();
-  };
-
   if (isInstructor) {
-    if (!pendingRequest) return null;
-
     return (
-      <div className="lobby-overlay-backdrop" style={{ position: 'fixed', inset: 0, zIndex: 10000, background: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div className="lobby-modal" style={{ background: '#1e293b', padding: '30px', borderRadius: '16px', textAlign: 'center', color: '#fff', border: '2px solid #3b82f6' }}>
-          <h2>Guest Waiting in Lobby</h2>
-          <p style={{ fontSize: '1.2rem', margin: '15px 0' }}><strong>{pendingRequest.name}</strong> wants to join your session.</p>
-          <button 
-            onClick={handleAcceptGuest}
-            style={{ padding: '12px 28px', background: '#22c55e', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '1.1rem', cursor: 'pointer', fontWeight: 'bold' }}
-          >
-            Admit Guest
-          </button>
-        </div>
+      <div style={{ position: 'fixed', bottom: '24px', right: '24px', zIndex: 10000 }}>
+        <InstructorAdmitQueue sessionId={sessionId} />
       </div>
     );
   }

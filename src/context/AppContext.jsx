@@ -9,36 +9,36 @@ export const AppContext = createContext(null);
 
 const getInitialAuth = () => {
   if (typeof window === 'undefined') {
-    return { sessionId: 'session-hm898y4nq', isJoined: true, lobbyStatus: 'approved', role: 'instructor', activeGuestId: null };
+    return { sessionId: 'session-hm898y4nq', isJoined: false, lobbyStatus: 'initial', role: 'student', activeGuestId: null };
   }
   const urlParams = new URLSearchParams(window.location.search);
   const paramSession = urlParams.get('session') || 'session-hm898y4nq';
   const roleParam = urlParams.get('role');
-  const savedRole = sessionStorage.getItem('stagetrack_role');
-  const isExplicitStudent = roleParam === 'student' || (savedRole === 'student' && roleParam !== 'instructor');
+  const isInstructor = roleParam === 'instructor';
 
-  if (isExplicitStudent) {
-    sessionStorage.setItem('stagetrack_role', 'student');
-    const savedSession = sessionStorage.getItem('stagetrack_session_id');
-    if (paramSession !== savedSession) {
-      sessionStorage.removeItem('stagetrack_lobby_response');
-      sessionStorage.removeItem('stagetrack_active_guest_id');
-      sessionStorage.setItem('stagetrack_session_id', paramSession);
-    }
-    const savedRes = sessionStorage.getItem('stagetrack_lobby_response');
-    if (savedRes) {
-      try {
-        const parsed = JSON.parse(savedRes);
-        if ((parsed.status === 'approved' || parsed.status === 'accepted') && parsed.joinedUser) {
-          return { sessionId: paramSession, isJoined: true, lobbyStatus: 'approved', role: 'student', activeGuestId: parsed.joinedUser.id };
-        }
-      } catch { /* ignore parse error */ }
-    }
-    return { sessionId: paramSession, isJoined: false, lobbyStatus: 'initial', role: 'student', activeGuestId: null };
-  } else {
+  if (isInstructor) {
     sessionStorage.setItem('stagetrack_role', 'instructor');
     return { sessionId: paramSession, isJoined: true, lobbyStatus: 'approved', role: 'instructor', activeGuestId: null };
   }
+
+  // Default every visitor to student (guest) in Lobby
+  sessionStorage.setItem('stagetrack_role', 'student');
+  const savedSession = sessionStorage.getItem('stagetrack_session_id');
+  if (paramSession !== savedSession) {
+    sessionStorage.removeItem('stagetrack_lobby_response');
+    sessionStorage.removeItem('stagetrack_active_guest_id');
+    sessionStorage.setItem('stagetrack_session_id', paramSession);
+  }
+  const savedRes = sessionStorage.getItem('stagetrack_lobby_response');
+  if (savedRes) {
+    try {
+      const parsed = JSON.parse(savedRes);
+      if ((parsed.status === 'approved' || parsed.status === 'accepted') && parsed.joinedUser) {
+        return { sessionId: paramSession, isJoined: true, lobbyStatus: 'approved', role: 'student', activeGuestId: parsed.joinedUser.id };
+      }
+    } catch { /* ignore parse error */ }
+  }
+  return { sessionId: paramSession, isJoined: false, lobbyStatus: 'initial', role: 'student', activeGuestId: null };
 };
 
 export function AppProvider({ children }) {
