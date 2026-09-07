@@ -290,12 +290,30 @@ const {
 } = require('./occupancy');
 const { recoverGuestPassHandler } = require('./recovery');
 
+const {
+  listGuestPassesHandler,
+  rotatePassLinkHandler,
+  revokeGuestPassHandler,
+} = require('./passManagement');
+
 exports.createGuestPass = functions.https.onCall(async (data, context) => {
   return createGuestPassHandler(data, context);
 });
 
 exports.getMyGuestPass = functions.https.onCall(async (data, context) => {
   return getMyGuestPassHandler(data, context);
+});
+
+exports.listGuestPasses = functions.https.onCall(async (data, context) => {
+  return listGuestPassesHandler(data, context);
+});
+
+exports.rotatePassLink = functions.https.onCall(async (data, context) => {
+  return rotatePassLinkHandler(data, context);
+});
+
+exports.revokeGuestPass = functions.https.onCall(async (data, context) => {
+  return revokeGuestPassHandler(data, context);
 });
 
 exports.recoverGuestPass = functions.https.onCall(async (data, context) => {

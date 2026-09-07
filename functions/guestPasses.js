@@ -65,7 +65,13 @@ function getAppBaseUrl() {
  */
 function sanitizeGuestPassForClient(passData, passId) {
   if (!passData) return null;
-  const { tokenHash, knownDevices, ...clientSafe } = passData;
+  const {
+    tokenHash,
+    activeTokenHashes,
+    activeTokenPool,
+    knownDevices,
+    ...clientSafe
+  } = passData;
   return {
     id: passId,
     ...clientSafe,

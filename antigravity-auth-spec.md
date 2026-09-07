@@ -98,11 +98,16 @@ Music Fun with My Little One passwordless guest pass, authentication, session ro
 
 ## Remaining Tasks
 
-### Task 8: Pass Management, Token Rotation, & Revocation
-- [ ] Admin/Instructor pass management API & UI: List passes, revoke pass, rotate pass link.
-- [ ] Intentional rotation: Mints new token, replaces `activeTokenHashes = [newTokenHash]`, clears old pool, preserves stable `uid`.
-- [ ] Instant server revocation: Sets `status: 'revoked'`, clears `activeTokenHashes = []`, and calls `admin.auth().revokeRefreshTokens(pass.uid)`.
-- [ ] Security rules check: Enforce `status: 'revoked'` and validate `request.auth.token.auth_time` against revocation timestamp.
+### Task 8: Pass Management, Token Rotation, & Revocation — `COMPLETED`
+- [x] Admin/Instructor pass management API (`listGuestPasses`, `rotatePassLink`, `revokeGuestPass` in `functions/passManagement.js`) & UI (`src/components/InstructorPassManagement.jsx`).
+- [x] Intentional rotation: Mints new token, replaces `activeTokenHashes = [newTokenHash]`, clears old pool, preserves stable `uid`.
+- [x] Instant server revocation: Sets `status: 'revoked'`, clears `activeTokenHashes = []`, calls `admin.auth().revokeRefreshTokens(pass.uid)`, and deletes active occupancy slot.
+- [x] Security rules enforcement: `isGuestPassActive()` enforces `status: 'active'` and validates `request.auth.token.auth_time > passDoc.data.revokedAt.toMillis() / 1000` with short-circuit protection for instructors.
+- [x] Evidenced by 4 acceptance tests in `functions/test/passManagement.test.js` and 2 emulator security rules tests in `functions/test/firestoreRules.test.js`.
+
+---
+
+## Remaining Tasks
 
 ### Task 9: Deployment & Production Launch Readiness
 - [ ] Configure Firestore TTL policy on `rateLimits` (`expiresAt`).

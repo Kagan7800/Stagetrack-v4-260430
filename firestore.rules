@@ -16,12 +16,23 @@ service cloud.firestore {
       return isSignedIn() && (request.auth.token.instructor == true || isAdmin());
     }
 
+    function isGuest() {
+      return isSignedIn() && ('isGuest' in request.auth.token) && request.auth.token.isGuest == true;
+    }
+
+    function isGuestPassActive() {
+      let passDoc = get(/databases/$(database)/documents/guestPasses/$(request.auth.token.passId));
+      return passDoc != null &&
+             passDoc.data.status == 'active' &&
+             (!('revokedAt' in passDoc.data) || request.auth.token.auth_time > passDoc.data.revokedAt.toMillis() / 1000);
+    }
+
     function isPassOwner(passId) {
-      return isSignedIn() && request.auth.token.passId == passId;
+      return isSignedIn() && request.auth.token.passId == passId && (!isGuest() || isGuestPassActive());
     }
 
     function hasProgramAccess(programId) {
-      return isSignedIn() && (request.auth.token.programId == programId || isInstructor());
+      return isInstructor() || (isSignedIn() && request.auth.token.programId == programId && (!isGuest() || isGuestPassActive()));
     }
 
     function isSessionActiveForJoin(sessionId) {
@@ -38,37 +49,38 @@ service cloud.firestore {
     }
 
     // --- 2. Sessions ---
-    // Read: only program members or instructors. Write: instructors only.
+    // Read: only active program members or instructors. Write: instructors only.
     match /sessions/{sessionId} {
       allow read: if hasProgramAccess(resource.data.programId);
       allow write: if isInstructor();
     }
 
     // --- 3. Join Requests ---
-    // Create: authenticated pass holder can ONLY create 'pending' requests for currently active (lobby_open/live) sessions in their program.
-    // Read: instructor can read all in program; pass owner can only read their own request.
+    // Create: authenticated active pass holder can ONLY create 'pending' requests for active sessions.
+    // Read: instructor can read all in program; active pass owner can only read their own request.
     // Update/Delete: instructor only (parents CANNOT self-admit or change status).
     match /joinRequests/{requestId} {
       allow create: if isSignedIn() &&
                     request.resource.data.passId == request.auth.token.passId &&
                     request.resource.data.status == 'pending' &&
+                    (!isGuest() || isGuestPassActive()) &&
                     isSessionActiveForJoin(request.resource.data.sessionId);
-      allow read: if isInstructor() || (isSignedIn() && resource.data.passId == request.auth.token.passId);
+      allow read: if isInstructor() || (isSignedIn() && resource.data.passId == request.auth.token.passId && (!isGuest() || isGuestPassActive()));
       allow update: if isInstructor();
       allow delete: if isInstructor();
     }
 
     // --- 4. Live Occupancy ---
-    // Server-write only via Cloud Functions. Read by instructors or the pass owner (§5 Task 6).
+    // Server-write only via Cloud Functions. Read by instructors or the active pass owner (§5 Task 6 & Task 8).
     match /occupancy/{passId} {
-      allow read: if isInstructor() || (isSignedIn() && request.auth.token.passId == passId);
+      allow read: if isInstructor() || (isSignedIn() && request.auth.token.passId == passId && (!isGuest() || isGuestPassActive()));
       allow write: if false;
     }
 
     // --- 5. Lobby Presence (Count Only) ---
-    // Parents can write their own presence heartbeat doc. Instructors can read/count.
+    // Active parents can write their own presence heartbeat doc. Instructors can read/count.
     match /lobbyPresence/{sessionId}/active/{uid} {
-      allow write: if isSignedIn() && request.auth.uid == uid;
+      allow write: if isSignedIn() && request.auth.uid == uid && (!isGuest() || isGuestPassActive());
       allow read: if isInstructor();
     }
 

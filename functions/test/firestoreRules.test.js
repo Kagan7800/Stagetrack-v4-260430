@@ -60,6 +60,7 @@ test('Firestore Security Rules — Real Emulator Test Suite (§7)', async (t) =>
         tokenHash: 'secret_hash_abcdef',
         programId: 'spring-2026',
         email: 'parent@example.com',
+        status: 'active',
       });
     });
 
@@ -77,6 +78,11 @@ test('Firestore Security Rules — Real Emulator Test Suite (§7)', async (t) =>
 
   await t.test('3. Sessions — program isolation and instructor write authority', async () => {
     await testEnv.withSecurityRulesDisabled(async (adminCtx) => {
+      await adminCtx.firestore().collection('guestPasses').doc('pass_100').set({
+        uid: 'guest_user_100',
+        programId: 'spring-2026',
+        status: 'active',
+      });
       await adminCtx.firestore().collection('sessions').doc('sess_spring').set({
         programId: 'spring-2026',
         state: 'lobby_open',
@@ -114,6 +120,11 @@ test('Firestore Security Rules — Real Emulator Test Suite (§7)', async (t) =>
 
   await t.test('4. Join Requests — anti-self-admission, active session check, and pass ownership', async () => {
     await testEnv.withSecurityRulesDisabled(async (adminCtx) => {
+      await adminCtx.firestore().collection('guestPasses').doc('pass_100').set({
+        uid: 'guest_user_100',
+        programId: 'spring-2026',
+        status: 'active',
+      });
       await adminCtx.firestore().collection('sessions').doc('sess_active').set({
         programId: 'spring-2026',
         state: 'lobby_open',
@@ -202,8 +213,13 @@ test('Firestore Security Rules — Real Emulator Test Suite (§7)', async (t) =>
   });
 
   await t.test('6. Occupancy & Internal Collections — pass-owner read, IDOR block, and server-write only', async () => {
-    // Seed occupancy doc via admin context
+    // Seed pass and occupancy doc via admin context
     await testEnv.withSecurityRulesDisabled(async (adminCtx) => {
+      await adminCtx.firestore().collection('guestPasses').doc('pass_100').set({
+        uid: 'guest_user_100',
+        programId: 'spring-2026',
+        status: 'active',
+      });
       await adminCtx.firestore().collection('occupancy').doc('pass_100').set({
         passId: 'pass_100',
         sessionId: 'sess_1',
@@ -256,6 +272,14 @@ test('Firestore Security Rules — Real Emulator Test Suite (§7)', async (t) =>
   });
 
   await t.test('7. Lobby Presence — client heartbeat write, instructor count read', async () => {
+    await testEnv.withSecurityRulesDisabled(async (adminCtx) => {
+      await adminCtx.firestore().collection('guestPasses').doc('pass_100').set({
+        uid: 'guest_user_100',
+        programId: 'spring-2026',
+        status: 'active',
+      });
+    });
+
     const parentDb = testEnv.authenticatedContext('guest_user_100', {
       passId: 'pass_100',
       programId: 'spring-2026',
@@ -284,6 +308,91 @@ test('Firestore Security Rules — Real Emulator Test Suite (§7)', async (t) =>
     await assertSucceeds(
       instructorDb.collection('lobbyPresence').doc('sess_1').collection('active').doc('guest_user_100').get()
     );
+  });
+
+  await t.test('8. Instant Revocation Gate — revoked pass immediately blocks all Firestore operations', async () => {
+    const now = Math.floor(Date.now() / 1000);
+
+    // Seed revoked pass with revokedAt timestamp in the past
+    await testEnv.withSecurityRulesDisabled(async (adminCtx) => {
+      const adminDb = adminCtx.firestore();
+      await adminDb.collection('guestPasses').doc('pass_revoked').set({
+        uid: 'guest_revoked',
+        programId: 'spring-2026',
+        status: 'revoked',
+        revokedAt: new Date((now - 60) * 1000), // revoked 60 seconds ago
+      });
+      await adminDb.collection('sessions').doc('sess_active').set({
+        programId: 'spring-2026',
+        state: 'lobby_open',
+      });
+      await adminDb.collection('occupancy').doc('pass_revoked').set({
+        passId: 'pass_revoked',
+        sessionId: 'sess_active',
+      });
+    });
+
+    // Parent JWT with auth_time issued before revocation
+    const revokedParentDb = testEnv.authenticatedContext('guest_revoked', {
+      passId: 'pass_revoked',
+      programId: 'spring-2026',
+      isGuest: true,
+      auth_time: now - 300, // token authenticated 5 minutes ago
+    }).firestore();
+
+    // 1. Cannot read session
+    await assertFails(revokedParentDb.collection('sessions').doc('sess_active').get());
+
+    // 2. Cannot create join request
+    await assertFails(
+      revokedParentDb.collection('joinRequests').doc('req_revoked').set({
+        passId: 'pass_revoked',
+        sessionId: 'sess_active',
+        status: 'pending',
+      })
+    );
+
+    // 3. Cannot read occupancy
+    await assertFails(revokedParentDb.collection('occupancy').doc('pass_revoked').get());
+
+    // 4. Cannot write lobby presence
+    await assertFails(
+      revokedParentDb.collection('lobbyPresence').doc('sess_active').collection('active').doc('guest_revoked').set({
+        heartbeatAt: new Date().toISOString(),
+      })
+    );
+  });
+
+  await t.test('9. Instructor Short-Circuit — non-guest without passId is completely unaffected by isGuestPassActive()', async () => {
+    await testEnv.withSecurityRulesDisabled(async (adminCtx) => {
+      const adminDb = adminCtx.firestore();
+      await adminDb.collection('sessions').doc('sess_inst_test').set({
+        programId: 'spring-2026',
+        state: 'lobby_open',
+      });
+      await adminDb.collection('joinRequests').doc('req_inst_test').set({
+        passId: 'pass_any',
+        sessionId: 'sess_inst_test',
+        status: 'pending',
+      });
+      await adminDb.collection('occupancy').doc('pass_any').set({
+        passId: 'pass_any',
+        sessionId: 'sess_inst_test',
+      });
+    });
+
+    // Instructor context has NO passId and NO isGuest claim
+    const instructorDb = testEnv.authenticatedContext('inst_clean', {
+      instructor: true,
+    }).firestore();
+
+    // All operations succeed cleanly and never fail or evaluate against undefined passId
+    await assertSucceeds(instructorDb.collection('sessions').doc('sess_inst_test').get());
+    await assertSucceeds(instructorDb.collection('sessions').doc('sess_inst_test').update({ state: 'live' }));
+    await assertSucceeds(instructorDb.collection('joinRequests').doc('req_inst_test').get());
+    await assertSucceeds(instructorDb.collection('joinRequests').doc('req_inst_test').update({ status: 'admitted' }));
+    await assertSucceeds(instructorDb.collection('occupancy').doc('pass_any').get());
+    await assertSucceeds(instructorDb.collection('lobbyPresence').doc('sess_inst_test').collection('active').doc('any_uid').get());
   });
 });
 
