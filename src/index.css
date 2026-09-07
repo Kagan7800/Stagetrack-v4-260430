@@ -3070,16 +3070,13 @@ img.sticker,
   top: 62.383%;
   width: 19.777%;
   height: 30.99%;
-  background: transparent;
-  border-radius: calc(24px * var(--lobby-scale));
-  border: none;
+  border-radius: 12px;
   overflow: visible;
   isolation: isolate;
   transform: translateZ(0);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 calc(10px * var(--lobby-scale)) calc(30px * var(--lobby-scale)) rgba(0,0,0,0.5);
   z-index: 3;
   box-sizing: border-box;
 }

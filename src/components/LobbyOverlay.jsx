@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { Loader2, ShieldAlert, Camera } from 'lucide-react';
-import PeoBorder from './PeoBorder';
 import InstructorAdmitQueue from './InstructorAdmitQueue';
 import { PassRecoveryModal } from './PassRecoveryModal';
+import { getBorderStyle, getGlowColor } from '../utils/borderStyles';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { getAuth } from 'firebase/auth';
 import { doc, setDoc, deleteDoc, onSnapshot, updateDoc } from 'firebase/firestore';
@@ -418,68 +418,91 @@ export default function LobbyOverlay() {
             })}
 
             {/* Camera feed overlay inside the container below the inputs */}
-            <div className="lobby-camera-preview-container">
-              {stream ? (
-                <video ref={localVideoRef} autoPlay playsInline muted className="lobby-camera-video-elem" />
-              ) : (
-                <div className="lobby-camera-blocked-fallback">
-                  <Camera className="camera-icon-fallback" />
-                  <span>Webcam Preview</span>
-                </div>
-              )}
-              {/* Name Overlay */}
-              {myName && (
-                <div className="lobby-camera-name-badge">
-                  {myName}
-                </div>
-              )}
-              {/* SVG-based PEO Border component */}
-              <PeoBorder color={selectedBorder} />
+            {(() => {
+              const glowColor = getGlowColor(selectedBorder);
+              const lobbyCameraBorderStyle = {
+                ...getBorderStyle(selectedBorder, 'rgba(11, 25, 46, 0.7)'),
+                boxShadow: `0 0 12px ${glowColor}`,
+                borderRadius: '12px'
+              };
 
-              {/* Selected Sticker Badge using standard session sticker-layer & slot rules */}
-              {selectedIcon && (() => {
-                const isSun = selectedIcon === 'Sun with sunglasses.svg' || selectedIcon.toLowerCase().includes('sun');
-                const slot = isSun ? 'E' : 'NW';
-                const isCrown = selectedIcon.toLowerCase().includes('crown') || slot === 'TC';
-                const isBirthday = selectedIcon.toLowerCase().includes('birthday') || slot === 'NE';
-                const isXylophone = selectedIcon.toLowerCase().includes('xylophone');
-                const isTrumpet = selectedIcon.toLowerCase().includes('trumpet');
-                const isFlower = selectedIcon.toLowerCase().includes('flower');
-                const isStar = selectedIcon.toLowerCase().includes('star');
-
-                let scale = 1;
-                if (isCrown || isBirthday || isXylophone) scale = 1.25;
-                else if (isTrumpet) scale = 1.20;
-                else if (isFlower) scale = 0.85;
-                else if (isStar) scale = 1.15;
-
-                let origin = 'center center';
-                if (isCrown) origin = 'center bottom';
-                else if (isSun) origin = 'right center';
-
-                return (
-                  <div className="sticker-layer" style={{ zIndex: 12 }}>
-                    <div 
-                      className="sticker-item sl-placed" 
-                      data-slot={slot}
-                    >
-                      <div 
-                        className="sticker-visual"
-                        style={{
-                          transform: `scale(${scale})`,
-                          transformOrigin: origin
-                        }}
-                      >
-                        <img 
-                          src={`/assets/svg_stickers/${selectedIcon}`} 
-                          alt={selectedIcon} 
-                        />
+              return (
+                <div className="lobby-camera-preview-container tile" style={lobbyCameraBorderStyle}>
+                  <div 
+                    className="gc-capture-wrapper" 
+                    style={{
+                      position: 'absolute',
+                      inset: 0,
+                      borderRadius: 'inherit',
+                      overflow: 'hidden',
+                      zIndex: 1,
+                      pointerEvents: 'none',
+                      backgroundColor: 'rgba(11, 25, 46, 0.7)'
+                    }}
+                  >
+                    {stream ? (
+                      <video ref={localVideoRef} autoPlay playsInline muted className="gc-video-element" />
+                    ) : (
+                      <div className="lobby-camera-blocked-fallback">
+                        <Camera className="camera-icon-fallback" />
+                        <span>Webcam Preview</span>
                       </div>
-                    </div>
+                    )}
                   </div>
-                );
-              })()}
-            </div>
+
+                  {/* Name Overlay */}
+                  {myName && (
+                    <div className="lobby-camera-name-badge">
+                      {myName}
+                    </div>
+                  )}
+
+                  {/* Selected Sticker Badge using standard session sticker-layer & slot rules */}
+                  {selectedIcon && (() => {
+                    const isSun = selectedIcon === 'Sun with sunglasses.svg' || selectedIcon.toLowerCase().includes('sun');
+                    const slot = isSun ? 'E' : 'NW';
+                    const isCrown = selectedIcon.toLowerCase().includes('crown') || slot === 'TC';
+                    const isBirthday = selectedIcon.toLowerCase().includes('birthday') || slot === 'NE';
+                    const isXylophone = selectedIcon.toLowerCase().includes('xylophone');
+                    const isTrumpet = selectedIcon.toLowerCase().includes('trumpet');
+                    const isFlower = selectedIcon.toLowerCase().includes('flower');
+                    const isStar = selectedIcon.toLowerCase().includes('star');
+
+                    let scale = 1;
+                    if (isCrown || isBirthday || isXylophone) scale = 1.25;
+                    else if (isTrumpet) scale = 1.20;
+                    else if (isFlower) scale = 0.85;
+                    else if (isStar) scale = 1.15;
+
+                    let origin = 'center center';
+                    if (isCrown) origin = 'center bottom';
+                    else if (isSun) origin = 'right center';
+
+                    return (
+                      <div className="sticker-layer" style={{ zIndex: 12 }}>
+                        <div 
+                          className="sticker-item sl-placed" 
+                          data-slot={slot}
+                        >
+                          <div 
+                            className="sticker-visual"
+                            style={{
+                              transform: `scale(${scale})`,
+                              transformOrigin: origin
+                            }}
+                          >
+                            <img 
+                              src={`/assets/svg_stickers/${selectedIcon}`} 
+                              alt={selectedIcon} 
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })()}
+                </div>
+              );
+            })()}
 
             {/* STO Stickers selection grid mapped over Card 1 (Left Side Box) */}
             <div className="lobby-stickers-grid">
