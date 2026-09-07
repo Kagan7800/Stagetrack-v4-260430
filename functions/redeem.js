@@ -259,9 +259,11 @@ async function redeemPassHandler(req, res, deps = {}) {
     // Set namespaced __session cookie if newly generated or refreshing
     if (isNewCookie) {
       const sessionPayload = encodeURIComponent(JSON.stringify({ dev: deviceId }));
+      const isSecure = req.secure || req.headers['x-forwarded-proto'] === 'https' || process.env.NODE_ENV === 'production';
+      const secureFlag = isSecure ? '; Secure' : '';
       res.setHeader(
         'Set-Cookie',
-        `__session=${sessionPayload}; Path=/; Max-Age=31536000; SameSite=Lax; Secure; HttpOnly`
+        `__session=${sessionPayload}; Path=/; Max-Age=31536000; SameSite=Lax${secureFlag}; HttpOnly`
       );
     }
 
