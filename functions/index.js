@@ -294,7 +294,9 @@ const {
   listGuestPassesHandler,
   rotatePassLinkHandler,
   revokeGuestPassHandler,
+  resendGuestPassLinkHandler,
 } = require('./passManagement');
+const { processDeliveryQueueRecord } = require('./delivery');
 
 exports.createGuestPass = functions.https.onCall(async (data, context) => {
   return createGuestPassHandler(data, context);
@@ -315,6 +317,16 @@ exports.rotatePassLink = functions.https.onCall(async (data, context) => {
 exports.revokeGuestPass = functions.https.onCall(async (data, context) => {
   return revokeGuestPassHandler(data, context);
 });
+
+exports.resendGuestPassLink = functions.https.onCall(async (data, context) => {
+  return resendGuestPassLinkHandler(data, context);
+});
+
+exports.processDeliveryQueue = functions.firestore
+  .document('deliveryQueue/{deliveryId}')
+  .onCreate(async (snap, context) => {
+    return processDeliveryQueueRecord(snap.data(), snap.ref);
+  });
 
 exports.recoverGuestPass = functions.https.onCall(async (data, context) => {
   return recoverGuestPassHandler(data, context);

@@ -169,7 +169,11 @@ async function recoverGuestPassHandler(data, context, deps = {}) {
     }
 
     if (passQuery.empty) {
-      // Constant-time return
+      // Timing equalization dummy write (noop)
+      const { queueDelivery } = require('./delivery');
+      try {
+        await queueDelivery({ type: 'noop', status: 'noop', db, now: () => now });
+      } catch (_) {}
       return { success: true, message: GENERIC_RECOVERY_MESSAGE };
     }
 
@@ -178,6 +182,10 @@ async function recoverGuestPassHandler(data, context, deps = {}) {
 
     // Invariant check: Ensure pass is active (status is single source of truth)
     if (passData.status !== 'active') {
+      const { queueDelivery } = require('./delivery');
+      try {
+        await queueDelivery({ type: 'noop', status: 'noop', db, now: () => now });
+      } catch (_) {}
       return { success: true, message: GENERIC_RECOVERY_MESSAGE };
     }
 
@@ -220,22 +228,23 @@ async function recoverGuestPassHandler(data, context, deps = {}) {
       lastRecoveredAt: fv.serverTimestamp(),
     });
 
-    // 6. Dispatch delivery (non-blocking fire-and-forget for true constant-time response)
+    // 6. Enqueue delivery to deliveryQueue (processed by background trigger)
     const baseUrl = (process.env.APP_BASE_URL || 'http://127.0.0.1:5000').replace(/\/+$/, '');
     const magicLink = `${baseUrl}/my/${recoveryToken}`;
+    const { queueDelivery } = require('./delivery');
 
-    if (type === 'email' && (process.env.SENDGRID_API_KEY || functions.config().sendgrid?.key)) {
-      sgMail.send({
-        to: contact,
-        from: 'hello@musicfunwithyourlittleone.com',
-        subject: 'Your Music Fun Session Access Link',
-        text: `Here is your link to enter the Music Fun session: ${magicLink}`,
-        html: `<p>Here is your link to enter your live Music Fun session:</p><p><a href="${magicLink}">Click here to join your session</a></p>`,
-      }).catch((mailErr) => {
-        console.warn('[Recovery] Email send warning:', mailErr.message);
+    try {
+      await queueDelivery({
+        passId: passDoc.id,
+        type,
+        contact,
+        passUrl: magicLink,
+        adultName: passData.adultName,
+        db,
+        now: () => now,
       });
-    } else {
-      console.log(`[Recovery] SMS/Email dispatched for ${contact}: ${magicLink}`);
+    } catch (queueErr) {
+      console.warn('[Recovery] Delivery queue warning:', queueErr.message);
     }
 
     return { success: true, message: GENERIC_RECOVERY_MESSAGE };

@@ -192,8 +192,98 @@ async function revokeGuestPassHandler(data, context, deps = {}) {
   };
 }
 
+/**
+ * Callable endpoint for instructors to manually resend an access link to a family (§6 Task 9).
+ * Generates a fresh token in the pool and enqueues delivery via deliveryQueue.
+ *
+ * @param {object} data { passId }
+ * @param {object} context Callable context
+ * @param {object} [deps] Injected dependencies for testing
+ * @returns {Promise<{ success: boolean, passId: string }>}
+ */
+async function resendGuestPassLinkHandler(data, context, deps = {}) {
+  if (
+    !context ||
+    !context.auth ||
+    (!context.auth.token?.admin && !context.auth.token?.instructor)
+  ) {
+    throw new functions.https.HttpsError(
+      'permission-denied',
+      'Only authorized administrators or instructors may resend pass links.'
+    );
+  }
+
+  const passId = data?.passId;
+  if (!passId || typeof passId !== 'string' || !passId.trim()) {
+    throw new functions.https.HttpsError(
+      'invalid-argument',
+      'A valid passId is required.'
+    );
+  }
+
+  const db = deps.db || admin.firestore();
+  const baseUrl = deps.baseUrl || getAppBaseUrl();
+  const now = deps.now ? deps.now() : Date.now();
+
+  const passDocRef = db.collection('guestPasses').doc(passId.trim());
+  const passSnap = await passDocRef.get();
+
+  if (!passSnap.exists) {
+    throw new functions.https.HttpsError('not-found', 'Guest pass not found.');
+  }
+
+  const passData = passSnap.data();
+  if (passData.status !== 'active') {
+    throw new functions.https.HttpsError(
+      'failed-precondition',
+      'Cannot resend a link for a revoked or inactive pass.'
+    );
+  }
+
+  // Generate new token & add to pool (preserving existing tokens up to 10)
+  const rawToken = generateToken(32);
+  const newTokenHash = hashToken(rawToken);
+  const NINETY_DAYS_MS = 90 * 24 * 60 * 60 * 1000;
+  const POOL_CAP = 10;
+
+  let currentPool = Array.isArray(passData.activeTokenPool) ? passData.activeTokenPool : [];
+  const validPool = currentPool.filter((item) => item && typeof item.createdAt === 'number' && (now - item.createdAt) <= NINETY_DAYS_MS);
+  validPool.push({ hash: newTokenHash, createdAt: now });
+  const cappedPool = validPool.slice(-POOL_CAP);
+  const updatedHashes = cappedPool.map((p) => p.hash);
+
+  const fv = admin.firestore.FieldValue;
+  await passDocRef.update({
+    activeTokenHashes: updatedHashes,
+    activeTokenPool: cappedPool,
+    deliveryStatus: 'pending',
+    updatedAt: fv.serverTimestamp(),
+  });
+
+  const passUrl = `${baseUrl}/my/${rawToken}`;
+  const contactType = passData.phone ? 'phone' : 'email';
+  const contactTarget = passData.phone || passData.email;
+
+  const { queueDelivery } = require('./delivery');
+  await queueDelivery({
+    passId: passSnap.id,
+    type: contactType,
+    contact: contactTarget,
+    passUrl,
+    adultName: passData.adultName,
+    db,
+    now: () => now,
+  });
+
+  return {
+    success: true,
+    passId: passSnap.id,
+  };
+}
+
 module.exports = {
   listGuestPassesHandler,
   rotatePassLinkHandler,
   revokeGuestPassHandler,
+  resendGuestPassLinkHandler,
 };

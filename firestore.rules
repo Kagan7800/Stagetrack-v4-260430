@@ -97,5 +97,9 @@ service cloud.firestore {
     match /agentLogs/{logId} {
       allow read, write: if false;
     }
+
+    match /deliveryQueue/{deliveryId} {
+      allow read, write: if false;
+    }
   }
 }

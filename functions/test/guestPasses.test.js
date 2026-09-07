@@ -266,8 +266,9 @@ test('Pass Creation — Task 2 Acceptance Tests', async (t) => {
     assert.notEqual(updatedDoc.tokenHash, initialHash, 'tokenHash must be rotated');
     assert.equal(updatedDoc.uid, initialUid, 'User uid must remain stable on pass rotation');
 
-    // Assert exactly 1 document exists in the store
-    assert.equal(db._store.size, 1, 'Exactly one pass document must exist for this family');
+    // Assert exactly 1 pass document exists in the store
+    const passDocs = Array.from(db._store.keys()).filter((k) => k.startsWith('guestPasses/'));
+    assert.equal(passDocs.length, 1, 'Exactly one pass document must exist for this family');
   });
 
   await t.test('E.164 Phone Handling — validates valid numbers and rejects malformed', async () => {

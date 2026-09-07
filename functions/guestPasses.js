@@ -181,8 +181,28 @@ async function createGuestPassHandler(data, context, deps = {}) {
     });
   }
 
-  // 5. Construct URL with raw token and return minimal payload (PII omitted)
+  // 5. Construct URL with raw token
   const passUrl = `${baseUrl}/my/${rawToken}`;
+
+  // 6. Enqueue delivery task (unless explicitly disabled)
+  if (data?.notify !== false) {
+    const { queueDelivery } = require('./delivery');
+    const contactType = phone ? 'phone' : 'email';
+    const contactTarget = phone || normalizedEmail;
+
+    try {
+      await queueDelivery({
+        passId,
+        type: contactType,
+        contact: contactTarget,
+        passUrl,
+        adultName,
+        db,
+      });
+    } catch (queueErr) {
+      console.warn('[PassCreation] Delivery queue warning:', queueErr.message);
+    }
+  }
 
   const response = {
     passId,

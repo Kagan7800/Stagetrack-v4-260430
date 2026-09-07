@@ -18,6 +18,7 @@ export default function InstructorPassManagement({ programId = 'spring-2026' }) 
   const listGuestPasses = httpsCallable(functions, 'listGuestPasses');
   const rotatePassLink = httpsCallable(functions, 'rotatePassLink');
   const revokeGuestPass = httpsCallable(functions, 'revokeGuestPass');
+  const resendGuestPassLink = httpsCallable(functions, 'resendGuestPassLink');
 
   const fetchPasses = async () => {
     try {
@@ -38,6 +39,20 @@ export default function InstructorPassManagement({ programId = 'spring-2026' }) 
       fetchPasses();
     }
   }, [programId]);
+
+  const handleResend = async (passId, adultName) => {
+    try {
+      setActionLoading((prev) => ({ ...prev, [passId]: 'resending' }));
+      await resendGuestPassLink({ passId });
+      alert(`Access link re-queued for delivery to ${adultName || 'family'}.`);
+      await fetchPasses();
+    } catch (err) {
+      console.error('Failed to resend pass link:', err);
+      alert(`Error resending pass link: ${err.message}`);
+    } finally {
+      setActionLoading((prev) => ({ ...prev, [passId]: null }));
+    }
+  };
 
   const handleRotate = async (passId, adultName) => {
     const confirmed = window.confirm(
@@ -139,8 +154,8 @@ export default function InstructorPassManagement({ programId = 'spring-2026' }) 
                 <th style={{ padding: '12px 16px', fontWeight: '600' }}>Family / Adult</th>
                 <th style={{ padding: '12px 16px', fontWeight: '600' }}>Children</th>
                 <th style={{ padding: '12px 16px', fontWeight: '600' }}>Contact</th>
-                <th style={{ padding: '12px 16px', fontWeight: '600' }}>Status</th>
-                <th style={{ padding: '12px 16px', fontWeight: '600' }}>Redeemed</th>
+                <th style={{ padding: '12px 16px', fontWeight: '600' }}>Pass Status</th>
+                <th style={{ padding: '12px 16px', fontWeight: '600' }}>Delivery</th>
                 <th style={{ padding: '12px 16px', fontWeight: '600', textAlign: 'right' }}>Actions</th>
               </tr>
             </thead>
@@ -148,6 +163,7 @@ export default function InstructorPassManagement({ programId = 'spring-2026' }) 
               {passes.map((pass) => {
                 const isActive = pass.status === 'active';
                 const isActioning = actionLoading[pass.id];
+                const delivery = pass.deliveryStatus || 'pending';
 
                 return (
                   <tr key={pass.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
@@ -180,11 +196,66 @@ export default function InstructorPassManagement({ programId = 'spring-2026' }) 
                         {pass.status}
                       </span>
                     </td>
-                    <td style={{ padding: '14px 16px', color: '#64748b' }}>
-                      {pass.redeemCount || 0} times
+                    <td style={{ padding: '14px 16px' }}>
+                      <div>
+                        <span
+                          style={{
+                            display: 'inline-block',
+                            padding: '3px 6px',
+                            borderRadius: '6px',
+                            fontSize: '11px',
+                            fontWeight: '600',
+                            textTransform: 'uppercase',
+                            background:
+                              delivery === 'delivered'
+                                ? '#f0fdf4'
+                                : delivery === 'failed'
+                                ? '#fef2f2'
+                                : '#fffbeb',
+                            color:
+                              delivery === 'delivered'
+                                ? '#16a34a'
+                                : delivery === 'failed'
+                                ? '#dc2626'
+                                : '#d97706',
+                            border: `1px solid ${
+                              delivery === 'delivered'
+                                ? '#bbf7d0'
+                                : delivery === 'failed'
+                                ? '#fecaca'
+                                : '#fde68a'
+                            }`,
+                          }}
+                        >
+                          {delivery}
+                        </span>
+                      </div>
+                      {pass.lastDeliveryError && (
+                        <div style={{ fontSize: '11px', color: '#ef4444', marginTop: '4px', maxWidth: '160px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={pass.lastDeliveryError}>
+                          {pass.lastDeliveryError}
+                        </div>
+                      )}
                     </td>
                     <td style={{ padding: '14px 16px', textAlign: 'right' }}>
                       <div style={{ display: 'inline-flex', gap: '8px' }}>
+                        {isActive && (
+                          <button
+                            onClick={() => handleResend(pass.id, pass.adultName)}
+                            disabled={!!isActioning}
+                            style={{
+                              padding: '6px 12px',
+                              borderRadius: '6px',
+                              border: '1px solid #cbd5e1',
+                              background: '#f8fafc',
+                              color: '#334155',
+                              fontSize: '13px',
+                              fontWeight: '600',
+                              cursor: isActioning ? 'not-allowed' : 'pointer',
+                            }}
+                          >
+                            {isActioning === 'resending' ? 'Sending...' : 'Resend'}
+                          </button>
+                        )}
                         {isActive && (
                           <button
                             onClick={() => handleRotate(pass.id, pass.adultName)}
