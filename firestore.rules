@@ -24,7 +24,7 @@ service cloud.firestore {
       let passDoc = get(/databases/$(database)/documents/guestPasses/$(request.auth.token.passId));
       return passDoc != null &&
              passDoc.data.status == 'active' &&
-             (!('revokedAt' in passDoc.data) || request.auth.token.auth_time > passDoc.data.revokedAt.toMillis() / 1000);
+             (!('revokedAt' in passDoc.data) || request.auth.token.auth_time * 1000 > passDoc.data.revokedAt.toMillis());
     }
 
     function isPassOwner(passId) {

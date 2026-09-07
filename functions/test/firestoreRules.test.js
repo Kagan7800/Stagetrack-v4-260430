@@ -394,5 +394,28 @@ test('Firestore Security Rules — Real Emulator Test Suite (§7)', async (t) =>
     await assertSucceeds(instructorDb.collection('occupancy').doc('pass_any').get());
     await assertSucceeds(instructorDb.collection('lobbyPresence').doc('sess_inst_test').collection('active').doc('any_uid').get());
   });
+
+  await t.test('10. Realistic Volume & get() Budget — instructor reading queue with 25 pending requests succeeds without exhausting rules budget', async () => {
+    // Seed 25 pending requests in joinRequests
+    await testEnv.withSecurityRulesDisabled(async (adminCtx) => {
+      const adminDb = adminCtx.firestore();
+      for (let i = 1; i <= 25; i++) {
+        await adminDb.collection('joinRequests').doc(`req_vol_${i}`).set({
+          passId: `pass_vol_${i}`,
+          sessionId: 'sess_vol_test',
+          status: 'pending',
+        });
+      }
+    });
+
+    const instructorDb = testEnv.authenticatedContext('inst_high_vol', {
+      instructor: true,
+    }).firestore();
+
+    // Instructor reads all 25 requests via collection query
+    // Because isInstructor() short-circuits, zero get() calls are made to guestPasses, preventing the 20-get query limit from being triggered
+    const querySnap = await instructorDb.collection('joinRequests').get();
+    assert.equal(querySnap.size, 25);
+  });
 });
 
