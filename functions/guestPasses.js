@@ -168,7 +168,6 @@ async function createGuestPassHandler(data, context, deps = {}) {
       adultName,
       childNames,
       status: 'active',
-      revoked: false,
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
       lastRedeemedAt: null,
       redeemCount: 0,

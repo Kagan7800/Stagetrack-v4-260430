@@ -149,7 +149,7 @@ async function recoverGuestPassHandler(data, context, deps = {}) {
     );
   }
 
-  // 4. Look up active, non-revoked pass
+  // 4. Look up active pass
   try {
     let passQuery;
     if (type === 'email') {
@@ -157,7 +157,6 @@ async function recoverGuestPassHandler(data, context, deps = {}) {
         .collection('guestPasses')
         .where('email', '==', contact)
         .where('status', '==', 'active')
-        .where('revoked', '==', false)
         .limit(1)
         .get();
     } else {
@@ -165,7 +164,6 @@ async function recoverGuestPassHandler(data, context, deps = {}) {
         .collection('guestPasses')
         .where('phone', '==', contact)
         .where('status', '==', 'active')
-        .where('revoked', '==', false)
         .limit(1)
         .get();
     }
@@ -178,44 +176,64 @@ async function recoverGuestPassHandler(data, context, deps = {}) {
     const passDoc = passQuery.docs[0];
     const passData = passDoc.data();
 
-    // Invariant check: Ensure pass is not revoked
-    if (passData.revoked === true || passData.status !== 'active') {
+    // Invariant check: Ensure pass is active (status is single source of truth)
+    if (passData.status !== 'active') {
       return { success: true, message: GENERIC_RECOVERY_MESSAGE };
     }
 
-    // 5. Generate fresh recovery token & append to activeTokenHashes pool
+    // 5. Generate fresh recovery token & append to activeTokenPool / activeTokenHashes
     const recoveryToken = generateToken(32);
     const recoveryTokenHash = hashToken(recoveryToken);
+    const NINETY_DAYS_MS = 90 * 24 * 60 * 60 * 1000;
+    const POOL_CAP = 10;
 
-    const existingHashes = Array.isArray(passData.activeTokenHashes)
-      ? passData.activeTokenHashes
-      : (passData.tokenHash ? [passData.tokenHash] : []);
+    // Support structured activeTokenPool: [{ hash, createdAt }] or legacy activeTokenHashes: [hash]
+    let currentPool = [];
+    if (Array.isArray(passData.activeTokenPool) && passData.activeTokenPool.length > 0) {
+      currentPool = passData.activeTokenPool;
+    } else if (Array.isArray(passData.activeTokenHashes) && passData.activeTokenHashes.length > 0) {
+      currentPool = passData.activeTokenHashes.map((h) => ({ hash: h, createdAt: now }));
+    } else if (passData.tokenHash) {
+      currentPool = [{ hash: passData.tokenHash, createdAt: now }];
+    }
 
-    // Keep the most recent 4 plus the new one (cap pool at 5)
-    const updatedTokenHashes = [...existingHashes.slice(-4), recoveryTokenHash];
+    // Filter out expired tokens (>90 days old)
+    const validPool = currentPool.filter((item) => {
+      if (!item || !item.hash) return false;
+      if (typeof item.createdAt === 'number') {
+        return (now - item.createdAt) <= NINETY_DAYS_MS;
+      }
+      return true;
+    });
+
+    // Add new token
+    validPool.push({ hash: recoveryTokenHash, createdAt: now });
+
+    // Cap pool at 10 most recent entries
+    const cappedPool = validPool.slice(-POOL_CAP);
+    const updatedTokenHashes = cappedPool.map((item) => item.hash);
 
     const fv = FieldValue || admin.firestore.FieldValue;
     await passDoc.ref.update({
       activeTokenHashes: updatedTokenHashes,
+      activeTokenPool: cappedPool,
       lastRecoveredAt: fv.serverTimestamp(),
     });
 
-    // 6. Dispatch delivery
+    // 6. Dispatch delivery (non-blocking fire-and-forget for true constant-time response)
     const baseUrl = (process.env.APP_BASE_URL || 'http://127.0.0.1:5000').replace(/\/+$/, '');
     const magicLink = `${baseUrl}/my/${recoveryToken}`;
 
     if (type === 'email' && (process.env.SENDGRID_API_KEY || functions.config().sendgrid?.key)) {
-      try {
-        await sgMail.send({
-          to: contact,
-          from: 'hello@musicfunwithyourlittleone.com',
-          subject: 'Your Music Fun Session Access Link',
-          text: `Here is your link to enter the Music Fun session: ${magicLink}`,
-          html: `<p>Here is your link to enter your live Music Fun session:</p><p><a href="${magicLink}">Click here to join your session</a></p>`,
-        });
-      } catch (mailErr) {
+      sgMail.send({
+        to: contact,
+        from: 'hello@musicfunwithyourlittleone.com',
+        subject: 'Your Music Fun Session Access Link',
+        text: `Here is your link to enter the Music Fun session: ${magicLink}`,
+        html: `<p>Here is your link to enter your live Music Fun session:</p><p><a href="${magicLink}">Click here to join your session</a></p>`,
+      }).catch((mailErr) => {
         console.warn('[Recovery] Email send warning:', mailErr.message);
-      }
+      });
     } else {
       console.log(`[Recovery] SMS/Email dispatched for ${contact}: ${magicLink}`);
     }

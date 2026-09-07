@@ -214,8 +214,8 @@ async function redeemPassHandler(req, res, deps = {}) {
 
     const passData = passDoc.data();
 
-    // Must be in 'active' status and not revoked (revoked passes fail with identical 404)
-    if (passData.status !== 'active' || passData.revoked === true) {
+    // Must be in 'active' status (revoked or disabled passes fail with identical 404)
+    if (passData.status !== 'active') {
       sendGenericNotFoundResponse(res);
       return;
     }

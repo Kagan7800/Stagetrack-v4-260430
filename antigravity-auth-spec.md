@@ -87,21 +87,22 @@ Music Fun with My Little One passwordless guest pass, authentication, session ro
 
 ### Task 7: Pass Recovery Flow — `COMPLETED`
 - [x] Unified auto-detecting input field handling email vs E.164 phone formats without tabs.
-- [x] Multi-token hash pool (`activeTokenHashes`) on `guestPasses` preserves bookmarked links on other devices.
-- [x] Strict refusal on revoked passes (`revoked: true` passes cannot be recovered or resurrected).
-- [x] Constant-time execution and identical response message for existing vs non-existing contacts.
+- [x] Multi-token hash pool (`activeTokenHashes` & `activeTokenPool` capped at 10 with 90-day TTL pruning) preserving bookmarked links on multiple family devices.
+- [x] Strict refusal on revoked passes (`status: 'revoked'` passes cannot be recovered or resurrected).
+- [x] Constant-time execution via non-blocking fire-and-forget delivery and identical response message for existing vs non-existing contacts.
 - [x] Dual rate limiting: 10/min per IP and 3/hr per contact target.
 - [x] UI component: `src/components/PassRecoveryModal.jsx` integrated into `LobbyOverlay.jsx`.
-- [x] Evidenced by 5 acceptance tests in `functions/test/recovery.test.js`.
+- [x] Evidenced by 6 acceptance tests in `functions/test/recovery.test.js`.
 
 ---
 
 ## Remaining Tasks
 
 ### Task 8: Pass Management, Token Rotation, & Revocation
-- [ ] Admin/Instructor pass management UI: List passes, revoke pass, rotate pass link.
-- [ ] Server revocation: Set `revoked: true` on pass doc and call `admin.auth().revokeRefreshTokens(pass.uid)`.
-- [ ] Security rules check: Validate `request.auth.token.auth_time` against revocation timestamp.
+- [ ] Admin/Instructor pass management API & UI: List passes, revoke pass, rotate pass link.
+- [ ] Intentional rotation: Mints new token, replaces `activeTokenHashes = [newTokenHash]`, clears old pool, preserves stable `uid`.
+- [ ] Instant server revocation: Sets `status: 'revoked'`, clears `activeTokenHashes = []`, and calls `admin.auth().revokeRefreshTokens(pass.uid)`.
+- [ ] Security rules check: Enforce `status: 'revoked'` and validate `request.auth.token.auth_time` against revocation timestamp.
 
 ### Task 9: Deployment & Production Launch Readiness
 - [ ] Configure Firestore TTL policy on `rateLimits` (`expiresAt`).

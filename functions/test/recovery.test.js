@@ -247,6 +247,54 @@ describe('Task 7: Passwordless Pass Recovery Acceptance Tests', () => {
     assert.equal(status1, 200); // Original bookmarked link still works!
   });
 
+  test('recoverGuestPass — 10-token pool capacity and 90-day expiration pruning', async () => {
+    const db = createMockDb();
+    const ninetyOneDaysMs = 91 * 24 * 60 * 60 * 1000;
+    const oldTimestamp = baseTime - ninetyOneDaysMs;
+
+    // Seed a pass with 1 expired token (>90d old) and 9 recent tokens
+    const initialPool = [
+      { hash: 'expired_hash_1', createdAt: oldTimestamp },
+      ...Array.from({ length: 9 }, (_, i) => ({
+        hash: `recent_hash_${i + 1}`,
+        createdAt: baseTime - (10 - i) * 1000,
+      })),
+    ];
+
+    await db.collection('guestPasses').doc('pass_pool_test').set({
+      uid: 'guest_pool_user',
+      activeTokenPool: initialPool,
+      activeTokenHashes: initialPool.map((p) => p.hash),
+      programId: 'spring-2026',
+      email: 'pool.test@example.com',
+      status: 'active',
+    });
+
+    // Call recovery -> should evict expired_hash_1 and add 1 new token (total 10 active tokens)
+    await recoverGuestPassHandler(
+      { contact: 'pool.test@example.com' },
+      { rawRequest: { ip: '203.0.113.50' } },
+      { db, now: () => baseTime }
+    );
+
+    const passDoc = (await db.collection('guestPasses').doc('pass_pool_test').get()).data();
+    assert.equal(passDoc.activeTokenHashes.length, 10);
+    assert.equal(passDoc.activeTokenPool.length, 10);
+    assert.equal(passDoc.activeTokenHashes.includes('expired_hash_1'), false, 'Expired token must be evicted');
+    assert.equal(passDoc.activeTokenHashes.includes('recent_hash_9'), true, 'Recent token must be preserved');
+
+    // Call recovery again -> total active tokens should still be strictly capped at 10 (evicting oldest recent_hash_1)
+    await recoverGuestPassHandler(
+      { contact: 'pool.test@example.com' },
+      { rawRequest: { ip: '203.0.113.51' } },
+      { db, now: () => baseTime + 5000 }
+    );
+
+    const passDoc2 = (await db.collection('guestPasses').doc('pass_pool_test').get()).data();
+    assert.equal(passDoc2.activeTokenHashes.length, 10, 'Pool size must strictly not exceed 10');
+    assert.equal(passDoc2.activeTokenHashes.includes('recent_hash_1'), false, 'Oldest token beyond cap of 10 must be evicted');
+  });
+
   test('recoverGuestPass — Strict refusal on REVOKED passes (Cannot resurrect revoked pass)', async () => {
     const db = createMockDb();
 
@@ -254,12 +302,11 @@ describe('Task 7: Passwordless Pass Recovery Acceptance Tests', () => {
     await db.collection('guestPasses').doc('pass_revoked_1').set({
       uid: 'guest_revoked',
       tokenHash: 'hash_revoked',
-      activeTokenHashes: ['hash_revoked'],
+      activeTokenHashes: [],
       programId: 'spring-2026',
       email: 'revoked.parent@example.com',
       phone: '+15559998888',
       status: 'revoked',
-      revoked: true,
     });
 
     // Attempt recovery on revoked email
@@ -271,9 +318,9 @@ describe('Task 7: Passwordless Pass Recovery Acceptance Tests', () => {
     assert.equal(resEmail.success, true);
     assert.equal(resEmail.message, GENERIC_RECOVERY_MESSAGE);
 
-    // Pass doc activeTokenHashes must NOT have any new tokens added
+    // Pass doc activeTokenHashes must remain empty (revoked pass cannot be resurrected)
     const passDoc = (await db.collection('guestPasses').doc('pass_revoked_1').get()).data();
-    assert.deepEqual(passDoc.activeTokenHashes, ['hash_revoked']); // Token pool untouched!
+    assert.deepEqual(passDoc.activeTokenHashes, []); // Token pool untouched!
   });
 
   test('recoverGuestPass — Constant-time response and secrecy on unknown contacts', async () => {
