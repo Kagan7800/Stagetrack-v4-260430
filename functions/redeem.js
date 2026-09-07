@@ -1,6 +1,7 @@
 'use strict';
 
 const admin = require('firebase-admin');
+const { FieldValue } = require('firebase-admin/firestore');
 const { generateToken, hashToken, safeHashToken } = require('./tokens');
 const { checkRateLimit } = require('./rateLimiter');
 
@@ -242,13 +243,14 @@ async function redeemPassHandler(req, res, deps = {}) {
     });
 
     // 6. Update pass counters & known devices atomically
+    const fv = FieldValue || admin.firestore.FieldValue;
     const updatePayload = {
-      redeemCount: admin.firestore.FieldValue.increment(1),
-      lastRedeemedAt: admin.firestore.FieldValue.serverTimestamp(),
+      redeemCount: fv.increment(1),
+      lastRedeemedAt: fv.serverTimestamp(),
     };
 
-    if (admin.firestore.FieldValue.arrayUnion) {
-      updatePayload.knownDevices = admin.firestore.FieldValue.arrayUnion(deviceHash);
+    if (fv.arrayUnion) {
+      updatePayload.knownDevices = fv.arrayUnion(deviceHash);
     }
 
     await passDoc.ref.update(updatePayload);
