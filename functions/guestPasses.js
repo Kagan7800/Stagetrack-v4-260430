@@ -146,6 +146,7 @@ async function createGuestPassHandler(data, context, deps = {}) {
 
     await existingDoc.ref.update({
       tokenHash,
+      activeTokenHashes: [tokenHash],
       phone,
       adultName,
       childNames,
@@ -160,12 +161,14 @@ async function createGuestPassHandler(data, context, deps = {}) {
     await newDocRef.set({
       uid,
       tokenHash,
+      activeTokenHashes: [tokenHash],
       programId: normalizedProgramId,
       email: normalizedEmail,
       phone,
       adultName,
       childNames,
       status: 'active',
+      revoked: false,
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
       lastRedeemedAt: null,
       redeemCount: 0,

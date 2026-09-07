@@ -85,14 +85,18 @@ Music Fun with My Little One passwordless guest pass, authentication, session ro
 - [x] UI components: `src/hooks/useSessionOccupancy.js` and `src/components/OccupancyTransferModal.jsx`.
 - [x] Evidenced by 6 acceptance tests in `functions/test/occupancy.test.js` and full E2E flow in `functions/test/e2e.test.js`.
 
+### Task 7: Pass Recovery Flow — `COMPLETED`
+- [x] Unified auto-detecting input field handling email vs E.164 phone formats without tabs.
+- [x] Multi-token hash pool (`activeTokenHashes`) on `guestPasses` preserves bookmarked links on other devices.
+- [x] Strict refusal on revoked passes (`revoked: true` passes cannot be recovered or resurrected).
+- [x] Constant-time execution and identical response message for existing vs non-existing contacts.
+- [x] Dual rate limiting: 10/min per IP and 3/hr per contact target.
+- [x] UI component: `src/components/PassRecoveryModal.jsx` integrated into `LobbyOverlay.jsx`.
+- [x] Evidenced by 5 acceptance tests in `functions/test/recovery.test.js`.
+
 ---
 
 ## Remaining Tasks
-
-### Task 7: Instructor Controls & Live Session Stage
-- [ ] Instructor dashboard controls: Mute all, Spotlight family, End session, Manage participants.
-- [ ] Stage view WebRTC connection binding with claimed occupancy slot.
-- [ ] Live participant grid with server-validated metadata (adult name, child names, sticker, border color, birthday badge).
 
 ### Task 8: Pass Management, Token Rotation, & Revocation
 - [ ] Admin/Instructor pass management UI: List passes, revoke pass, rotate pass link.

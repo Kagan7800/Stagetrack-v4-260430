@@ -288,6 +288,7 @@ const {
   heartbeatOccupancyHandler,
   releaseOccupancySlotHandler,
 } = require('./occupancy');
+const { recoverGuestPassHandler } = require('./recovery');
 
 exports.createGuestPass = functions.https.onCall(async (data, context) => {
   return createGuestPassHandler(data, context);
@@ -295,6 +296,10 @@ exports.createGuestPass = functions.https.onCall(async (data, context) => {
 
 exports.getMyGuestPass = functions.https.onCall(async (data, context) => {
   return getMyGuestPassHandler(data, context);
+});
+
+exports.recoverGuestPass = functions.https.onCall(async (data, context) => {
+  return recoverGuestPassHandler(data, context);
 });
 
 exports.submitJoinRequest = functions.https.onCall(async (data, context) => {
@@ -328,5 +333,6 @@ exports.redeemPass = functions.https.onRequest(async (req, res) => {
 exports.getRecordingSignedUrl = functions.https.onCall(async (data, context) => {
   return getRecordingSignedUrlHandler(data, context);
 });
+
 
 

@@ -187,22 +187,35 @@ async function redeemPassHandler(req, res, deps = {}) {
 
   // 3. Look up active guest pass in Firestore
   try {
-    const passQuery = await db
+    let passDoc = null;
+    const arrayQuery = await db
       .collection('guestPasses')
-      .where('tokenHash', '==', tokenHash)
+      .where('activeTokenHashes', 'array-contains', tokenHash)
       .limit(1)
       .get();
 
-    if (passQuery.empty) {
+    if (!arrayQuery.empty) {
+      passDoc = arrayQuery.docs[0];
+    } else {
+      const legacyQuery = await db
+        .collection('guestPasses')
+        .where('tokenHash', '==', tokenHash)
+        .limit(1)
+        .get();
+      if (!legacyQuery.empty) {
+        passDoc = legacyQuery.docs[0];
+      }
+    }
+
+    if (!passDoc) {
       sendGenericNotFoundResponse(res);
       return;
     }
 
-    const passDoc = passQuery.docs[0];
     const passData = passDoc.data();
 
-    // Must be in 'active' status (revoked passes fail with identical 404)
-    if (passData.status !== 'active') {
+    // Must be in 'active' status and not revoked (revoked passes fail with identical 404)
+    if (passData.status !== 'active' || passData.revoked === true) {
       sendGenericNotFoundResponse(res);
       return;
     }

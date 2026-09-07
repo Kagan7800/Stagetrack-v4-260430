@@ -3,6 +3,7 @@ import { useAppContext } from '../context/AppContext';
 import { Loader2, ShieldAlert, Camera } from 'lucide-react';
 import PeoBorder from './PeoBorder';
 import InstructorAdmitQueue from './InstructorAdmitQueue';
+import { PassRecoveryModal } from './PassRecoveryModal';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { getAuth } from 'firebase/auth';
 import { doc, setDoc, deleteDoc, onSnapshot, updateDoc } from 'firebase/firestore';
@@ -92,6 +93,7 @@ export default function LobbyOverlay() {
   const [selectedBorder, setSelectedBorder] = useState(BORDERS[0].value);
   const [selectedIcon, setSelectedIcon] = useState(null);
   const [selectedVibeChips, setSelectedVibeChips] = useState([]);
+  const [isRecoveryOpen, setIsRecoveryOpen] = useState(false);
 
   const [children, setChildren] = useState(['']);
 
@@ -535,12 +537,27 @@ export default function LobbyOverlay() {
               <button type="button" onClick={handleRetry} className="lobby-status-retry-btn">
                 Try Again
               </button>
+              <button
+                type="button"
+                onClick={() => setIsRecoveryOpen(true)}
+                style={{
+                  marginTop: '12px',
+                  background: 'none',
+                  border: 'none',
+                  color: '#60a5fa',
+                  textDecoration: 'underline',
+                  fontSize: '13px',
+                  cursor: 'pointer',
+                }}
+              >
+                Lost your pass link? Recover it here
+              </button>
             </div>
           )}
         </div>
       )}
-      
 
+      <PassRecoveryModal isOpen={isRecoveryOpen} onClose={() => setIsRecoveryOpen(false)} />
     </div>
   );
 }
