@@ -3,6 +3,7 @@
 
 import { createContext, useContext, useState, useEffect, useRef, useMemo } from 'react';
 import { db, auth, ensureAuthenticated } from '../firebase';
+import { useSessionOccupancy } from '../hooks/useSessionOccupancy';
 import { doc, onSnapshot, updateDoc, arrayUnion, setDoc, getDoc } from 'firebase/firestore';
 
 export const AppContext = createContext(null);
@@ -131,6 +132,17 @@ export function AppProvider({ children }) {
     const role = sessionStorage.getItem('stagetrack_role');
     return role === 'instructor';
   }, [currentUser, instructorUid]);
+
+  // Guest Pass Identifier & State (§5 Task 6)
+  const [passId] = useState(() => (typeof window !== 'undefined' ? sessionStorage.getItem('__mf_pass_id') : null));
+  const isAdmittedGuest = !isInstructorVerified && (lobbyStatus === 'approved' || lobbyStatus === 'accepted');
+
+  // Root Session Occupancy Hook Integration (§5 Task 6)
+  const occupancy = useSessionOccupancy({
+    sessionId: isInstructorVerified ? null : sessionId,
+    passId: isInstructorVerified ? null : passId,
+    isAdmitted: isAdmittedGuest,
+  });
 
   // 1.5. INITIALIZE FIRESTORE SESSION DOCUMENT ON MOUNT FOR INSTRUCTOR (Preserves active session states on reload)
   useEffect(() => {
@@ -1037,7 +1049,14 @@ export function AppProvider({ children }) {
     handleShareDoodleToClass,
     isInstructorVerified,
     currentUser,
-    instructorUid
+    instructorUid,
+    occupancyState: occupancy.occupancyState,
+    occupancyErrorMessage: occupancy.errorMessage,
+    occupancyConnectionId: occupancy.connectionId,
+    claimOccupancySlot: occupancy.claimSlot,
+    retryClaimOccupancy: occupancy.retryClaim,
+    resetOccupancy: occupancy.resetOccupancy,
+    cooldownSeconds: occupancy.cooldownSeconds,
   };
 
   return (
