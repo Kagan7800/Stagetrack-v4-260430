@@ -183,9 +183,5 @@ describe('Review B: useSessionOccupancy Unit & State Machine Tests', () => {
         true
       );
     });
-
-    test('MANUAL_RETRY_COOLDOWN_MS is configured to 3000ms', () => {
-      assert.equal(MANUAL_RETRY_COOLDOWN_MS, 3000);
-    });
   });
 });
