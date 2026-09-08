@@ -420,6 +420,10 @@ export default function LobbyOverlay() {
             {/* Camera feed overlay inside the container below the inputs */}
             {(() => {
               const glowColor = getGlowColor(selectedBorder);
+              // Note: borderRadius uses calc(24px * var(--lobby-scale, 1)) for proportional scaling
+              // within the 5208x2817 SVG coordinate space on desktop (>1024px).
+              // On tablet/mobile (<=1024px), index.css:4443 (.lobby-camera-preview-container)
+              // overrides this with `border-radius: 16px !important` for stacked layout.
               const lobbyCameraBorderStyle = {
                 ...getBorderStyle(selectedBorder, 'rgba(11, 25, 46, 0.7)'),
                 boxShadow: `0 0 12px ${glowColor}`,
