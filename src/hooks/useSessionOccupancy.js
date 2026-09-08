@@ -3,6 +3,7 @@ import { getFunctions, httpsCallable } from 'firebase/functions';
 import { getFirestore, doc, onSnapshot } from 'firebase/firestore';
 
 export const RETRY_DELAYS_MS = [1000, 2000, 4000];
+export const MANUAL_RETRY_COOLDOWN_MS = 3000;
 
 /**
  * Classifies an error as transient (retryable) or permanent.
@@ -114,10 +115,9 @@ export function shouldTriggerAutoClaim({ isAdmitted, occupancyState, hasClaimed,
  * @param {string} params.sessionId
  * @param {string} params.passId
  * @param {boolean} params.isAdmitted
- * @param {boolean} [params.isDismissed=false]
  * @returns {object}
  */
-export function useSessionOccupancy({ sessionId, passId, isAdmitted, isDismissed = false }) {
+export function useSessionOccupancy({ sessionId, passId, isAdmitted }) {
   const [occupancyState, setOccupancyState] = useState('idle'); // 'idle' | 'claiming' | 'connected' | 'occupied_conflict' | 'displaced' | 'error'
   const [errorMessage, setErrorMessage] = useState(null);
   const [activeConnectionId, setActiveConnectionId] = useState(null);
@@ -129,9 +129,21 @@ export function useSessionOccupancy({ sessionId, passId, isAdmitted, isDismissed
       : `conn_${Math.random().toString(36).substring(2, 15)}`
   );
   const heartbeatTimerRef = useRef(null);
+  const cooldownTimerRef = useRef(null);
   const hasClaimedRef = useRef(false);
+  const isDismissedRef = useRef(false);
+  const prevIsAdmittedRef = useRef(isAdmitted);
+  const lastManualClaimTimeRef = useRef(0);
 
-  // 1. Claim Occupancy Handler
+  // 1. Reset / Return-to-Lobby Action
+  const resetOccupancy = useCallback(() => {
+    isDismissedRef.current = true;
+    hasClaimedRef.current = false;
+    setErrorMessage(null);
+    setOccupancyState('idle');
+  }, []);
+
+  // 2. Claim Occupancy Handler
   const claimSlot = useCallback(
     async (forceTransfer = false) => {
       if (!sessionId || !passId) return;
@@ -163,6 +175,7 @@ export function useSessionOccupancy({ sessionId, passId, isAdmitted, isDismissed
 
         if (result?.status === 'connected') {
           hasClaimedRef.current = true;
+          isDismissedRef.current = false;
           setOccupancyState('connected');
           return { status: 'connected' };
         }
@@ -178,18 +191,68 @@ export function useSessionOccupancy({ sessionId, passId, isAdmitted, isDismissed
     [sessionId, passId]
   );
 
-  // Retry claim handler (guarded to error state only)
+  // 3. Manual Retry Claim Handler with 3-second Rate Limiter & Cooldown Countdown
   const retryClaim = useCallback(
-    async () => {
+    async (forceTransfer = false) => {
       if (occupancyState !== 'error') {
-        return;
+        return { status: 'invalid_state' };
       }
-      return claimSlot(false);
+
+      const now = Date.now();
+      const elapsed = now - lastManualClaimTimeRef.current;
+      if (elapsed < MANUAL_RETRY_COOLDOWN_MS) {
+        const remainingMs = MANUAL_RETRY_COOLDOWN_MS - elapsed;
+        const remainingSec = Math.max(1, Math.ceil(remainingMs / 1000));
+        setCooldownSeconds(remainingSec);
+        if (!cooldownTimerRef.current) {
+          cooldownTimerRef.current = setInterval(() => {
+            const curRemainingMs = MANUAL_RETRY_COOLDOWN_MS - (Date.now() - lastManualClaimTimeRef.current);
+            const curSec = Math.max(0, Math.ceil(curRemainingMs / 1000));
+            setCooldownSeconds(curSec);
+            if (curSec <= 0 && cooldownTimerRef.current) {
+              clearInterval(cooldownTimerRef.current);
+              cooldownTimerRef.current = null;
+            }
+          }, 250);
+        }
+        return { status: 'rate_limited' };
+      }
+
+      lastManualClaimTimeRef.current = now;
+      isDismissedRef.current = false;
+      hasClaimedRef.current = false;
+
+      // Start 3-second countdown
+      setCooldownSeconds(Math.ceil(MANUAL_RETRY_COOLDOWN_MS / 1000));
+      if (cooldownTimerRef.current) {
+        clearInterval(cooldownTimerRef.current);
+      }
+
+      cooldownTimerRef.current = setInterval(() => {
+        const remainingMs = MANUAL_RETRY_COOLDOWN_MS - (Date.now() - lastManualClaimTimeRef.current);
+        const remainingSec = Math.max(0, Math.ceil(remainingMs / 1000));
+        setCooldownSeconds(remainingSec);
+        if (remainingSec <= 0 && cooldownTimerRef.current) {
+          clearInterval(cooldownTimerRef.current);
+          cooldownTimerRef.current = null;
+        }
+      }, 250);
+
+      return claimSlot(forceTransfer);
     },
     [occupancyState, claimSlot]
   );
 
-  // 2. Real-time Displacement Subscription (pass owner read)
+  // 4. Edge Detector: Reset dismissal on fresh admission (false -> true)
+  useEffect(() => {
+    if (!prevIsAdmittedRef.current && isAdmitted) {
+      isDismissedRef.current = false;
+      hasClaimedRef.current = false;
+    }
+    prevIsAdmittedRef.current = isAdmitted;
+  }, [isAdmitted]);
+
+  // 5. Real-time Displacement Subscription (pass owner read)
   useEffect(() => {
     if (!passId || occupancyState !== 'connected') return;
 
@@ -219,7 +282,7 @@ export function useSessionOccupancy({ sessionId, passId, isAdmitted, isDismissed
     return () => unsubscribe();
   }, [passId, occupancyState]);
 
-  // 3. 15-second Heartbeat Timer
+  // 6. 15-second Heartbeat Timer
   useEffect(() => {
     if (occupancyState !== 'connected' || !passId || !sessionId) return;
 
@@ -249,7 +312,7 @@ export function useSessionOccupancy({ sessionId, passId, isAdmitted, isDismissed
     };
   }, [occupancyState, passId, sessionId]);
 
-  // 4. Mobile Lifecycle Cleanup (pagehide & visibilitychange)
+  // 7. Mobile Lifecycle Cleanup (pagehide & visibilitychange)
   useEffect(() => {
     const handleRelease = () => {
       if (hasClaimedRef.current && passId) {
@@ -279,19 +342,28 @@ export function useSessionOccupancy({ sessionId, passId, isAdmitted, isDismissed
     };
   }, [passId]);
 
-  // 5. Trigger Initial Claim when Admitted
+  // 8. Cooldown Timer Unmount Cleanup
+  useEffect(() => {
+    return () => {
+      if (cooldownTimerRef.current) {
+        clearInterval(cooldownTimerRef.current);
+      }
+    };
+  }, []);
+
+  // 9. Trigger Initial Claim when Admitted
   useEffect(() => {
     if (
       shouldTriggerAutoClaim({
         isAdmitted,
         occupancyState,
         hasClaimed: hasClaimedRef.current,
-        isDismissed,
+        isDismissed: isDismissedRef.current,
       })
     ) {
       claimSlot(false);
     }
-  }, [isAdmitted, occupancyState, isDismissed, claimSlot]);
+  }, [isAdmitted, occupancyState, claimSlot]);
 
   return {
     occupancyState,
@@ -299,6 +371,7 @@ export function useSessionOccupancy({ sessionId, passId, isAdmitted, isDismissed
     connectionId: connectionIdRef.current,
     claimSlot,
     retryClaim,
+    resetOccupancy,
     cooldownSeconds,
   };
 }

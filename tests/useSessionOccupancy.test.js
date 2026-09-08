@@ -5,6 +5,7 @@ import {
   executeClaimWithRetry,
   shouldTriggerAutoClaim,
   RETRY_DELAYS_MS,
+  MANUAL_RETRY_COOLDOWN_MS,
 } from '../src/hooks/useSessionOccupancy.js';
 
 describe('Review B: useSessionOccupancy Unit & State Machine Tests', () => {
@@ -136,8 +137,6 @@ describe('Review B: useSessionOccupancy Unit & State Machine Tests', () => {
 
   describe('3. Deliberate Exit vs Re-Admission State Machine Invariant', () => {
     test('shouldTriggerAutoClaim blocks re-trigger when isDismissed is true even if isAdmitted is true', () => {
-      // Unpatched behavior allowed trigger whenever isAdmitted && idle && !hasClaimed
-      // Patched behavior MUST return false when isDismissed is true
       const shouldTriggerOnExit = shouldTriggerAutoClaim({
         isAdmitted: true,
         occupancyState: 'idle',
@@ -158,15 +157,35 @@ describe('Review B: useSessionOccupancy Unit & State Machine Tests', () => {
       assert.equal(shouldTriggerOnFreshAdmit, true);
     });
 
-    test('retryClaim rejects execution unless state is error', () => {
-      const canRetry = (state) => state === 'error';
+    test('shouldTriggerAutoClaim requires occupancyState to be idle and hasClaimed to be false', () => {
+      assert.equal(
+        shouldTriggerAutoClaim({ isAdmitted: true, occupancyState: 'claiming', hasClaimed: false, isDismissed: false }),
+        false
+      );
+      assert.equal(
+        shouldTriggerAutoClaim({ isAdmitted: true, occupancyState: 'connected', hasClaimed: false, isDismissed: false }),
+        false
+      );
+      assert.equal(
+        shouldTriggerAutoClaim({ isAdmitted: true, occupancyState: 'error', hasClaimed: false, isDismissed: false }),
+        false
+      );
+      assert.equal(
+        shouldTriggerAutoClaim({ isAdmitted: true, occupancyState: 'idle', hasClaimed: true, isDismissed: false }),
+        false
+      );
+      assert.equal(
+        shouldTriggerAutoClaim({ isAdmitted: false, occupancyState: 'idle', hasClaimed: false, isDismissed: false }),
+        false
+      );
+      assert.equal(
+        shouldTriggerAutoClaim({ isAdmitted: true, occupancyState: 'idle', hasClaimed: false, isDismissed: false }),
+        true
+      );
+    });
 
-      assert.equal(canRetry('connected'), false);
-      assert.equal(canRetry('claiming'), false);
-      assert.equal(canRetry('idle'), false);
-      assert.equal(canRetry('occupied_conflict'), false);
-      assert.equal(canRetry('displaced'), false);
-      assert.equal(canRetry('error'), true);
+    test('MANUAL_RETRY_COOLDOWN_MS is configured to 3000ms', () => {
+      assert.equal(MANUAL_RETRY_COOLDOWN_MS, 3000);
     });
   });
 });
