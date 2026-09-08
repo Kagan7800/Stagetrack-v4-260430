@@ -82,8 +82,9 @@ Music Fun with My Little One passwordless guest pass, authentication, session ro
 - [x] Real-time instant displacement: Pass owner subscribes to `occupancy/{passId}` via `onSnapshot` (0 ms delay).
 - [x] 15-second heartbeat interval with 45-second server-side staleness timeout.
 - [x] Mobile lifecycle: `pagehide` and `visibilitychange` release handlers.
+- [x] **Amendment A5 Security Check:** Transactional `assertPassActive(transaction, db, passId)` in `mintJoinTokenHandler` and `claimOccupancySlotHandler` strictly blocking revoked/inactive passes from minting tokens or claiming slots.
 - [x] UI components: `src/hooks/useSessionOccupancy.js` and `src/components/OccupancyTransferModal.jsx`.
-- [x] Evidenced by 6 acceptance tests in `functions/test/occupancy.test.js` and full E2E flow in `functions/test/e2e.test.js`.
+- [x] Evidenced by 11 acceptance tests in `functions/test/occupancy.test.js` and full E2E flow in `functions/test/e2e.test.js`.
 
 ### Task 7: Pass Recovery Flow — `COMPLETED`
 - [x] Unified auto-detecting input field handling email vs E.164 phone formats without tabs.
@@ -101,9 +102,9 @@ Music Fun with My Little One passwordless guest pass, authentication, session ro
 ### Task 8: Pass Management, Token Rotation, & Revocation — `COMPLETED`
 - [x] Admin/Instructor pass management API (`listGuestPasses`, `rotatePassLink`, `revokeGuestPass` in `functions/passManagement.js`) & UI (`src/components/InstructorPassManagement.jsx`).
 - [x] Intentional rotation: Mints new token, replaces `activeTokenHashes = [newTokenHash]`, clears old pool, preserves stable `uid`.
-- [x] Instant server revocation: Sets `status: 'revoked'`, clears `activeTokenHashes = []`, calls `admin.auth().revokeRefreshTokens(pass.uid)`, and deletes active occupancy slot.
+- [x] Instant server revocation: Sets `status: 'revoked'`, clears `activeTokenHashes = []`, calls `admin.auth().revokeRefreshTokens(pass.uid)`, deletes active occupancy slot, and deletes associated `joinRequests` with fail-on-error behavior (Amendments A5 & A5.1).
 - [x] Security rules enforcement: `isGuestPassActive()` enforces `status: 'active'` and validates `request.auth.token.auth_time > passDoc.data.revokedAt.toMillis() / 1000` with short-circuit protection for instructors.
-- [x] Evidenced by 4 acceptance tests in `functions/test/passManagement.test.js` and 2 emulator security rules tests in `functions/test/firestoreRules.test.js`.
+- [x] Evidenced by 5 acceptance tests in `functions/test/passManagement.test.js` and 2 emulator security rules tests in `functions/test/firestoreRules.test.js`.
 
 ---
 
@@ -118,6 +119,6 @@ Music Fun with My Little One passwordless guest pass, authentication, session ro
 
 ---
 
-## All 9 Tasks Complete — Test Coverage Summary
-- **Unit & Integration Tests:** 59 passed, 0 failed across 5 suites.
+## All 9 Tasks Complete + Security Amendments — Test Coverage Summary
+- **Unit & Integration Tests:** 65 passed, 0 failed across 5 suites.
 - **Live Firestore Security Rules Tests:** 11 passed, 0 failed against live emulator.

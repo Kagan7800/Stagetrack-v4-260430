@@ -186,6 +186,11 @@ async function revokeGuestPassHandler(data, context, deps = {}) {
     console.warn(`[Revocation] Warning deleting occupancy for ${passSnap.id}:`, occErr.message);
   }
 
+  // 4. Delete all join requests for this pass (must fail revocation if cleanup fails per A5.1)
+  const joinRequestsSnap = await db.collection('joinRequests').where('passId', '==', passSnap.id).get();
+  const deletePromises = joinRequestsSnap.docs.map((d) => d.ref.delete());
+  await Promise.all(deletePromises);
+
   return {
     success: true,
     passId: passSnap.id,

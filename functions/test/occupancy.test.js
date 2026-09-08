@@ -92,6 +92,12 @@ describe('Task 6: Join Token & Exclusivity Acceptance Tests', () => {
     const passId = 'pass_t6_1';
     const uid = 'guest_user_1';
 
+    await db.collection('guestPasses').doc(passId).set({
+      passId,
+      uid,
+      status: 'active',
+    });
+
     // 1. Unadmitted joinRequest should fail
     await db.collection('joinRequests').doc(`${sessionId}_${passId}`).set({
       sessionId,
@@ -144,6 +150,12 @@ describe('Task 6: Join Token & Exclusivity Acceptance Tests', () => {
     const uid = 'guest_user_2';
     const conn1 = 'conn_device_a';
 
+    await db.collection('guestPasses').doc(passId).set({
+      passId,
+      uid,
+      status: 'active',
+    });
+
     // Prepare admitted pass and mint join token
     await db.collection('joinRequests').doc(`${sessionId}_${passId}`).set({
       sessionId,
@@ -193,6 +205,12 @@ describe('Task 6: Join Token & Exclusivity Acceptance Tests', () => {
     const passId = 'pass_t6_3';
     const uid = 'guest_user_3';
 
+    await db.collection('guestPasses').doc(passId).set({
+      passId,
+      uid,
+      status: 'active',
+    });
+
     await db.collection('joinRequests').doc(`${sessionId}_${passId}`).set({
       sessionId,
       passId,
@@ -231,6 +249,12 @@ describe('Task 6: Join Token & Exclusivity Acceptance Tests', () => {
     const uid = 'guest_user_4';
     const conn1 = 'device_ipad';
     const conn2 = 'device_iphone';
+
+    await db.collection('guestPasses').doc(passId).set({
+      passId,
+      uid,
+      status: 'active',
+    });
 
     await db.collection('joinRequests').doc(`${sessionId}_${passId}`).set({
       sessionId,
@@ -304,6 +328,12 @@ describe('Task 6: Join Token & Exclusivity Acceptance Tests', () => {
     const connA = 'conn_laptop';
     const connB = 'conn_phone';
 
+    await db.collection('guestPasses').doc(passId).set({
+      passId,
+      uid,
+      status: 'active',
+    });
+
     await db.collection('joinRequests').doc(`${sessionId}_${passId}`).set({
       sessionId,
       passId,
@@ -365,6 +395,12 @@ describe('Task 6: Join Token & Exclusivity Acceptance Tests', () => {
     const connOld = 'conn_abandoned_device';
     const connNew = 'conn_new_device';
 
+    await db.collection('guestPasses').doc(passId).set({
+      passId,
+      uid,
+      status: 'active',
+    });
+
     // Occupancy exists with abandoned heartbeat 50 seconds ago
     await db.collection('occupancy').doc(passId).set({
       passId,
@@ -403,6 +439,12 @@ describe('Task 6: Join Token & Exclusivity Acceptance Tests', () => {
     const passId = 'pass_t6_rot1';
     const uid = 'guest_user_rot1';
     const conn1 = 'conn_rot1';
+
+    await db.collection('guestPasses').doc(passId).set({
+      passId,
+      uid,
+      status: 'active',
+    });
 
     // Seed admitted joinRequest
     await db.collection('joinRequests').doc(`${sessionId}_${passId}`).set({
@@ -467,6 +509,12 @@ describe('Task 6: Join Token & Exclusivity Acceptance Tests', () => {
     const uid = 'guest_user_rot2';
     const conn1 = 'conn_rot2';
 
+    await db.collection('guestPasses').doc(passId).set({
+      passId,
+      uid,
+      status: 'active',
+    });
+
     await db.collection('joinRequests').doc(`${sessionId}_${passId}`).set({
       sessionId,
       passId,
@@ -513,6 +561,12 @@ describe('Task 6: Join Token & Exclusivity Acceptance Tests', () => {
     const passId = 'pass_t6_rot3';
     const uid = 'guest_user_rot3';
 
+    await db.collection('guestPasses').doc(passId).set({
+      passId,
+      uid,
+      status: 'active',
+    });
+
     await db.collection('joinRequests').doc(`${sessionId}_${passId}`).set({
       sessionId,
       passId,
@@ -548,4 +602,89 @@ describe('Task 6: Join Token & Exclusivity Acceptance Tests', () => {
     assert.equal(doc1.used, true);
     assert.equal(doc1.invalidationReason, 'rotated');
   });
+
+  test('mintJoinToken — revoked pass cannot mint despite admitted joinRequest', async () => {
+    const db = createMockDb();
+    const sessionId = 'session_t6_rev1';
+    const passId = 'pass_t6_rev1';
+    const uid = 'guest_user_rev1';
+
+    await db.collection('guestPasses').doc(passId).set({
+      passId,
+      uid,
+      status: 'revoked',
+    });
+
+    await db.collection('joinRequests').doc(`${sessionId}_${passId}`).set({
+      sessionId,
+      passId,
+      status: 'admitted',
+    });
+
+    const context = {
+      auth: {
+        uid,
+        token: { passId, programId: 'prog_1', isGuest: true },
+      },
+    };
+
+    await assert.rejects(
+      async () => {
+        await mintJoinTokenHandler({ sessionId }, context, { db, now: () => baseTime });
+      },
+      (err) => {
+        assert.equal(err.code, 'permission-denied');
+        assert.equal(err.message, 'This pass is no longer active.');
+        return true;
+      }
+    );
+  });
+
+  test('claimOccupancySlot — revoked pass cannot claim slot with valid unused token', async () => {
+    const db = createMockDb();
+    const sessionId = 'session_t6_rev2';
+    const passId = 'pass_t6_rev2';
+    const uid = 'guest_user_rev2';
+    const connectionId = 'conn_rev2';
+    const rawJoinToken = 'valid_raw_token_32_bytes_entropy_abc123';
+    const tokenHash = hashToken(rawJoinToken);
+
+    await db.collection('guestPasses').doc(passId).set({
+      passId,
+      uid,
+      status: 'revoked',
+    });
+
+    await db.collection('joinTokens').doc(tokenHash).set({
+      tokenHash,
+      passId,
+      sessionId,
+      uid,
+      used: false,
+      expiresAt: baseTime + 60000,
+    });
+
+    const context = {
+      auth: {
+        uid,
+        token: { passId, programId: 'prog_1', isGuest: true },
+      },
+    };
+
+    await assert.rejects(
+      async () => {
+        await claimOccupancySlotHandler(
+          { sessionId, connectionId, joinToken: rawJoinToken },
+          context,
+          { db, now: () => baseTime }
+        );
+      },
+      (err) => {
+        assert.equal(err.code, 'permission-denied');
+        assert.equal(err.message, 'This pass is no longer active.');
+        return true;
+      }
+    );
+  });
 });
+

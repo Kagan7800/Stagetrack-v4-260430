@@ -312,12 +312,17 @@ describe('Task 8: Pass Management, Token Rotation, & Revocation Acceptance Tests
     );
     const rawToken = creation.passUrl.replace('http://127.0.0.1:5000/my/', '');
 
-    // Seed active occupancy doc
+    // Seed active occupancy doc and joinRequests doc
     await db.collection('occupancy').doc(creation.passId).set({
       passId: creation.passId,
       programId: 'prog_spring',
       holderUid: 'guest_eve',
       status: 'occupied',
+    });
+    await db.collection('joinRequests').doc(`session_1_${creation.passId}`).set({
+      sessionId: 'session_1',
+      passId: creation.passId,
+      status: 'admitted',
     });
 
     // 2. Revoke the pass
@@ -340,9 +345,11 @@ describe('Task 8: Pass Management, Token Rotation, & Revocation Acceptance Tests
     // 4. Assert Firebase Auth revokeRefreshTokens was called with the decoupled pass.uid
     assert.equal(revokedUid, passDoc.uid);
 
-    // 5. Assert occupancy doc was cleanly deleted (not set to vacant)
+    // 5. Assert occupancy doc and joinRequests were cleanly deleted
     const occDoc = await db.collection('occupancy').doc(creation.passId).get();
     assert.equal(occDoc.exists, false, 'Occupancy document must be deleted on revocation');
+    const reqDoc = await db.collection('joinRequests').doc(`session_1_${creation.passId}`).get();
+    assert.equal(reqDoc.exists, false, 'JoinRequest document must be deleted on revocation');
 
     // 6. Assert redemption returns 404
     let statusRedeem = 0;
@@ -374,4 +381,42 @@ describe('Task 8: Pass Management, Token Rotation, & Revocation Acceptance Tests
       (err) => err.code === 'failed-precondition'
     );
   });
+
+  test('revokeGuestPass — failed joinRequests cleanup rejects revocation without swallowing error (A5.1)', async () => {
+    const db = createMockDb();
+    const creation = await createGuestPassHandler(
+      { programId: 'prog_spring', email: 'fail@example.com', adultName: 'FailTest' },
+      instructorCtx,
+      { db, baseUrl, now: () => baseTime }
+    );
+
+    // Override collection('joinRequests') to simulate a database query error during cleanup
+    const origCollection = db.collection.bind(db);
+    db.collection = (col) => {
+      if (col === 'joinRequests') {
+        return {
+          where() {
+            throw new Error('Firestore joinRequests query failure');
+          },
+        };
+      }
+      return origCollection(col);
+    };
+
+    const mockAuth = { async revokeRefreshTokens() {} };
+    await assert.rejects(
+      async () => {
+        await revokeGuestPassHandler(
+          { passId: creation.passId },
+          instructorCtx,
+          { db, auth: mockAuth }
+        );
+      },
+      (err) => {
+        assert.match(err.message, /Firestore joinRequests query failure/);
+        return true;
+      }
+    );
+  });
 });
+

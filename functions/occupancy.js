@@ -23,6 +23,19 @@ function toEpochMillis(ts) {
 }
 
 /**
+ * Loads guestPasses/{passId} inside a transaction and rejects unless active.
+ * Must be called before any transaction writes — Firestore requires all reads first.
+ */
+async function assertPassActive(transaction, db, passId) {
+  const passRef = db.collection('guestPasses').doc(passId);
+  const passDoc = await transaction.get(passRef);
+  if (!passDoc.exists || passDoc.data().status !== 'active') {
+    throw new functions.https.HttpsError('permission-denied', 'This pass is no longer active.');
+  }
+  return passDoc;
+}
+
+/**
  * Callable handler to mint a short-lived (60s), single-use join token (§5 Task 6).
  * Requires the pass holder to have an 'admitted' joinRequest for the session.
  *
@@ -57,6 +70,7 @@ async function mintJoinTokenHandler(data, context, deps = {}) {
 
   // 2. Transactional validation, token rotation, and single active token assignment
   return await db.runTransaction(async (transaction) => {
+    await assertPassActive(transaction, db, passId);
     const requestDoc = await transaction.get(requestDocRef);
 
     if (!requestDoc.exists) {
@@ -162,6 +176,7 @@ async function claimOccupancySlotHandler(data, context, deps = {}) {
 
   // 2. Transactional validation and claim
   return await db.runTransaction(async (transaction) => {
+    await assertPassActive(transaction, db, passId);
     const tokenDoc = await transaction.get(joinTokenRef);
     if (!tokenDoc.exists) {
       throw new functions.https.HttpsError('not-found', 'Invalid join token.');
