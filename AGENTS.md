@@ -88,6 +88,9 @@ Review finds; repair fixes. Repair is where reviews cause outages.
 - **Preserve public behavior** unless the behavior is the finding. Interface changes are separate, flagged commits.
 - **If a fix needs changes outside scope, stop and report.** Do not expand scope mid-repair.
 - **If a fix cannot be verified, do not apply it.** Propose it instead.
+- **Apply verification against approved diff.** After applying, inspect `git diff <approved-base>..HEAD` and confirm it matches the approved diff exactly. Any deviations must be reported and corrected before push.
+- **Behavioral coverage floor.** Every approved state transition, timer, rate limiter, and guard must have a corresponding test. A passing test suite is only evidence for what it explicitly asserts; unevidenced behaviors create invisible drift.
+- **No tautological or copycat tests.** A test that reimplements or mocks a copy of the logic under test proves nothing. Tests must assert directly against the actual imported implementation and observable state outputs, never against locally-defined mock functions or duplicate logic.
 
 ## 8. Deletion Requires Two Independent Signals
 
