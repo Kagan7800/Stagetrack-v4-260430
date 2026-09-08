@@ -3070,7 +3070,7 @@ img.sticker,
   top: 62.383%;
   width: 19.777%;
   height: 30.99%;
-  border-radius: 12px;
+  border-radius: calc(24px * var(--lobby-scale));
   overflow: visible;
   isolation: isolate;
   transform: translateZ(0);

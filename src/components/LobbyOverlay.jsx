@@ -423,7 +423,7 @@ export default function LobbyOverlay() {
               const lobbyCameraBorderStyle = {
                 ...getBorderStyle(selectedBorder, 'rgba(11, 25, 46, 0.7)'),
                 boxShadow: `0 0 12px ${glowColor}`,
-                borderRadius: '12px'
+                borderRadius: 'calc(24px * var(--lobby-scale, 1))'
               };
 
               return (
