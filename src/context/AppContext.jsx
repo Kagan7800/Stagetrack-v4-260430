@@ -5,7 +5,9 @@ import { createContext, useContext, useState, useEffect, useRef, useMemo } from 
 import { db, auth, ensureAuthenticated } from '../firebase';
 import { useSessionOccupancy } from '../hooks/useSessionOccupancy';
 import { doc, onSnapshot, updateDoc, arrayUnion, setDoc, getDoc } from 'firebase/firestore';
+import { shouldAttachSessionListener } from '../utils/sessionSync.js';
 
+export { shouldAttachSessionListener };
 export const AppContext = createContext(null);
 
 const getInitialAuth = () => {
@@ -221,7 +223,7 @@ export function AppProvider({ children }) {
 
   // 2. FIRESTORE REALTIME SYNC (Handles Lobby Requests, Acceptances, and Room States)
   useEffect(() => {
-    if (!sessionId) return;
+    if (!shouldAttachSessionListener({ sessionId, currentUser })) return;
 
     const sessionRef = doc(db, "sessions", sessionId);
     const unsubscribe = onSnapshot(sessionRef, (snap) => {
@@ -412,7 +414,7 @@ export function AppProvider({ children }) {
     });
 
     return () => unsubscribe();
-  }, [sessionId, lobbyStatus, isJoined]);
+  }, [sessionId, lobbyStatus, isJoined, currentUser]);
 
   // --- HANDLERS TO UPDATE FIRESTORE AND LOCAL STATE ---
 
