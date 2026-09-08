@@ -396,4 +396,156 @@ describe('Task 6: Join Token & Exclusivity Acceptance Tests', () => {
     assert.equal(claimRes.status, 'connected');
     assert.equal(claimRes.connectionId, connNew);
   });
+
+  test('mintJoinToken — second mint for same requestId invalidates prior token', async () => {
+    const db = createMockDb();
+    const sessionId = 'session_t6_rot1';
+    const passId = 'pass_t6_rot1';
+    const uid = 'guest_user_rot1';
+    const conn1 = 'conn_rot1';
+
+    // Seed admitted joinRequest
+    await db.collection('joinRequests').doc(`${sessionId}_${passId}`).set({
+      sessionId,
+      passId,
+      status: 'admitted',
+    });
+
+    const context = {
+      auth: {
+        uid,
+        token: { passId, programId: 'prog_1', isGuest: true },
+      },
+    };
+
+    // First mint
+    const mint1 = await mintJoinTokenHandler({ sessionId }, context, { db, now: () => baseTime });
+    assert.ok(mint1.joinToken);
+
+    // Verify pointer on joinRequest
+    const reqAfterMint1 = (await db.collection('joinRequests').doc(`${sessionId}_${passId}`).get()).data();
+    assert.equal(reqAfterMint1.activeTokenHash, hashToken(mint1.joinToken));
+
+    // Second mint for same requestId (simulating retry / reconnect)
+    const mint2 = await mintJoinTokenHandler({ sessionId }, context, { db, now: () => baseTime + 2000 });
+    assert.ok(mint2.joinToken);
+    assert.notEqual(mint1.joinToken, mint2.joinToken);
+
+    // Verify pointer updated to mint2's hash
+    const reqAfterMint2 = (await db.collection('joinRequests').doc(`${sessionId}_${passId}`).get()).data();
+    assert.equal(reqAfterMint2.activeTokenHash, hashToken(mint2.joinToken));
+
+    // First token document must now be marked used: true (invalidated)
+    const tok1Doc = (await db.collection('joinTokens').doc(hashToken(mint1.joinToken)).get()).data();
+    assert.equal(tok1Doc.used, true);
+
+    // Attempting to claim occupancy with token 1 must be REJECTED (token has already been used)
+    await assert.rejects(
+      async () => {
+        await claimOccupancySlotHandler(
+          { sessionId, connectionId: conn1, joinToken: mint1.joinToken },
+          context,
+          { db, now: () => baseTime + 3000 }
+        );
+      },
+      (err) => err.code === 'failed-precondition' && err.message.includes('already been used')
+    );
+
+    // Claiming with token 2 must SUCCEED
+    const claimRes2 = await claimOccupancySlotHandler(
+      { sessionId, connectionId: conn1, joinToken: mint2.joinToken },
+      context,
+      { db, now: () => baseTime + 4000 }
+    );
+    assert.equal(claimRes2.status, 'connected');
+  });
+
+  test('mintJoinToken — mint when prior token is already used is a clean no-op', async () => {
+    const db = createMockDb();
+    const sessionId = 'session_t6_rot2';
+    const passId = 'pass_t6_rot2';
+    const uid = 'guest_user_rot2';
+    const conn1 = 'conn_rot2';
+
+    await db.collection('joinRequests').doc(`${sessionId}_${passId}`).set({
+      sessionId,
+      passId,
+      status: 'admitted',
+    });
+
+    const context = {
+      auth: {
+        uid,
+        token: { passId, programId: 'prog_1', isGuest: true },
+      },
+    };
+
+    // First mint and claim
+    const mint1 = await mintJoinTokenHandler({ sessionId }, context, { db, now: () => baseTime });
+    await claimOccupancySlotHandler(
+      { sessionId, connectionId: conn1, joinToken: mint1.joinToken },
+      context,
+      { db, now: () => baseTime + 1000 }
+    );
+
+    // Verify token 1 is used
+    const tok1Doc = (await db.collection('joinTokens').doc(hashToken(mint1.joinToken)).get()).data();
+    assert.equal(tok1Doc.used, true);
+
+    // Subsequent mint (e.g. second device or reconnect after session) succeeds cleanly without error
+    const mint2 = await mintJoinTokenHandler({ sessionId }, context, { db, now: () => baseTime + 5000 });
+    assert.equal(mint2.success, true);
+    assert.ok(mint2.joinToken);
+
+    // Verify pointer was updated to mint2's hash
+    const reqAfterMint2 = (await db.collection('joinRequests').doc(`${sessionId}_${passId}`).get()).data();
+    assert.equal(reqAfterMint2.activeTokenHash, hashToken(mint2.joinToken));
+
+    // Verify token 1 remains used without having invalidationReason: 'rotated' applied
+    const tok1AfterMint2 = (await db.collection('joinTokens').doc(hashToken(mint1.joinToken)).get()).data();
+    assert.equal(tok1AfterMint2.used, true);
+    assert.equal(tok1AfterMint2.invalidationReason, undefined);
+  });
+
+  test('mintJoinToken — sequential mints leave exactly one activeTokenHash and invalidate superseded token', async () => {
+    const db = createMockDb();
+    const sessionId = 'session_t6_rot3';
+    const passId = 'pass_t6_rot3';
+    const uid = 'guest_user_rot3';
+
+    await db.collection('joinRequests').doc(`${sessionId}_${passId}`).set({
+      sessionId,
+      passId,
+      status: 'admitted',
+    });
+
+    const context = {
+      auth: {
+        uid,
+        token: { passId, programId: 'prog_1', isGuest: true },
+      },
+    };
+
+    // Sequential mint requests
+    const res1 = await mintJoinTokenHandler({ sessionId }, context, { db, now: () => baseTime });
+    const res2 = await mintJoinTokenHandler({ sessionId }, context, { db, now: () => baseTime + 10 });
+
+    assert.equal(res1.success, true);
+    assert.equal(res2.success, true);
+
+    // Check final joinRequest state: activeTokenHash must match the second token
+    const reqDoc = (await db.collection('joinRequests').doc(`${sessionId}_${passId}`).get()).data();
+    const hash1 = hashToken(res1.joinToken);
+    const hash2 = hashToken(res2.joinToken);
+
+    assert.equal(reqDoc.activeTokenHash, hash2);
+
+    // Token 2 must be active (used: false), Token 1 must be invalidated (used: true)
+    const doc1 = (await db.collection('joinTokens').doc(hash1).get()).data();
+    const doc2 = (await db.collection('joinTokens').doc(hash2).get()).data();
+
+    assert.equal(doc2.used, false);
+    assert.equal(doc1.used, true);
+    assert.equal(doc1.invalidationReason, 'rotated');
+  });
 });

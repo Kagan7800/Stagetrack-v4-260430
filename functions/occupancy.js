@@ -52,44 +52,67 @@ async function mintJoinTokenHandler(data, context, deps = {}) {
 
   const db = deps.db || admin.firestore();
   const now = deps.now ? deps.now() : Date.now();
-
-  // 2. Validate that the joinRequest is admitted
   const requestId = `${sessionId.trim()}_${passId}`;
-  const requestDoc = await db.collection('joinRequests').doc(requestId).get();
+  const requestDocRef = db.collection('joinRequests').doc(requestId);
 
-  if (!requestDoc.exists) {
-    throw new functions.https.HttpsError('not-found', 'Join request not found.');
-  }
+  // 2. Transactional validation, token rotation, and single active token assignment
+  return await db.runTransaction(async (transaction) => {
+    const requestDoc = await transaction.get(requestDocRef);
 
-  const requestData = requestDoc.data();
-  if (requestData.status !== 'admitted') {
-    throw new functions.https.HttpsError(
-      'failed-precondition',
-      'You must be admitted by the instructor before obtaining a join token.'
-    );
-  }
+    if (!requestDoc.exists) {
+      throw new functions.https.HttpsError('not-found', 'Join request not found.');
+    }
 
-  // 3. Generate raw 32-byte crypto token and SHA-256 hash
-  const rawToken = generateToken(32);
-  const tokenHash = hashToken(rawToken);
-  const expiresAtMillis = now + TOKEN_TTL_MS;
+    const requestData = requestDoc.data();
+    if (requestData.status !== 'admitted') {
+      throw new functions.https.HttpsError(
+        'failed-precondition',
+        'You must be admitted by the instructor before obtaining a join token.'
+      );
+    }
 
-  const tokenDocRef = db.collection('joinTokens').doc(tokenHash);
-  await tokenDocRef.set({
-    tokenHash,
-    passId,
-    sessionId: sessionId.trim(),
-    uid: userUid,
-    used: false,
-    createdAt: admin.firestore.Timestamp.fromMillis(now),
-    expiresAt: admin.firestore.Timestamp.fromMillis(expiresAtMillis),
+    // 3. Invalidate prior active token if one exists and is unconsumed
+    const priorTokenHash = requestData.activeTokenHash;
+    if (priorTokenHash && typeof priorTokenHash === 'string') {
+      const priorTokenRef = db.collection('joinTokens').doc(priorTokenHash);
+      const priorTokenDoc = await transaction.get(priorTokenRef);
+      if (priorTokenDoc.exists && priorTokenDoc.data().used !== true) {
+        transaction.update(priorTokenRef, {
+          used: true,
+          invalidatedAt: admin.firestore.Timestamp.fromMillis(now),
+          invalidationReason: 'rotated',
+        });
+      }
+    }
+
+    // 4. Generate raw 32-byte crypto token and SHA-256 hash
+    const rawToken = generateToken(32);
+    const tokenHash = hashToken(rawToken);
+    const expiresAtMillis = now + TOKEN_TTL_MS;
+
+    const tokenDocRef = db.collection('joinTokens').doc(tokenHash);
+    transaction.set(tokenDocRef, {
+      tokenHash,
+      passId,
+      sessionId: sessionId.trim(),
+      uid: userUid,
+      used: false,
+      createdAt: admin.firestore.Timestamp.fromMillis(now),
+      expiresAt: admin.firestore.Timestamp.fromMillis(expiresAtMillis),
+    });
+
+    // 5. Update active token pointer on joinRequest
+    transaction.update(requestDocRef, {
+      activeTokenHash: tokenHash,
+      tokenMintedAt: admin.firestore.Timestamp.fromMillis(now),
+    });
+
+    return {
+      success: true,
+      joinToken: rawToken,
+      expiresAt: expiresAtMillis,
+    };
   });
-
-  return {
-    success: true,
-    joinToken: rawToken,
-    expiresAt: expiresAtMillis,
-  };
 }
 
 /**
