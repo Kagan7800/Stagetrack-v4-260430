@@ -84,7 +84,7 @@ Notes:       Durable `deliveryQueue` architecture with 15-minute TTL, anti-OTP v
 
 ## Amendment A5 & A5.1 — Pass Status Enforcement on Live-Session Path & Fail-on-Error Cleanup
 Status:      COMPLETE
-Commit:      HEAD
+Commit:      a465249
 Tests:       11 passing (`functions/test/occupancy.test.js`), 5 passing (`functions/test/passManagement.test.js`), 65 total passing across `functions/`
 Amendments:  A5 applied, A5.1 applied, A5.2 verified (passId in joinRequests schema), A5.3 verified (status: 'active' at creation)
 Verified by: In-memory mock Firestore suite with negative regression assertions failing before fix and passing after
