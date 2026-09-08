@@ -2,6 +2,108 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { getFirestore, doc, onSnapshot } from 'firebase/firestore';
 
+export const RETRY_DELAYS_MS = [1000, 2000, 4000];
+
+/**
+ * Classifies an error as transient (retryable) or permanent.
+ * @param {any} err
+ * @returns {boolean}
+ */
+export function isTransientOccupancyError(err) {
+  if (!err) return false;
+  const transientCodes = new Set([
+    'not-found',
+    'aborted',
+    'unavailable',
+    'deadline-exceeded',
+    'resource-exhausted',
+  ]);
+  if (err.code && transientCodes.has(err.code)) {
+    return true;
+  }
+  if (err instanceof TypeError && err.message?.includes('Failed to fetch')) {
+    return true;
+  }
+  if (err.message && (err.message.includes('Failed to fetch') || err.message.includes('NetworkError'))) {
+    return true;
+  }
+  return false;
+}
+
+/**
+ * Executes join token minting and occupancy slot claiming with exponential backoff and jitter for transient errors.
+ * @param {object} params
+ * @param {string} params.sessionId
+ * @param {string} params.passId
+ * @param {string} params.connectionId
+ * @param {boolean} [params.forceTransfer=false]
+ * @param {object} [params.deps={}]
+ * @returns {Promise<any>}
+ */
+export async function executeClaimWithRetry({
+  sessionId,
+  passId,
+  connectionId,
+  forceTransfer = false,
+  deps = {},
+}) {
+  const mintFn = deps.mintFn || ((args) => httpsCallable(getFunctions(), 'mintJoinToken')(args));
+  const claimFn = deps.claimFn || ((args) => httpsCallable(getFunctions(), 'claimOccupancySlot')(args));
+  const sleep = deps.sleep || ((ms) => new Promise((resolve) => setTimeout(resolve, ms)));
+
+  let lastError;
+  const maxAttempts = 3;
+
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    try {
+      // Step 1: Mint Join Token
+      const mintRes = await mintFn({ sessionId });
+      const rawJoinToken = mintRes?.data?.joinToken;
+
+      if (!rawJoinToken) {
+        throw new Error('Failed to obtain a valid join token.');
+      }
+
+      // Step 2: Claim Occupancy Slot
+      const claimRes = await claimFn({
+        sessionId,
+        connectionId,
+        joinToken: rawJoinToken,
+        forceTransfer,
+      });
+
+      return claimRes?.data;
+    } catch (err) {
+      lastError = err;
+      if (!isTransientOccupancyError(err)) {
+        throw err;
+      }
+      if (attempt < maxAttempts - 1) {
+        const baseDelay = RETRY_DELAYS_MS[attempt] || 1000;
+        const jitter = Math.floor(Math.random() * 300);
+        await sleep(baseDelay + jitter);
+      }
+    }
+  }
+
+  throw lastError;
+}
+
+/**
+ * Pure predicate determining whether auto-claim should trigger.
+ * Prevents re-claiming after deliberate user dismissal/exit.
+ * @param {object} params
+ * @param {boolean} params.isAdmitted
+ * @param {string} params.occupancyState
+ * @param {boolean} params.hasClaimed
+ * @param {boolean} [params.isDismissed]
+ * @returns {boolean}
+ */
+export function shouldTriggerAutoClaim({ isAdmitted, occupancyState, hasClaimed, isDismissed }) {
+  if (isDismissed) return false;
+  return Boolean(isAdmitted && occupancyState === 'idle' && !hasClaimed);
+}
+
 /**
  * Custom hook to manage single-stream exclusivity and join token lifecycle (§5 Task 6).
  * Follows strict flow: Mint Join Token -> Claim Occupancy Slot -> (Caller initializes WebRTC).
@@ -12,9 +114,10 @@ import { getFirestore, doc, onSnapshot } from 'firebase/firestore';
  * @param {string} params.sessionId
  * @param {string} params.passId
  * @param {boolean} params.isAdmitted
+ * @param {boolean} [params.isDismissed=false]
  * @returns {object}
  */
-export function useSessionOccupancy({ sessionId, passId, isAdmitted }) {
+export function useSessionOccupancy({ sessionId, passId, isAdmitted, isDismissed = false }) {
   const [occupancyState, setOccupancyState] = useState('idle'); // 'idle' | 'claiming' | 'connected' | 'occupied_conflict' | 'displaced' | 'error'
   const [errorMessage, setErrorMessage] = useState(null);
   const [activeConnectionId, setActiveConnectionId] = useState(null);
@@ -36,31 +139,26 @@ export function useSessionOccupancy({ sessionId, passId, isAdmitted }) {
       try {
         setOccupancyState('claiming');
         setErrorMessage(null);
+
         const functions = getFunctions();
-
-        // Step 1: Mint Join Token
         const mintJoinTokenFn = httpsCallable(functions, 'mintJoinToken');
-        const mintRes = await mintJoinTokenFn({ sessionId });
-        const rawJoinToken = mintRes.data?.joinToken;
-
-        if (!rawJoinToken) {
-          throw new Error('Failed to obtain a valid join token.');
-        }
-
-        // Step 2: Claim Occupancy Slot (Transactional)
         const claimFn = httpsCallable(functions, 'claimOccupancySlot');
-        const claimRes = await claimFn({
+
+        const result = await executeClaimWithRetry({
           sessionId,
+          passId,
           connectionId: connectionIdRef.current,
-          joinToken: rawJoinToken,
           forceTransfer,
+          deps: {
+            mintFn: (args) => mintJoinTokenFn(args),
+            claimFn: (args) => claimFn(args),
+          },
         });
 
-        const result = claimRes.data;
         if (result?.status === 'occupied') {
           setActiveConnectionId(result.currentConnectionId);
           setOccupancyState('occupied_conflict');
-          return { status: 'occupied' };
+          return { status: 'occupied', currentConnectionId: result.currentConnectionId };
         }
 
         if (result?.status === 'connected') {
@@ -78,6 +176,17 @@ export function useSessionOccupancy({ sessionId, passId, isAdmitted }) {
       }
     },
     [sessionId, passId]
+  );
+
+  // Retry claim handler (guarded to error state only)
+  const retryClaim = useCallback(
+    async () => {
+      if (occupancyState !== 'error') {
+        return;
+      }
+      return claimSlot(false);
+    },
+    [occupancyState, claimSlot]
   );
 
   // 2. Real-time Displacement Subscription (pass owner read)
@@ -172,16 +281,24 @@ export function useSessionOccupancy({ sessionId, passId, isAdmitted }) {
 
   // 5. Trigger Initial Claim when Admitted
   useEffect(() => {
-    if (isAdmitted && occupancyState === 'idle' && !hasClaimedRef.current) {
+    if (
+      shouldTriggerAutoClaim({
+        isAdmitted,
+        occupancyState,
+        hasClaimed: hasClaimedRef.current,
+        isDismissed,
+      })
+    ) {
       claimSlot(false);
     }
-  }, [isAdmitted, occupancyState, claimSlot]);
+  }, [isAdmitted, occupancyState, isDismissed, claimSlot]);
 
   return {
     occupancyState,
     errorMessage,
     connectionId: connectionIdRef.current,
     claimSlot,
+    retryClaim,
     cooldownSeconds,
   };
 }
