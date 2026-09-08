@@ -39,5 +39,3 @@ service cloud.firestore {
     }
   }
 }
-
-// redeploy 2026-09-08T11:04:35.2335309-04:00
